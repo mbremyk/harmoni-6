@@ -1,3 +1,6 @@
+import Sequelize from 'sequelize';
+import { compare, hash } from 'bcrypt';
+import {sign, verify} from "jsonwebtoken";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");

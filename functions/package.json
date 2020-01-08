@@ -16,7 +16,10 @@
     "firebase-functions": "^3.3.0",
     "cors": "latest",
     "body-parser": "latest",
-    "express": "latest"
+    "express": "latest",
+    "sequelize": "^5.21.3",
+    "mysql": "^2.17.1",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.1.6"
