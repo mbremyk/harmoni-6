@@ -1,4 +1,6 @@
-Object.defineProperty(exports, "__esModule", {value: true});
+import Sequelize from 'sequelize';
+import { compare, hash } from 'bcrypt';
+import {sign, verify} from "jsonwebtoken";Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
