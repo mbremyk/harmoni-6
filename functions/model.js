@@ -3,14 +3,43 @@ const properties = require('../properties.js');
 
 let pr = new properties.Properties();
 
-let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
+/*let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
     host: "mysql",
     dialect: "mysql"
 }) : new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
     host: pr.databaseURL,//process.env.CI ? 'mysql' : 'localhost', // The host is 'mysql' when running in gitlab CI
-    dialect: pr.dialect,
-    logging: false
-});
+    dialect: pr.dialect
+});*/
+
+let sequlize = init();
+
+function init() {
+    if (!isCI){
+        let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
+            host: pr.databaseURL,
+            dialect: pr.dialect,
+            pool: {
+                max: 10,
+                min: 0,
+                idle: 10000
+            },
+        });
+        return sequelize;
+    }else{
+        console.log("CI");
+        let sequelize = new Sequelize('School', 'root', '', {
+            host: process.env.CI ? 'mysql' : 'localhost',
+            dialect: 'mysql',
+            pool: {
+                max: 10,
+                min: 0,
+                idle: 10000
+            },
+
+        });
+        return sequelize;
+    }
+}
 
 sequelize
     .authenticate()
