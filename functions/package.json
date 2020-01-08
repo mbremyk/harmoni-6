@@ -6,10 +6,15 @@
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "jest --detectOpenHandles --forceExit"
   },
   "engines": {
     "node": "8"
+  },
+  "jest": {
+    "testRegex": "./tests/.+Test\\.js$",
+    "testURL": "http://localhost"
   },
   "dependencies": {
     "body-parser": "latest",
@@ -25,6 +30,7 @@
   },
   "devDependencies": {
     "firebase-functions-test": "^0.1.6",
+    "babel-jest": "^24.9.0",
     "sequelize": "^5.21.3"
   },
   "private": true
