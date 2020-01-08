@@ -1,0 +1,36 @@
+{
+  "name": "public",
+  "version": "1.0.0",
+  "description": "Team 6 scrum",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "react-scripts build",
+    "start": "react-scripts start"
+  },
+  "author": "Team 6",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.0",
+    "react": "^16.12.0",
+    "react-scripts": "^3.3.0",
+    "react-simplified": "^1.6.1",
+    "scripts": "^0.1.0"
+  },
+  "devDependencies": {
+    "history": "^4.10.1",
+    "react-router-dom": "^5.1.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

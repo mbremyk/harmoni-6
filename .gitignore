@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+# Firebase hosting
+.firebase
+
 # Log file
 *.log
 
@@ -414,3 +417,4 @@ ASALocalRun/
 
 debug
 properties.js
+*/package-lock.json
