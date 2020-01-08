@@ -41,7 +41,7 @@ app.get("/concerts/search/:searchText", (req, res) => {
         .catch(error => console.error(error));
 });
 
-app.post("/createUser", (req, res) => {
+app.post("/user", (req, res) => {
     console.log("POST-request received from client");
     return model.UserModel.create({
         username: req.username,

@@ -13,7 +13,7 @@ class Services
 {
 	createUser(user)
 	{
-		return axios.post<User, void>('/createUser', user).then(response => response.data);
+		return axios.post<User, void>('/user', user).then(response => response.data);
 	}
 }
 
