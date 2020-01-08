@@ -17,10 +17,8 @@ export class myPage extends Component {
                         <Form.Control size="lg" value={this.name} onChange={(event: SyntheticInputEvent<HTMLInputElement>) => (this.name = event.target.value)}>
                         </Form.Control>
                     </Form.Group>
-                    <Form.Group>
-                        <Form.Label>E-post</Form.Label>
-                    </Form.Group>
                     <Form.Group controlId="formBasicEmail">
+                        <Form.Label>E-post</Form.Label>
                         <Form.Control size="lg" value={this.email} onChange={(event: SyntheticInputEvent<HTMLInputElement>) => (this.email = event.target.value)}>
                         </Form.Control>
                     </Form.Group>
