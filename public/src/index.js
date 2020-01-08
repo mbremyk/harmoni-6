@@ -4,7 +4,10 @@ import { HashRouter, BrowserRouter, Route,  NavLink } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
-import "@fortawesome/fontawesome-free"
+import "@fortawesome/fontawesome-free";
+import {myPage} from '../src/components/mypage.js';
+import {navbar} from '../src/components/navbar.js';
+
 
 
 //const history = createHashHistory();
@@ -31,7 +34,7 @@ function test(){
         }
     })
         .then(res => alert(res.body))
-        .catch(err => alert("an error occured"));
+        .catch(err => console.log("error"));
 }
 
 const root = document.getElementById('root');
@@ -39,7 +42,9 @@ if (root)
     ReactDOM.render(
     <BrowserRouter>
     <div>
-    <Route exact path="/" component={Test} />
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={Test}/>
+        <Route path="/min-side" component={myPage}/>
     </div>
     </BrowserRouter>,
 root
