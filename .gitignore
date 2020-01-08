@@ -416,5 +416,5 @@ ASALocalRun/
 .mfractor/
 
 debug
-*/properties.js
+functions/properties.js
 */package-lock.json
