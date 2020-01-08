@@ -35,13 +35,7 @@ class Test extends Component{
     }
 }
 
-class Login extends Component{
-    render() {
-        return(
-            <LoginForm/>
-        )
-    }
-}
+
 
 const root = document.getElementById('root');
 if (root)
@@ -49,7 +43,7 @@ if (root)
     <BrowserRouter>
     <div>
     <Route exact path="/" component={Test} />
-    <Route exact path="/logg-inn" component={Login} />
+    <Route exact path="/logg-inn" component={LoginForm} />
 
 
     </div>
