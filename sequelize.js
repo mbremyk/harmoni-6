@@ -1,3 +1,5 @@
+//@flow
+
 const Sequelize = require('sequelize');
 const properties = require('./properties.js');
 
@@ -96,13 +98,13 @@ let TicketModel: Class<Sequelize.Model<Ticket>> = sequelize.define('ticket', {
     amount: Sequelize.INTEGER
 });
 
-type Personell = {
-    personellId,
+type Personnel = {
+    personnelId,
     concertId
 }
 
-let PersonellModel: Class<Sequelize.Model<Personell>> = sequelize.define('personell', {
-    personellId: {
+let PersonnelModel: Class<Sequelize.Model<Personnel>> = sequelize.define('personnel', {
+    personnelId: {
         type: Sequelize.INTEGER, primaryKey: true, references: {
             model: UserModel,
             key: 'userId'
@@ -117,3 +119,5 @@ let PersonellModel: Class<Sequelize.Model<Personell>> = sequelize.define('person
 });
 
 sequelize.sync();
+
+module.exports = {UserModel, ConcertModel, GigModel, PersonnelModel, TicketModel};
