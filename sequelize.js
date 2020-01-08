@@ -62,7 +62,7 @@ let ConcertModel: Class<Sequelize.Model<Concert>> = sequelize.define('concert', 
     ageLimit: Sequelize.INTEGER,
     dateTime: Sequelize.DATE,
     description: Sequelize.TEXT,
-    contract: Sequelize.STRING
+    contract: Sequelize.BLOB
 });
 
 type Gig = {
@@ -95,3 +95,25 @@ let TicketModel: Class<Sequelize.Model<Ticket>> = sequelize.define('ticket', {
     price: Sequelize.INTEGER,
     amount: Sequelize.INTEGER
 });
+
+type Personell = {
+    personellId,
+    concertId
+}
+
+let PersonellModel: Class<Sequelize.Model<Personell>> = sequelize.define('personell', {
+    personellId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: UserModel,
+            key: 'userId'
+        }
+    },
+    concertId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: ConcertModel,
+            key: 'concertId'
+        }
+    }
+});
+
+sequelize.sync();
