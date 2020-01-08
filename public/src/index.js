@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
+import {LoginForm} from "./components/login";
 
 
 //const history = createHashHistory();
@@ -34,12 +35,23 @@ class Test extends Component{
     }
 }
 
+class Login extends Component{
+    render() {
+        return(
+            <LoginForm/>
+        )
+    }
+}
+
 const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
     <BrowserRouter>
     <div>
     <Route exact path="/" component={Test} />
+    <Route exact path="/logg-inn" component={Login} />
+
+
     </div>
     </BrowserRouter>,
 root

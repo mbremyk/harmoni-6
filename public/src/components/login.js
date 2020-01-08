@@ -4,6 +4,9 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
+import {service} from "../services";
+import {encrypt} from "../encryption";
+
 
 
 export class LoginForm extends Component{
@@ -14,6 +17,8 @@ export class LoginForm extends Component{
             password: ''
         };
         this.handleEmailChange = this.handleEmailChange.bind(this);
+        this.handlePasswordChange = this.handlePasswordChange.bind(this);
+
     }
 
     handleEmailChange(event) {
@@ -46,7 +51,11 @@ export class LoginForm extends Component{
     }
 
     hashPassword(){
-        return this.state.password
+        return encrypt(this.state.password);
+    }
+
+    getAccessToken(){
+        return service.getAccessToken(this.state.email, this.hashPassword(this.state.password))
     }
 
 
