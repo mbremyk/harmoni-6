@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
-const properties = require('../properties.js');
+const properties = require('./properties.js');
+const isCI = require('is-ci');
 
 let pr = new properties.Properties();
 
@@ -11,7 +12,7 @@ let pr = new properties.Properties();
     dialect: pr.dialect
 });*/
 
-let sequlize = init();
+let sequelize = init();
 
 function init() {
     if (!isCI){
@@ -23,6 +24,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
+            logging: false
         });
         return sequelize;
     }else{
@@ -35,7 +37,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
-
+            logging: false
         });
         return sequelize;
     }

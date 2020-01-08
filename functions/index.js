@@ -24,7 +24,7 @@ const deployed = true;
 
 function loginOk(username, password)
 {
-    return true;
+    return model.UserModel.findAll({where:{[op.and]:[{username:username},{password:password}]}}).length === 1;
 }
 
 app.get("/test", (req, res) => {
@@ -60,6 +60,13 @@ app.post("/user", (req, res) => {
     })
         .then(res.sendStatus(201))
         .catch(error => console.error(error));
+});
+
+app.post("/login", (req, res) => {
+    if(loginOk(req.body.username, req.body.password))
+    {
+
+    }
 });
 
 console.log("Server initalized");
