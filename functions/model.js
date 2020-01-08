@@ -30,7 +30,7 @@ class User {
 
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-    username: {type: Sequelize.STRING, unique: true},
+    username: {type: Sequelize.STRING, unique: true, allowNull: false},
     password: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
     email: Sequelize.STRING
@@ -55,9 +55,10 @@ let ConcertModel = sequelize.define('concert', {
         type: Sequelize.INTEGER, references: {
             model: UserModel,
             key: 'userId'
-        }
+        },
+        allowNull: false
     },
-    concertName: Sequelize.STRING,
+    concertName: {type:Sequelize.STRING, allowNull:false},
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
     dateTime: Sequelize.DATE,
