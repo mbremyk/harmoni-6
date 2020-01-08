@@ -48,7 +48,9 @@ app.post("/user", (req, res) => {
         password: req.password,
         salt:     req.salt,
         email:    req.email
-    });
+    })
+        .then(_ => res.send(201))
+        .catch(error => console.error(error))
 });
 
 console.log("Server initalized");
