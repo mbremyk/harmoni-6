@@ -39,6 +39,8 @@ if (root)
     ReactDOM.render(
     <BrowserRouter>
     <div>
+        <Route path="/"/>
+        <Route exact path="/min-side"/>
     <Route exact path="/" component={Test} />
     </div>
     </BrowserRouter>,
