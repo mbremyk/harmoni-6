@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
-
+import {addEvent} from '../src/components/createevent.js';
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -34,12 +34,14 @@ function test(){
         .catch(err => alert("an error occured"));
 }
 
+
 const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
     <BrowserRouter>
     <div>
     <Route exact path="/" component={Test} />
+    <Route exact path="/opprett-arrangement" component={addEvent} />
     </div>
     </BrowserRouter>,
 root
