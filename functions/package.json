@@ -20,7 +20,8 @@
     "mysql2": "^2.1.0",
     "sequelize": "^5.21.3",
     "mysql": "^2.17.1",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "is-ci": "latest"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.1.6",
