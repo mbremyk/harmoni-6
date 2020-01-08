@@ -7,7 +7,10 @@ const model = require('./model.js');
 model.syncModels();
 const sequelize = require("sequelize");
 const op = sequelize.Op;
+const jwt = require("jsonwebtoken");
 let cors = require("cors");
+
+let privateKey = (publicKey = "shhhhhverysecret");
 
 admin.initializeApp(functions.config().firebase);
 const app = express();
@@ -18,6 +21,11 @@ main.use('/api/v1', app);
 main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
+
+function loginOk(username, password)
+{
+    return true;
+}
 
 app.get("/test", (req, res) => {
     console.log(req);
@@ -41,14 +49,17 @@ app.get("/concerts/search/:searchText", (req, res) => {
         .catch(error => console.error(error));
 });
 
-app.post("/createUser", (req, res) => {
+app.post("/user", (req, res) => {
     console.log("POST-request received from client");
+    console.log(req.body);
     return model.UserModel.create({
-        username: req.username,
-        password: req.password,
-        salt:     req.salt,
-        email:    req.email
-    });
+        username: req.body.username,
+        password: req.body.password,
+        salt: req.body.salt,
+        email: req.body.email
+    })
+        .then(res.sendStatus(201))
+        .catch(error => console.error(error));
 });
 
 console.log("Server initalized");

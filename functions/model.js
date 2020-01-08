@@ -8,7 +8,8 @@ let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
     dialect: "mysql"
 }) : new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
     host: pr.databaseURL,//process.env.CI ? 'mysql' : 'localhost', // The host is 'mysql' when running in gitlab CI
-    dialect: pr.dialect
+    dialect: pr.dialect,
+    logging: false
 });
 
 sequelize
@@ -63,7 +64,6 @@ let ConcertModel = sequelize.define('concert', {
     ageLimit: Sequelize.INTEGER,
     dateTime: Sequelize.DATE,
     description: Sequelize.TEXT,
-    contract: Sequelize.BLOB
 });
 
 class Gig {
@@ -75,7 +75,8 @@ class Gig {
 let GigModel = sequelize.define('gig', {
     artistId: {type: Sequelize.INTEGER, primaryKey: true},
     concertId: {type: Sequelize.INTEGER, primaryKey: true},
-    rider: Sequelize.STRING
+    rider: Sequelize.BLOB,
+    contract: Sequelize.BLOB
 });
 
 class Ticket {
