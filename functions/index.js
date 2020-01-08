@@ -1,17 +1,17 @@
-import Sequelize from 'sequelize';
-import { compare, hash } from 'bcrypt';
-import {sign, verify} from "jsonwebtoken";
-
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
 const bodyParser = require("body-parser");
+const model = require('./model.js');
+model.syncModels();
+const sequelize = require("sequelize");
+const op = sequelize.Op;
 let cors = require("cors");
 
 admin.initializeApp(functions.config().firebase);
 const app = express();
-app.use(cors({origin:true}));
+app.use(cors({origin: true}));
 
 const main = express();
 main.use('/api/v1', app);
@@ -23,4 +23,32 @@ app.get("/test", (req, res) => {
     console.log(req);
     res.send("test functional");
 });
+
+app.get("/concerts", (req, res) => {
+    console.log("GET-request received from client");
+    return model.ConcertModel.findAll({order: [['dateTime', 'ASC']]})
+        .then(concerts => res.send(concerts))
+        .catch(error => console.error(error));
+});
+
+app.get("/concerts/search/:searchText", (req, res) => {
+    console.log("GET-request received from client");
+    return model.ConcertModel.findAll({
+        where: {[op.or]: [{concertName: {[op.like]: `%${req.params.searchText}%`}}, {description: {[op.like]: `%${req.params.searchText}%`}}]},
+        order: [['dateTime', 'ASC']]
+    })
+        .then(concerts => res.send(concerts))
+        .catch(error => console.error(error));
+});
+
+app.post("/createUser", (req, res) => {
+    console.log("POST-request received from client");
+    return model.UserModel.create({
+        username: req.username,
+        password: req.password,
+        salt:     req.salt,
+        email:    req.email
+    });
+});
+
 console.log("Server initalized");
