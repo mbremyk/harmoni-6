@@ -15,7 +15,11 @@
     "react": "^16.12.0",
     "react-scripts": "^3.3.0",
     "react-simplified": "^1.6.1",
-    "scripts": "^0.1.0"
+    "scripts": "^0.1.0",
+    "axios": "^0.19.1",
+    "react-bootstrap": "^1.0.0-beta.16",
+    "bootstrap": "^4.4.1",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "history": "^4.10.1",

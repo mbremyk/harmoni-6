@@ -17,7 +17,7 @@ class Test extends Component{
             <div>
                 <button onClick={test()}>Test webapp</button>
             </div>
-        )
+        );
     }
 }
 function test(){
