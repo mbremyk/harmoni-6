@@ -7,10 +7,7 @@ if(window.location.href.includes('localhost')){
 	url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
 
-console.log('url:');
-console.log(url);
-
-class User
+export class User
 {
 	userId;
 	username;

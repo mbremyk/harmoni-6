@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
-
+import {CreateUserForm} from '../src/components/createuser';
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -39,7 +39,7 @@ if (root)
     ReactDOM.render(
     <BrowserRouter>
     <div>
-    <Route exact path="/" component={Test} />
+    <Route exact path="/" component={CreateUserForm} />
     </div>
     </BrowserRouter>,
 root
