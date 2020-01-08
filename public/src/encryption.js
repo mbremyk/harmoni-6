@@ -8,6 +8,7 @@ async function encrypt(password, salt = '')
 		salt = await bcrypt.genSalt(saltRounds);
 	}
 	let hash = await bcrypt.hash(password, salt);
+	delete password;
 	return [hash, salt];
 }
 

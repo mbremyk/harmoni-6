@@ -44,10 +44,10 @@ app.get("/concerts/search/:searchText", (req, res) => {
 app.post("/user", (req, res) => {
     console.log("POST-request received from client");
     return model.UserModel.create({
-        username: req.username,
-        password: req.password,
-        salt:     req.salt,
-        email:    req.email
+        username: req.body.username,
+        password: req.body.password,
+        salt:     req.body.salt,
+        email:    req.body.email
     })
         .then(_ => res.send(201))
         .catch(error => console.error(error))
