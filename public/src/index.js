@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
+import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
 
@@ -44,6 +45,9 @@ if (root)
         <Route path="/" component={navbar}/>
         <Route exact path="/min-side" component={myPage}/>
     <Route exact path="/" component={Test} />
+    <Route exact path="/logg-inn" component={LoginForm} />
+
+
     </div>
     </BrowserRouter>,
 root
