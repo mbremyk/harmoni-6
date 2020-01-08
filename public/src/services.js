@@ -13,8 +13,13 @@ class Services
 {
 	createUser(user)
 	{
-		return axios.post<User, void>('/createUser', user).then(response => response.data);
+		return axios.post('/createUser', user).then(response => response.data);
 	}
+
+	getAccessToken(email, hashedPassword){
+		return axios.post('/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
+	}
+
 }
 
 export let service = new Services();

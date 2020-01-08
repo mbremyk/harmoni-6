@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 
+
 export class LoginForm extends Component{
     constructor(props) {
         super(props);
@@ -43,5 +44,14 @@ export class LoginForm extends Component{
             </Container>
         );
     }
+
+    hashPassword(){
+        return this.state.password
+    }
+
+
+
+
+
 }
 
