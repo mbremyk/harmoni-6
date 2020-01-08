@@ -39,6 +39,6 @@ export class navbar extends Component {
         );
     }
     search() {
-        console.log("search clicked");
+        alert("Search clicked");
     }
 }
