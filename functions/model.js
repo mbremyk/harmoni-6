@@ -31,7 +31,7 @@ class User
 	password;
 	salt;
 	email;
-};
+}
 
 let UserModel = sequelize.define('user', {
 	userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
@@ -123,6 +123,7 @@ class Personnel
 {
 	personnelId;
 	concertId;
+	role;
 }
 
 
@@ -139,7 +140,8 @@ let PersonnelModel = sequelize.define('personnel', {
 			model: ConcertModel,
 			key: 'concertId'
 		}
-	}
+	},
+	role: Sequelize.STRING
 }, {tableName: 'personnel'});
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
