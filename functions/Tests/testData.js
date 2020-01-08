@@ -1,132 +1,135 @@
-import {ConcertModel, GigModel, PersonnelModel, TicketModel, UserModel} from '../model.js';
+const model = require('../model');
+
 
 const Sequelize = require('sequelize');
 const properties = require('../properties.js');
 
-let pr = new properties.TestProperties();
+let pr_test = new properties.TestProperties();
 
 let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
 	host: "mysql",
 	dialect: "mysql"
-}) : new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-	host: pr.databaseURL,//process.env.CI ? 'mysql' : 'localhost', // The host is 'mysql' when running in gitlab CI
-	dialect: pr.dialect
+}) : new Sequelize(pr_test.databaseName, pr_test.databaseUser, pr_test.databasePassword, {
+	host: pr_test.databaseURL,//process.env.CI ? 'mysql' : 'localhost', // The host is 'mysql' when running in gitlab CI
+	dialect: pr_test.dialect
 });
 
-export let syncTestData = sequelize.sync({force: true}).then(() =>
+let syncTestData = () => sequelize.sync({force: true}).then(() =>
 {
 	return (
-		UserModel.bulkCreate([
+		model.UserModel.bulkCreate([
 			{
-				name: 'TestBruker1',
+				username: 'TestBruker1',
 				password: 'TestBruker1',
 				salt: '1',
 				email: '1@mail.com'
 			},
 			{
-				name: 'TestBruker2',
+				username: 'TestBruker2',
 				password: 'TestBruker2',
 				salt: '2',
 				email: '2@mail.com'
 			},
 			{
-				name: 'TestBruker3',
+				username: 'TestBruker3',
 				password: 'TestBruker3',
 				salt: '3',
 				email: '3@mail.com'
 			},
 			{
-				name: 'TestBruker4',
+				username: 'TestBruker4',
 				password: 'TestBruker4',
 				salt: '4',
 				email: '4@mail.com'
 			},
 			{
-				name: 'TestBruker5',
+				username: 'TestBruker5',
 				password: 'TestBruker5',
 				salt: '5',
 				email: '5@mail.com'
 			},
 			{
-				name: 'TestBruker6',
+				username: 'TestBruker6',
 				password: 'TestBruker6',
 				salt: '6',
 				email: '6@mail.com'
 			}]).then(() =>
 		{
-			ConcertModel.bulkCreate([
+			model.ConcertModel.bulkCreate([
 				{
+					organizerId: '1',
+					concertName: 'Test1',
 					address: 'Adresse1',
-					organizerID: '1',
 					ageLimit: '12',
-					dateTime: '',
+					dateTime: 'Soon',
 					description: 'Konsert for barn',
-					contract: 'BLOB'
+					contract: 'BLOB1'
 				},
 				{
+					organizerId: '2',
+					concertName: 'Test1',
 					address: 'Adresse2',
-					organizerID: '2',
 					ageLimit: '20',
-					dateTime: '',
+					dateTime: 'Kinda soon',
 					description: 'Konsert for voksne',
-					contract: 'BLOB'
+					contract: 'BLOB2'
 				}]).then(() =>
 			{
-				GigModel.bulkCreate([
+				model.GigModel.bulkCreate([
 					{
-						concertID: '1',
-						userID: '1',
-						rider: 'BLOB'
+						artistId: '1',
+						concertId: '1',
+						rider: 'BLOB3'
 					},
 					{
-						concertID: '2',
-						userID: '2',
-						rider: 'BLOB'
+						artistId: '2',
+						concertId: '2',
+						rider: 'BLOB4'
 					}]).then(() =>
 				{
-					PersonnelModel.bulkCreate([
+					model.PersonnelModel.bulkCreate([
 						{
-							concertID: '1',
-							userID: '3',
-							rolle: 'Lyd'
+							personnelId: '3',
+							concertId: '1',
+							role: 'Lyd'
 						},
 						{
-							concertID: '1',
-							userID: '4',
-							rolle: 'Lys'
+							personnelId: '4',
+							concertId: '1',
+							role: 'Lys'
 						},
 						{
-							concertID: '1',
-							userID: '5',
-							rolle: 'Sikkerhet'
+							personnelId: '5',
+							concertId: '1',
+							role: 'Sikkerhet'
 						},
 						{
-							concertID: '2',
-							userID: '6',
-							rolle: 'Lyd'
+							personnelId: '6',
+							concertId: '2',
+							role: 'Lyd'
 						}]).then(() =>
 					{
-						TicketModel.bulkCreate([
+						model.TicketModel.bulkCreate([
 							{
-								concertID: '1',
+								concertId: '1',
 								type: '1',
 								price: '99',
 								amount: '1'
 							},
 							{
-								concertID: '1',
+								concertId: '1',
 								type: '2',
 								price: '149',
 								amount: '2'
 							},
 							{
-								concertID: '1',
+								concertId: '1',
 								type: '3',
 								price: '199',
 								amount: '100'
 							},
 							{
-								conecertID: '2',
+								conecertId: '2',
 								type: '2',
 								price: '299',
 								amount: '200'
@@ -136,5 +139,7 @@ export let syncTestData = sequelize.sync({force: true}).then(() =>
 				});
 			});
 		})
-	);
+	).catch(error => console.log(error));
 });
+
+module.exports = {syncTestData};
