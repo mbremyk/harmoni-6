@@ -1,9 +1,7 @@
-//@flow
-
 const Sequelize = require('sequelize');
-const properties = require('./properties.js');
+const properties = require('../properties.js');
 
-let pr = new Properties();
+let pr = new properties.Properties();
 
 let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
     host: "mysql",
@@ -22,15 +20,15 @@ sequelize
         console.error('Unable to connect to the database:', err);
     });
 
-type User = {
-    userId,
-    username,
-    password,
-    salt,
-    email
+class User {
+    userId;
+    username;
+    password;
+    salt;
+    email;
 };
 
-let UserModel: Class<Sequelize.Model<User>> = sequelize.define('user', {
+let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     username: {type: Sequelize.STRING, unique: true},
     password: Sequelize.STRING.BINARY,
@@ -40,18 +38,18 @@ let UserModel: Class<Sequelize.Model<User>> = sequelize.define('user', {
     timestamps: true
 });
 
-type Concert = {
-    concertId,
-    organizerId,    //userId
-    concertName,
-    address,
-    ageLimit,
-    dateTime,
-    description,
-    contract
+class Concert {
+    concertId;
+    organizerId;    //userId
+    concertName;
+    address;
+    ageLimit;
+    dateTime;
+    description;
+    contract;
 }
 
-let ConcertModel: Class<Sequelize.Model<Concert>> = sequelize.define('concert', {
+let ConcertModel = sequelize.define('concert', {
     concertId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     organizerId: {
         type: Sequelize.INTEGER, references: {
@@ -67,26 +65,26 @@ let ConcertModel: Class<Sequelize.Model<Concert>> = sequelize.define('concert', 
     contract: Sequelize.BLOB
 });
 
-type Gig = {
-    artistId,
-    concertId,
-    rider
+class Gig {
+    artistId;
+    concertId;
+    rider;
 }
 
-let GigModel: Class<Sequelize.Model<Gig>> = sequelize.define('gig', {
+let GigModel = sequelize.define('gig', {
     artistId: {type: Sequelize.INTEGER, primaryKey: true},
     concertId: {type: Sequelize.INTEGER, primaryKey: true},
     rider: Sequelize.STRING
 });
 
-type Ticket = {
-    concertId,
-    type,
-    price,
-    amount
+class Ticket {
+    concertId;
+    type;
+    price;
+    amount;
 }
 
-let TicketModel: Class<Sequelize.Model<Ticket>> = sequelize.define('ticket', {
+let TicketModel = sequelize.define('ticket', {
     concertId: {
         type: Sequelize.INTEGER, primaryKey: true, references: {
             model: ConcertModel,
@@ -98,12 +96,12 @@ let TicketModel: Class<Sequelize.Model<Ticket>> = sequelize.define('ticket', {
     amount: Sequelize.INTEGER
 });
 
-type Personnel = {
-    personnelId,
-    concertId
+class Personnel {
+    personnelId;
+    concertId;
 }
 
-let PersonnelModel: Class<Sequelize.Model<Personnel>> = sequelize.define('personnel', {
+let PersonnelModel = sequelize.define('personnel', {
     personnelId: {
         type: Sequelize.INTEGER, primaryKey: true, references: {
             model: UserModel,
@@ -116,8 +114,8 @@ let PersonnelModel: Class<Sequelize.Model<Personnel>> = sequelize.define('person
             key: 'concertId'
         }
     }
-});
+}, {tableName: 'personnel'});
 
-sequelize.sync();
+let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
-module.exports = {UserModel, ConcertModel, GigModel, PersonnelModel, TicketModel};
+module.exports = {UserModel, ConcertModel, GigModel, PersonnelModel, TicketModel, syncModels};
