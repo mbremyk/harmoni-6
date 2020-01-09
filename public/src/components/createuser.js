@@ -63,10 +63,6 @@ export class CreateUserForm extends Component{
 			.then(res => console.log('Submit user status: ' + res))
 			.catch(err => alert("En feil oppsto."));
 	}
-	cancel() {
-		console.log('Canceled create user');
-		alert('Canceled');
-	}
 
 	render(){
 		return(
@@ -92,7 +88,7 @@ export class CreateUserForm extends Component{
 					<Button onClick={this.handleSubmit} variant="primary" type="button">
 						Opprett bruker
 					</Button>
-					<Button href="logg-inn" onClick={this.cancel()} variant="secondary" type="button">
+					<Button href="hjem" variant="secondary" type="button">
 						Avbryt
 					</Button>
 				</Form>
