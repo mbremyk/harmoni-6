@@ -22,8 +22,8 @@ main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
 
-function loginOk(username, password) {
-    return model.UserModel.findAll({where: {[op.and]: [{username: username}, {password: password}]}})
+function loginOk(email, password) {
+    return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
         .then(response => {
             return response.length === 1;
         });
@@ -76,8 +76,8 @@ app.get("/salt/:email", (req, res) => {
 
 app.post("/login", (req, res) => {
 	console.log("POST-request received from client");
-    if (loginOk(req.body.username, req.body.password)) {
-        let token = jwt.sign({username: req.body.username}, privateKey, {
+    if (loginOk(req.body.email, req.body.password)) {
+        let token = jwt.sign({email: req.body.email}, privateKey, {
             expiresIn: 1800
         });
         res.json({jwt: token})
@@ -98,7 +98,7 @@ app.use("/auth", (req, res, next) => {
             res.json({error: "Not authorized"});
         } else {
             console.log("Token OK");
-            next(decoded.username);
+            next();
         }
     })
 });
