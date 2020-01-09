@@ -7,8 +7,6 @@ import NavLink from "react-bootstrap/NavLink";
 import {service} from "../services";
 import {hashPassword} from "../userhandling";
 
-
-
 export class LoginForm extends Component{
     constructor(props) {
         super(props);
@@ -26,6 +24,23 @@ export class LoginForm extends Component{
     }
     handlePasswordChange(event) {
         this.setState({password: event.target.value});
+    }
+    handleLogin() {
+        service.getSalt(this.state.email)
+            .then(salt => hashPassword(this.state.password, salt)
+                .then(credentials => login(credentials)))
+                .catch(err => alert("En feil oppsto. hash"))
+            .catch(err => alert("En feil oppsto. salt"));
+    }
+
+    login(credentials) {
+        service.getAccessToken(this.state.email, credentials[0])
+            .then(token => )
+            .catch(err => alert("En feil oppsto. token"))
+    }
+
+    getAccessToken(){
+        return service.getAccessToken(this.state.email)
     }
 
     render(){
@@ -49,16 +64,6 @@ export class LoginForm extends Component{
             </Container>
         );
     }
-
-    hashPassword(){
-        return hashPassword(this.state.password);
-    }
-
-    getAccessToken(){
-        return service.getAccessToken(this.state.email, this.hashPassword(this.state.password))
-    }
-
-
 
 
 
