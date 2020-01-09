@@ -12,6 +12,12 @@ import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
 
+import Dropdown from "react-bootstrap/Dropdown";
+import FormControl from "react-bootstrap/FormControl";
+import {Button} from "react-bootstrap";
+import ListGroup from "react-bootstrap/ListGroup";
+import ListGroupItem from "react-bootstrap/ListGroupItem";
+
 export class addEvent extends Component{
 
     eventName = "";
@@ -22,6 +28,35 @@ export class addEvent extends Component{
 
     ageLimit = 0;
 
+    CustomMenu = React.forwardRef(
+        ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
+            const [value, setValue] = React.useState('');
+
+            return (
+                <div
+                    ref={ref}
+                    style={style}
+                    className={className}
+                    aria-labelledby={labeledBy}
+                >
+                    <FormControl
+                        autoFocus
+                        className="mx-3 my-2 w-auto"
+                        placeholder="Type to filter..."
+                        onChange={e => setValue(e.target.value)}
+                        value={value}
+                    />
+                    <ul className="list-unstyled">
+                        {React.Children.toArray(children).filter(
+                            child =>
+                                !value || child.props.children.toLowerCase().startsWith(value),
+                        )}
+                    </ul>
+                </div>
+            );
+        },
+    );
+
     state = {
         fDate: new Date(),
         tDate: new Date()
@@ -30,6 +65,8 @@ export class addEvent extends Component{
     riderFilename = "";
 
     onChange = (date) => this.setState({ date });
+
+    artists = [];
 
     render(){
         return(
@@ -114,6 +151,10 @@ export class addEvent extends Component{
                             </InputGroup.Append>
                         </InputGroup>
                     </ButtonToolbar>
+                        <Dropdown onSelect={(eventKey) => this.addArtist(eventKey)}>
+                            <Dropdown.Toggle variant={"success"} id="dropdown">
+                                Velg artist
+                            </Dropdown.Toggle>
 
                     <Row>
                         <Col>
@@ -132,7 +173,22 @@ export class addEvent extends Component{
                             <Button type="submit">Opprett arrangementet</Button>
                         </Col>
                     </Row>
-                </Form>
+                            <Dropdown.Menu as={this.CustomMenu}>
+                                <Dropdown.Item eventKey="Marius">Marius</Dropdown.Item>
+                                <Dropdown.Item eventKey="Jakob">Jakob</Dropdown.Item>
+                                <Dropdown.Item eventKey="Steffen">Steffen</Dropdown.Item>
+                                <Dropdown.Item eventKey="Jan">Jan</Dropdown.Item>
+                            </Dropdown.Menu>
+
+                        </Dropdown>
+                            <ListGroup title={"Valgte artister"}>
+                                {this.artists.map(artist => (
+                                    <React.Fragment key={artist}>
+                                    <ListGroupItem>
+                                    {artist}
+                                </ListGroupItem></React.Fragment>))}
+                            </ListGroup>
+                    </Form>
             </Container>
         );
     }
@@ -160,4 +216,8 @@ export class addEvent extends Component{
         }
     }
 
+
+    addArtist(eventKey) {
+        this.artists.push(eventKey);
+    }
 }
