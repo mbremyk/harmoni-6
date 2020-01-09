@@ -56,8 +56,8 @@ app.post("/user", (req, res) => {
     return model.UserModel.create({
         username: req.body.username,
         password: req.body.password,
-        salt:     req.body.salt,
-        email:    req.body.email
+        salt: req.body.salt,
+        email: req.body.email
     })
         .then(res.status(201))
         .catch(error => {
@@ -75,7 +75,7 @@ app.get("/salt/:email", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-	console.log("POST-request received from client");
+    console.log("POST-request received from client");
     if (loginOk(req.body.email, req.body.password)) {
         let token = jwt.sign({email: req.body.email}, privateKey, {
             expiresIn: 1800
@@ -90,9 +90,8 @@ app.post("/login", (req, res) => {
 app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
     let token = req.headers["x-access-token"];
-    console.log(token);
     jwt.verify(token, publicKey, (err, decoded) => {
-        if (err) {
+        if (err || decoded.username !== req.body.username) {
             console.log("Token not OK");
             res.status(401);
             res.json({error: "Not authorized"});
@@ -105,8 +104,7 @@ app.use("/auth", (req, res, next) => {
 
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
-
-    return model.UserModel.findAll({where: {userId: req.params.userId}})
+    return model.UserModel.findAll({where: {[op.and]: [{userId: req.params.userId}, {username: req.body.username}]}})
         .then(user => {
             if (user.length === 1) {
                 return user;
