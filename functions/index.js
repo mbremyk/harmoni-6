@@ -66,6 +66,14 @@ app.post("/user", (req, res) => {
         });
 });
 
+app.get("/salt/:email", (req, res) => {
+    console.log("GET-request received from client");
+
+    return model.UserModel.findAll({where: {email:req.params.email}, attributes:['salt']})
+        .then(salt => res.send(salt))
+        .catch(error => console.error(error));
+});
+
 app.post("/login", (req, res) => {
 	console.log("POST-request received from client");
     if (loginOk(req.body.username, req.body.password)) {
@@ -107,6 +115,14 @@ app.get("/auth/user/:userId", (req, res) => {
             }
         })
         .then(user => res.send(user))
+        .catch(error => console.error(error));
+});
+
+app.get("/tickets/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+
+    return model.TicketModel.findAll({where: {eventId: req.params.eventId}})
+        .then(tickets => res.send(tickets))
         .catch(error => console.error(error));
 });
 
