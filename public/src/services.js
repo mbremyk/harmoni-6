@@ -9,11 +9,32 @@ export class User
 	email;
 }
 
+export class Event
+{
+	eventId;
+	eventName;
+	adress;
+	ageLimit;
+	image;
+	Startdate;
+	Enddate;
+	discription;
+
+}
+
+
+
+
 class Services
 {
 	createUser(user)
 	{
-		return axios.post<User, void>('/createUser', user).then(response => response.data);
+		//eturn axios.post<User, void>('/createUser', user).then(response => response.data);
+	}
+
+	getEvents()
+	{
+		//return axios.get<Events[]>('/events').then(response => response.data);
 	}
 }
 

@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
+import {LandingPage} from "./components/frontpage";
 
 
 //const history = createHashHistory();
@@ -40,6 +41,7 @@ if (root)
     <BrowserRouter>
     <div>
     <Route exact path="/" component={Test} />
+    <Route exact path="/" component={LandingPage}/>
     </div>
     </BrowserRouter>,
 root
