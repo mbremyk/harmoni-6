@@ -63,8 +63,8 @@ export class CreateUserForm extends Component{
 		user.password = credentials[0];
 		user.salt     = credentials[1];
 
-		alert('Hash and salt\n' + credentials[0] + '\n' + credentials[1]);
-		return;
+		//alert('Hash and salt\n' + credentials[0] + '\n' + credentials[1]);
+		//return;
 
 		service.createUser(user)
 			.then(res => console.log('Submit user status: ' + res))
