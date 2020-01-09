@@ -25,7 +25,7 @@ class Services
 	}
 
 	getAccessToken(email, hashedPassword){
-		return axios.post('/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
+		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
 
 }

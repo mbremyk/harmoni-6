@@ -43,6 +43,7 @@ if (root)
     <div>
     <Route exact path="/" component={Test} />
     <Route exact path="/logg-inn" component={LoginForm} />
+    <Route exact path="/nybruker" component={CreateUserForm} />
 
 
     </div>
