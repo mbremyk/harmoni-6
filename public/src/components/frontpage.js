@@ -58,52 +58,17 @@ export class LandingPage extends Component
 
 					<Row>
 
+						{this.events.map(event => (
+							<EventInfo image= {event.image}
+							           title= {event.title}
+							           address={event.address}
+							           price= "0"
+							           age_limit={event.ageLimit}
+							           start_date={event.startTime}
+							           end_date={event.endTime}  />
+						))}
 
 
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
 
 					</Row>
 				</Container>

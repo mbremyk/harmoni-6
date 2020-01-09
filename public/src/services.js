@@ -19,14 +19,17 @@ export class User
 
 export class Event
 {
+
 	eventId;
+	organizerId;
 	eventName;
 	address;
 	ageLimit;
+	startTime;
+	endTime;
 	image;
-	startDate;
-	endDate;
 	description;
+
 
 }
 

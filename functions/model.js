@@ -189,7 +189,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 				email: '6@mail.com'
 			}]).then(() =>
 		{
-			ConcertModel.bulkCreate([
+			EventModel.bulkCreate([
 				{
 					organizerId: '1',
 					concertName: 'Test1',

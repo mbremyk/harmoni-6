@@ -7,7 +7,7 @@ export class EventInfo extends Component
 {
 	image;
 	title;
-	adress;
+	address;
 	price;
 	age_limit;
 	start_date;
@@ -32,7 +32,7 @@ export class EventInfo extends Component
 							<div className="font-weight-bold ">
 								Adresse
 							</div>
-							{this.props.adress}
+							{this.props.address}
 
 
 							<div className="font-weight-bold">
