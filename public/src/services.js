@@ -1,5 +1,5 @@
 //const axios = require('axios');
-import { axios } from 'axios'
+import axios from 'axios'
 
 var url = '';
 if(window.location.href.includes('localhost')){
@@ -47,7 +47,7 @@ class Services
 	}
 
 	getAccessToken(email, hashedPassword){
-		return axios.post('/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
+		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
 
 }

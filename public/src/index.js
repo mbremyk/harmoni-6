@@ -5,12 +5,11 @@ import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
+import {CreateUserForm} from '../src/components/createuser';
 import {LandingPage} from "./components/frontpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
-
-import {CreateUserForm} from '../src/components/createuser';
 
 //const history = createHashHistory();
 const history = createBrowserHistory();

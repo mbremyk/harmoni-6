@@ -49,22 +49,19 @@ export class CreateUserForm extends Component{
 			.catch(err => alert("En feil oppsto."));
 	}
 	submit(credentials) {
-		console.log('Submit user');
+		console.log('Submit user' + credentials);
 		let user      = new User();
 		user.email    = this.state.email;
 		user.username = this.state.username;
 		user.password = credentials[0];
 		user.salt     = credentials[1];
 
-		alert(credentials);
+		alert('Hash and salt\n' + credentials[0] + '\n' + credentials[1]);
 		return;
 
 		service.createUser(user)
 			.then(res => console.log('Submit user status: ' + res))
 			.catch(err => alert("En feil oppsto."));
-	}
-	cancel() {
-		console.log('Canceled create user');
 	}
 
 	render(){
@@ -91,7 +88,7 @@ export class CreateUserForm extends Component{
 					<Button onClick={this.handleSubmit} variant="primary" type="button">
 						Opprett bruker
 					</Button>
-					<Button href="logg-inn" onClick={this.cancel()} variant="secondary" type="button">
+					<Button href="hjem" variant="secondary" type="button">
 						Avbryt
 					</Button>
 				</Form>
