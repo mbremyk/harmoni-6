@@ -1,7 +1,6 @@
 const Models = require('../model.js');
-const testData = require('./testData.js');
 
-beforeAll(() => testData.syncTestData);
+beforeAll(() => Models.syncTestData);
 
 describe('Correct Data', () =>
 {
