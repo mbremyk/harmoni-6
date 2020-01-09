@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const properties = require('../properties.js');
+const properties = require('./properties.js');
 const isCI = require('is-ci');
 
 let pr = new properties.Properties();
@@ -12,7 +12,7 @@ let pr = new properties.Properties();
     dialect: pr.dialect
 });*/
 
-let sequlize = init();
+let sequelize = init();
 
 function init() {
     if (!isCI){
@@ -24,6 +24,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
+            logging: false
         });
         return sequelize;
     }else{
@@ -36,7 +37,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
-
+            logging: false
         });
         return sequelize;
     }
@@ -51,17 +52,17 @@ sequelize
         console.error('Unable to connect to the database:', err);
     });
 
-class User {
+/*class User {
     userId;
     username;
     password;
     salt;
     email;
-};
+};*/
 
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-    username: {type: Sequelize.STRING, unique: true},
+    username: {type: Sequelize.STRING, unique: true, allowNull: false},
     password: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
     email: Sequelize.STRING
@@ -69,7 +70,7 @@ let UserModel = sequelize.define('user', {
     timestamps: true
 });
 
-class Concert {
+/*class Concert {
     concertId;
     organizerId;    //userId
     concertName;
@@ -77,8 +78,7 @@ class Concert {
     ageLimit;
     dateTime;
     description;
-    contract;
-}
+}*/
 
 let ConcertModel = sequelize.define('concert', {
     concertId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
@@ -86,34 +86,36 @@ let ConcertModel = sequelize.define('concert', {
         type: Sequelize.INTEGER, references: {
             model: UserModel,
             key: 'userId'
-        }
+        },
+        allowNull: false
     },
-    concertName: Sequelize.STRING,
+    concertName: {type:Sequelize.STRING, allowNull:false},
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
     dateTime: Sequelize.DATE,
     description: Sequelize.TEXT,
-    contract: Sequelize.BLOB
 });
 
-class Gig {
+/*class Gig {
     artistId;
     concertId;
     rider;
-}
+    contract;
+}*/
 
 let GigModel = sequelize.define('gig', {
     artistId: {type: Sequelize.INTEGER, primaryKey: true},
     concertId: {type: Sequelize.INTEGER, primaryKey: true},
-    rider: Sequelize.STRING
+    rider: Sequelize.BLOB,
+    contract: Sequelize.BLOB
 });
 
-class Ticket {
+/*class Ticket {
     concertId;
     type;
     price;
     amount;
-}
+}*/
 
 let TicketModel = sequelize.define('ticket', {
     concertId: {
@@ -127,10 +129,10 @@ let TicketModel = sequelize.define('ticket', {
     amount: Sequelize.INTEGER
 });
 
-class Personnel {
+/*class Personnel {
     personnelId;
     concertId;
-}
+}*/
 
 let PersonnelModel = sequelize.define('personnel', {
     personnelId: {
