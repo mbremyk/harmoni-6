@@ -111,7 +111,7 @@ app.get("/auth/user/:userId", (req, res) => {
 });
 
 app.get("/tickets/:eventId", (req, res) => {
-    concole.log("GET-request received from client");
+    console.log("GET-request received from client");
 
     return model.TicketModel.findAll({where: {eventId: req.params.eventId}})
         .then(tickets => res.send(tickets))
