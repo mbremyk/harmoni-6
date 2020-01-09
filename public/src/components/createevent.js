@@ -15,14 +15,6 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 
 export class addEvent extends Component{
 
-    eventName = "";
-
-    eventAdress = "";
-
-    eventDescription = "";
-
-    ageLimit = 0;
-
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
             const [value, setValue] = React.useState('');
@@ -52,12 +44,43 @@ export class addEvent extends Component{
         },
     );
 
-    state = {
-        fDate: new Date(),
-        tDate: new Date()
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            eventName: '',
+            eventAddress: '',
+            eventDescription: '',
+            ageLimit: 0,
+            fDate: new Date(),
+            tDate: new Date(),
+            riderFilename: '',
+        };
+        this.eventName = this.handleEventNameChange.bind(this);
+        this.eventAddress = this.handleEventAddressChange.bind(this);
+        this.eventDescription = this.handleEventDescriptionChange.bind(this);
+        this.ageLimit = this.handleAgeLimitChange.bind(this);
+        this.riderFilename = this.handleRiderChange.bind(this);
+    }
 
-    riderFilename = "";
+    handleEventNameChange(event){
+        this.setState({eventName: event.target.value});
+    }
+
+    handleEventAddressChange(event){
+        this.setState({eventAddress: event.target.value});
+    }
+
+    handleEventDescriptionChange(event){
+        this.setState({eventDescription: event.target.value});
+    }
+
+    handleAgeLimitChange(event){
+        this.setState({ageLimit: event.target.value});
+    }
+
+    handleRiderChange(event){
+        this.setState({riderFilename: event.target.value})
+    }
 
     onChange = (date) => this.setState({ date });
 
@@ -77,11 +100,8 @@ export class addEvent extends Component{
                             <Form.Label>Arrangementsnavn</Form.Label>
                             <Form.Control
                                 placeholder="Navn på arrangement . . ."
-                                value={this.eventName}
-                                onChange={(event) => {
-                                    this.eventName = event.target.value;
-                                }
-                                }
+                                value={this.state.eventName}
+                                onChange={this.handleEventNameChange}
                             />
                         </Form.Group>
 
@@ -89,8 +109,8 @@ export class addEvent extends Component{
                             <Form.Label>Adresse</Form.Label>
                                 <Form.Control
                                     placeholder="Adresse der arrangementet skal holdes . . ."
-                                    value={this.eventAdress}
-                                    onChange={(event) => {this.eventAdress = event.target.value}}
+                                    value={this.state.eventAddress}
+                                    onChange={this.handleEventAddressChange}
 
                                 />
                         </Form.Group>
@@ -101,8 +121,8 @@ export class addEvent extends Component{
                                     placeholder="Her kan du skrive en kort beskrivelse av arrangementet (max. 500 ord) . . ."
                                     as="textarea"
                                     rows="8"
-                                    value={this.eventDescription}
-                                    onChange={(event) => this.eventDescription = event.target.value}
+                                    value={this.state.eventDescription}
+                                    onChange={this.handleEventDescriptionChange}
                                 />
                         </Form.Group>
 
@@ -156,6 +176,7 @@ export class addEvent extends Component{
 
                         <Form.Group as={Col} sm={"6"}>
                             <Form.Label>Til Dato:</Form.Label>
+
                             <DateTimePicker
                                 className="m-4 font-weight-bold"
                                 id='toDatePicker'
@@ -177,8 +198,9 @@ export class addEvent extends Component{
 
                                 <InputGroup>
                                     <FormControl
-                                        value={this.ageLimit}
-                                        onChange={(event) => this.ageLimit = event.target.value}
+                                        type="input"
+                                        value={this.state.ageLimit}
+                                        onChange={this.handleAgeLimitChange}
                                         aria-label="btn-age"
                                         aria-describedby="btnGroupAddon"
                                     />
@@ -195,7 +217,7 @@ export class addEvent extends Component{
                             <InputGroup className="mb-5">
                                 <FormControl
                                     type="file"
-                                    value={this.riderFilename}
+                                    value={this.state.riderFilename}
                                 />
                             </InputGroup>
                         </Form.Group>
@@ -223,13 +245,16 @@ export class addEvent extends Component{
         });
     }
 
+
     IncrementAge(){
-        this.ageLimit++;
+        this.state.ageLimit++;
+        this.setState({ageLimit: this.state.ageLimit});
     }
 
     decrementAge(){
-        if (this.ageLimit > 0) {
-            this.ageLimit--;
+        if (this.state.ageLimit > 0) {
+            this.state.ageLimit--;
+            this.setState({ageLimit: this.state.ageLimit})
         }
     }
 
