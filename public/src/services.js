@@ -51,11 +51,6 @@ class Services
 	getAccessToken(email, hashedPassword){
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
-
-	verifyToken() {
-		return true;
-	}
-
 }
 
 export let service = new Services();
