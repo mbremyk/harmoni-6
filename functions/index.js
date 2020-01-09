@@ -8,6 +8,7 @@ model.syncModels();
 const sequelize = require("sequelize");
 const op = sequelize.Op;
 const jwt = require("jsonwebtoken");
+const fileHandler = require("./filehandler");
 let cors = require("cors");
 
 let privateKey = (publicKey = "shhhhhverysecret");
@@ -74,6 +75,10 @@ app.post("/login", (req, res) => {
         res.status(401);
         res.json({error: "Not authorized"});
     }
+});
+
+app.post("/file", (req, res) => {
+    fileHandler.setContract(res.body);
 });
 
 console.log("Server initalized");

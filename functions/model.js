@@ -4,11 +4,12 @@ const isCI = require('is-ci');
 
 function init()
 {
-    let test = process.env.NODE_ENV === 'test';
+    //let test = process.env.NODE_ENV === 'test';
+	let test = true;
 	if (isCI)
 	{
 		console.log("CI");
-		sequelize = new Sequelize('School', 'root', '', {
+		let sequelize = new Sequelize('School', 'root', '', {
 			host: process.env.CI ? 'mysql' : 'localhost',
 			dialect: 'mysql',
 			pool: {
@@ -22,8 +23,9 @@ function init()
 	}
 	else
 	{
-		let pr = test ? new properties.TestProperties() : new properties.Properties();
-		sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
+		let pr = test ? new properties.SebProperties() : new properties.Properties();
+		console.log(pr.databaseUser);
+		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
 			host: pr.databaseURL,
 			dialect: pr.dialect,
 			pool: {
@@ -147,12 +149,12 @@ let PersonnelModel = sequelize.define('personnel', {
 	}
 }, {tableName: 'personnel'});
 
-let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
+let syncModels = () => sequelize.sync({force: true}).then().catch(error => console.log(error));
 
 /*
 creates tables in the testdatabase and inserts the test data
 */
-let syncTestData = () => sequelize.sync({force: true}).then(() =>
+let syncTestData = () => sequelize.sync({force: false}).then(() =>
 {
 	return (
 		UserModel.bulkCreate([
@@ -199,7 +201,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 					concertName: 'Test1',
 					address: 'Adresse1',
 					ageLimit: '12',
-					dateTime: 'Soon',
+					dateTime: null,
 					description: 'Konsert for barn',
 					contract: 'BLOB1'
 				},
@@ -208,7 +210,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 					concertName: 'Test1',
 					address: 'Adresse2',
 					ageLimit: '20',
-					dateTime: 'Kinda soon',
+					dateTime: null,
 					description: 'Konsert for voksne',
 					contract: 'BLOB2'
 				}]).then(() =>
