@@ -45,11 +45,10 @@ if (root)
     <BrowserRouter>
     <div>
         <Route path="/" component={navbar}/>
-    <Route exact path="/ny-bruker" component={CreateUserForm} />
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
-    <Route exact path="/" component={Test} />
-    <Route exact path="/" component={LandingPage}/>
-    <Route exact path="/logg-inn" component={LoginForm} />
+        <Route exact path="/logg-inn" component={LoginForm} />
 
 
     </div>
