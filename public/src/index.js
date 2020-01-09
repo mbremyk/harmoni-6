@@ -9,29 +9,29 @@ import {CreateUserForm} from '../src/components/createuser';
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
-const url = "http://localhost:5001/harmoni-6/us-central1//api/v1/";
+const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
 
 class Test extends Component{
     render(){
         return(
             <div>
-                <button onClick={test()}>Test webapp</button>
+                <button onClick={this.test}>Test webapp</button>
             </div>
         );
     }
-}
-function test(){
-    console.log("Test called");
-    fetch(url+"test", {
-        method: "GET",
-        body: JSON.stringify({ }),
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-            'x-access-token': 'undefined',
-        }
-    })
-        .then(res => alert(res.body))
-        .catch(err => alert("an error occured"));
+    test(){
+        console.log("Test called");
+        fetch(url+"test", {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'x-access-token': 'undefined',
+                "Access-Control-Allow-Origin": "true"
+            }
+        })
+            .then(res => alert(res.json()))
+            .catch(err => alert(err));
+    }
 }
 
 const root = document.getElementById('root');
