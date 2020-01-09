@@ -9,6 +9,7 @@ import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
 
+import {CreateUserForm} from '../src/components/createuser';
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -43,6 +44,7 @@ if (root)
     <BrowserRouter>
     <div>
         <Route path="/" component={navbar}/>
+    <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
     <Route exact path="/" component={Test} />
     <Route exact path="/logg-inn" component={LoginForm} />

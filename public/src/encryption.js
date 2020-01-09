@@ -8,6 +8,7 @@ export async function encrypt(password, salt = '')
 		salt = await bcrypt.genSalt(saltRounds);
 	}
 	let hash = await bcrypt.hash(password, salt);
+	password = undefined;
 	return [hash, salt];
 }
 
@@ -24,5 +25,3 @@ async function test()
 	console.log('Hash : ' + credentials1[0]);
 	console.log('Salt : ' + credentials1[1]);
 }
-
-test();

@@ -65,7 +65,6 @@ export class CreateUserForm extends Component{
 	}
 	cancel() {
 		console.log('Canceled create user');
-		Window.history.push('/login')
 	}
 
 	render(){
@@ -92,7 +91,7 @@ export class CreateUserForm extends Component{
 					<Button onClick={this.handleSubmit} variant="primary" type="button">
 						Opprett bruker
 					</Button>
-					<Button onClick={this.cancel} variant="secondary" type="button">
+					<Button href="logg-inn" onClick={this.cancel()} variant="secondary" type="button">
 						Avbryt
 					</Button>
 				</Form>
