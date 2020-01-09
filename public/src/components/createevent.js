@@ -1,8 +1,7 @@
 import {Component} from "react-simplified";
-import React, {useState} from "react";
+import React from "react";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import DateTimePicker from 'react-datetime-picker';
 import Col from "react-bootstrap/Col";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -15,8 +14,9 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import DatePicker from "react-date-picker";
 import TimePicker from "react-time-picker";
 
-export class addEvent extends Component{
 
+
+export class AddEvent extends Component {
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
             const [value, setValue] = React.useState('');
@@ -48,6 +48,14 @@ export class addEvent extends Component{
 
     constructor(props) {
         super(props);
+
+        this.eventName = this.handleEventNameChange.bind(this);
+        this.eventAddress = this.handleEventAddressChange.bind(this);
+        this.eventDescription = this.handleEventDescriptionChange.bind(this);
+        this.ageLimit = this.handleAgeLimitChange.bind(this);
+        this.riderFilename = this.handleRiderChange.bind(this);
+        this.artists = this.handleArtists.bind(this);
+
         this.state = {
             eventName: '',
             eventAddress: '',
@@ -58,12 +66,8 @@ export class addEvent extends Component{
             fTime: '00:00',
             tTime: '00:00',
             riderFilename: '',
+            artists: [],
         };
-        this.eventName = this.handleEventNameChange.bind(this);
-        this.eventAddress = this.handleEventAddressChange.bind(this);
-        this.eventDescription = this.handleEventDescriptionChange.bind(this);
-        this.ageLimit = this.handleAgeLimitChange.bind(this);
-        this.riderFilename = this.handleRiderChange.bind(this);
     }
 
     handleEventNameChange(event){
@@ -86,12 +90,11 @@ export class addEvent extends Component{
         this.setState({riderFilename: event.target.value})
     }
 
-    onChange = (date) => this.setState({ date });
-
-    artists = [];
-
-    render(){
-        return(
+    handleArtists(event){
+        this.setState({artists: event.target.value})
+    }
+    render() {
+        return (
             <Container>
                 <Form>
                     <Form.Row>
@@ -111,50 +114,50 @@ export class addEvent extends Component{
 
                         <Form.Group as={Col} sm={"12"}>
                             <Form.Label>Adresse</Form.Label>
-                                <Form.Control
-                                    placeholder="Adresse der arrangementet skal holdes . . ."
-                                    value={this.state.eventAddress}
-                                    onChange={this.handleEventAddressChange}
+                            <Form.Control
+                                placeholder="Adresse der arrangementet skal holdes . . ."
+                                value={this.state.eventAddress}
+                                onChange={this.handleEventAddressChange}
 
-                                />
+                            />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={12}>
                             <Form.Label>Beskrivelse</Form.Label>
-                                <Form.Control
-                                    placeholder="Her kan du skrive en kort beskrivelse av arrangementet (max. 500 ord) . . ."
-                                    as="textarea"
-                                    rows="8"
-                                    value={this.state.eventDescription}
-                                    onChange={this.handleEventDescriptionChange}
-                                />
+                            <Form.Control
+                                placeholder="Her kan du skrive en kort beskrivelse av arrangementet (max. 500 ord) . . ."
+                                as="textarea"
+                                rows="8"
+                                value={this.state.eventDescription}
+                                onChange={this.handleEventDescriptionChange}
+                            />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"2"}>
 
                             <Form.Label>Artist</Form.Label>
 
-                                <Dropdown onSelect={(eventKey) => this.addArtist(eventKey)}>
+                            <Dropdown onSelect={(eventKey) => this.addArtist(eventKey)}>
 
-                                    <Dropdown.Toggle variant={"success"} id="dropdown">
-                                        Velg artist
-                                    </Dropdown.Toggle>
+                                <Dropdown.Toggle variant={"success"} id="dropdown">
+                                    Velg artist
+                                </Dropdown.Toggle>
 
-                                    <Dropdown.Menu as={this.CustomMenu}>
-                                        <Dropdown.Item eventKey="Marius">Marius</Dropdown.Item>
-                                        <Dropdown.Item eventKey="Jakob">Jakob</Dropdown.Item>
-                                        <Dropdown.Item eventKey="Steffen">Steffen</Dropdown.Item>
-                                        <Dropdown.Item eventKey="Jan">Jan</Dropdown.Item>
-                                    </Dropdown.Menu>
+                                <Dropdown.Menu as={this.CustomMenu}>
+                                    <Dropdown.Item eventKey="Marius">Marius</Dropdown.Item>
+                                    <Dropdown.Item eventKey="Jakob">Jakob</Dropdown.Item>
+                                    <Dropdown.Item eventKey="Steffen">Steffen</Dropdown.Item>
+                                    <Dropdown.Item eventKey="Jan">Jan</Dropdown.Item>
+                                </Dropdown.Menu>
 
-                                </Dropdown>
+                            </Dropdown>
 
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"10"}>
 
                             <ListGroup title={"Valgte artister"}>
-                                {this.artists.map(artist => (
+                                {this.state.artists.map(artist => (
                                     <React.Fragment key={artist}>
                                         <ListGroupItem>
                                             {artist}
@@ -170,8 +173,8 @@ export class addEvent extends Component{
 
                             <DatePicker
                                 className="m-4 font-weight-bold"
-                                id = 'fromDatePicker'
-                                name = 'fdate'
+                                id='fromDatePicker'
+                                name='fdate'
                                 disableClock={true}
                                 selected={this.state.fDate}
                                 value={this.state.fDate}
@@ -213,10 +216,10 @@ export class addEvent extends Component{
 
                             <Form.Label>Aldersgrense</Form.Label>
                             <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
-                                    <ButtonGroup className="mr-2" aria-label="button-group">
-                                        <Button onClick={this.decrementAge}>-</Button>
-                                        <Button onClick={this.IncrementAge}>+</Button>
-                                    </ButtonGroup>
+                                <ButtonGroup className="mr-2" aria-label="button-group">
+                                    <Button onClick={this.decrementAge}>-</Button>
+                                    <Button onClick={this.IncrementAge}>+</Button>
+                                </ButtonGroup>
 
                                 <InputGroup>
                                     <FormControl
@@ -245,8 +248,8 @@ export class addEvent extends Component{
                             </InputGroup>
                         </Form.Group>
 
-                        <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                                <Button type="submit">Opprett arrangementet</Button>
+                        <Form.Group as={Col} md={{span: 3, offset: 5}}>
+                            <Button type="submit">Opprett arrangementet</Button>
                         </Form.Group>
 
                     </Form.Row>
@@ -294,6 +297,8 @@ export class addEvent extends Component{
     }
 
     addArtist(eventKey) {
-        this.artists.push(eventKey);
+        this.setState({
+            artists: [...this.state.artists, eventKey]
+        })
     }
 }
