@@ -6,9 +6,11 @@ import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
 import {CreateUserForm} from '../src/components/createuser';
+import {LandingPage} from "./components/frontpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
+import {addEvent} from '../src/components/createevent.js';
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -20,12 +22,14 @@ if (root)
     <BrowserRouter>
     <div>
         <Route path="/" component={navbar}/>
-	    <Route exact path="/" component={Test} />
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
         <Route exact path="/logg-inn" component={LoginForm} />
-        <Route exact path="/ny-bruker" component={CreateUserForm} />
 
 
+    <Route exact path="/" component={Test} />
+    <Route exact path="/opprett-arrangement" component={addEvent} />
     </div>
     </BrowserRouter>,
 root

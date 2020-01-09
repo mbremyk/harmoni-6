@@ -17,6 +17,22 @@ export class User
 	email;
 }
 
+export class Event
+{
+	eventId;
+	eventName;
+	adress;
+	ageLimit;
+	image;
+	Startdate;
+	Enddate;
+	discription;
+
+}
+
+
+
+
 class Services
 {
 
@@ -24,6 +40,12 @@ class Services
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
+
+	}
+
+	getEvents()
+	{
+		//return axios.get<Events[]>('/events').then(response => response.data);
 	}
 
 	getAccessToken(email, hashedPassword){
