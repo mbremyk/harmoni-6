@@ -70,18 +70,18 @@ let UserModel = sequelize.define('user', {
     timestamps: true
 });
 
-class Concert {
-    concertId;
+class Event {
+    eventId;
     organizerId;    //userId
-    concertName;
+    eventName;
     address;
     ageLimit;
     dateTime;
     description;
 }
 
-let ConcertModel = sequelize.define('concert', {
-    concertId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+let EventModel = sequelize.define('event', {
+    eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     organizerId: {
         type: Sequelize.INTEGER, references: {
             model: UserModel,
@@ -89,7 +89,7 @@ let ConcertModel = sequelize.define('concert', {
         },
         allowNull: false
     },
-    concertName: {type:Sequelize.STRING, allowNull:false},
+    eventName: {type:Sequelize.STRING, allowNull:false},
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
     dateTime: Sequelize.DATE,
@@ -98,30 +98,30 @@ let ConcertModel = sequelize.define('concert', {
 
 class Gig {
     artistId;
-    concertId;
+    eventId;
     rider;
     contract;
 }
 
 let GigModel = sequelize.define('gig', {
     artistId: {type: Sequelize.INTEGER, primaryKey: true},
-    concertId: {type: Sequelize.INTEGER, primaryKey: true},
+    eventId: {type: Sequelize.INTEGER, primaryKey: true},
     rider: Sequelize.BLOB,
     contract: Sequelize.BLOB
 });
 
 class Ticket {
-    concertId;
+    eventId;
     type;
     price;
     amount;
 }
 
 let TicketModel = sequelize.define('ticket', {
-    concertId: {
+    eventId: {
         type: Sequelize.INTEGER, primaryKey: true, references: {
-            model: ConcertModel,
-            key: 'concertId'
+            model: EventModel,
+            key: 'eventId'
         }
     },
     type: Sequelize.STRING,
@@ -131,7 +131,7 @@ let TicketModel = sequelize.define('ticket', {
 
 class Personnel {
     personnelId;
-    concertId;
+    eventId;
 }
 
 let PersonnelModel = sequelize.define('personnel', {
@@ -141,14 +141,14 @@ let PersonnelModel = sequelize.define('personnel', {
             key: 'userId'
         }
     },
-    concertId: {
+    eventId: {
         type: Sequelize.INTEGER, primaryKey: true, references: {
-            model: ConcertModel,
-            key: 'concertId'
+            model: EventModel,
+            key: 'eventId'
         }
     }
 }, {tableName: 'personnel'});
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
-module.exports = {UserModel, ConcertModel, GigModel, PersonnelModel, TicketModel, syncModels};
+module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels};
