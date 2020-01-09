@@ -12,6 +12,8 @@ import FormControl from "react-bootstrap/FormControl";
 import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
+import DatePicker from "react-date-picker";
+import TimePicker from "react-time-picker";
 
 export class addEvent extends Component{
 
@@ -53,6 +55,8 @@ export class addEvent extends Component{
             ageLimit: 0,
             fDate: new Date(),
             tDate: new Date(),
+            fTime: '00:00',
+            tTime: '00:00',
             riderFilename: '',
         };
         this.eventName = this.handleEventNameChange.bind(this);
@@ -164,26 +168,44 @@ export class addEvent extends Component{
 
                             <Form.Label>Fra Dato:</Form.Label>
 
-                            <DateTimePicker
+                            <DatePicker
                                 className="m-4 font-weight-bold"
                                 id = 'fromDatePicker'
                                 name = 'fdate'
+                                disableClock={true}
                                 selected={this.state.fDate}
                                 value={this.state.fDate}
                                 onChange={date => this.changeDate('fdate', date)}
+                            />
+                            <Form.Label>kl:</Form.Label>
+                            <TimePicker
+                                className="m-4 font-weight-bold"
+                                name='fTime'
+                                selected={this.state.fTime}
+                                value={this.state.fTime}
+                                onChange={time => this.changeTime('fTime', time)}
                             />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
                             <Form.Label>Til Dato:</Form.Label>
 
-                            <DateTimePicker
+                            <DatePicker
                                 className="m-4 font-weight-bold"
                                 id='toDatePicker'
                                 name='tdate'
+                                disableClock={true}
                                 selected={this.state.tDate}
                                 value={this.state.tDate}
                                 onChange={date => this.changeDate('tdate', date)}
+                            />
+                            <Form.Label>kl:</Form.Label>
+                            <TimePicker
+                                className=" m-4 font-weight-bold"
+                                name='tTime'
+                                selected={this.state.tTime}
+                                value={this.state.tTime}
+                                onChange={time => this.changeTime('tTime', time)}
                             />
                         </Form.Group>
 
@@ -218,6 +240,7 @@ export class addEvent extends Component{
                                 <FormControl
                                     type="file"
                                     value={this.state.riderFilename}
+                                    onChange={this.handleRiderChange}
                                 />
                             </InputGroup>
                         </Form.Group>
@@ -245,6 +268,18 @@ export class addEvent extends Component{
         });
     }
 
+    changeTime(timeName, timeValue){
+        let{fTime, tTime} = this.state;
+        if(timeName === 'fTime'){
+            fTime = timeValue;
+        }else{
+            tTime = timeValue;
+        }
+        this.setState({
+            fTime,
+            tTime
+        });
+    }
 
     IncrementAge(){
         this.state.ageLimit++;
