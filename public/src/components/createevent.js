@@ -11,22 +11,11 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
-
 import Dropdown from "react-bootstrap/Dropdown";
-import FormControl from "react-bootstrap/FormControl";
-import {Button} from "react-bootstrap";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 
 export class addEvent extends Component{
-
-    eventName = "";
-
-    eventAdress = "";
-
-    eventDescription = "";
-
-    ageLimit = 0;
 
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
@@ -57,12 +46,43 @@ export class addEvent extends Component{
         },
     );
 
-    state = {
-        fDate: new Date(),
-        tDate: new Date()
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            eventName: '',
+            eventAdress: '',
+            eventDescription: '',
+            ageLimit: 0,
+            fDate: new Date(),
+            tDate: new Date(),
+            riderFilename: '',
+        };
+        this.eventName = this.handleEventNameChange.bind(this);
+        this.eventAdress = this.handleEventAdressChange.bind(this);
+        this.eventDescription = this.handleEventDescriptionChange.bind(this);
+        this.ageLimit = this.handleAgeLimitChange.bind(this);
+        this.riderFilename = this.handleRiderChange.bind(this);
+    }
 
-    riderFilename = "";
+    handleEventNameChange(event){
+        this.setState({eventName: event.target.value});
+    }
+
+    handleEventAdressChange(event){
+        this.setState({eventAdress: event.target.value});
+    }
+
+    handleEventDescriptionChange(event){
+        this.setState({eventDescription: event.target.value});
+    }
+
+    handleAgeLimitChange(event){
+        this.setState({ageLimit: event.target.value});
+    }
+
+    handleRiderChange(event){
+        this.setState({riderFilename: event.target.value})
+    }
 
     onChange = (date) => this.setState({ date });
 
@@ -216,8 +236,4 @@ export class addEvent extends Component{
         }
     }
 
-
-    addArtist(eventKey) {
-        this.artists.push(eventKey);
-    }
 }
