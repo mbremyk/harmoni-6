@@ -4,7 +4,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
-import {encrypt} from "../encryption"
+import {hashPassword} from "../userhandling"
 import {service, User} from "../services";
 import { createHashHistory } from 'history';
 
@@ -39,12 +39,19 @@ export class CreateUserForm extends Component{
 	}
 	handleSubmit() {
 		console.log('handle Submit user');
-		if(this.state.password1 != this.state.password2) {
+		// check empty fields
+		if(!this.state.username || !this.state.email)
+		{
+			alert('Tomme felter');
+			return;
+		}
+		// check password mismatch
+		if(this.state.password1 !== this.state.password2) {
 			alert('Passordene stemmer ikke');
 			return;
 		}
 		// async encrypt promise
-		encrypt(this.state.password1)
+		hashPassword(this.state.password1)
 			.then(credentials => this.submit(credentials))
 			.catch(err => alert("En feil oppsto."));
 	}

@@ -19,6 +19,8 @@ export class User
 
 class Services
 {
+
+
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
@@ -26,6 +28,10 @@ class Services
 
 	getAccessToken(email, hashedPassword){
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
+	}
+
+	verifyToken() {
+		return true;
 	}
 
 }
