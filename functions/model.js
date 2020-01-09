@@ -193,7 +193,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 					eventName: 'Test1',
 					address: 'Adresse1',
 					ageLimit: '12',
-					dateTime: 'Soon',
+					dateTime: null,
 					description: 'Konsert for barn',
 					contract: 'BLOB1'
 				},
@@ -202,7 +202,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 					eventName: 'Test1',
 					address: 'Adresse2',
 					ageLimit: '20',
-					dateTime: 'Kinda soon',
+					dateTime: null,
 					description: 'Konsert for voksne',
 					contract: 'BLOB2'
 				}]).then(() =>
