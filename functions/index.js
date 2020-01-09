@@ -24,20 +24,20 @@ app.get("/test", (req, res) => {
     res.send("test functional");
 });
 
-app.get("/concerts", (req, res) => {
+app.get("/events", (req, res) => {
     console.log("GET-request received from client");
-    return model.ConcertModel.findAll({order: [['dateTime', 'ASC']]})
-        .then(concerts => res.send(concerts))
+    return model.EventModel.findAll({order: [['dateTime', 'ASC']]})
+        .then(events => res.send(events))
         .catch(error => console.error(error));
 });
 
-app.get("/concerts/search/:searchText", (req, res) => {
+app.get("/events/search/:searchText", (req, res) => {
     console.log("GET-request received from client");
-    return model.ConcertModel.findAll({
-        where: {[op.or]: [{concertName: {[op.like]: `%${req.params.searchText}%`}}, {description: {[op.like]: `%${req.params.searchText}%`}}]},
+    return model.EventModel.findAll({
+        where: {[op.or]: [{eventName: {[op.like]: `%${req.params.searchText}%`}}, {description: {[op.like]: `%${req.params.searchText}%`}}]},
         order: [['dateTime', 'ASC']]
     })
-        .then(concerts => res.send(concerts))
+        .then(events => res.send(events))
         .catch(error => console.error(error));
 });
 
