@@ -60,8 +60,11 @@ app.post("/user", (req, res) => {
         salt: req.body.salt,
         email: req.body.email
     })
-        .then(res.sendStatus(201))
-        .catch(error => console.error(error));
+        .then(res.status(201))
+        .catch(error => {
+            console.error(error);
+            res.status(400);
+        });
 });
 
 app.post("/login", (req, res) => {
@@ -82,28 +85,26 @@ app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
     let token = req.headers["x-access-token"];
     console.log(token);
-    jwt.verify(token, publicKey, (err, decoded)=>{
-        if(err)
-        {
+    jwt.verify(token, publicKey, (err, decoded) => {
+        if (err) {
             console.log("Token not OK");
             res.status(401);
-            res.json({ error: "Not authorized" });
-        }else{
+            res.json({error: "Not authorized"});
+        } else {
             console.log("Token OK");
-            next();
+            next(decoded.username);
         }
     })
 });
 
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
+
     return model.UserModel.findAll({where: {userId: req.params.userId}})
         .then(user => {
-            if(user.length === 1)
-            {
+            if (user.length === 1) {
                 return user;
-            }
-            else{
+            } else {
                 res.sendStatus(503);
             }
         })
