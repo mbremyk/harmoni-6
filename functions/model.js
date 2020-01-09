@@ -78,7 +78,6 @@ class Concert {
     ageLimit;
     dateTime;
     description;
-    contract;
 }
 
 let ConcertModel = sequelize.define('concert', {
@@ -101,6 +100,7 @@ class Gig {
     artistId;
     concertId;
     rider;
+    contract;
 }
 
 let GigModel = sequelize.define('gig', {
