@@ -21,12 +21,12 @@ export class Event
 {
 	eventId;
 	eventName;
-	adress;
+	eventAddress;
 	ageLimit;
 	image;
-	Startdate;
-	Enddate;
-	discription;
+	startDate;
+	endDate;
+	description;
 
 }
 
@@ -39,6 +39,10 @@ class Services
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
 
+	}
+
+	createEvent(event){
+		return axios.post(url + '/event', event).then(response => response.data);
 	}
 
 	getEvents()

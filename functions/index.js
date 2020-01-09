@@ -41,6 +41,25 @@ app.get("/events", (req, res) => {
         .catch(error => console.error(error));
 });
 
+app.post("/event", (req, res) =>{
+   console.log("POST-request recieved from client");
+   return model.EventModel.create({
+       eventName: req.body.eventName,
+       eventAddress: req.body.eventAddress,
+       eventDescription: req.body.eventDescription,
+       ageLimit: req.body.ageLimit,
+       image: req.body.image,
+       startDate: req.body.startDate,
+       endDate: req.body.endDate,
+       description: req.body.description
+   })
+       .then(res.status(201))
+       .catch(error => {
+           console.error(error);
+           res.status(400);
+       });
+});
+
 app.get("/events/search/:searchText", (req, res) => {
     console.log("GET-request received from client");
     return model.EventModel.findAll({

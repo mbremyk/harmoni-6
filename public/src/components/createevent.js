@@ -1,8 +1,8 @@
+import {service, Event} from "../services";
 import {Component} from "react-simplified";
 import React, {useState} from "react";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import DateTimePicker from 'react-datetime-picker';
 import Col from "react-bootstrap/Col";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -55,8 +55,8 @@ export class addEvent extends Component{
             ageLimit: 0,
             fDate: new Date(),
             tDate: new Date(),
-            fTime: '00:00',
-            tTime: '00:00',
+            fTime: '00:00:00',
+            tTime: '00:00:00',
             riderFilename: '',
         };
         this.eventName = this.handleEventNameChange.bind(this);
@@ -84,6 +84,40 @@ export class addEvent extends Component{
 
     handleRiderChange(event){
         this.setState({riderFilename: event.target.value})
+    }
+
+    handleSubmit(){
+        if(this.state.eventName === '' ||
+            this.state.eventAddress === '' ||
+            this.state.eventDescription === ''){
+            alert('Tomme felter! Vennligst fyll ut alle felt');
+            return;
+        }else if(
+            this.state.tDate < this.state.fDate ||
+            this.state.tTime < this.state.fTime
+        ){
+            alert('Fra-tidspunkt må være større enn til-tidspunkt!');
+            return;
+        }
+    }
+
+    mergeDateTime(fdate, ftime){
+        return fdate + " " + ftime;
+    }
+
+    submit(eventInfo){
+        console.log('Submit event' + eventInfo);
+        let event = new Event();
+        event.adress = this.state.eventAddress;
+        event.ageLimit = this.state.ageLimit;
+        event.description = this.state.eventDescription;
+        event.startDate = this.mergeDateTime(this.state.fDate, this.state.fTime);
+        event.endDate = this.mergeDateTime(this.state.tDate, this.state.tTime);
+        event.eventName = this.state.eventName;
+
+        service.createEvent(event)
+            .then(res => console.log('submit user status ' + res))
+        .catch(err => alert('En feil oppsto!' + err.message))
     }
 
     onChange = (date) => this.setState({ date });
@@ -172,7 +206,7 @@ export class addEvent extends Component{
                                 className="m-4 font-weight-bold"
                                 id = 'fromDatePicker'
                                 name = 'fdate'
-                                disableClock={true}
+                                format={"yyyy-MM-dd"}
                                 selected={this.state.fDate}
                                 value={this.state.fDate}
                                 onChange={date => this.changeDate('fdate', date)}
@@ -181,6 +215,9 @@ export class addEvent extends Component{
                             <TimePicker
                                 className="m-4 font-weight-bold"
                                 name='fTime'
+                                disableClock={false}
+                                format="HH:mm:ss"
+                                locale="sv-sv-sv"
                                 selected={this.state.fTime}
                                 value={this.state.fTime}
                                 onChange={time => this.changeTime('fTime', time)}
@@ -194,7 +231,7 @@ export class addEvent extends Component{
                                 className="m-4 font-weight-bold"
                                 id='toDatePicker'
                                 name='tdate'
-                                disableClock={true}
+                                format="yyyy-MM-dd"
                                 selected={this.state.tDate}
                                 value={this.state.tDate}
                                 onChange={date => this.changeDate('tdate', date)}
@@ -203,6 +240,9 @@ export class addEvent extends Component{
                             <TimePicker
                                 className=" m-4 font-weight-bold"
                                 name='tTime'
+                                locale="sv-sv-sv"
+                                disableClock={false}
+                                format="HH:mm:ss"
                                 selected={this.state.tTime}
                                 value={this.state.tTime}
                                 onChange={time => this.changeTime('tTime', time)}
@@ -246,7 +286,7 @@ export class addEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                                <Button type="submit">Opprett arrangementet</Button>
+                                <Button type="submit" onClick={this.handleSubmit}>Opprett arrangementet</Button>
                         </Form.Group>
 
                     </Form.Row>
