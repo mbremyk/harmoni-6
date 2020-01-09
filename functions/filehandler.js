@@ -1,5 +1,7 @@
 const model = require('./model.js');
 const testData = require('./Tests/testData.js');
+const Blob = require("cross-blob");
+
 let GigModel = model.GigModel;
 
 const testString = {hello: "world"};

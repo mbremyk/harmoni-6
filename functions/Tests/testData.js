@@ -15,7 +15,7 @@ let pr_test = new properties.SebProperties();
 	dialect: pr_test.dialect
 });*/
 
-let sequlize = init();
+let sequelize = init();
 
 function init() {
 	if (!isCI){
