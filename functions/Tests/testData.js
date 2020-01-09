@@ -5,7 +5,7 @@ const Sequelize = require('sequelize');
 const properties = require('../properties.js');
 const isCI = require('is-ci');
 
-let pr_test = new properties.SebProperties();
+let pr = new properties.SebProperties();
 
 /*let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
 	host: "mysql",

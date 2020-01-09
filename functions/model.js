@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const properties = require('./properties.js');
 const isCI = require('is-ci');
 
-let pr = new properties.Properties();
+let pr = new properties.SebProperties();
 
 /*let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
     host: "mysql",
@@ -151,4 +151,4 @@ let PersonnelModel = sequelize.define('personnel', {
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
-module.exports = {UserModel, ConcertModel, GigModel, PersonnelModel, TicketModel, syncModels};
+module.exports = {UserModel, ConcertModel, GigModel, PersonnelModel, TicketModel, syncModels, sequelize, init };
