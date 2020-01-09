@@ -22,9 +22,11 @@ main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
 
-function loginOk(username, password)
-{
-    return model.UserModel.findAll({where:{[op.and]:[{username:username},{password:password}]}}).length === 1;
+function loginOk(username, password) {
+    return model.UserModel.findAll({where: {[op.and]: [{username: username}, {password: password}]}})
+        .then(response => {
+            return response.length === 1;
+        });
 }
 
 app.get("/test", (req, res) => {
@@ -63,9 +65,14 @@ app.post("/user", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    if(loginOk(req.body.username, req.body.password))
-    {
-
+    if (loginOk(req.body.username, req.body.password)) {
+        let token = jwt.sign({username: req.body.username}, privateKey, {
+            expiresIn: 1800
+        });
+        res.json({jwt: token})
+    } else {
+        res.status(401);
+        res.json({error: "Not authorized"});
     }
 });
 
