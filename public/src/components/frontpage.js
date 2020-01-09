@@ -1,13 +1,15 @@
 import {Component} from "react-simplified";
-import {Container, Row, Col, Button, Form} from "react-bootstrap";
+import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
 import {EventInfo} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
+import {Event, service} from '../services';
+
 
 
 export class LandingPage extends Component
 {
-	events;
+	events = [];
 
 	render()
 	{
@@ -113,10 +115,10 @@ export class LandingPage extends Component
 
 	mounted()
 	{
-		/*service
+		service
 			.getEvents()
-			.then(events => (this.events = Array.from(events)))
-			.catch((error) => Alert.danger(error.message));*/
+			.then(events => (this.events = events))
+			.catch((error) => <Alert variant="danger"> error.message </Alert>);
 
 
 

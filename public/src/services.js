@@ -21,15 +21,14 @@ export class Event
 {
 	eventId;
 	eventName;
-	adress;
+	address;
 	ageLimit;
 	image;
-	Startdate;
-	Enddate;
-	discription;
+	startDate;
+	endDate;
+	description;
 
 }
-
 
 
 
@@ -43,7 +42,7 @@ class Services
 
 	getEvents()
 	{
-		//return axios.get<Events[]>('/events').then(response => response.data);
+		return axios.get(url + '/events').then(response => response.data);
 	}
 
 	getAccessToken(email, hashedPassword){
