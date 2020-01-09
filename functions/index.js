@@ -34,46 +34,45 @@ app.get("/test", (req, res) => {
     res.send("test functional");
 });
 
-app.get("/concerts", (req, res) => {
+app.get("/events", (req, res) => {
     console.log("GET-request received from client");
-    return model.ConcertModel.findAll({order: [['dateTime', 'ASC']]})
-        .then(concerts => res.send(concerts))
+    return model.EventModel.findAll({order: [['dateTime', 'ASC']]})
+        .then(events => res.send(events))
         .catch(error => console.error(error));
 });
 
-app.get("/concerts/search/:searchText", (req, res) => {
+app.get("/events/search/:searchText", (req, res) => {
     console.log("GET-request received from client");
-    return model.ConcertModel.findAll({
-        where: {[op.or]: [{concertName: {[op.like]: `%${req.params.searchText}%`}}, {description: {[op.like]: `%${req.params.searchText}%`}}]},
+    return model.EventModel.findAll({
+        where: {[op.or]: [{eventName: {[op.like]: `%${req.params.searchText}%`}}, {description: {[op.like]: `%${req.params.searchText}%`}}]},
         order: [['dateTime', 'ASC']]
     })
-        .then(concerts => res.send(concerts))
+        .then(events => res.send(events))
         .catch(error => console.error(error));
 });
 
 app.post("/user", (req, res) => {
     console.log("POST-request received from client");
-    console.log(req.body);
     return model.UserModel.create({
         username: req.body.username,
         password: req.body.password,
-        salt: req.body.salt,
-        email: req.body.email
+        salt:     req.body.salt,
+        email:    req.body.email
     })
-        .then(res.sendStatus(201))
-        .catch(error => console.error(error));
+        .then(_ => res.send(201))
+        .catch(error => console.error(error))
 });
 
 app.post("/login", (req, res) => {
-    if (loginOk(req.body.username, req.body.password)) {
-        let token = jwt.sign({username: req.body.username}, privateKey, {
-            expiresIn: 1800
-        });
-        res.json({jwt: token})
-    } else {
-        res.status(401);
-        res.json({error: "Not authorized"});
-    }
+	if (loginOk(req.body.username, req.body.password)) {
+		let token = jwt.sign({username: req.body.username}, privateKey, {
+			expiresIn: 1800
+		});
+		res.json({jwt: token})
+	} else {
+		res.status(401);
+		res.json({error: "Not authorized"});
+	}
 });
 
 console.log("Server initalized");

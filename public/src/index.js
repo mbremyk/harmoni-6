@@ -5,7 +5,10 @@ import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
-
+import {CreateUserForm} from '../src/components/createuser';
+import {LoginForm} from "./components/login";
+import {navbar} from "./components/navbar.js";
+import {myPage} from "./components/mypage.js";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -39,7 +42,13 @@ if (root)
     ReactDOM.render(
     <BrowserRouter>
     <div>
-    <Route exact path="/" component={Test} />
+        <Route path="/" component={navbar}/>
+	    <Route exact path="/" component={Test} />
+        <Route exact path="/min-side" component={myPage}/>
+        <Route exact path="/logg-inn" component={LoginForm} />
+        <Route exact path="/ny-bruker" component={CreateUserForm} />
+
+
     </div>
     </BrowserRouter>,
 root
