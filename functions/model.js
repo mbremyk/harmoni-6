@@ -4,24 +4,18 @@ const isCI = require('is-ci');
 
 function init()
 {
-    let test = process.env.NODE_ENV === 'test';
 	if (isCI)
 	{
 		console.log("CI");
 		sequelize = new Sequelize('School', 'root', '', {
-			host: process.env.CI ? 'mysql' : 'localhost',
-			dialect: 'mysql',
-			pool: {
-				max: 10,
-				min: 0,
-				idle: 10000
-			},
-			logging: false
+			host: 'mysql',
+			dialect: 'mysql'
 		});
 		return sequelize;
 	}
 	else
 	{
+		let test = (process.env.NODE_ENV === 'test');
 		let pr = test ? new properties.TestProperties() : new properties.Properties();
 		sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
 			host: pr.databaseURL,
