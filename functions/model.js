@@ -24,6 +24,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
+            logging: false
         });
         return sequelize;
     }else{
@@ -36,7 +37,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
-
+            logging: false
         });
         return sequelize;
     }
@@ -61,7 +62,7 @@ sequelize
 
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-    username: {type: Sequelize.STRING, unique: true},
+    username: {type: Sequelize.STRING, unique: true, allowNull: false},
     password: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
     email: Sequelize.STRING
@@ -77,7 +78,6 @@ let UserModel = sequelize.define('user', {
     ageLimit;
     dateTime;
     description;
-    contract;
 }*/
 
 let ConcertModel = sequelize.define('concert', {
@@ -86,26 +86,28 @@ let ConcertModel = sequelize.define('concert', {
         type: Sequelize.INTEGER, references: {
             model: UserModel,
             key: 'userId'
-        }
+        },
+        allowNull: false
     },
-    concertName: Sequelize.STRING,
+    concertName: {type:Sequelize.STRING, allowNull:false},
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
     dateTime: Sequelize.DATE,
     description: Sequelize.TEXT,
-    contract: Sequelize.BLOB
 });
 
 /*class Gig {
     artistId;
     concertId;
     rider;
+    contract;
 }*/
 
 let GigModel = sequelize.define('gig', {
     artistId: {type: Sequelize.INTEGER, primaryKey: true},
     concertId: {type: Sequelize.INTEGER, primaryKey: true},
-    rider: Sequelize.STRING
+    rider: Sequelize.BLOB,
+    contract: Sequelize.BLOB
 });
 
 /*class Ticket {
