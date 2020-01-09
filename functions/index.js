@@ -65,6 +65,8 @@ app.post("/user", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+    console.log("POST-request received from client");
+    console.log(req);
     if (loginOk(req.body.username, req.body.password)) {
         let token = jwt.sign({username: req.body.username}, privateKey, {
             expiresIn: 1800
@@ -74,6 +76,39 @@ app.post("/login", (req, res) => {
         res.status(401);
         res.json({error: "Not authorized"});
     }
+});
+
+app.use("/auth", (req, res, next) => {
+    console.log("Authorization request received from client");
+    let token = req.headers["x-access-token"];
+    console.log(token);
+    jwt.verify(token, publicKey, (err, decoded)=>{
+        if(err)
+        {
+            console.log("Token not OK");
+            res.status(401);
+            res.json({ error: "Not authorized" });
+        }else{
+            console.log("Token OK");
+            next();
+        }
+    })
+});
+
+app.get("/auth/user/:userId", (req, res) => {
+    console.log("GET-request received from client");
+    return model.UserModel.findAll({where: {userId: req.params.userId}})
+        .then(user => {
+            if(user.length === 1)
+            {
+                return user;
+            }
+            else{
+                res.sendStatus(503);
+            }
+        })
+        .then(user => res.send(user))
+        .catch(error => console.error(error));
 });
 
 console.log("Server initalized");
