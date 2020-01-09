@@ -99,14 +99,14 @@ export class addEvent extends Component{
             alert('Fra-tidspunkt må være større enn til-tidspunkt!');
             return;
         }
+        this.submit()
     }
 
     mergeDateTime(fdate, ftime){
         return fdate + " " + ftime;
     }
 
-    submit(eventInfo){
-        console.log('Submit event' + eventInfo);
+    submit(){
         let event = new Event();
         event.adress = this.state.eventAddress;
         event.ageLimit = this.state.ageLimit;
@@ -119,8 +119,6 @@ export class addEvent extends Component{
             .then(res => console.log('submit user status ' + res))
         .catch(err => alert('En feil oppsto!' + err.message))
     }
-
-    onChange = (date) => this.setState({ date });
 
     artists = [];
 

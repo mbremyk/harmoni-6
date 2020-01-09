@@ -45,13 +45,12 @@ app.post("/event", (req, res) =>{
    console.log("POST-request recieved from client");
    return model.EventModel.create({
        eventName: req.body.eventName,
-       eventAddress: req.body.eventAddress,
-       eventDescription: req.body.eventDescription,
+       address: req.body.eventAddress,
+       description: req.body.eventDescription,
        ageLimit: req.body.ageLimit,
        image: req.body.image,
-       startDate: req.body.startDate,
-       endDate: req.body.endDate,
-       description: req.body.description
+       startTime: req.body.startDate,
+       endTime: req.body.endDate,
    })
        .then(res.status(201))
        .catch(error => {
