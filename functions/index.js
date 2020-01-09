@@ -36,7 +36,7 @@ app.get("/test", (req, res) => {
 
 app.get("/events", (req, res) => {
     console.log("GET-request received from client");
-    return model.EventModel.findAll({order: [['dateTime', 'ASC']]})
+    return model.EventModel.findAll({order: [['startTime', 'ASC']]})
         .then(events => res.send(events))
         .catch(error => console.error(error));
 });
@@ -45,7 +45,7 @@ app.get("/events/search/:searchText", (req, res) => {
     console.log("GET-request received from client");
     return model.EventModel.findAll({
         where: {[op.or]: [{eventName: {[op.like]: `%${req.params.searchText}%`}}, {description: {[op.like]: `%${req.params.searchText}%`}}]},
-        order: [['dateTime', 'ASC']]
+        order: [['startTime', 'ASC']]
     })
         .then(events => res.send(events))
         .catch(error => console.error(error));

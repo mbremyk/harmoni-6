@@ -187,7 +187,8 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
                     eventName: 'Test1',
                     address: 'Adresse1',
                     ageLimit: '12',
-                    dateTime: 'Soon',
+                    startTime: null,
+                    endTime: null,
                     description: 'Konsert for barn'
                 },
                 {
@@ -195,7 +196,8 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
                     eventName: 'Test1',
                     address: 'Adresse2',
                     ageLimit: '20',
-                    dateTime: 'Kinda soon',
+                    startTime: null,
+                    endTime: null,
                     description: 'Konsert for voksne'
                 }]).then(() => {
                 GigModel.bulkCreate([
