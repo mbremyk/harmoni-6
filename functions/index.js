@@ -25,7 +25,7 @@ const deployed = true;
 function loginOk(username, password) {
     return model.UserModel.findAll({where: {[op.and]: [{username: username}, {password: password}]}})
         .then(response => {
-            return response.length === 1;
+            return response.length === 1; // TODO use bcrypt.compare()
         });
 }
 
