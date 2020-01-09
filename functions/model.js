@@ -7,7 +7,7 @@ function init()
 	if (isCI)
 	{
 		console.log("CI");
-		sequelize = new Sequelize('School', 'root', '', {
+		let sequelize = new Sequelize('School', 'root', '', {
 			host: 'mysql',
 			dialect: 'mysql'
 		});
@@ -17,7 +17,7 @@ function init()
 	{
 		let test = (process.env.NODE_ENV === 'test');
 		let pr = test ? new properties.TestProperties() : new properties.Properties();
-		sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
+		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
 			host: pr.databaseURL,
 			dialect: pr.dialect,
 			pool: {
