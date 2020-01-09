@@ -31,7 +31,8 @@
     "sequelize": "^5.21.3",
     "mysql": "^2.17.1",
     "bcryptjs": "^2.4.3",
-    "is-ci": "latest"
+    "is-ci": "latest",
+    "jsonwebtoken": "latest"
   },
   "devDependencies": {
     "babel-jest": "^24.9.0",
