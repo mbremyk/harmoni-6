@@ -1,6 +1,6 @@
 const Models = require('../model.js');
 
-beforeAll(() => Models.syncTestData);
+beforeAll(() => Models.syncTestData());
 
 describe('Correct Data', () =>
 {
@@ -10,7 +10,7 @@ describe('Correct Data', () =>
 		{
 			expect(users
 				.map(user => user.toJSON())
-				.map((user) => (
+				.map(user => (
 					{
 						userId: user.userId,
 						username: user.username,
@@ -21,37 +21,37 @@ describe('Correct Data', () =>
 					})))
 				.toEqual([
 					{
-						userId: '1',
+						userId: 1,
 						username: 'TestBruker1',
 						password: 'TestBruker1',
 						email: '1@mail.com'
 					},
 					{
-						userId: '2',
+						userId: 2,
 						username: 'TestBruker2',
 						password: 'TestBruker2',
 						email: '2@mail.com'
 					},
 					{
-						userId: '3',
+						userId: 3,
 						username: 'TestBruker3',
 						password: 'TestBruker3',
 						email: '3@mail.com'
 					},
 					{
-						userId: '4',
+						userId: 4,
 						username: 'TestBruker4',
 						password: 'TestBruker4',
 						email: '4@mail.com'
 					},
 					{
-						userId: '5',
+						userId: 5,
 						username: 'TestBruker5',
 						password: 'TestBruker5',
 						email: '5@mail.com'
 					},
 					{
-						userId: '6',
+						userId: 6,
 						username: 'TestBruker6',
 						password: 'TestBruker6',
 						email: '6@mail.com'
@@ -67,7 +67,7 @@ describe('Correct Data', () =>
 		{
 			expect(events
 				.map(event => event.toJSON())
-				.map((event) => (
+				.map(event => (
 					{
 						eventId: event.id,
 						organizerId: event.organizerId,
@@ -80,16 +80,16 @@ describe('Correct Data', () =>
 					})))
 				.toEqual([
 					{
-						organizerId: '1',
+						organizerId: 1,
 						eventName: 'Test1',
 						address: 'Adresse1',
-						ageLimit: '12',
+						ageLimit: 12,
 						dateTime: '',
 						description: 'Konsert for barn',
 						contract: 'BLOB'
 					},
 					{
-						organizerId: '2',
+						organizerId: 2,
 						eventName: 'Test1',
 						address: 'Adresse2',
 						ageLimit: '20',
@@ -121,37 +121,37 @@ describe('Other type of methods', () =>
 					})))
 				.toEqual([
 					{
-						id: '1',
+						id: 1,
 						name: 'TestBruker1',
 						password: 'TestBruker1',
 						email: '1@mail.com'
 					},
 					{
-						id: '2',
+						id: 2,
 						name: 'TestBruker2',
 						password: 'TestBruker2',
 						email: '2@mail.com'
 					},
 					{
-						id: '3',
+						id: 3,
 						name: 'TestBruker3',
 						password: 'TestBruker3',
 						email: '3@mail.com'
 					},
 					{
-						id: '4',
+						id: 4,
 						name: 'TestBruker4',
 						password: 'TestBruker4',
 						email: '4@mail.com'
 					},
 					{
-						id: '5',
+						id: 5,
 						name: 'TestBruker5',
 						password: 'TestBruker5',
 						email: '5@mail.com'
 					},
 					{
-						id: '6',
+						id: 6,
 						name: 'TestBruker6',
 						password: 'TestBruker6',
 						email: '6@mail.com'
@@ -180,19 +180,19 @@ describe('Other type of methods', () =>
 					})))
 				.toEqual([
 					{
-						organizerId: '1',
+						organizerId: 1,
 						eventName: 'Test1',
 						address: 'Adresse1',
-						ageLimit: '12',
+						ageLimit: 12,
 						dateTime: '',
 						description: 'Konsert for barn',
 						contract: 'BLOB'
 					},
 					{
-						organizerId: '2',
+						organizerId: 2,
 						eventName: 'Test1',
 						address: 'Adresse2',
-						ageLimit: '20',
+						ageLimit: 20,
 						dateTime: '',
 						description: 'Konsert for voksne',
 						contract: 'BLOB'
