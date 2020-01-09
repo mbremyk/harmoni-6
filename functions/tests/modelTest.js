@@ -61,27 +61,27 @@ describe('Correct Data', () =>
 		});
 	});
 
-	it('correct data concerts', done =>
+	it('correct data events', done =>
 	{
-		Models.ConcertModel.findOne().then(concerts =>
+		Models.EventModel.findOne().then(events =>
 		{
-			expect(concerts
-				.map(concert => concert.toJSON())
-				.map((concert) => (
+			expect(events
+				.map(event => event.toJSON())
+				.map((event) => (
 					{
-						concertId: concert.id,
-						organizerId: concert.organizerId,
-						concertName: concert.name,
-						address: concert.password,
-						agelimit: concert.ageLimit,
-						dateTime: concert.dateTime,
-						description: concert.description,
-						contract: concert.contract,
+						eventId: event.id,
+						organizerId: event.organizerId,
+						eventName: event.name,
+						address: event.password,
+						agelimit: event.ageLimit,
+						dateTime: event.dateTime,
+						description: event.description,
+						contract: event.contract,
 					})))
 				.toEqual([
 					{
 						organizerId: '1',
-						concertName: 'Test1',
+						eventName: 'Test1',
 						address: 'Adresse1',
 						ageLimit: '12',
 						dateTime: '',
@@ -90,7 +90,7 @@ describe('Correct Data', () =>
 					},
 					{
 						organizerId: '2',
-						concertName: 'Test1',
+						eventName: 'Test1',
 						address: 'Adresse2',
 						ageLimit: '20',
 						dateTime: '',
@@ -105,7 +105,7 @@ describe('Correct Data', () =>
 
 describe('Other type of methods', () =>
 {
-	it('is concert organizer', done =>
+	it('is event organizer', done =>
 	{
 		Models.UserModel.findAll().then(users =>
 		{
@@ -161,27 +161,27 @@ describe('Other type of methods', () =>
 		});
 	});
 
-	it('is not concert organizer', done =>
+	it('is not event organizer', done =>
 	{
-		Models.ConcertModel.findOne().then(concerts =>
+		Models.EventModel.findOne().then(events =>
 		{
-			expect(concerts
-				.map(concert => concert.toJSON())
-				.map((concert) => (
+			expect(events
+				.map(event => event.toJSON())
+				.map((event) => (
 					{
-						concertId: concert.id,
-						organizerId: concert.organizerId,
-						concertName: concert.name,
-						address: concert.password,
-						agelimit: concert.ageLimit,
-						dateTime: concert.dateTime,
-						description: concert.description,
-						contract: concert.contract,
+						eventId: event.id,
+						organizerId: event.organizerId,
+						eventName: event.name,
+						address: event.password,
+						agelimit: event.ageLimit,
+						dateTime: event.dateTime,
+						description: event.description,
+						contract: event.contract,
 					})))
 				.toEqual([
 					{
 						organizerId: '1',
-						concertName: 'Test1',
+						eventName: 'Test1',
 						address: 'Adresse1',
 						ageLimit: '12',
 						dateTime: '',
@@ -190,7 +190,7 @@ describe('Other type of methods', () =>
 					},
 					{
 						organizerId: '2',
-						concertName: 'Test1',
+						eventName: 'Test1',
 						address: 'Adresse2',
 						ageLimit: '20',
 						dateTime: '',

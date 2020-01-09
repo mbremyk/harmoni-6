@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const properties = require('./properties.js');
 const isCI = require('is-ci');
+const test = (process.env.NODE_ENV === 'test');
 
 function init()
 {
@@ -15,7 +16,6 @@ function init()
 	}
 	else
 	{
-		let test = (process.env.NODE_ENV === 'test');
 		let pr = test ? new properties.TestProperties() : new properties.Properties();
 		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
 			host: pr.databaseURL,
@@ -141,6 +141,7 @@ let PersonnelModel = sequelize.define('personnel', {
 	}
 }, {tableName: 'personnel'});
 
+
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
 /*
@@ -148,8 +149,7 @@ creates tables in the testdatabase and inserts the test data
 */
 let syncTestData = () => sequelize.sync({force: true}).then(() =>
 {
-	return (
-		UserModel.bulkCreate([
+	return UserModel.bulkCreate([
 			{
 				username: 'TestBruker1',
 				password: 'TestBruker1',
@@ -187,10 +187,10 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 				email: '6@mail.com'
 			}]).then(() =>
 		{
-			ConcertModel.bulkCreate([
+			EventModel.bulkCreate([
 				{
 					organizerId: '1',
-					concertName: 'Test1',
+					eventName: 'Test1',
 					address: 'Adresse1',
 					ageLimit: '12',
 					dateTime: 'Soon',
@@ -199,7 +199,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 				},
 				{
 					organizerId: '2',
-					concertName: 'Test1',
+					eventName: 'Test1',
 					address: 'Adresse2',
 					ageLimit: '20',
 					dateTime: 'Kinda soon',
@@ -210,52 +210,52 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 				GigModel.bulkCreate([
 					{
 						artistId: '1',
-						concertId: '1',
+						eventId: '1',
 						rider: 'BLOB3'
 					},
 					{
 						artistId: '2',
-						concertId: '2',
+						eventId: '2',
 						rider: 'BLOB4'
 					}]).then(() =>
 				{
 					PersonnelModel.bulkCreate([
 						{
 							personnelId: '3',
-							concertId: '1',
+							eventId: '1',
 							role: 'Lyd'
 						},
 						{
 							personnelId: '4',
-							concertId: '1',
+							eventId: '1',
 							role: 'Lys'
 						},
 						{
 							personnelId: '5',
-							concertId: '1',
+							eventId: '1',
 							role: 'Sikkerhet'
 						},
 						{
 							personnelId: '6',
-							concertId: '2',
+							eventId: '2',
 							role: 'Lyd'
 						}]).then(() =>
 					{
 						TicketModel.bulkCreate([
 							{
-								concertId: '1',
+								eventId: '1',
 								type: '1',
 								price: '99',
 								amount: '1'
 							},
 							{
-								concertId: '1',
+								eventId: '1',
 								type: '2',
 								price: '149',
 								amount: '2'
 							},
 							{
-								concertId: '1',
+								eventId: '1',
 								type: '3',
 								price: '199',
 								amount: '100'
@@ -270,7 +270,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() =>
 					});
 				});
 			});
-		})
+		}
 	).catch(error => console.log(error));
 });
 
