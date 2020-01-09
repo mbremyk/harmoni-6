@@ -90,6 +90,10 @@ app.use("/auth", (req, res, next) => {
             res.json({error: "Not authorized"});
         } else {
             console.log("Token OK");
+            /*let newToken = jwt.sign({username: decoded.username}, privateKey, {
+                expiresIn: 1800
+            });
+            res.json({jwt: newToken});*/
             next(decoded.username);
         }
     })
@@ -97,7 +101,6 @@ app.use("/auth", (req, res, next) => {
 
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
-
     return model.UserModel.findAll({where: {userId: req.params.userId}})
         .then(user => {
             if (user.length === 1) {
