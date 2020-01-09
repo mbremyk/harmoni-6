@@ -2,55 +2,47 @@ const Sequelize = require('sequelize');
 const properties = require('./properties.js');
 const isCI = require('is-ci');
 
-let pr = new properties.Properties();
-
-/*let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
-    host: "mysql",
-    dialect: "mysql"
-}) : new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-    host: pr.databaseURL,//process.env.CI ? 'mysql' : 'localhost', // The host is 'mysql' when running in gitlab CI
-    dialect: pr.dialect
-});*/
+function init()
+{
+	if (isCI)
+	{
+		console.log("CI");
+		let sequelize = new Sequelize('School', 'root', '', {
+			host: 'mysql',
+			dialect: 'mysql'
+		});
+		return sequelize;
+	}
+	else
+	{
+		let test = (process.env.NODE_ENV === 'test');
+		let pr = test ? new properties.TestProperties() : new properties.Properties();
+		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
+			host: pr.databaseURL,
+			dialect: pr.dialect,
+			pool: {
+				max: 10,
+				min: 0,
+				idle: 10000
+			},
+			logging: false
+		});
+		return sequelize;
+	}
+}
 
 let sequelize = init();
 
-function init() {
-    if (!isCI){
-        let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-            host: pr.databaseURL,
-            dialect: pr.dialect,
-            pool: {
-                max: 10,
-                min: 0,
-                idle: 10000
-            },
-            logging: false
-        });
-        return sequelize;
-    }else{
-        console.log("CI");
-        let sequelize = new Sequelize('School', 'root', '', {
-            host: process.env.CI ? 'mysql' : 'localhost',
-            dialect: 'mysql',
-            pool: {
-                max: 10,
-                min: 0,
-                idle: 10000
-            },
-            logging: false
-        });
-        return sequelize;
-    }
-}
-
 sequelize
-    .authenticate()
-    .then(() => {
-        console.log('Connection has been established successfully.');
-    })
-    .catch(err => {
-        console.error('Unable to connect to the database:', err);
-    });
+	.authenticate()
+	.then(() =>
+	{
+		console.log('Connection has been established successfully.');
+	})
+	.catch(err =>
+	{
+		console.error('Unable to connect to the database:', err);
+	});
 
 /*class User {
     userId;
@@ -61,13 +53,13 @@ sequelize
 };*/
 
 let UserModel = sequelize.define('user', {
-    userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-    username: {type: Sequelize.STRING, unique: true, allowNull: false},
-    password: Sequelize.STRING.BINARY,
-    salt: Sequelize.STRING.BINARY,
-    email: Sequelize.STRING
+	userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+	username: {type: Sequelize.STRING, unique: true, allowNull: false},
+	password: Sequelize.STRING.BINARY,
+	salt: Sequelize.STRING.BINARY,
+	email: Sequelize.STRING
 }, {
-    timestamps: true
+	timestamps: true
 });
 
 /*class Event {
@@ -81,19 +73,19 @@ let UserModel = sequelize.define('user', {
 }*/
 
 let EventModel = sequelize.define('event', {
-    eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-    organizerId: {
-        type: Sequelize.INTEGER, references: {
-            model: UserModel,
-            key: 'userId'
-        },
-        allowNull: false
-    },
-    eventName: {type:Sequelize.STRING, allowNull:false},
-    address: Sequelize.STRING,
-    ageLimit: Sequelize.INTEGER,
-    dateTime: Sequelize.DATE,
-    description: Sequelize.TEXT,
+	eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+	organizerId: {
+		type: Sequelize.INTEGER, references: {
+			model: UserModel,
+			key: 'userId'
+		},
+		allowNull: false
+	},
+	eventName: {type: Sequelize.STRING, allowNull: false},
+	address: Sequelize.STRING,
+	ageLimit: Sequelize.INTEGER,
+	dateTime: Sequelize.DATE,
+	description: Sequelize.TEXT,
 });
 
 /*class Gig {
@@ -104,10 +96,10 @@ let EventModel = sequelize.define('event', {
 }*/
 
 let GigModel = sequelize.define('gig', {
-    artistId: {type: Sequelize.INTEGER, primaryKey: true},
-    eventId: {type: Sequelize.INTEGER, primaryKey: true},
-    rider: Sequelize.BLOB,
-    contract: Sequelize.BLOB
+	artistId: {type: Sequelize.INTEGER, primaryKey: true},
+	eventId: {type: Sequelize.INTEGER, primaryKey: true},
+	rider: Sequelize.BLOB,
+	contract: Sequelize.BLOB
 });
 
 /*class Ticket {
@@ -118,15 +110,15 @@ let GigModel = sequelize.define('gig', {
 }*/
 
 let TicketModel = sequelize.define('ticket', {
-    eventId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
-            model: EventModel,
-            key: 'eventId'
-        }
-    },
-    type: Sequelize.STRING,
-    price: Sequelize.INTEGER,
-    amount: Sequelize.INTEGER
+	eventId: {
+		type: Sequelize.INTEGER, primaryKey: true, references: {
+			model: EventModel,
+			key: 'eventId'
+		}
+	},
+	type: Sequelize.STRING,
+	price: Sequelize.INTEGER,
+	amount: Sequelize.INTEGER
 });
 
 /*class Personnel {
@@ -135,20 +127,152 @@ let TicketModel = sequelize.define('ticket', {
 }*/
 
 let PersonnelModel = sequelize.define('personnel', {
-    personnelId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
-            model: UserModel,
-            key: 'userId'
-        }
-    },
-    eventId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
-            model: EventModel,
-            key: 'eventId'
-        }
-    }
+	personnelId: {
+		type: Sequelize.INTEGER, primaryKey: true, references: {
+			model: UserModel,
+			key: 'userId'
+		}
+	},
+	eventId: {
+		type: Sequelize.INTEGER, primaryKey: true, references: {
+			model: EventModel,
+			key: 'eventId'
+		}
+	}
 }, {tableName: 'personnel'});
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels};
+/*
+creates tables in the testdatabase and inserts the test data
+*/
+let syncTestData = () => sequelize.sync({force: true}).then(() =>
+{
+	return (
+		UserModel.bulkCreate([
+			{
+				username: 'TestBruker1',
+				password: 'TestBruker1',
+				salt: '1',
+				email: '1@mail.com'
+			},
+			{
+				username: 'TestBruker2',
+				password: 'TestBruker2',
+				salt: '2',
+				email: '2@mail.com'
+			},
+			{
+				username: 'TestBruker3',
+				password: 'TestBruker3',
+				salt: '3',
+				email: '3@mail.com'
+			},
+			{
+				username: 'TestBruker4',
+				password: 'TestBruker4',
+				salt: '4',
+				email: '4@mail.com'
+			},
+			{
+				username: 'TestBruker5',
+				password: 'TestBruker5',
+				salt: '5',
+				email: '5@mail.com'
+			},
+			{
+				username: 'TestBruker6',
+				password: 'TestBruker6',
+				salt: '6',
+				email: '6@mail.com'
+			}]).then(() =>
+		{
+			ConcertModel.bulkCreate([
+				{
+					organizerId: '1',
+					concertName: 'Test1',
+					address: 'Adresse1',
+					ageLimit: '12',
+					dateTime: 'Soon',
+					description: 'Konsert for barn',
+					contract: 'BLOB1'
+				},
+				{
+					organizerId: '2',
+					concertName: 'Test1',
+					address: 'Adresse2',
+					ageLimit: '20',
+					dateTime: 'Kinda soon',
+					description: 'Konsert for voksne',
+					contract: 'BLOB2'
+				}]).then(() =>
+			{
+				GigModel.bulkCreate([
+					{
+						artistId: '1',
+						concertId: '1',
+						rider: 'BLOB3'
+					},
+					{
+						artistId: '2',
+						concertId: '2',
+						rider: 'BLOB4'
+					}]).then(() =>
+				{
+					PersonnelModel.bulkCreate([
+						{
+							personnelId: '3',
+							concertId: '1',
+							role: 'Lyd'
+						},
+						{
+							personnelId: '4',
+							concertId: '1',
+							role: 'Lys'
+						},
+						{
+							personnelId: '5',
+							concertId: '1',
+							role: 'Sikkerhet'
+						},
+						{
+							personnelId: '6',
+							concertId: '2',
+							role: 'Lyd'
+						}]).then(() =>
+					{
+						TicketModel.bulkCreate([
+							{
+								concertId: '1',
+								type: '1',
+								price: '99',
+								amount: '1'
+							},
+							{
+								concertId: '1',
+								type: '2',
+								price: '149',
+								amount: '2'
+							},
+							{
+								concertId: '1',
+								type: '3',
+								price: '199',
+								amount: '100'
+							},
+							{
+								conecertId: '2',
+								type: '2',
+								price: '299',
+								amount: '200'
+							}
+						]);
+					});
+				});
+			});
+		})
+	).catch(error => console.log(error));
+});
+
+
+module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels, syncTestData};
