@@ -52,13 +52,13 @@ sequelize
         console.error('Unable to connect to the database:', err);
     });
 
-class User {
+/*class User {
     userId;
     username;
     password;
     salt;
     email;
-};
+};*/
 
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
@@ -70,7 +70,7 @@ let UserModel = sequelize.define('user', {
     timestamps: true
 });
 
-class Concert {
+/*class Concert {
     concertId;
     organizerId;    //userId
     concertName;
@@ -78,7 +78,7 @@ class Concert {
     ageLimit;
     dateTime;
     description;
-}
+}*/
 
 let ConcertModel = sequelize.define('concert', {
     concertId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
@@ -96,12 +96,12 @@ let ConcertModel = sequelize.define('concert', {
     description: Sequelize.TEXT,
 });
 
-class Gig {
+/*class Gig {
     artistId;
     concertId;
     rider;
     contract;
-}
+}*/
 
 let GigModel = sequelize.define('gig', {
     artistId: {type: Sequelize.INTEGER, primaryKey: true},
@@ -110,12 +110,12 @@ let GigModel = sequelize.define('gig', {
     contract: Sequelize.BLOB
 });
 
-class Ticket {
+/*class Ticket {
     concertId;
     type;
     price;
     amount;
-}
+}*/
 
 let TicketModel = sequelize.define('ticket', {
     concertId: {
@@ -129,10 +129,10 @@ let TicketModel = sequelize.define('ticket', {
     amount: Sequelize.INTEGER
 });
 
-class Personnel {
+/*class Personnel {
     personnelId;
     concertId;
-}
+}*/
 
 let PersonnelModel = sequelize.define('personnel', {
     personnelId: {
