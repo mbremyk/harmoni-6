@@ -23,6 +23,11 @@ class Services
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
 	}
+
+	getAccessToken(email, hashedPassword){
+		return axios.post('/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
+	}
+
 }
 
 export let service = new Services();
