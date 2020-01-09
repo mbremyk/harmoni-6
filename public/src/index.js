@@ -10,6 +10,7 @@ import {LandingPage} from "./components/frontpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
+import {addEvent} from '../src/components/createevent.js';
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -50,6 +51,8 @@ if (root)
         <Route exact path="/logg-inn" component={LoginForm} />
 
 
+    <Route exact path="/" component={Test} />
+    <Route exact path="/opprett-arrangement" component={addEvent} />
     </div>
     </BrowserRouter>,
 root
