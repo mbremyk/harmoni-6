@@ -53,27 +53,26 @@ app.get("/concerts/search/:searchText", (req, res) => {
 
 app.post("/user", (req, res) => {
     console.log("POST-request received from client");
-    console.log(req.body);
     return model.UserModel.create({
         username: req.body.username,
         password: req.body.password,
-        salt: req.body.salt,
-        email: req.body.email
+        salt:     req.body.salt,
+        email:    req.body.email
     })
-        .then(res.sendStatus(201))
-        .catch(error => console.error(error));
+        .then(_ => res.send(201))
+        .catch(error => console.error(error))
 });
 
 app.post("/login", (req, res) => {
-    if (loginOk(req.body.username, req.body.password)) {
-        let token = jwt.sign({username: req.body.username}, privateKey, {
-            expiresIn: 1800
-        });
-        res.json({jwt: token})
-    } else {
-        res.status(401);
-        res.json({error: "Not authorized"});
-    }
+	if (loginOk(req.body.username, req.body.password)) {
+		let token = jwt.sign({username: req.body.username}, privateKey, {
+			expiresIn: 1800
+		});
+		res.json({jwt: token})
+	} else {
+		res.status(401);
+		res.json({error: "Not authorized"});
+	}
 });
 
 console.log("Server initalized");

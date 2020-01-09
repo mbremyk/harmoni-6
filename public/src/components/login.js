@@ -44,7 +44,7 @@ export class LoginForm extends Component{
                     <Button onClick={() => alert("Email: " + this.state.email + " Password: " + this.state.password)} variant="primary" type="submit">
                         Login
                     </Button>
-                    <NavLink href={'/nybruker'}>Opprett bruker her!</NavLink>
+                    <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
                 </Form>
             </Container>
         );

@@ -10,7 +10,6 @@ import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
 
-
 //const history = createHashHistory();
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
@@ -45,9 +44,9 @@ if (root)
     <div>
         <Route path="/" component={navbar}/>
         <Route exact path="/min-side" component={myPage}/>
-    <Route exact path="/" component={Test} />
-    <Route exact path="/logg-inn" component={LoginForm} />
-    <Route exact path="/nybruker" component={CreateUserForm} />
+        <Route exact path="/" component={Test} />
+        <Route exact path="/logg-inn" component={LoginForm} />
+        <Route exact path="/nybruker" component={CreateUserForm} />
 
 
     </div>
