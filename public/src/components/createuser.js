@@ -19,7 +19,10 @@ export class CreateUserForm extends Component{
 			salt: '',
 			hash: '',
 		};
-		this.handleEmailChange = this.handleEmailChange.bind(this);
+		this.handleEmailChange     = this.handleEmailChange.bind(this);
+		this.handleUsernameChange  = this.handleUsernameChange.bind(this);
+		this.handlePassword1Change = this.handlePassword1Change.bind(this);
+		this.handlePassword2Change = this.handlePassword2Change.bind(this);
 	}
 
 	handleUsernameChange(event) {
@@ -35,17 +38,19 @@ export class CreateUserForm extends Component{
 		this.setState({password2: event.target.value});
 	}
 	handleSubmit() {
-		console.log('Submit user');
+		console.log('handle Submit user');
 		if(this.state.password1 != this.state.password2) {
 			alert('Passordene stemmer ikke');
 			return;
 		}
+		// async encrypt promise
 		encrypt(this.state.password1)
 			.then(credentials => this.submit(credentials))
 			.catch(err => alert("En feil oppsto."));
 	}
 	submit(credentials) {
-		let user = new User();
+		console.log('Submit user');
+		let user      = new User();
 		user.email    = this.state.email;
 		user.username = this.state.username;
 		user.password = credentials[0];
@@ -84,10 +89,10 @@ export class CreateUserForm extends Component{
 						<Form.Control type="password" placeholder="Gjenta passord" value={this.state.password2} onChange={this.handlePassword2Change} />
 					</Form.Group>
 
-					<Button onClick={() => this.handleSubmit()/*alert("Email: " + this.state.email + " Password: " + this.state.password1)*/} variant="outline-success" type="submit">
+					<Button onClick={this.handleSubmit} variant="primary" type="button">
 						Opprett bruker
 					</Button>
-					<Button onClick={() => this.cancel} variant="outline-danger" type="click">
+					<Button onClick={this.cancel} variant="secondary" type="button">
 						Avbryt
 					</Button>
 				</Form>
