@@ -48,9 +48,11 @@ class Services
 		//return axios.get<Events[]>('/events').then(response => response.data);
 	}
 
-	getAccessToken(email, hashedPassword)
+
+
+	login(email, hashedPassword)
 	{
-		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
+		return axios.post(url + '/login', {params: {email: email, hashedPassword: hashedPassword}}).then(response => response.data);
 	}
 
 	getSalt(email)

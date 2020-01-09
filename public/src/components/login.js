@@ -26,17 +26,26 @@ export class LoginForm extends Component{
         this.setState({password: event.target.value});
     }
     handleLogin() {
+
+        // get salt
         service.getSalt(this.state.email)
-            .then(salt => hashPassword(this.state.password, salt)
-                .then(credentials => login(credentials)))
+
+            // hash password with salt
+            .then(salt => hashPassword(this.state.password, salt))
+
+                // get access token
+                .then(credentials => service.login(this.state.email, credentials[0]))
+
+                    // set local token and login
+                    .then(token => this.login(token))
+
+                    .catch(err => alert("En feil oppsto. token"))
                 .catch(err => alert("En feil oppsto. hash"))
-            .catch(err => alert("En feil oppsto. salt"));
+            .catch(err => alert("En feil oppsto. salt"))
     }
 
-    login(credentials) {
-        service.getAccessToken(this.state.email, credentials[0])
-            .then(token => )
-            .catch(err => alert("En feil oppsto. token"))
+    login(token) {
+        window.localStorage.setItem('token', token)
     }
 
     getAccessToken(){
