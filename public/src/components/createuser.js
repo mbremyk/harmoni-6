@@ -49,14 +49,14 @@ export class CreateUserForm extends Component{
 			.catch(err => alert("En feil oppsto."));
 	}
 	submit(credentials) {
-		console.log('Submit user');
+		console.log('Submit user' + credentials);
 		let user      = new User();
 		user.email    = this.state.email;
 		user.username = this.state.username;
 		user.password = credentials[0];
 		user.salt     = credentials[1];
 
-		alert(credentials);
+		alert('Hash and salt\n' + credentials[0] + '\n' + credentials[1]);
 		return;
 
 		service.createUser(user)
@@ -65,7 +65,9 @@ export class CreateUserForm extends Component{
 	}
 	cancel() {
 		console.log('Canceled create user');
-		Window.history.push('/login')
+		alert('Canceled');
+		//history.push('/logginn');
+		// test i chrome/firefox, mulige problemer med Brave
 	}
 
 	render(){

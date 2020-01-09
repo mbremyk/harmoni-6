@@ -1,5 +1,5 @@
 //const axios = require('axios');
-import { axios } from 'axios'
+import axios from 'axios'
 
 var url = '';
 if(window.location.href.includes('localhost')){
