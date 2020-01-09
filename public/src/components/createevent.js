@@ -92,11 +92,11 @@ export class addEvent extends Component{
                 <Form>
                     <Form.Row>
 
-                        <Form.Group as={Col} xs={"12"}>
+                        <Form.Group as={Col} sm={"12"}>
                             <h1 className="font-weight-bold text-center">Opprett arrangement</h1>
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"12"}>
+                        <Form.Group as={Col} sm={"12"}>
                             <Form.Label>Arrangementsnavn</Form.Label>
                             <Form.Control
                                 placeholder="Navn på arrangement . . ."
@@ -105,7 +105,7 @@ export class addEvent extends Component{
                             />
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"12"}>
+                        <Form.Group as={Col} sm={"12"}>
                             <Form.Label>Adresse</Form.Label>
                                 <Form.Control
                                     placeholder="Adresse der arrangementet skal holdes . . ."
@@ -115,7 +115,7 @@ export class addEvent extends Component{
                                 />
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={12}>
+                        <Form.Group as={Col} sm={12}>
                             <Form.Label>Beskrivelse</Form.Label>
                                 <Form.Control
                                     placeholder="Her kan du skrive en kort beskrivelse av arrangementet (max. 500 ord) . . ."
@@ -126,7 +126,7 @@ export class addEvent extends Component{
                                 />
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"2"}>
+                        <Form.Group as={Col} sm={"2"}>
 
                             <Form.Label>Artist</Form.Label>
 
@@ -147,7 +147,7 @@ export class addEvent extends Component{
 
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"10"}>
+                        <Form.Group as={Col} sm={"10"}>
 
                             <ListGroup title={"Valgte artister"}>
                                 {this.artists.map(artist => (
@@ -160,7 +160,7 @@ export class addEvent extends Component{
 
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"6"}>
+                        <Form.Group as={Col} sm={"6"}>
 
                             <Form.Label>Fra Dato:</Form.Label>
 
@@ -174,7 +174,7 @@ export class addEvent extends Component{
                             />
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"6"}>
+                        <Form.Group as={Col} sm={"6"}>
                             <Form.Label>Til Dato:</Form.Label>
 
                             <DateTimePicker
@@ -187,7 +187,7 @@ export class addEvent extends Component{
                             />
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"6"}>
+                        <Form.Group as={Col} sm={"6"}>
 
                             <Form.Label>Aldersgrense</Form.Label>
                             <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
@@ -212,7 +212,7 @@ export class addEvent extends Component{
                             </ButtonToolbar>
                         </Form.Group>
 
-                        <Form.Group as={Col} xs={"6"}>
+                        <Form.Group as={Col} sm={"6"}>
                             <Form.Label>Last opp rider</Form.Label>
                             <InputGroup className="mb-5">
                                 <FormControl
