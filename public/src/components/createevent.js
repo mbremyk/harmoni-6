@@ -7,22 +7,10 @@ import Card from "react-bootstrap/Card";
 import Dropdown from "react-bootstrap/Dropdown";
 import FormControl from "react-bootstrap/FormControl";
 import {Button} from "react-bootstrap";
+import ListGroup from "react-bootstrap/ListGroup";
+import ListGroupItem from "react-bootstrap/ListGroupItem";
 
 export class addEvent extends Component{
-
-    CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
-        <a
-            href=""
-            ref={ref}
-            onClick={e => {
-                e.preventDefault();
-                onClick(e);
-            }}
-        >
-            {children}
-            &#x25bc;
-        </a>
-    ));
 
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
@@ -60,6 +48,8 @@ export class addEvent extends Component{
 
     onChange = date => this.setState({ date });
 
+    artists = [];
+
     render(){
         return(
             <Container>
@@ -85,33 +75,36 @@ export class addEvent extends Component{
                                 >
                                     {console.log(this.state.date)}
                                 </DateTimePicker>
-
-
                             </div>
                         <Form.Label column={1}>Aldersgrense</Form.Label>
 
-                        <Dropdown>
-                            <Dropdown.Toggle as={this.CustomToggle} id="dropdown" onSelect={this.save()}>
-                                Custom toggle
+                        <Dropdown onSelect={(eventKey) => this.addArtist(eventKey)}>
+                            <Dropdown.Toggle variant={"success"} id="dropdown">
+                                Velg artist
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu as={this.CustomMenu}>
-                                <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                                <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                                <Dropdown.Item eventKey="3" active>
-                                    Orange
-                                </Dropdown.Item>
-                                <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item>
+                                <Dropdown.Item eventKey="Marius">Marius</Dropdown.Item>
+                                <Dropdown.Item eventKey="Jakob">Jakob</Dropdown.Item>
+                                <Dropdown.Item eventKey="Steffen">Steffen</Dropdown.Item>
+                                <Dropdown.Item eventKey="Jan">Jan</Dropdown.Item>
                             </Dropdown.Menu>
+
                         </Dropdown>
+                            <ListGroup title={"Valgte artister"}>
+                                {this.artists.map(artist => (
+                                    <React.Fragment key={artist}>
+                                    <ListGroupItem>
+                                    {artist}
+                                </ListGroupItem></React.Fragment>))}
+                            </ListGroup>
                     </Form>
                 </Card>
             </Container>
         );
     }
 
-    save() {
-        console.log("tset");
-        console.log(document.getElementById("dropdown"));
+    addArtist(eventKey) {
+        this.artists.push(eventKey);
     }
 }
