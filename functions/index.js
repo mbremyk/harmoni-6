@@ -90,10 +90,6 @@ app.use("/auth", (req, res, next) => {
             res.json({error: "Not authorized"});
         } else {
             console.log("Token OK");
-            /*let newToken = jwt.sign({username: decoded.username}, privateKey, {
-                expiresIn: 1800
-            });
-            res.json({jwt: newToken});*/
             next(decoded.username);
         }
     })
