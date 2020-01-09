@@ -53,12 +53,11 @@ app.get("/events/search/:searchText", (req, res) => {
 
 app.post("/user", (req, res) => {
     console.log("POST-request received from client");
-    console.log(req.body);
     return model.UserModel.create({
         username: req.body.username,
         password: req.body.password,
-        salt: req.body.salt,
-        email: req.body.email
+        salt:     req.body.salt,
+        email:    req.body.email
     })
         .then(res.status(201))
         .catch(error => {
@@ -68,8 +67,7 @@ app.post("/user", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    console.log("POST-request received from client");
-    console.log(req);
+	console.log("POST-request received from client");
     if (loginOk(req.body.username, req.body.password)) {
         let token = jwt.sign({username: req.body.username}, privateKey, {
             expiresIn: 1800
