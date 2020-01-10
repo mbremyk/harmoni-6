@@ -178,7 +178,7 @@ describe('User Tests', () =>
 {
 	it('find user by id and username', done =>
 	{
-		db.findUser(1, 'Steffen T').then(users =>
+		db.getUser(1, 'Steffen T').then(users =>
 		{
 			expect(users
 				.map(user => user.toJSON())
@@ -328,7 +328,7 @@ describe('Search', () =>
 	{
 		db.findEventsBySearch('konsert').then(events =>
 		{
-			console.log(events);
+			events.map(event => console.log(event));
 			expect(events
 				.map(event => event.toJSON())
 				.map(event => (
@@ -356,7 +356,6 @@ describe('Search', () =>
 	{
 		db.findEventsBySearch('Kygo').then(events =>
 		{
-			console.log(events);
 			expect(events
 				.map(event => event.toJSON())
 				.map(event => (
