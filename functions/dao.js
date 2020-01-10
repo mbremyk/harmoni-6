@@ -28,7 +28,7 @@ class Dao
 	findUser(userId, username)
 	{
 		return model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
-		     .then(user => user);
+		            .then(user => user);
 	}
 
 
@@ -51,6 +51,8 @@ class Dao
 		            });
 	}
 
+
+
 	//returns true if user was created, false if something went wrong
 	updateUser(user)
 	{
@@ -62,7 +64,7 @@ class Dao
 				email: user.email
 			},
 			{where: {userId: user.userId}}
-		).then(response => response.id !== null)
+		).then(response => response[0] === 1 /*affected rows === 1*/)
 		            .catch(error =>
 		            {
 			            console.error(error);
@@ -71,10 +73,10 @@ class Dao
 	}
 
 
+
 	//returns true if an event is updated, false if too many, or noone is
 	updateEvent(event)
 	{
-		console.log('updating');
 		return model.EventModel.update(
 			{
 				organizerId: event.organizerId,
@@ -86,7 +88,12 @@ class Dao
 				description: event.description
 			},
 			{where: {eventId: event.eventId}}
-		).then(updated => {console.log(updated);});
+		).then(response => response[0] === 1 /*affected rows === 1*/)
+		            .catch(error =>
+		            {
+			            console.error(error);
+			            return false;
+		            });
 	}
 
 
@@ -103,7 +110,7 @@ class Dao
 				endTime: event.endTime,
 				description: event.description
 			}
-		).then(created => ({insertId: (created.id)}));
+		).then(created => ({insertId: created.eventId}));
 	}
 
 

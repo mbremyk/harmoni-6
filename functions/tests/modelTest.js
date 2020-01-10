@@ -196,20 +196,61 @@ describe('User', () =>
 
 describe('Event', () =>
 {
-	it('post an event', () =>
-	{
-		let event = {};
-		expect(db.createEvent(event)).toBeTruthy();
-	});
-
-	it('update  an event', done =>
+	it('create event', done =>
 	{
 		let event = {
-			eventId: 1,
-			eventname: 'TestUpdate'
+			organizerId: '3',
+			eventName: 'CreateEventTest',
+			address: 'event.address,',
+			ageLimit: '45',
+			startTime: null,
+			endTime: null,
+			description: 'if you can see this the event was created properly'
 		};
-		expect(db.updateEvent(event)).toBeTruthy();
-		done();
+		db.createEvent(event).then(response =>
+		{
+			console.log(response);
+			expect(response.insertId).toEqual(3);
+			done();
+		});
+	});
+
+	it('update event success', done =>
+	{
+		let event = {
+			eventId: '2',
+			organizerId: '2',
+			eventName: 'UpdateEventTest',
+			address: 'event.address',
+			ageLimit: '20',
+			startTime: null,
+			endTime: null,
+			description: 'EVENT UPDATED'
+		};
+		db.updateEvent(event).then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+
+	it('update event fail', done =>
+	{
+		let event = {
+			eventId: '-1',
+			organizerId: '2',
+			eventName: 'UpdateEventTest',
+			address: 'event.address',
+			ageLimit: '20',
+			startTime: null,
+			endTime: null,
+			description: 'EVENT UPDATED'
+		};
+		db.updateEvent(event).then(response =>
+		{
+			expect(response).toBeFalsy();
+			done();
+		});
 	});
 });
 
@@ -217,16 +258,6 @@ describe('Event', () =>
 
 describe('Uncategorized', () =>
 {
-	it('Find user by id and username', done =>
-	{
-		expect(db.findUser('1', 'TestBruker1')
-		         .map(user => ({
-			         userId: user.userId,
-			         username: user.username,
-			         email: user.email
-		         })))
-			.toEqual({userId: 1, username: 'TestBruker1', email: '1@mail.com'});
-		done();
-	});
+
 });
 
