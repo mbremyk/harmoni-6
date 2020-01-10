@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const properties = require('./properties.js');
 const isCI = require('is-ci');
+const test = (process.env.NODE_ENV === 'test');
 
 function init() {
     if (isCI) {
@@ -26,6 +27,35 @@ function init() {
         });
         return sequelize;
     }
+function init()
+{
+	if (isCI)
+	{
+		console.log("CI");
+		let sequelize = new Sequelize('School', 'root', '', {
+			host: 'mysql',
+			dialect: 'mysql'
+		});
+		return sequelize;
+	}
+	else
+	{
+		let pr = test ? new properties.TestProperties() : new properties.Properties();
+		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
+			host: pr.databaseURL,
+			dialect: pr.dialect,
+            dialectOptions: {
+                dateStrings: true,
+            },
+			pool: {
+				max: 10,
+				min: 0,
+				idle: 10000
+			},
+			logging: false
+		});
+		return sequelize;
+	}
 }
 
 let sequelize = init();
@@ -137,6 +167,7 @@ let PersonnelModel = sequelize.define('personnel', {
         }
     }
 }, {tableName: 'personnel'});
+
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
