@@ -24,43 +24,59 @@ export class Event
 	eventName;
 	eventAddress;
 	ageLimit;
+	startTime;
+	endTime;
+	imageUrl;
 	image;
-	imageUrl
 	startDate;
 	endDate;
-	description;
+	eventDescription;
 
 }
 
-export class Gig
-{
+export class Gig {
+
 	artistId;
 	eventId;
 	rider;
 	contract;
+
+	constructor(artistId, eventId, rider, contract) {
+		this.artistId = artistId;
+		this.eventId = eventId;
+		this.rider = rider;
+		this.contract = contract;
+	}
 }
 
 export class Ticket
 {
- eventId;
- type;
- price;
- amount;
- }
-
-
+    eventId;
+    type;
+    price;
+    amount;
+}
 
 class Services
 {
+	login(email, password)
+	{
+		return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
+	}
+
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
-
 	}
 
 	getUsers()
 	{
 		return axios.get(url + '/user').then(response => response.data);
+	}
+
+	getUser(id)
+	{
+		return axios.get(url + '/user/' + id).then(response => response.data);
 	}
 
 	createEvent(event)
@@ -82,20 +98,33 @@ class Services
 		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
 	}
 
-	getEvent()
+	getAccessToken(email, hashedPassword)
 	{
-		return axios.get<Event>('/events/:id').then(response => response.data);
+
+    }
+	getEvent(id)
+	{
+		return axios.get<Event>('/events/' + id).then(response => response.data);
 	}
 
 
-	getAccessToken(email, hashedPassword)
-	{
+	getAccessToken(email, hashedPassword){
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
 
 	searchForEvents(input)
 	{
 		return axios.get('/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+	}
+
+	getEventsByOrganizer(organizerId)
+	{
+		return axios.get('/events/' + organizerId).then(response => response.data);
+	}
+
+	getEventByEventId(eventId)
+	{
+		return axios.get('/events/eventdetails/' + eventId).then(response => response.data);
 	}
 
 

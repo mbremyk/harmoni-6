@@ -1,29 +1,29 @@
 Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const express = require("express");
+admin.initializeApp(functions.config().firebase);
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
+const hashPassword = require("./userhandling");
 let cors = require("cors");
 
-// const model = require('./model.js');
-// model.syncModels();
-// const sequelize = require("sequelize");
-// const op = sequelize.Op;
-const dao = require('./dao.js');
-let db = new dao();
 
-
-let privateKey = (publicKey = "shhhhhverysecret");
-
-admin.initializeApp(functions.config().firebase);
+//Express
+const express = require("express");
 const app = express();
 app.use(cors({origin: true}));
-
 const main = express();
 main.use('/api/v1', app);
 main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
+
+//Sequelize
+const model = require('./model.js');
+const dao = require('./dao.js');
+let db = new dao();
+model.syncModels();
+
+let privateKey = (publicKey = "shhhhhverysecret");
 const deployed = true;
 
 /**
@@ -94,44 +94,27 @@ app.get("/events", (req, res) => {
 
 app.post("/event", (req, res) =>{
    console.log("POST-request received from client");
-   return model.EventModel.create({
-       eventName: req.body.eventName,
-       address: req.body.eventAddress,
-       description: req.body.eventDescription,
-       ageLimit: req.body.ageLimit,
-       image: req.body.image,
-       startTime: req.body.startDate,
-       endTime: req.body.endDate,
-   })
-       .then(res.status(201))
-       .catch(error => {
-           console.error(error);
+   return db.createEvent(req.body).then(response => {
+       if (response.insertId !== undefined) {
+           res.status(201).send(response)
+       }
+       else {
            res.status(400);
-       });
+       }
+   })
 });
 
 
 
-app.post("/gig", (req, res) =>{
-   console.log("POST-request received from client");
-   return model.GigModel.create({
-       artistId: req.body.artistId,
-       eventId: req.body.eventId,
-       rider: req.body.rider,
-       contract: req.body.contract,
-   })
-       .then(res.status(201))
-       .catch(error => {
-           console.error(error);
-           res.status(400);
-       });
-});
-
-app.get("/events/:id", (req, res) => {
-    console.log("GET-request received from client");
-    return model.EventModel.findOne({where: {eventId: req.params.id }})
-        .then(events => res.send(events))
-        .catch(error => console.error(error));
+app.post("/gig", (req, res) => {
+    console.log("POST-request received from client");
+    db.createGig(req.body).then(response => {
+        if (response) {
+            res.status(201).send(response)
+        } else {
+            res.status(400);
+        }
+    });
 });
 
 /**
@@ -163,11 +146,11 @@ app.get("/events/search/:searchText", (req, res) => {
 /**
  * Create new user
  * body:
- *      {
- *          username: string
- *          password: string
- *          email: string
- *      }
+ * {
+ *     username: string
+ *     password: string
+ *     email: string
+ * }
  */
 app.post("/user", (req, res) => {
     return db.createUser(req.body)
@@ -177,35 +160,44 @@ app.post("/user", (req, res) => {
 /**
  * Checks if a user with the given email and password exists in the database and returns a token if login information is valid
  * body:
- *      {
- *          email: string
- *          password: string
- *      }
+ * {
+ *     email: string
+ *     password: string
+ * }
  *
  * @return {json} {jwt: token}
  */
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
-    db.loginOk(req.body.email, req.body.password).then(ok => {
-        if (ok) {
-            db.getUser(req.body.email).then(user => {
-                console.log(user[0].dataValues);
-                let token = getToken(user[0].dataValues);
-                res.json({jwt: token});
-            })
-        } else {
+
+    db.getSaltByEmail(req.body.email).then(salt => {
+        if (salt.length !== 1) {
             res.status(401);
-            res.json({error: "Not authorized"})
+            return;
         }
+        hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+            db.loginOk(req.body.email, credentials[0]).then(ok => {
+                if (ok) {
+                    db.getUser(req.body.email).then(user => {
+                        console.log(user[0].dataValues);
+                        let token = getToken(user[0].dataValues);
+                        res.json({jwt: token});
+                    })
+                } else {
+                    res.status(401);
+                    res.json({error: "Not authorized"})
+                }
+            });
+        })
     });
 });
 
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:
- *      {
- *          x-access-token: string
- *      }
+ * {
+ *     x-access-token: string
+ * }
  */
 app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
@@ -230,9 +222,9 @@ app.use("/auth", (req, res, next) => {
  *      }
  *
  * body:
- *      {
- *          email: string
- *      }
+ * {
+ *     email: string
+ * }
  */
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
@@ -253,9 +245,9 @@ app.get("/tickets/:eventId", (req, res) => {
 /**
  * Invalidate old access token and get a new one
  * header:
- *      {
- *          x-access-token: string
- *      }
+ * {
+ *      x-access-token: string
+ * }
  *
  * @return {json} {jwt: token}
  */
@@ -269,7 +261,36 @@ app.post("/auth/refresh", (req, res) => {
         res.json({jwt: token});
     });
 });
+app.get("/events/:organizerId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getEventsByOrganizerId(req.params.organizerId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
 
+app.get("/events/eventdetails/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getEventByEventId(req.params.eventId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+
+/**
+ * Invalidates your access token
+ * header:
+ * {
+ *     x-access-token: string
+ * }
+ */
 app.post("/auth/logout", (req, res) => {
     console.log("POST-request received from client");
 
@@ -277,6 +298,15 @@ app.post("/auth/logout", (req, res) => {
     jwtBlacklist.push(token);
 });
 
+/**
+ * Update user information
+ * body:
+ * {
+ *     username: string
+ *     email: string
+ *     newEmail: string
+ * }
+ */
 app.put("/auth/user/:userId", (req, res) => {
     console.log("PUT-request received from client");
 
