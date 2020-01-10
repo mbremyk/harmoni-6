@@ -59,6 +59,7 @@ describe('Correct Data', () =>
 						email: '6@mail.com'
 					}
 				]);
+			console.log(users);
 			done();
 		});
 	});
@@ -78,7 +79,8 @@ describe('Correct Data', () =>
 						ageLimit: event.ageLimit,
 						startTime: event.startTime,
 						endTime: event.endTime,
-						// image: event.image,
+						imageURL: event.imageURL,
+						image: event.image,
 						description: event.description
 					})))
 				.toEqual([
@@ -90,6 +92,8 @@ describe('Correct Data', () =>
 						ageLimit: 12,
 						startTime: null,
 						endTime: null,
+						imageURL: null,
+						image: null,
 						description: 'Konsert for barn'
 					},
 					{
@@ -100,6 +104,8 @@ describe('Correct Data', () =>
 						ageLimit: 20,
 						startTime: null,
 						endTime: null,
+						imageURL: null,
+						image: null,
 						description: 'Konsert for voksne'
 					}
 				]);
@@ -126,20 +132,84 @@ describe('Login', () =>
 });
 
 
+describe('User', () =>
+{
+	it('find user by id and username', done =>
+	{
+		db.findUser(1,'TestBruker1').then(users =>
+		{
+			console.log(users);
+			expect(users
+				.map(user => user.toJSON())
+				.map(user => (
+					{
+						userId: user.userId,
+						username: user.username,
+						password: user.password,
+						// salt: user.salt,
+						email: user.email,
+
+					})))
+				.toEqual([
+					{
+						userId: 1,
+						username: 'TestBruker1',
+						password: 'TestBruker1',
+						email: '1@mail.com'
+					}
+				]);
+			done();
+		});
+	});
+
+
+	it('create user', done =>
+	{
+		let user = {username: 'TestBrukerCreated', password: 'Passord', salt: ':(', email: '7@mail.com'};
+		db.createUser(user).then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+
+	it('update user success', done =>
+	{
+		let user = {userId: '4', username: 'TestBrukerUpdated', password: 'PassordUpdated', salt: ':)', email: '4@mail.com'};
+		db.updateUser(user).then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+
+	it('update user fail', done =>
+	{
+		let user = {userId: '-1', username: 'TestBrukerUpdated', password: 'PassordUpdated', salt: ':)', email: '4@mail.com'};
+		db.updateUser(user).then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+});
 
 describe('Event', () =>
 {
-	it('update  an event', done =>
-	{
-		let event = {eventId: 1, eventname: 'TestUpdate'};
-		expect(db.updateEvent(event)).toBeTruthy();
-		done();
-	});
-
 	it('post an event', () =>
 	{
 		let event = {};
 		expect(db.createEvent(event)).toBeTruthy();
+	});
+
+	it('update  an event', done =>
+	{
+		let event = {
+			eventId: 1,
+			eventname: 'TestUpdate'
+		};
+		expect(db.updateEvent(event)).toBeTruthy();
+		done();
 	});
 });
 
