@@ -41,19 +41,16 @@ export class Ticket
     amount;
 }
 
-
-
 class Services
 {
 	login(email, password)
 	{
-		return axios.post(url + '/login', {params: {email: email, password: password}}).then(response => console.log(response.data));
+		return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
 	}
 
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
-
 	}
 
 	getEvents()
@@ -75,8 +72,6 @@ class Services
 	{
 		return axios.get('/events/search/:' + encodeURIComponent(input)).then(response => response.data);
 	}
-
-
 }
 
 export let service = new Services();

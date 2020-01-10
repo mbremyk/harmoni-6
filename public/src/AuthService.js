@@ -12,9 +12,8 @@ class AuthService {
 		// Get a token from api server using the fetch api
 		return service.login(email, password)
 			.then(res => {
-				console.log('res ' + res);
-				this.setToken(res.token); // Setting the token in localStorage
-				return Promise.resolve(res)
+				this.setToken(res.jwt); // Setting the token in localStorage
+				return res;
 			})
 	}
 
@@ -32,9 +31,9 @@ class AuthService {
 		}
 	}
 
-	setToken(idToken) {
+	setToken(token) {
 		// Saves user token to localStorage
-		localStorage.setItem('token', idToken)
+		localStorage.setItem('token', token)
 	}
 
 	getToken() {

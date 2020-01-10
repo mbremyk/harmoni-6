@@ -4,7 +4,6 @@ const op = sequelize.Op;
 
 let date_format = '\'%d %M %H:%i\'';
 
-
 class Dao {
     //returns array of all users in the database
     getAllUsers() {
@@ -119,7 +118,7 @@ class Dao {
 
 
     getSaltByEmail(email) {
-        model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+        return model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
             .then(salt => {
                 return salt;
             })
@@ -129,12 +128,14 @@ class Dao {
             });
     }
 
+
     updateUser(user) {
         return model.UserModel.update({
             username: user.username,
             email: user.newemail,
         }, {where: {email: user.email}})
     }
+
 
     getEventsUser(userId) {
         return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
