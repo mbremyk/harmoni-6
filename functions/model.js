@@ -87,6 +87,7 @@ let EventModel = sequelize.define('event', {
     ageLimit: Sequelize.INTEGER,
     startTime: Sequelize.DATE,
     endTime: Sequelize.DATE,
+    imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
     description: Sequelize.TEXT,
 });
