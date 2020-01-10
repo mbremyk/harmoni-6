@@ -31,12 +31,7 @@ class Dao {
     }
 
     getUserById(userId) {
-        return model.UserModel.findOne({where: {userId: userId}}).then(user => {
-                if (user.length === 1) {
-                    return user;
-                }
-                return null;
-            });
+        return model.UserModel.findOne({where: {userId: userId}})
     }
 
 

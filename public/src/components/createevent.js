@@ -105,14 +105,14 @@ export class AddEvent extends Component{
     }
 
     handleArtistsAdd(event){
-        service.getUser(event).then(user => this.setState({artistsAdd: [...this.state.artistsAdd,user]}));
+        service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
     }
 
     handleArtists(event){
         this.setState({artists: [...this.state.artists, ...event]})
     }
 
-    handleSubmit(){
+    handleSubmit() {
         if(this.state.eventName === '' ||
             this.state.eventAddress === '' ||
             this.state.eventDescription === ''){
@@ -134,15 +134,18 @@ export class AddEvent extends Component{
 
     submit(){
         let ev = new Event();
-        ev.eventAddress = this.state.eventAddress;
+        console.log(this.state)
+        ev.address = this.state.eventAddress;
         ev.organizerId = 1;
         ev.ageLimit = this.state.ageLimit;
-        ev.eventDescription = this.state.eventDescription;
-        ev.startDate = this.mergeDateTime(this.state.fDate, this.state.fTime);
-        ev.endDate = this.mergeDateTime(this.state.tDate, this.state.tTime);
+        ev.description = this.state.eventDescription;
+        ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
+        ev.endTime = this.mergeDateTime(this.state.tDate, this.state.tTime);
         ev.eventName = this.state.eventName;
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
+
+        console.log(ev);
 
 
         service.createEvent(ev)

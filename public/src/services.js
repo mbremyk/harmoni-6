@@ -22,15 +22,13 @@ export class Event
 	eventId;
 	organizerId;
 	eventName;
-	eventAddress;
+	address;
 	ageLimit;
 	startTime;
 	endTime;
 	imageUrl;
 	image;
-	startDate;
-	endDate;
-	eventDescription;
+	description;
 
 }
 

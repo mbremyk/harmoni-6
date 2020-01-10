@@ -178,7 +178,7 @@ app.get("/users", (req, res) => {
  * Get one user by id
  */
 app.get("/users/:userId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request received from client for get one user by id");
     return db.getUserById(req.params.userId).then(user => {
         if (user !== null) {
             res.status(201).send(user);
