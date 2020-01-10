@@ -7,10 +7,6 @@ let date_format = '\'%d %M %H:%i\'';
 
 class Dao
 {
-	constructor() {}
-
-
-
 	//returns array of all users in the database
 	getAllUsers()
 	{
@@ -85,9 +81,6 @@ class Dao
 		            });
 	}
 }
-
-
-
 module.exports = Dao;
 
 
