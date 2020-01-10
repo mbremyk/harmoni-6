@@ -22,6 +22,18 @@ main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
 
+let jwtBlacklist = [];
+
+function tokenIsBlacklisted(token) {
+    return jwtBlacklist.includes(token);
+}
+
+setInterval(() => {
+    jwtBlacklist = jwtBlacklist.filter(token => {
+        token.isValid();
+    })
+}, 60 * 60 * 1000);
+
 function loginOk(email, password) {
     return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
         .then(response => {
@@ -91,7 +103,7 @@ app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
     let token = req.headers["x-access-token"];
     jwt.verify(token, publicKey, (err, decoded) => {
-        if (err || decoded.username !== req.body.username) {
+        if (err || decoded.email !== req.body.email || tokenIsBlacklisted(token)) {
             console.log("Token not OK");
             res.status(401);
             res.json({error: "Not authorized"});
@@ -104,7 +116,7 @@ app.use("/auth", (req, res, next) => {
 
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
-    return model.UserModel.findAll({where: {[op.and]: [{userId: req.params.userId}, {username: req.body.username}]}})
+    return model.UserModel.findAll({where: {[op.and]: [{userId: req.params.userId}, {email: req.body.email}]}})
         .then(user => {
             if (user.length === 1) {
                 return user;
@@ -127,7 +139,19 @@ app.get("/tickets/:eventId", (req, res) => {
 app.post("/auth/refresh", (req, res) => {
     console.log("POST-request received from client");
 
+    let token = req.headers["x-access-token"];
+    jwtBlacklist.push(token);
+    token = jwt.sign({email: req.body.email}, privateKey, {
+        expiresIn: 1800
+    });
+    res.json({jwt: token});
+});
 
+app.post("/auth/logout", (req, res) => {
+    console.log("POST-request received from client");
+
+    let token = req.headers["x-access-token"];
+    jwtBlacklist.push(token);
 });
 
 console.log("Server initalized");
