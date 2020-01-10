@@ -23,14 +23,17 @@ class Dao
 	}
 
 
-
-	//returns a user if userid and username matches, else return null
-	getUser(userId, username)
-	{
-		return model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
-		            .then(user => user);
-	}
-
+    //returns a user if userid and username matches, else return null
+    getUser(email, userId = null) {
+    	let where = userId ? {[op.and]: [{userId: userId}, {email: email}]} : {email: email};
+        return model.UserModel.findAll({where: where})
+            .then(user => {
+                if (user.length === 1) {
+                    return user;
+                }
+                return null;
+            });
+    }
 
 
 	//returns true if user was created, false if something went wrong
@@ -59,8 +62,6 @@ class Dao
 		return model.UserModel.update(
 			{
 				username: user.username,
-				password: user.password,
-				salt: user.salt,
 				email: user.email
 			},
 			{where: {userId: user.userId}}
@@ -97,37 +98,33 @@ class Dao
 	}
 
 
-
-	createEvent(event)
-	{
-		return model.EventModel.create(
-			{
-				organizerId: event.organizerId,
-				eventName: event.eventName,
-				address: event.address,
-				ageLimit: event.ageLimit,
-				startTime: event.startTime,
-				endTime: event.endTime,
-				description: event.description
-			}
-		).then(created => ({insertId: created.eventId}));
-	}
+    createEvent(event) {
+        return model.EventModel.create(
+            {
+                organizerId: event.organizerId,
+                eventName: event.eventName,
+                address: event.address,
+                ageLimit: event.ageLimit,
+                startTime: event.startTime,
+                endTime: event.endTime,
+                description: event.description
+            }
+        ).then(created => ({insertId: (created.id)}));
+    }
 
 
-
-	findEventsBySearch(searchText)
-	{
-		return model.EventModel.findAll({
-			where: {[op.or]: [{eventName: {[op.like]: '%' + searchText + '%'}}, {description: {[op.like]: `%${searchText}%`}}]},
-			order: [['startTime', 'ASC']]
-		})
-		            .then(events => (Array.isArray(events) && events.length) ? events : null)
-		            .catch(error =>
-		            {
-			            console.error(error);
-			            return null;
-		            });
-	}
+    getEventsMatching(searchText) {
+        model.EventModel.findAll({
+            where: {[op.or]: [{eventName: {[op.like]: `%${ searchText }%`}}, {description: {[op.like]: `%${searchText}%`}}]},
+            order: [['startTime', 'ASC']]
+        }).then(events => {
+            return events;
+        })
+            .catch(error => {
+                console.error(error);
+                return null;
+            });
+    }
 
 
 
@@ -163,7 +160,7 @@ class Dao
 
 	getSaltByEmail(email)
 	{
-		model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+		returnmodel.UserModel.findAll({where: {email: email}, attributes: ['salt']})
 		     .then(salt =>
 		     {
 			     return salt;
@@ -175,35 +172,32 @@ class Dao
 		     });
 	}
 
-
-
-	getEventsUser(userId)
-	{
+	//returns an array with all events by one organizerId
+	getEventsByOrganizerId(userId) {
 		return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
 	}
 
+	//returns an event with the same id
+	getEventByEventId(eventId)
+	{
+		return model.EventModel.findOne({where: {eventId: eventId}});
 
+	}
 
 	getPersonnel(eventId)
 	{
 		return model.PersonnelModel.findAll({where: {eventId: eventId}});
 	}
 
-
-
 	getGig(eventId)
 	{
 		return model.GigModel.findAll({where: {eventId: eventId}});
 	}
 
-
-
 	getTickets(eventId)
 	{
 		return model.TicketModel.findAll({where: {eventId: eventId}});
 	}
-
-
 
 	addPersonnel(eventId, userId, role)
 	{
