@@ -419,3 +419,5 @@ debug
 functions/properties.js
 */package-lock.json
 functions/package-lock.json
+
+public/build/
