@@ -1,16 +1,18 @@
 const Models = require('../model.js');
+const dao = require('../dao.js');
+let db = new dao();
 
-beforeAll(() => Models.syncTestData);
+beforeAll(() => Models.syncTestData());
 
 describe('Correct Data', () =>
 {
-	it('correct data users', done =>
+	it('correct data in users', done =>
 	{
-		Models.UserModel.findAll().then(users =>
+		db.getAllUsers().then(users =>
 		{
 			expect(users
 				.map(user => user.toJSON())
-				.map((user) => (
+				.map(user => (
 					{
 						userId: user.userId,
 						username: user.username,
@@ -21,37 +23,37 @@ describe('Correct Data', () =>
 					})))
 				.toEqual([
 					{
-						userId: '1',
+						userId: 1,
 						username: 'TestBruker1',
 						password: 'TestBruker1',
 						email: '1@mail.com'
 					},
 					{
-						userId: '2',
+						userId: 2,
 						username: 'TestBruker2',
 						password: 'TestBruker2',
 						email: '2@mail.com'
 					},
 					{
-						userId: '3',
+						userId: 3,
 						username: 'TestBruker3',
 						password: 'TestBruker3',
 						email: '3@mail.com'
 					},
 					{
-						userId: '4',
+						userId: 4,
 						username: 'TestBruker4',
 						password: 'TestBruker4',
 						email: '4@mail.com'
 					},
 					{
-						userId: '5',
+						userId: 5,
 						username: 'TestBruker5',
 						password: 'TestBruker5',
 						email: '5@mail.com'
 					},
 					{
-						userId: '6',
+						userId: 6,
 						username: 'TestBruker6',
 						password: 'TestBruker6',
 						email: '6@mail.com'
@@ -61,41 +63,44 @@ describe('Correct Data', () =>
 		});
 	});
 
-	it('correct data concerts', done =>
+	it('correct data in events', done =>
 	{
-		Models.ConcertModel.findOne().then(concerts =>
+		db.getAllEvents().then(events =>
 		{
-			expect(concerts
-				.map(concert => concert.toJSON())
-				.map((concert) => (
+			expect(events
+				.map(event => event.toJSON())
+				.map(event => (
 					{
-						concertId: concert.id,
-						organizerId: concert.organizerId,
-						concertName: concert.name,
-						address: concert.password,
-						agelimit: concert.ageLimit,
-						dateTime: concert.dateTime,
-						description: concert.description,
-						contract: concert.contract,
+						eventId: event.eventId,
+						organizerId: event.organizerId,
+						eventName: event.eventName,
+						address: event.address,
+						ageLimit: event.ageLimit,
+						startTime: event.startTime,
+						endTime: event.endTime,
+						// image: event.image,
+						description: event.description
 					})))
 				.toEqual([
 					{
-						organizerId: '1',
-						concertName: 'Test1',
+						eventId: 1,
+						organizerId: 1,
+						eventName: 'Test1',
 						address: 'Adresse1',
-						ageLimit: '12',
-						dateTime: '',
-						description: 'Konsert for barn',
-						contract: 'BLOB'
+						ageLimit: 12,
+						startTime: null,
+						endTime: null,
+						description: 'Konsert for barn'
 					},
 					{
-						organizerId: '2',
-						concertName: 'Test1',
+						eventId: 2,
+						organizerId: 2,
+						eventName: 'Test1',
 						address: 'Adresse2',
-						ageLimit: '20',
-						dateTime: '',
-						description: 'Konsert for voksne',
-						contract: 'BLOB'
+						ageLimit: 20,
+						startTime: null,
+						endTime: null,
+						description: 'Konsert for voksne'
 					}
 				]);
 			done();
@@ -103,103 +108,55 @@ describe('Correct Data', () =>
 	});
 });
 
-describe('Other type of methods', () =>
-{
-	it('is concert organizer', done =>
-	{
-		Models.UserModel.findAll().then(users =>
-		{
-			expect(users
-				.map(user => user.toJSON())
-				.map((user) => (
-					{
-						id: user.id,
-						name: user.name,
-						password: user.password,
-						email: user.email,
 
-					})))
-				.toEqual([
-					{
-						id: '1',
-						name: 'TestBruker1',
-						password: 'TestBruker1',
-						email: '1@mail.com'
-					},
-					{
-						id: '2',
-						name: 'TestBruker2',
-						password: 'TestBruker2',
-						email: '2@mail.com'
-					},
-					{
-						id: '3',
-						name: 'TestBruker3',
-						password: 'TestBruker3',
-						email: '3@mail.com'
-					},
-					{
-						id: '4',
-						name: 'TestBruker4',
-						password: 'TestBruker4',
-						email: '4@mail.com'
-					},
-					{
-						id: '5',
-						name: 'TestBruker5',
-						password: 'TestBruker5',
-						email: '5@mail.com'
-					},
-					{
-						id: '6',
-						name: 'TestBruker6',
-						password: 'TestBruker6',
-						email: '6@mail.com'
-					}
-				]);
-			done();
-		});
+
+describe('Login', () =>
+{
+	it('Login Fail on wrong password', done =>
+	{
+		expect(db.loginOk('TestBruker1', 'FeilPassord')).toBeFalsy();
+		done();
 	});
 
-	it('is not concert organizer', done =>
+	it('Login Success on correct password', done =>
 	{
-		Models.ConcertModel.findOne().then(concerts =>
-		{
-			expect(concerts
-				.map(concert => concert.toJSON())
-				.map((concert) => (
-					{
-						concertId: concert.id,
-						organizerId: concert.organizerId,
-						concertName: concert.name,
-						address: concert.password,
-						agelimit: concert.ageLimit,
-						dateTime: concert.dateTime,
-						description: concert.description,
-						contract: concert.contract,
-					})))
-				.toEqual([
-					{
-						organizerId: '1',
-						concertName: 'Test1',
-						address: 'Adresse1',
-						ageLimit: '12',
-						dateTime: '',
-						description: 'Konsert for barn',
-						contract: 'BLOB'
-					},
-					{
-						organizerId: '2',
-						concertName: 'Test1',
-						address: 'Adresse2',
-						ageLimit: '20',
-						dateTime: '',
-						description: 'Konsert for voksne',
-						contract: 'BLOB'
-					}
-				]);
-			done();
-		});
+		expect(db.loginOk('TestBruker1', 'TestBruker1')).toBeTruthy();
+		done();
+	});
+});
+
+
+
+describe('Event', () =>
+{
+	it('update  an event', done =>
+	{
+		let event = {eventId: 1, eventname: 'TestUpdate'};
+		expect(db.updateEvent(event)).toBeTruthy();
+		done();
+	});
+
+	it('post an event', () =>
+	{
+		let event = {};
+		expect(db.createEvent(event)).toBeTruthy();
+	});
+});
+
+
+
+describe('Uncategorized', () =>
+{
+	it('Find user by id and username', done =>
+	{
+		expect(db.findUser('1', 'TestBruker1')
+		         .map(user => ({
+			         userId: user.userId,
+			         username: user.username,
+			         email: user.email
+		         })))
+			.toEqual({userId: 1, username: 'TestBruker1', email: '1@mail.com'});
+		done();
 	});
 });
 
