@@ -1,203 +1,327 @@
 const Models = require('../model.js');
+const dao = require('../dao.js');
+let db = new dao();
 
-beforeAll(() => Models.syncTestData);
 
-describe('Correct Data', () =>
+
+beforeAll(() => Models.syncTestData());
+
+
+
+describe('Login Test', () =>
 {
-	it('correct data users', done =>
+	it('Login Fail on wrong password', done =>
 	{
-		Models.UserModel.findAll().then(users =>
+		expect(db.loginOk('TestBruker1', 'FeilPassord')).toBeFalsy();
+		done();
+	});
+
+
+
+	it('Login Success on correct password', done =>
+	{
+		expect(db.loginOk('TestBruker1', 'TestBruker1')).toBeTruthy();
+		done();
+	});
+});
+
+
+
+
+
+describe('User Tests', () =>
+{
+	it('correct data in users', done =>
+	{
+		db.getAllUsers().then(users =>
+		{
+			expect(users.length).toBeGreaterThanOrEqual(9);
+			done();
+		});
+	});
+
+
+
+	it('find user by id and username', done =>
+	{
+		db.getUser(1, 'Steffen T').then(users =>
 		{
 			expect(users
 				.map(user => user.toJSON())
-				.map((user) => (
+				.map(user => (
 					{
 						userId: user.userId,
 						username: user.username,
 						password: user.password,
-						// salt: user.salt,
+						salt: user.salt,
 						email: user.email,
 
 					})))
 				.toEqual([
 					{
-						userId: '1',
-						username: 'TestBruker1',
-						password: 'TestBruker1',
-						email: '1@mail.com'
-					},
-					{
-						userId: '2',
-						username: 'TestBruker2',
-						password: 'TestBruker2',
-						email: '2@mail.com'
-					},
-					{
-						userId: '3',
-						username: 'TestBruker3',
-						password: 'TestBruker3',
-						email: '3@mail.com'
-					},
-					{
-						userId: '4',
-						username: 'TestBruker4',
-						password: 'TestBruker4',
-						email: '4@mail.com'
-					},
-					{
-						userId: '5',
-						username: 'TestBruker5',
-						password: 'TestBruker5',
-						email: '5@mail.com'
-					},
-					{
-						userId: '6',
-						username: 'TestBruker6',
-						password: 'TestBruker6',
-						email: '6@mail.com'
+						userId: 1,
+						username: 'Steffen T',
+						password: 'ST',
+						salt: 'salt',
+						email: 'steffen@mail.com'
 					}
 				]);
 			done();
 		});
 	});
 
-	it('correct data concerts', done =>
+
+
+	it('create user', done =>
 	{
-		Models.ConcertModel.findOne().then(concerts =>
+		let user = {username: 'TestBrukerCreated', password: 'Passord', salt: ':(', email: '7@mail.com'};
+		db.createUser(user).then(response =>
 		{
-			expect(concerts
-				.map(concert => concert.toJSON())
-				.map((concert) => (
-					{
-						concertId: concert.id,
-						organizerId: concert.organizerId,
-						concertName: concert.name,
-						address: concert.password,
-						agelimit: concert.ageLimit,
-						dateTime: concert.dateTime,
-						description: concert.description,
-						contract: concert.contract,
-					})))
-				.toEqual([
-					{
-						organizerId: '1',
-						concertName: 'Test1',
-						address: 'Adresse1',
-						ageLimit: '12',
-						dateTime: '',
-						description: 'Konsert for barn',
-						contract: 'BLOB'
-					},
-					{
-						organizerId: '2',
-						concertName: 'Test1',
-						address: 'Adresse2',
-						ageLimit: '20',
-						dateTime: '',
-						description: 'Konsert for voksne',
-						contract: 'BLOB'
-					}
-				]);
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+
+
+
+	it('update user success', done =>
+	{
+		let user = {
+			userId: '1',
+			username: 'UsernameUpdated',
+			password: 'PasswordUpdated',
+			salt: ':)',
+			email: 'NEW@mail.com'
+		};
+		db.updateUser(user).then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+
+
+
+	it('update user fail', done =>
+	{
+		let user = {
+			userId: '-1',
+			username: 'FAIL',
+			password: 'FAIL',
+			salt: 'FAIL',
+			email: 'FAIL'
+		};
+		db.updateUser(user).then(response =>
+		{
+			expect(response).toBeFalsy();
 			done();
 		});
 	});
 });
 
-describe('Other type of methods', () =>
-{
-	it('is concert organizer', done =>
-	{
-		Models.UserModel.findAll().then(users =>
-		{
-			expect(users
-				.map(user => user.toJSON())
-				.map((user) => (
-					{
-						id: user.id,
-						name: user.name,
-						password: user.password,
-						email: user.email,
 
+
+
+
+describe('Event Tests', () =>
+{
+	it('correct data in events', done =>
+	{
+		db.getAllEvents().then(events =>
+		{
+			expect(events.length).toBeGreaterThanOrEqual(5);
+			done();
+		});
+	});
+
+
+
+	it('create event', done =>
+	{
+		let event = {
+			organizerId: '3',
+			eventName: 'CreateEvent',
+			address: 'event.address,',
+			ageLimit: '45',
+			startTime: null,
+			endTime: null,
+			description: 'if you can see this the event was created properly'
+		};
+		db.createEvent(event).then(response =>
+		{
+			console.log(response);
+			expect(response.insertId).toEqual(6);
+			done();
+		});
+	});
+
+
+
+	it('update event success', done =>
+	{
+		let event = {
+			eventId: 2,
+			organizerId: 7,
+			eventName: 'KANSELLERT',
+			address: 'KANSELLERT',
+			ageLimit: 18,
+			startTime: null,
+			endTime: null,
+			imageUrl: 'https://www.bakgaarden.no/wp-content/uploads/2019/08/DDE-1-crop%C2%A9LineBerre-1030x686.jpg',
+			description: 'UPDATED'
+		};
+		db.updateEvent(event).then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+
+
+
+	it('update event fail', done =>
+	{
+		let event = {
+			eventId: '-1',
+			organizerId: '2',
+			eventName: 'UpdateEventFailTest',
+			address: 'event.address',
+			ageLimit: '20',
+			startTime: null,
+			endTime: null,
+			description: 'EVENT UPDATED'
+		};
+		db.updateEvent(event).then(response =>
+		{
+			expect(response).toBeFalsy();
+			done();
+		});
+	});
+});
+
+
+
+
+
+describe('Personnel Tests', () =>
+{
+	it('correct data in personnel', done =>
+	{
+		db.getPersonnel(4).then(personnel =>
+		{
+			expect(personnel.length).toBe(2);
+			done();
+		});
+	});
+
+
+
+	it('add personnel to event', done =>
+	{
+		db.addPersonnel(1, 1, 'JEG VIL JOBBE').then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+});
+
+
+
+
+
+describe('Search', () =>
+{
+	it('search several results', done =>
+	{
+		db.findEventsBySearch('konsert').then(events =>
+		{
+			events.map(event => console.log(event));
+			expect(events
+				.map(event => event.toJSON())
+				.map(event => (
+					{
+						eventName: event.eventName,
 					})))
 				.toEqual([
 					{
-						id: '1',
-						name: 'TestBruker1',
-						password: 'TestBruker1',
-						email: '1@mail.com'
+						eventName: 'Ungdomskonsert',
 					},
 					{
-						id: '2',
-						name: 'TestBruker2',
-						password: 'TestBruker2',
-						email: '2@mail.com'
+						eventName: 'D.D.E',
 					},
 					{
-						id: '3',
-						name: 'TestBruker3',
-						password: 'TestBruker3',
-						email: '3@mail.com'
-					},
-					{
-						id: '4',
-						name: 'TestBruker4',
-						password: 'TestBruker4',
-						email: '4@mail.com'
-					},
-					{
-						id: '5',
-						name: 'TestBruker5',
-						password: 'TestBruker5',
-						email: '5@mail.com'
-					},
-					{
-						id: '6',
-						name: 'TestBruker6',
-						password: 'TestBruker6',
-						email: '6@mail.com'
+						eventName: 'Kygokonsert på torget',
 					}
 				]);
 			done();
 		});
 	});
 
-	it('is not concert organizer', done =>
+
+
+	it('search one results', done =>
 	{
-		Models.ConcertModel.findOne().then(concerts =>
+		db.findEventsBySearch('Kygo').then(events =>
 		{
-			expect(concerts
-				.map(concert => concert.toJSON())
-				.map((concert) => (
+			expect(events
+				.map(event => event.toJSON())
+				.map(event => (
 					{
-						concertId: concert.id,
-						organizerId: concert.organizerId,
-						concertName: concert.name,
-						address: concert.password,
-						agelimit: concert.ageLimit,
-						dateTime: concert.dateTime,
-						description: concert.description,
-						contract: concert.contract,
+						eventName: event.eventName,
 					})))
 				.toEqual([
 					{
-						organizerId: '1',
-						concertName: 'Test1',
-						address: 'Adresse1',
-						ageLimit: '12',
-						dateTime: '',
-						description: 'Konsert for barn',
-						contract: 'BLOB'
-					},
-					{
-						organizerId: '2',
-						concertName: 'Test1',
-						address: 'Adresse2',
-						ageLimit: '20',
-						dateTime: '',
-						description: 'Konsert for voksne',
-						contract: 'BLOB'
+						eventName: 'Kygokonsert på torget',
 					}
 				]);
+			done();
+		});
+	});
+
+
+
+	it('search with no results', done =>
+	{
+		db.findEventsBySearch('Finnes ikke').then(events =>
+		{
+
+			expect(events).toBe(null);
+			done();
+		});
+	});
+});
+
+
+
+
+
+describe('Uncategorized', () =>
+{
+	it('1+1=2', done =>
+	{
+		expect(1 + 1).toBe(2);
+		done();
+	});
+
+
+
+	it('correct data in gigs', done =>
+	{
+		db.getGig(4).then(gig =>
+		{
+			expect(gig.length).toBe(1);
+			done();
+		});
+	});
+
+
+
+	it('correct data in tickets', done =>
+	{
+		db.getTickets(4).then(tickets =>
+		{
+			expect(tickets.length).toBe(3);
 			done();
 		});
 	});

@@ -1,18 +1,27 @@
 import {Component} from "react-simplified";
-import {Col,Card} from "react-bootstrap";
+import {Col, Card} from "react-bootstrap";
 import * as React from 'react';
+
+
+
 
 
 export class EventInfo extends Component
 {
-	image;
+	imageUrl;
 	title;
-	adress;
+	address;
 	price;
 	age_limit;
 	start_date;
 	end_date;
 	uploaded;
+	link;
+
+	/*<div className="font-weight-bold">
+	 Pris fra
+	 </div>
+	 {this.props.price}*/
 
 	render()
 	{
@@ -21,52 +30,51 @@ export class EventInfo extends Component
 			<Col md={12} lg={4}>
 
 
-				<Card>
-					<Card.Img variant="top"
-					          src={this.props.image}/>
-					<Card.Body>
+					<Card>
+						<Card.Img variant="top"
+						          src={this.props.imageUrl}
+						          alt={this.title}/>
+						<Card.Body>
 
 
-						<Card.Title>{this.props.title}</Card.Title>
-						<Card.Text>
-							<div className="font-weight-bold ">
-								Adresse
-							</div>
-							{this.props.adress}
+							<Card.Title>{this.props.title}</Card.Title>
+							<Card.Text>
+								<div className="font-weight-bold ">
+									Adresse
+								</div>
+								{this.props.address}
+
+								<div className="font-weight-bold">
+									Aldersgrense
+								</div>
+								<div className="font-italic">
+									{this.props.age_limit}
+								</div>
+								<div className="font-weight-bold">
+									Fra
+								</div>
+
+								{this.props.start_date}
+
+								<div className="font-weight-bold">
+									Til
+								</div>
+
+								{this.props.end_date}
+
+							</Card.Text>
+
+							<a href={"/arrangement/" + this.props.link} className="stretched-link"></a>
 
 
-							<div className="font-weight-bold">
-								Pris
-							</div>
-							{this.props.price}
 
 
-							<div className="font-weight-bold">
-								Aldersgrense
-							</div>
-							<div className="font-italic">
-								{this.props.age_limit}
-							</div>
-							<div className="font-weight-bold">
-								Fra
-							</div>
+						</Card.Body>
+						<Card.Footer>
+							<small className="text-muted"> Publisert {this.props.uploaded}</small>
+						</Card.Footer>
+					</Card>
 
-							{this.props.start_date}
-
-							<div className="font-weight-bold">
-								Til
-							</div>
-
-							{this.props.end_date}
-
-						</Card.Text>
-
-
-					</Card.Body>
-					<Card.Footer>
-						<small className="text-muted"> Publisert {this.props.uploaded}</small>
-					</Card.Footer>
-				</Card>
 
 
 			</Col>

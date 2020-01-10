@@ -6,39 +6,21 @@ import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
 import {CreateUserForm} from '../src/components/createuser';
-import {LandingPage} from "./components/frontpage";
+import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
+import { GuardProvider, GuardedRoute } from 'react-router-guards';
+import {addEvent} from '../src/components/createevent.js';
+import {HomePage} from "./components/homepage";
+import{EventPage} from "./components/eventpage";
+import AuthService from "./AuthService";
 import {EditEvent} from "./components/editevent";
 import {AddEvent} from "./components/createevent";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
-
-class Test extends Component{
-    render(){
-        return(
-            <div>
-                <button onClick={this.test}>Test webapp</button>
-            </div>
-        );
-    }
-    test(){
-        console.log("Test called");
-        fetch(url+"test", {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                'x-access-token': 'undefined',
-                "Access-Control-Allow-Origin": "true"
-            }
-        })
-            .then(res => alert(res.json()))
-            .catch(err => alert(err));
-    }
-}
 
 const root = document.getElementById('root');
 if (root)
@@ -50,7 +32,8 @@ if (root)
         <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
         <Route exact path="/logg-inn" component={LoginForm} />
-        <Route exact path="/" component={Test} />
+        <Route exact path="/hjem" component={HomePage} />
+        <Route exact path="/arrangement/:id" component={EventPage} />
         <Route exact path="/opprett-arrangement" component={AddEvent} />
         <Route exact path="/endre-arrangement" component={EditEvent} />
 
@@ -58,3 +41,21 @@ if (root)
     </BrowserRouter>,
 root
 );
+
+/*
+const GuardProvider = require('react-router-guards').GuardProvider;
+const GuardedRoute = require('react-router-guards').GuardedRoute;
+
+const App = () => (
+  <Router history={history}>
+    <GuardProvider loading={Loading} error={NotFound}>
+      <GuardedRoute path="/login" exact component={Login} />
+      <GuardProvider guards={[requireLogin]}>
+        <GuardedRoute path="/" exact component={Home} />
+        <GuardedRoute path="/about" exact component={About} />
+      </GuardProvider>
+      <GuardedRoute path="*" component={NotFound} />
+    </GuardProvider>
+  </Router>
+);
+ */

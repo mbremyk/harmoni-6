@@ -5,9 +5,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {service} from "../services";
-import {encrypt} from "../encryption";
-
-
+import {authService} from "../AuthService";
 
 export class LoginForm extends Component{
     constructor(props) {
@@ -18,7 +16,6 @@ export class LoginForm extends Component{
         };
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
-
     }
 
     handleEmailChange(event) {
@@ -26,6 +23,26 @@ export class LoginForm extends Component{
     }
     handlePasswordChange(event) {
         this.setState({password: event.target.value});
+    }
+    handleLogin() {
+        if(!this.state.email || !this.state.password) { return; }
+        authService.login(this.state.email, this.state.password)
+            .then(res => this.login(res));
+    }
+
+    login(res) {
+        console.log('res n ' + res);
+        console.log('token '+ authService.getToken());
+        if(authService.loggedIn())
+        {
+            alert('Inn');
+        }
+        else
+        {
+            alert('out');
+        }
+        authService.logout();
+        console.log('token '+ authService.getToken());
     }
 
     render(){
@@ -41,26 +58,15 @@ export class LoginForm extends Component{
                         <Form.Control type="password" placeholder="Skriv inn passord" value={this.state.password} onChange={this.handlePasswordChange} />
                     </Form.Group>
 
-                    <Button onClick={() => alert("Email: " + this.state.email + " Password: " + this.state.password)} variant="primary" type="submit">
+                    <Button onClick={this.handleLogin} variant="primary" type="button">
                         Login
+                    </Button>
+                    <Button href="/" variant="secondary" type="button">
+                        Avbryt
                     </Button>
                     <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
                 </Form>
             </Container>
         );
     }
-
-    hashPassword(){
-        return encrypt(this.state.password);
-    }
-
-    getAccessToken(){
-        return service.getAccessToken(this.state.email, this.hashPassword(this.state.password))
-    }
-
-
-
-
-
 }
-
