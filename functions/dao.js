@@ -27,15 +27,8 @@ class Dao
 	//returns a user if userid and username matches, else return null
 	findUser(userId, username)
 	{
-		model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
-		     .then(user =>
-		     {
-			     if (user.length === 1)
-			     {
-				     return user;
-			     }
-			     return null;
-		     });
+		return model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
+		     .then(user => user);
 	}
 
 
@@ -58,11 +51,30 @@ class Dao
 		            });
 	}
 
+	//returns true if user was created, false if something went wrong
+	updateUser(user)
+	{
+		return model.UserModel.update(
+			{
+				username: user.username,
+				password: user.password,
+				salt: user.salt,
+				email: user.email
+			},
+			{where: {userId: user.userId}}
+		).then(response => response.id !== null)
+		            .catch(error =>
+		            {
+			            console.error(error);
+			            return false;
+		            });
+	}
 
 
 	//returns true if an event is updated, false if too many, or noone is
 	updateEvent(event)
 	{
+		console.log('updating');
 		return model.EventModel.update(
 			{
 				organizerId: event.organizerId,
@@ -74,7 +86,7 @@ class Dao
 				description: event.description
 			},
 			{where: {eventId: event.eventId}}
-		).then(updated => (updated[0] /* affected rows */ === 1));
+		).then(updated => {console.log(updated);});
 	}
 
 
