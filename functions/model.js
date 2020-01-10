@@ -20,6 +20,9 @@ function init()
 		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
 			host: pr.databaseURL,
 			dialect: pr.dialect,
+            dialectOptions: {
+                dateStrings: true,
+            },
 			pool: {
 				max: 10,
 				min: 0,
