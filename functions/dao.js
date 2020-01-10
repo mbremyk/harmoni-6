@@ -21,9 +21,9 @@ class Dao {
     //returns a user if userid and username matches, else return null
     getUser(email, userId = null) {
         let where = userId ? {[op.and]: [{userId: userId}, {email: email}]} : {email: email};
-        return model.UserModel.findAll({where: where})
+        return model.UserModel.findOne({where: where})
             .then(user => {
-                if (user.length === 1) {
+                if (user) {
                     return user;
                 }
                 return null;
@@ -112,11 +112,11 @@ class Dao {
                 endTime: event.endTime,
                 description: event.description
             }
-        ).then(created => ({insertId: (created.id)}));
+        ).then(created => ({insertId: (created.eventId)}));
     }
 
     getEventsMatching(searchText) {
-        model.EventModel.findAll({
+        return model.EventModel.findAll({
             where: {[op.or]: [{eventName: {[op.like]: `%${searchText}%`}}, {description: {[op.like]: `%${searchText}%`}}]},
             order: [['startTime', 'ASC']]
         }).then(events => {
