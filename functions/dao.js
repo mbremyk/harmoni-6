@@ -57,8 +57,6 @@ class Dao {
 		return model.UserModel.update(
 			{
 				username: user.username,
-				password: user.password,
-				salt: user.salt,
 				email: user.email
 			},
 			{where: {userId: user.userId}}
@@ -157,13 +155,6 @@ class Dao {
                 console.error(error);
                 return null;
             });
-    }
-
-    updateUser(user) {
-        return model.UserModel.update({
-            username: user.username,
-            email: user.newemail,
-        }, {where: {email: user.email}})
     }
 
     getEventsUser(userId) {
