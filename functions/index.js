@@ -94,38 +94,27 @@ app.get("/events", (req, res) => {
 
 app.post("/event", (req, res) =>{
    console.log("POST-request received from client");
-   return model.EventModel.create({
-       organizerId: req.body.organizerId,
-       eventName: req.body.eventName,
-       address: req.body.eventAddress,
-       description: req.body.eventDescription,
-       ageLimit: req.body.ageLimit,
-       image: req.body.image,
-       startTime: req.body.startDate,
-       endTime: req.body.endDate,
-   })
-       .then(res.status(201))
-       .catch(error => {
-           console.error(error);
+   return db.createEvent(req.body).then(response => {
+       if (response.insertId !== undefined) {
+           res.status(201).send(response)
+       }
+       else {
            res.status(400);
-       });
+       }
+   })
 });
 
 
 
-app.post("/gig", (req, res) =>{
-   console.log("POST-request received from client");
-   return model.GigModel.create({
-       artistId: req.body.artistId,
-       eventId: req.body.eventId,
-       rider: req.body.rider,
-       contract: req.body.contract,
-   })
-       .then(res.status(201))
-       .catch(error => {
-           console.error(error);
-           res.status(400);
-       });
+app.post("/gig", (req, res) => {
+    console.log("POST-request received from client");
+    db.createGig(req.body).then(response => {
+        if (response) {
+            res.status(201).send(response)
+        } else {
+            res.status(400);
+        }
+    });
 });
 
 app.get("/events/:id", (req, res) => {

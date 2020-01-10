@@ -63,6 +63,18 @@ class Dao {
             });
     }
 
+    createGig(gig) {
+        return model.GigModel.create({
+            artistId: gig.artistId,
+            eventId: gig.eventId,
+            rider: gig.rider,
+            contract: gig.contract,
+        }).then(response => response.id !== null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
 
     //returns true if an event is updated, false if too many, or noone is
     updateEvent(event) {
@@ -98,7 +110,6 @@ class Dao {
             }
         ).then(created => ({insertId: (created.id)}));
     }
-
 
     getEventsMatching(searchText) {
         model.EventModel.findAll({
