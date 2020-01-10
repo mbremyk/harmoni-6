@@ -99,7 +99,7 @@ export class AddEvent extends Component{
     }
 
     handleArtistsAdd(event){
-        this.setState({artistsAdd: event.target.value})
+        this.setState({artistsAdd: [...this.state.artistsAdd, event]})
     }
 
 
@@ -142,7 +142,7 @@ export class AddEvent extends Component{
         service.createEvent(ev)
             .then(updated =>
             {this.state.artistsAdd.map(artist =>
-                (service.createGig(artist.userId, updated.insertId, this.state.rider, this.state.contract)))}
+                (service.createGig(1, updated.insertId, this.state.rider, this.state.contract)))}
 
                 )
         .catch(err => alert('En feil oppsto!' + err.message))
@@ -151,7 +151,7 @@ export class AddEvent extends Component{
     }
 
     render(){
-
+        if(this.state.artists === null) return null;
         if(!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
 
         return(
@@ -197,7 +197,7 @@ export class AddEvent extends Component{
 
                             <Form.Label>Artist</Form.Label>
 
-                            <Dropdown onSelect={(eventKey) => this.addArtist(eventKey)}>
+                            <Dropdown onSelect={this.handleArtistsAdd}>
 
                                 <Dropdown.Toggle variant={"success"} id="dropdown">
                                     Velg artist
@@ -207,7 +207,6 @@ export class AddEvent extends Component{
                                     {this.state.artists[0].map(artist => (
                                         <Dropdown.Item eventKey={artist}>
                                             {artist.username}
-                                            {console.log(artist)}
                                         </Dropdown.Item>
                                         ))}
                                 </Dropdown.Menu>
@@ -220,7 +219,7 @@ export class AddEvent extends Component{
 
                             <ListGroup title={"Valgte artister"}>
                                 {this.state.artistsAdd.map(artist => (
-                                    <React.Fragment key={artist.userId}>
+                                    <React.Fragment key={artist}>
                                         <ListGroupItem>
                                             {artist.username}
                                         </ListGroupItem>
@@ -266,6 +265,7 @@ export class AddEvent extends Component{
                                 selected={this.state.tDate}
                                 value={this.state.tDate}
                                 onChange={date => this.changeDate('tdate', date)}
+
                             />
                             <Form.Label>kl:</Form.Label>
                             <TimePicker
@@ -277,6 +277,7 @@ export class AddEvent extends Component{
                                 selected={this.state.tTime}
                                 value={this.state.tTime}
                                 onChange={time => this.changeTime('tTime', time)}
+
                             />
                         </Form.Group>
 
@@ -386,12 +387,5 @@ export class AddEvent extends Component{
             this.state.ageLimit--;
             this.setState({ageLimit: this.state.ageLimit})
         }
-    }
-
-    addArtist(eventKey) {
-        console.log(eventKey);
-        this.setState({
-            artistsAdd: [...this.state.artistsAdd, eventKey]
-        })
     }
 }
