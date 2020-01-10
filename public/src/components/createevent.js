@@ -380,4 +380,11 @@ export class AddEvent extends Component{
             this.setState({ageLimit: this.state.ageLimit})
         }
     }
+
+    addArtist(eventKey) {
+        console.log(eventKey);
+        this.setState({
+            artistsAdd: [...this.state.artistsAdd, eventKey]
+        })
+    }
 }
