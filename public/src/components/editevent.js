@@ -13,8 +13,11 @@ import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
+import {service} from "../services";
 
 export class EditEvent extends Component {
+
+    event;
 
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
@@ -299,6 +302,10 @@ export class EditEvent extends Component {
         this.setState({
             artists: [...this.state.artists, eventKey]
         })
+    }
+
+    mounted() {
+        service.getEvent().then()
     }
 }
 

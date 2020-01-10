@@ -62,6 +62,12 @@ class Services
 		//return axios.get<Events[]>('/events').then(response => response.data);
 	}
 
+	getEvent()
+	{
+		return axios.get<Event>('/events/:id').then(response => response.data);
+	}
+
+
 	getAccessToken(email, hashedPassword){
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
