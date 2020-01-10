@@ -146,21 +146,24 @@ app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
     db.getSaltByEmail(req.body.email).then(salt => {
-       if(salt.length !== 1) { res.status(401); return; }
-       hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
-           db.loginOk(req.body.email, credentials[0]).then(ok => {
-               if (ok) {
-                   db.getUser(req.body.email).then(user => {
-                       console.log(user[0].dataValues);
-                       let token = getToken(user[0].dataValues);
-                       res.json({jwt: token});
-                   })
-               } else {
-                   res.status(401);
-                   res.json({error: "Not authorized"})
-               }
-           });
-       })
+        if (salt.length !== 1) {
+            res.status(401);
+            return;
+        }
+        hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+            db.loginOk(req.body.email, credentials[0]).then(ok => {
+                if (ok) {
+                    db.getUser(req.body.email).then(user => {
+                        console.log(user[0].dataValues);
+                        let token = getToken(user[0].dataValues);
+                        res.json({jwt: token});
+                    })
+                } else {
+                    res.status(401);
+                    res.json({error: "Not authorized"})
+                }
+            });
+        })
     });
 });
 
@@ -233,28 +236,26 @@ app.post("/auth/refresh", (req, res) => {
         res.json({jwt: token});
     });
 });
-app.get("/events/:organizerId", (req, res) =>
-{
-	console.log("GET-request received from client");
-	return db.getEventsByOrganizerId(req.params.organizerId).then(events =>
-	{
-		if (events !== null)
-		{res.status(201).send(events);}
-		else
-		{res.sendStatus(400);}
-	});
+app.get("/events/:organizerId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getEventsByOrganizerId(req.params.organizerId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
 });
 
-app.get("/events/eventdetails/:eventId", (req, res) =>
-{
-	console.log("GET-request received from client");
-	return db.getEventByEventId(req.params.eventId).then(events =>
-	{
-		if (events !== null)
-		{res.status(201).send(events);}
-		else
-		{res.sendStatus(400);}
-	});
+app.get("/events/eventdetails/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getEventByEventId(req.params.eventId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
 });
 
 

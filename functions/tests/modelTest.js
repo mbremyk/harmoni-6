@@ -8,153 +8,6 @@ beforeAll(() => Models.syncTestData());
 
 
 
-describe('Correct Data', () =>
-{
-	it('correct data in users', done =>
-	{
-		db.getAllUsers().then(users =>
-		{
-			expect(users
-				.map(user => user.toJSON())
-				.map(user => (
-					{
-						userId: user.userId,
-						username: user.username,
-						password: user.password,
-						salt: user.salt,
-						email: user.email,
-
-					})))
-				.toEqual([
-					{
-						userId: 1,
-						username: 'Steffen T',
-						password: 'ST',
-						salt: 'salt',
-						email: 'steffen@mail.com'
-					},
-					{
-						userId: 2,
-						username: 'Marius T',
-						password: 'MT',
-						salt: 'salt',
-						email: 'marius@mail.com'
-					},
-					{
-						userId: 3,
-						username: 'Sebastian I',
-						password: 'TestBruker1',
-						salt: 'salt',
-						email: 'sebastian@mail.com'
-					},
-					{
-						userId: 4,
-						username: 'Jakob L.M',
-						password: 'JM',
-						salt: 'salt',
-						email: 'jakob@mail.com'
-					},
-					{
-						userId: 5,
-						username: 'Magnus B',
-						password: 'MB',
-						salt: 'salt',
-						email: 'magnus@mail.com'
-					},
-					{
-						userId: 6,
-						username: 'Jan L',
-						password: 'JL',
-						salt: 'salt',
-						email: 'jan@mail.com'
-					},
-					{
-						userId: 7,
-						username: 'Sivert U',
-						password: 'SU',
-						salt: 'salt',
-						email: 'sivert@mail.com'
-					},
-					{
-						userId: 8,
-						username: 'Michael S.L',
-						password: 'M',
-						salt: 'salt',
-						email: 'michael@mail.com'
-					},
-					{
-						userId: 9,
-						username: 'Sabine S',
-						password: 'SS',
-						salt: 'salt',
-						email: 'sabine@mail.com'
-					}
-				]);
-			console.log(users);
-			done();
-		});
-	});
-
-
-
-	it('correct data in events', done =>
-	{
-		db.getAllEvents().then(events =>
-		{
-			expect(events
-				.map(event => event.toJSON())
-				.map(event => (
-					{
-						eventId: event.eventId,
-						organizerId: event.organizerId,
-						eventName: event.eventName,
-						address: event.address,
-						ageLimit: event.ageLimit,
-					})))
-				.toEqual([
-					{
-						eventId: 1,
-						organizerId: 9,
-						eventName: 'Fredagsquiz',
-						address: 'Ikke en faktisk addresse 1',
-						ageLimit: 0,
-					},
-					{
-						eventId: 2,
-						organizerId: 4,
-						eventName: 'Ungdomskonsert',
-						address: 'Sukkerhuset',
-						ageLimit: 15,
-					},
-					{
-						eventId: 3,
-						organizerId: 7,
-						eventName: 'D.D.E',
-						address: 'Festningen',
-						ageLimit: 18,
-					},
-					{
-						eventId: 4,
-						organizerId: 2,
-						eventName: 'Kygokonsert på torget',
-						address: 'Trondheim torg',
-						ageLimit: 0,
-					},
-					{
-						eventId: 5,
-						organizerId: 2,
-						eventName: 'Mandagsfylla',
-						address: 'Sukkerhuset',
-						ageLimit: 21,
-					}
-				]);
-			done();
-		});
-	});
-});
-
-
-
 describe('Login Test', () =>
 {
 	it('Login Fail on wrong password', done =>
@@ -174,8 +27,21 @@ describe('Login Test', () =>
 
 
 
+
+
 describe('User Tests', () =>
 {
+	it('correct data in users', done =>
+	{
+		db.getAllUsers().then(users =>
+		{
+			expect(users.length).toBeGreaterThanOrEqual(9);
+			done();
+		});
+	});
+
+
+
 	it('find user by id and username', done =>
 	{
 		db.getUser(1, 'Steffen T').then(users =>
@@ -255,8 +121,21 @@ describe('User Tests', () =>
 
 
 
+
+
 describe('Event Tests', () =>
 {
+	it('correct data in events', done =>
+	{
+		db.getAllEvents().then(events =>
+		{
+			expect(events.length).toBeGreaterThanOrEqual(5);
+			done();
+		});
+	});
+
+
+
 	it('create event', done =>
 	{
 		let event = {
@@ -319,6 +198,35 @@ describe('Event Tests', () =>
 		});
 	});
 });
+
+
+
+
+
+describe('Personnel Tests', () =>
+{
+	it('correct data in personnel', done =>
+	{
+		db.getPersonnel(4).then(personnel =>
+		{
+			expect(personnel.length).toBe(2);
+			done();
+		});
+	});
+
+
+
+	it('add personnel to event', done =>
+	{
+		db.addPersonnel(1, 1, 'JEG VIL JOBBE').then(response =>
+		{
+			expect(response).toBeTruthy();
+			done();
+		});
+	});
+});
+
+
 
 
 
@@ -386,12 +294,36 @@ describe('Search', () =>
 
 
 
+
+
 describe('Uncategorized', () =>
 {
 	it('1+1=2', done =>
 	{
 		expect(1 + 1).toBe(2);
 		done();
+	});
+
+
+
+	it('correct data in gigs', done =>
+	{
+		db.getGig(4).then(gig =>
+		{
+			expect(gig.length).toBe(1);
+			done();
+		});
+	});
+
+
+
+	it('correct data in tickets', done =>
+	{
+		db.getTickets(4).then(tickets =>
+		{
+			expect(tickets.length).toBe(3);
+			done();
+		});
 	});
 });
 
