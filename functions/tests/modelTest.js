@@ -149,7 +149,7 @@ describe('Uncategorized', () =>
 {
 	it('Find user by id and username', done =>
 	{
-		expect(db.findUser('1', 'TestBruker1')
+		expect(db.getUser('1', 'TestBruker1')
 		         .map(user => ({
 			         userId: user.userId,
 			         username: user.username,

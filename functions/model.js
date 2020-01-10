@@ -3,35 +3,31 @@ const properties = require('./properties.js');
 const isCI = require('is-ci');
 const test = (process.env.NODE_ENV === 'test');
 
-function init()
-{
-	if (isCI)
-	{
-		console.log("CI");
-		let sequelize = new Sequelize('School', 'root', '', {
-			host: 'mysql',
-			dialect: 'mysql'
-		});
-		return sequelize;
-	}
-	else
-	{
-		let pr = test ? new properties.TestProperties() : new properties.Properties();
-		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-			host: pr.databaseURL,
-			dialect: pr.dialect,
+function init() {
+    if (isCI) {
+        console.log("CI");
+        let sequelize = new Sequelize('School', 'root', '', {
+            host: 'mysql',
+            dialect: 'mysql'
+        });
+        return sequelize;
+    } else {
+        let pr = test ? new properties.TestProperties() : new properties.Properties();
+        let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
+            host: pr.databaseURL,
+            dialect: pr.dialect,
             dialectOptions: {
                 dateStrings: true,
             },
-			pool: {
-				max: 10,
-				min: 0,
-				idle: 10000
-			},
-			logging: false
-		});
-		return sequelize;
-	}
+            pool: {
+                max: 10,
+                min: 0,
+                idle: 10000
+            },
+            logging: false
+        });
+        return sequelize;
+    }
 }
 
 let sequelize = init();
@@ -100,8 +96,18 @@ let EventModel = sequelize.define('event', {
 }*/
 
 let GigModel = sequelize.define('gig', {
-    artistId: {type: Sequelize.INTEGER, primaryKey: true},
-    eventId: {type: Sequelize.INTEGER, primaryKey: true},
+    artistId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: UserModel,
+            key: 'userId'
+        }
+    },
+    eventId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: EventModel,
+            key: 'eventId'
+        }
+    },
     rider: Sequelize.BLOB,
     contract: Sequelize.BLOB
 });
