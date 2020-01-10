@@ -1,12 +1,14 @@
 const Models = require('../model.js');
+const dao = require('../dao.js');
+let db = new dao();
 
 beforeAll(() => Models.syncTestData());
 
 describe('Correct Data', () =>
 {
-	it('correct data users', done =>
+	it('correct data in users', done =>
 	{
-		Models.UserModel.findAll().then(users =>
+		db.getAllUsers().then(users =>
 		{
 			expect(users
 				.map(user => user.toJSON())
@@ -61,41 +63,44 @@ describe('Correct Data', () =>
 		});
 	});
 
-	it('correct data events', done =>
+	it('correct data in events', done =>
 	{
-		Models.EventModel.findOne().then(events =>
+		db.getAllEvents().then(events =>
 		{
 			expect(events
 				.map(event => event.toJSON())
 				.map(event => (
 					{
-						eventId: event.id,
+						eventId: event.eventId,
 						organizerId: event.organizerId,
-						eventName: event.name,
-						address: event.password,
-						agelimit: event.ageLimit,
-						dateTime: event.dateTime,
-						description: event.description,
-						contract: event.contract,
+						eventName: event.eventName,
+						address: event.address,
+						ageLimit: event.ageLimit,
+						startTime: event.startTime,
+						endTime: event.endTime,
+						// image: event.image,
+						description: event.description
 					})))
 				.toEqual([
 					{
+						eventId: 1,
 						organizerId: 1,
 						eventName: 'Test1',
 						address: 'Adresse1',
 						ageLimit: 12,
-						dateTime: '',
-						description: 'Konsert for barn',
-						contract: 'BLOB'
+						startTime: null,
+						endTime: null,
+						description: 'Konsert for barn'
 					},
 					{
+						eventId: 2,
 						organizerId: 2,
 						eventName: 'Test1',
 						address: 'Adresse2',
-						ageLimit: '20',
-						dateTime: '',
-						description: 'Konsert for voksne',
-						contract: 'BLOB'
+						ageLimit: 20,
+						startTime: null,
+						endTime: null,
+						description: 'Konsert for voksne'
 					}
 				]);
 			done();
@@ -103,103 +108,55 @@ describe('Correct Data', () =>
 	});
 });
 
-describe('Other type of methods', () =>
-{
-	it('is event organizer', done =>
-	{
-		Models.UserModel.findAll().then(users =>
-		{
-			expect(users
-				.map(user => user.toJSON())
-				.map((user) => (
-					{
-						id: user.id,
-						name: user.name,
-						password: user.password,
-						email: user.email,
 
-					})))
-				.toEqual([
-					{
-						id: 1,
-						name: 'TestBruker1',
-						password: 'TestBruker1',
-						email: '1@mail.com'
-					},
-					{
-						id: 2,
-						name: 'TestBruker2',
-						password: 'TestBruker2',
-						email: '2@mail.com'
-					},
-					{
-						id: 3,
-						name: 'TestBruker3',
-						password: 'TestBruker3',
-						email: '3@mail.com'
-					},
-					{
-						id: 4,
-						name: 'TestBruker4',
-						password: 'TestBruker4',
-						email: '4@mail.com'
-					},
-					{
-						id: 5,
-						name: 'TestBruker5',
-						password: 'TestBruker5',
-						email: '5@mail.com'
-					},
-					{
-						id: 6,
-						name: 'TestBruker6',
-						password: 'TestBruker6',
-						email: '6@mail.com'
-					}
-				]);
-			done();
-		});
+
+describe('Login', () =>
+{
+	it('Login Fail on wrong password', done =>
+	{
+		expect(db.loginOk('TestBruker1', 'FeilPassord')).toBeFalsy();
+		done();
 	});
 
-	it('is not event organizer', done =>
+	it('Login Success on correct password', done =>
 	{
-		Models.EventModel.findOne().then(events =>
-		{
-			expect(events
-				.map(event => event.toJSON())
-				.map((event) => (
-					{
-						eventId: event.id,
-						organizerId: event.organizerId,
-						eventName: event.name,
-						address: event.password,
-						agelimit: event.ageLimit,
-						dateTime: event.dateTime,
-						description: event.description,
-						contract: event.contract,
-					})))
-				.toEqual([
-					{
-						organizerId: 1,
-						eventName: 'Test1',
-						address: 'Adresse1',
-						ageLimit: 12,
-						dateTime: '',
-						description: 'Konsert for barn',
-						contract: 'BLOB'
-					},
-					{
-						organizerId: 2,
-						eventName: 'Test1',
-						address: 'Adresse2',
-						ageLimit: 20,
-						dateTime: '',
-						description: 'Konsert for voksne',
-						contract: 'BLOB'
-					}
-				]);
-			done();
-		});
+		expect(db.loginOk('TestBruker1', 'TestBruker1')).toBeTruthy();
+		done();
+	});
+});
+
+
+
+describe('Event', () =>
+{
+	it('update  an event', done =>
+	{
+		let event = {eventId: 1, eventname: 'TestUpdate'};
+		expect(db.updateEvent(event)).toBeTruthy();
+		done();
+	});
+
+	it('post an event', () =>
+	{
+		let event = {};
+		expect(db.createEvent(event)).toBeTruthy();
+	});
+});
+
+
+
+describe('Uncategorized', () =>
+{
+	it('Find user by id and username', done =>
+	{
+		expect(db.findUser('1', 'TestBruker1')
+		         .map(user => ({
+			         userId: user.userId,
+			         username: user.username,
+			         email: user.email
+		         })))
+			.toEqual({userId: 1, username: 'TestBruker1', email: '1@mail.com'});
+		done();
 	});
 });
 
