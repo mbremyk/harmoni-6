@@ -3,12 +3,16 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
 const bodyParser = require("body-parser");
-const model = require('./model.js');
-model.syncModels();
-const sequelize = require("sequelize");
-const op = sequelize.Op;
 const jwt = require("jsonwebtoken");
 let cors = require("cors");
+
+// const model = require('./model.js');
+// model.syncModels();
+// const sequelize = require("sequelize");
+// const op = sequelize.Op;
+const dao = require('../dao.js');
+let db = new dao();
+
 
 let privateKey = (publicKey = "shhhhhverysecret");
 
