@@ -30,38 +30,66 @@ class Dao {
     }
 
 
-    //returns true if user was created, false if something went wrong
-    createUser(user) {
-        return model.UserModel.create(
-            {
-                username: user.username,
-                password: user.password,
-                salt: user.salt,
-                email: user.email
-            }
-        ).then(response => response.id !== null)
-            .catch(error => {
-                console.error(error);
-                return false;
-            });
-    }
+	//returns true if user was created, false if something went wrong
+	createUser(user)
+	{
+		return model.UserModel.create(
+			{
+				username: user.username,
+				password: user.password,
+				salt: user.salt,
+				email: user.email
+			}
+		).then(response => response.id !== null)
+		            .catch(error =>
+		            {
+			            console.error(error);
+			            return false;
+		            });
+	}
 
 
-    //returns true if an event is updated, false if too many, or noone is
-    updateEvent(event) {
-        return model.EventModel.update(
-            {
-                organizerId: event.organizerId,
-                eventName: event.eventName,
-                address: event.address,
-                ageLimit: event.ageLimit,
-                startTime: event.startTime,
-                endTime: event.endTime,
-                description: event.description
-            },
-            {where: {eventId: event.eventId}}
-        ).then(updated => (updated[0] /* affected rows */ === 1));
-    }
+
+	//returns true if user was created, false if something went wrong
+	updateUser(user)
+	{
+		return model.UserModel.update(
+			{
+				username: user.username,
+				email: user.email
+			},
+			{where: {userId: user.userId}}
+		).then(response => response[0] === 1 /*affected rows === 1*/)
+		            .catch(error =>
+		            {
+			            console.error(error);
+			            return false;
+		            });
+	}
+
+
+
+	//returns true if an event is updated, false if too many, or noone is
+	updateEvent(event)
+	{
+		return model.EventModel.update(
+			{
+				organizerId: event.organizerId,
+				eventName: event.eventName,
+				address: event.address,
+				ageLimit: event.ageLimit,
+				startTime: event.startTime,
+				endTime: event.endTime,
+				description: event.description
+			},
+			{where: {eventId: event.eventId}}
+		).then(response => response[0] === 1 /*affected rows === 1*/)
+		            .catch(error =>
+		            {
+			            console.error(error);
+			            return false;
+		            });
+	}
 
 
     createEvent(event) {
@@ -127,15 +155,6 @@ class Dao {
                 return null;
             });
     }
-
-
-    updateUser(user) {
-        return model.UserModel.update({
-            username: user.username,
-            email: user.newEmail,
-        }, {where: {email: user.email}})
-    }
-
 
     getEventsUser(userId) {
         return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
