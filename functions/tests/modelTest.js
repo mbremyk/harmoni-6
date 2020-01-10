@@ -8,7 +8,7 @@ beforeAll(() => Models.syncTestData());
 
 describe('Login Test', () => {
     it('Login Fail on wrong password', done => {
-        db.loginOk('TestBruker1', 'FeilPassord').then(ok => {
+        db.loginOk('steffen@mail.com', 'FeilPassord').then(ok => {
             expect(ok).toBeFalsy();
             done();
         });
@@ -16,7 +16,7 @@ describe('Login Test', () => {
 
 
     it('Login Success on correct password', done => {
-        db.loginOk('TestBruker1', 'TestBruker1').then(ok => {
+        db.loginOk('steffen@mail.com', 'ST').then(ok => {
             expect(ok).toBeTruthy();
             done();
         });
@@ -34,7 +34,7 @@ describe('User Tests', () => {
 
 
     it('find user by id and username', done => {
-        db.getUser(1, 'Steffen T').then(users => {
+        db.getUser("steffen@mail.com", 1).then(users => {
             expect(users
                 .map(user => user.toJSON())
                 .map(user => (
@@ -185,7 +185,7 @@ describe('Personnel Tests', () => {
 
 describe('Search', () => {
     it('search several results', done => {
-        db.findEventsBySearch('konsert').then(events => {
+        db.getEventsMatching('konsert').then(events => {
             events.map(event => console.log(event));
             expect(events
                 .map(event => event.toJSON())
@@ -194,9 +194,6 @@ describe('Search', () => {
                         eventName: event.eventName,
                     })))
                 .toEqual([
-                    {
-                        eventName: 'Ungdomskonsert',
-                    },
                     {
                         eventName: 'D.D.E',
                     },
@@ -210,7 +207,7 @@ describe('Search', () => {
 
 
     it('search one results', done => {
-        db.findEventsBySearch('Kygo').then(events => {
+        db.getEventsMatching('Kygo').then(events => {
             expect(events
                 .map(event => event.toJSON())
                 .map(event => (
@@ -228,9 +225,8 @@ describe('Search', () => {
 
 
     it('search with no results', done => {
-        db.findEventsBySearch('Finnes ikke').then(events => {
-
-            expect(events).toBe(null);
+        db.getEventsMatching('Finnes ikke').then(events => {
+            expect(events.length).toBe(0);
             done();
         });
     });

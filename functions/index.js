@@ -128,8 +128,23 @@ app.get("/events/search/:searchText", (req, res) => {
  * }
  */
 app.post("/user", (req, res) => {
-    return db.createUser(req.body)
-        .then(success => success ? res.status(201) : res.status(400));
+    return db.getUser(req.body.email)
+        .then(user => {
+            if (user) {
+                res.sendStatus(409);
+            } else {
+                return hashPassword.hashPassword(req.body.password).then(credentials => {
+                    db.createUser({
+                        username: req.body.username,
+                        email: req.body.email,
+                        password: credentials[0],
+                        salt: credentials[1]
+                    })
+                        .then(success => success ? res.status(201) : res.status(400))
+                        .catch(error => console.error(error));
+                });
+            }
+        });
 });
 
 /**
@@ -145,7 +160,7 @@ app.post("/user", (req, res) => {
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
-    db.getSaltByEmail(req.body.email).then(salt => {
+    return db.getSaltByEmail(req.body.email).then(salt => {
         if (salt.length !== 1) {
             res.status(401);
             return;
@@ -154,8 +169,8 @@ app.post("/login", (req, res) => {
             db.loginOk(req.body.email, credentials[0]).then(ok => {
                 if (ok) {
                     db.getUser(req.body.email).then(user => {
-                        console.log(user[0].dataValues);
-                        let token = getToken(user[0].dataValues);
+                        console.log(user.dataValues);
+                        let token = getToken(user.dataValues);
                         res.json({jwt: token});
                     })
                 } else {
