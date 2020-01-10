@@ -90,8 +90,8 @@ function test() {
 
 module.exports = {getContract, getRider, setRider, setContract};
     //new File(new Blob(["test"], {type : 'text'}), "test");
-setContract(new ArrayBuffer(8), 1, 1);
+//setContract(new ArrayBuffer(8), 1, 1);
 //data.append('file', new File(new Blob(["test"], {type : 'text'}), "test"));
-test();
+//test();
 
 

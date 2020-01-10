@@ -1,6 +1,7 @@
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
+const Blob = require("cross-blob");
 
 let date_format = '\'%d %M %H:%i\'';
 
@@ -144,6 +145,33 @@ class Dao
 			     console.error(error);
 			     return null;
 		     });
+	}
+
+	setContract(contract, gig, artist ){
+		return model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+			.then(gig => {
+				console.log(contract);
+				let b = new Blob([contract]);
+				gig.update({contract: b});
+			}
+		);
+		console.log(contract);
+
+		/*model.GigModel.update(
+			{contract: contract},
+			{ where: { gigId: gig, artistId: artist}}
+		);
+		model.update();*/
+
+	}
+
+	getContract(gig, artist){
+		return model.GigModel.findAll({where:{eventId: gig, artistId: artist } })
+			.then(gig => {
+					console.log(gig[0].contract);
+					return gig[0].contract;
+			}
+		);
 	}
 }
 

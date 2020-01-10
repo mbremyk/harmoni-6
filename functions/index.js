@@ -93,17 +93,22 @@ app.post("/login", (req, res) =>
 
 
 
-app.post("/file", (req, res) => {
-    console.log("server says:");
-    let dataBlob = req.body;
-    console.log(req.body);
-    console.log("Data: "+new ArrayBuffer(dataBlob));
-    model.GigModel.findOne({where:{eventId: 1, artistId: 1 } })
-        .then(gig => {
-            console.log("updating: ");
-            gig.update({contract: dataBlob});
-        }).then(() => res.send("done"));
-    console.log("upload done");
+app.post("/contract/:eventId/:artistId", (req, res) => {
+	console.log("Calling setContract");
+	console.log(req);
+	console.log("Body: "+req.body);
+    db.setContract(req.body, req.params.eventId, req.params.artistId)
+		.then(() => res.send("Change made"));
+});
+
+
+app.get("/contract/:eventId/:artistId", (req, res) => {
+	console.log("downloading file");
+	db.getContract(req.params.eventId, req.params.artistId)
+		.then(result => {
+			res.send(JSON.stringify(result));
+			}
+		);
 });
 
 app.use("/auth", (req, res, next) => {

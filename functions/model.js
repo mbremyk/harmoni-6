@@ -27,36 +27,8 @@ function init() {
         });
         return sequelize;
     }
-function init()
-{
-	if (isCI)
-	{
-		console.log("CI");
-		let sequelize = new Sequelize('School', 'root', '', {
-			host: 'mysql',
-			dialect: 'mysql'
-		});
-		return sequelize;
-	}
-	else
-	{
-		let pr = test ? new properties.TestProperties() : new properties.Properties();
-		let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-			host: pr.databaseURL,
-			dialect: pr.dialect,
-            dialectOptions: {
-                dateStrings: true,
-            },
-			pool: {
-				max: 10,
-				min: 0,
-				idle: 10000
-			},
-			logging: false
-		});
-		return sequelize;
-	}
 }
+
 
 let sequelize = init();
 
@@ -170,6 +142,8 @@ let PersonnelModel = sequelize.define('personnel', {
 
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
+
+let update = () => sequelize.sync();
 
 /*
 creates tables in the testdatabase and inserts the test data
@@ -299,4 +273,4 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
     ).catch(error => console.log(error));
 });
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels, syncTestData};
+module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels, syncTestData, update};

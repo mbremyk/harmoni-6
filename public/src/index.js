@@ -40,8 +40,40 @@ class Test extends Component{
     }
 }
 
+class DownloadWidget extends Component{
+    render (){
+        return(
+            <button onClick={this.download}>Dowload the file</button>
+        )
+    }
+
+    download(){
+        service.downloadContract(1, 1)
+            .then(res =>{
+                console.log("Answer: "+res);
+                console.log(res instanceof Buffer );
+
+
+
+                const link = document.createElement( 'a' );
+                link.style.display = 'none';
+                document.body.appendChild( link );
+
+
+                const blob = new Blob(  [res], { type: 'application/octet-binary;charset=utf-8' } );
+                const objectURL = URL.createObjectURL( blob );
+
+                console.log(blob);
+
+                link.href = objectURL;
+                link.href = URL.createObjectURL( blob );
+                link.download =  'data.txt';
+                link.click();
+            })
+    }
+}
+
 class UploadWidget extends Component{
-    curFile;
     render(){
         return(
             <div className="container">
@@ -60,15 +92,17 @@ class UploadWidget extends Component{
     fileHandler = (e) => {
         e.preventDefault();
         let selectedFile =  e.target.files[0];
-        //console.log(selectedFile);
-        const formData = new FormData();
-        formData.append('file', selectedFile);
+        let data = new FormData();
+        data.append("file", selectedFile);
+        console.log(data);
         const reader = new FileReader();
         let send;
+        /*service.uploadContract(data, 1, 1)
+            .then(res => console.log(res));*/
         //send = selectedFile.toDataURL("text/txt");
-        selectedFile.arrayBuffer().then(readRes => {
+       selectedFile.arrayBuffer().then(readRes => {
             console.log(readRes);
-            service.uploadFile(readRes)
+            service.uploadContract(readRes, 1, 1)
                 .then(res => console.log(res));
         });
         //console.log(formData);
@@ -89,6 +123,7 @@ if (root)
 
 
     <Route exact path="/Upload" component={UploadWidget} />
+    <Route exact path="/Upload" component={DownloadWidget} />
     <Route exact path="/opprett-arrangement" component={addEvent} />
     </div>
     </BrowserRouter>,

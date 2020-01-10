@@ -46,9 +46,14 @@ class Services
 		//return axios.get<Events[]>('/events').then(response => response.data);
 	}
 
-	uploadFile(formData)
+	uploadContract(formData, event, artist)
 	{
-		return axios.post(url+"/file", formData).then(response => console.log(response.data));
+		return axios.post(url+"/contract/"+event+"/"+artist, formData).then(response => console.log(response.data));
+	}
+
+	downloadContract(event, artist)
+	{
+		return axios.get(url+"/contract/"+event+"/"+artist).then(response => response);
 	}
 
 	getAccessToken(email, hashedPassword){
