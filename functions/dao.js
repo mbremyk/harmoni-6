@@ -76,9 +76,9 @@ class Dao
 
 
 	//chekcs if username and password match, then reuturns true or false
-	loginOk(username, password)
+	loginOk(email, password)
 	{
-		return model.UserModel.findAll({where: {[op.and]: [{username: username}, {password: password}]}})
+		return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
 		            .then(response =>
 		            {
 			            return response.length === 1;

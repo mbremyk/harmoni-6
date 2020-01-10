@@ -26,13 +26,6 @@ main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
 
-function loginOk(email, password) {
-    return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
-        .then(response => {
-            return response.length === 1;
-        });
-}
-
 app.get("/test", (req, res) => {
     console.log(req);
     res.send("test functional");
@@ -80,7 +73,7 @@ app.get("/salt/:email", (req, res) => {
 
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
-    if (loginOk(req.body.email, req.body.password)) {
+    if (db.loginOk(req.body.email, req.body.password)) {
         let token = jwt.sign({email: req.body.email}, privateKey, {
             expiresIn: 1800
         });
