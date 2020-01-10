@@ -5,6 +5,7 @@ const op = sequelize.Op;
 let date_format = '\'%d %M %H:%i\'';
 
 
+
 class Dao
 {
 	//returns array of all users in the database
@@ -25,11 +26,34 @@ class Dao
 
 	findUser(userId, username)
 	{
-		return model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
-		            .then(user =>
+		model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
+		     .then(user =>
+		     {
+			     if (user.length === 1)
+			     {
+				     return user;
+			     }
+			     return null;
+		     });
+	}
+
+
+
+	//returns true if user was created, false if something went wrong
+	createUser(user)
+	{
+		return model.UserModel.create(
+			{
+				username: user.username,
+				password: user.password,
+				salt: user.salt,
+				email: user.email
+			}
+		).then(response => response.id !== null)
+		            .catch(error =>
 		            {
-			            if (user.length === 1) return user;
-			            return null;
+			            console.error(error);
+			            return false;
 		            });
 	}
 
@@ -71,16 +95,34 @@ class Dao
 
 
 
+	findEventsBySearch(searchText)
+	{
+		model.EventModel.findAll({
+			where: {[op.or]: [{eventName: {[op.like]: `%${searchText}%`}}, {description: {[op.like]: `%${searchText}%`}}]},
+			order: [['startTime', 'ASC']]
+		}).then(events => {return events;})
+		     .catch(error =>
+		     {
+			     console.error(error);
+			     return null;
+		     });
+	}
+
+
+
 	//chekcs if username and password match, then reuturns true or false
 	loginOk(email, password)
 	{
-		return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
-		            .then(response =>
-		            {
-			            return response.length === 1;
-		            });
+		model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
+		     .then(response =>
+		     {
+			     return response.length === 1;
+		     });
 	}
 }
+
+
+
 module.exports = Dao;
 
 
