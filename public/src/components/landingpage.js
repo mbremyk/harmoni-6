@@ -27,7 +27,7 @@ export class LandingPage extends Component
 	 </Row>
 
 	 </Container>
-	*/
+	 */
 
 	render()
 	{
@@ -59,22 +59,21 @@ export class LandingPage extends Component
 				</div>
 
 
-
-
-
 				<Container>
 
 
 					<Row>
 
 						{this.events.map(event => (
-							<EventInfo imageUrl={event.imageUrl}
-							           title={event.eventName}
-							           address={event.address}
-							           age_limit={event.ageLimit}
-							           start_date={event.startTime}
-							           end_date={event.endTime}
-							           uploaded={event.createdAt}
+							<EventInfo
+								link={event.eventName}
+								imageUrl={event.imageUrl}
+								title={event.eventName}
+								address={event.address}
+								age_limit={event.ageLimit}
+								start_date={event.startTime}
+								end_date={event.endTime}
+								uploaded={event.createdAt}
 							/>
 						))}
 
@@ -128,14 +127,14 @@ export class LandingPage extends Component
 	}
 
 	/*
-	searchForEvents(input)
-	{
-		service
-			.searchForEvents(input)
-			.then(searchevents => this.searchevents = searchevents)
-			.catch((error) => console.log(error));
+	 searchForEvents(input)
+	 {
+	 service
+	 .searchForEvents(input)
+	 .then(searchevents => this.searchevents = searchevents)
+	 .catch((error) => console.log(error));
 
-	}
-	*/
+	 }
+	 */
 
 }
