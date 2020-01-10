@@ -1,29 +1,28 @@
 Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const express = require("express");
+admin.initializeApp(functions.config().firebase);
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 let cors = require("cors");
 
-// const model = require('./model.js');
-// model.syncModels();
-// const sequelize = require("sequelize");
-// const op = sequelize.Op;
-const dao = require('./dao.js');
-let db = new dao();
 
-
-let privateKey = (publicKey = "shhhhhverysecret");
-
-admin.initializeApp(functions.config().firebase);
+//Express
+const express = require("express");
 const app = express();
 app.use(cors({origin: true}));
-
 const main = express();
 main.use('/api/v1', app);
 main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
+
+//Sequalize
+const model = require('./model.js');
+const dao = require('./dao.js');
+let db = new dao();
+model.syncModels();
+
+let privateKey = (publicKey = "shhhhhverysecret");
 const deployed = true;
 
 /**
