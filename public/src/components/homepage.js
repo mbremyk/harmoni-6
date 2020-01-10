@@ -45,13 +45,17 @@ export class HomePage extends Component
 
 				<Row>
 					{this.myEvents.map(event => (
-						<EventInfo imageUrl={event.imageUrl}
-						           title={event.eventName}
-						           address={event.address}
-						           age_limit={event.ageLimit}
-						           start_date={event.startTime}
-						           end_date={event.endTime}
-						           uploaded={event.createdAt}
+						<EventInfo
+
+							link={event.eventName}
+							imageUrl={event.imageUrl}
+							title={event.eventName}
+							address={event.address}
+							age_limit={event.ageLimit}
+							start_date={event.startTime}
+							end_date={event.endTime}
+							uploaded={event.createdAt}
+
 						/>
 					))}
 				</Row>

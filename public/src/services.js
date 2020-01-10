@@ -81,6 +81,11 @@ class Services
 		return axios.get('/events/' + organizerId).then(response => response.data);
 	}
 
+	getEventByEventId(eventId)
+	{
+		return axios.get('/events/eventdetails/' + eventId).then(response => response.data);
+	}
+
 
 }
 

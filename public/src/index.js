@@ -13,6 +13,7 @@ import {myPage} from "./components/mypage.js";
 import { GuardProvider, GuardedRoute } from 'react-router-guards';
 import {addEvent} from '../src/components/createevent.js';
 import {HomePage} from "./components/homepage";
+import{EventPage} from "./components/eventpage";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -30,6 +31,10 @@ if (root)
         <Route exact path="/logg-inn" component={LoginForm} />
         <Route exact path="/opprett-arrangement" component={addEvent} />
         <Route exact path="/hjem" component={HomePage} />
+        <Route exact path="/arrangement/:id" component={EventPage} />
+
+
+
 
     </div>
     </BrowserRouter>,

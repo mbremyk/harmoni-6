@@ -153,6 +153,18 @@ app.get("/events/:organizerId", (req, res) =>
 	});
 });
 
+app.get("/events/eventdetails/:eventId", (req, res) =>
+{
+	console.log("GET-request received from client");
+	return db.getEventByEventId(req.params.eventId).then(events =>
+	{
+		if (events !== null)
+		{res.status(201).send(events);}
+		else
+		{res.sendStatus(400);}
+	});
+});
+
 
 
 console.log("Server initalized");

@@ -153,6 +153,13 @@ class Dao
 
 	}
 
+	//returns an event with the same id
+	getEventByEventId(eventId)
+	{
+		return model.EventModel.findOne({where: {eventId: eventId}});
+
+	}
+
 }
 
 
