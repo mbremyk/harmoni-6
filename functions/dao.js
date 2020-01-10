@@ -4,7 +4,6 @@ const op = sequelize.Op;
 
 let date_format = '\'%d %M %H:%i\'';
 
-
 class Dao {
     //returns array of all users in the database
     getAllUsers() {
