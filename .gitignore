@@ -421,3 +421,5 @@ functions/properties.js
 functions/package-lock.json
 
 public/build/
+*/build/
+build/
