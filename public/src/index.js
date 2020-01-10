@@ -12,6 +12,7 @@ import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
 import { GuardProvider, GuardedRoute } from 'react-router-guards';
 import {addEvent} from '../src/components/createevent.js';
+import AuthService from "./AuthService";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
