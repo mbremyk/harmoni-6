@@ -434,5 +434,7 @@ public/build/asset-manifest.json
 public/build/
 */build/
 build/
+/public/build/
+
 build
 /build
