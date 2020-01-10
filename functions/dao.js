@@ -21,9 +21,9 @@ class Dao {
     //returns a user if userid and username matches, else return null
     getUser(email, userId = null) {
         let where = userId ? {[op.and]: [{userId: userId}, {email: email}]} : {email: email};
-        return model.UserModel.findAll({where: where})
+        return model.UserModel.findOne({where: where})
             .then(user => {
-                if (user.length === 1) {
+                if (user) {
                     return user;
                 }
                 return null;
@@ -85,25 +85,23 @@ class Dao {
     }
 
 
-
-	createEvent(event)
-	{
-		return model.EventModel.create(
-			{
-				organizerId: event.organizerId,
-				eventName: event.eventName,
-				address: event.address,
-				ageLimit: event.ageLimit,
-				startTime: event.startTime,
-				endTime: event.endTime,
-				description: event.description
-			}
-		).then(created => ({insertId: created.eventId}));
-	}
+    createEvent(event) {
+        return model.EventModel.create(
+            {
+                organizerId: event.organizerId,
+                eventName: event.eventName,
+                address: event.address,
+                ageLimit: event.ageLimit,
+                startTime: event.startTime,
+                endTime: event.endTime,
+                description: event.description
+            }
+        ).then(created => ({insertId: (created.eventId)}));
+    }
 
 
     getEventsMatching(searchText) {
-        model.EventModel.findAll({
+        return model.EventModel.findAll({
             where: {[op.or]: [{eventName: {[op.like]: `%${searchText}%`}}, {description: {[op.like]: `%${searchText}%`}}]},
             order: [['startTime', 'ASC']]
         }).then(events => {
@@ -141,7 +139,7 @@ class Dao {
 
 
     getSaltByEmail(email) {
-        returnmodel.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+        return model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
             .then(salt => {
                 return salt;
             })
@@ -157,15 +155,10 @@ class Dao {
     }
 
     //returns an event with the same id
-    getEventByEventId(eventId)
-    {
-	    return model.EventModel.findOne({where: {eventId: eventId}});
-    }
+    getEventByEventId(eventId) {
+        return model.EventModel.findOne({where: {eventId: eventId}});
 
-	getEventsUser(userId)
-	{
-		return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
-	}
+    }
 
     getPersonnel(eventId) {
         return model.PersonnelModel.findAll({where: {eventId: eventId}});
