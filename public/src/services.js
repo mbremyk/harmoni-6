@@ -20,22 +20,30 @@ export class User
 export class Event
 {
 	eventId;
+	organizerId;
 	eventName;
 	eventAddress;
 	ageLimit;
 	image;
 	startDate;
 	endDate;
-	description;
+	eventDescription;
 
 }
 
-export class Gig
-{
+export class Gig {
+
 	artistId;
 	eventId;
 	rider;
 	contract;
+
+	constructor(artistId, eventId, rider, contract) {
+		this.artistId = artistId;
+		this.eventId = eventId;
+		this.rider = rider;
+		this.contract = contract;
+	}
 }
 
 
@@ -54,6 +62,11 @@ class Services
 		return axios.get(url + '/user').then(response => response.data);
 	}
 
+	getUser(id)
+	{
+		return axios.get(url + '/user/' + id).then(response => response.data);
+	}
+
 	createEvent(event)
 	{
 		return axios.post(url + '/event', event).then(response => response.insertId);
@@ -68,9 +81,9 @@ class Services
 		//return axios.get<Events[]>('/events').then(response => response.data);
 	}
 
-	getEvent()
+	getEvent(id)
 	{
-		return axios.get<Event>('/events/:id').then(response => response.data);
+		return axios.get<Event>('/events/' + id).then(response => response.data);
 	}
 
 

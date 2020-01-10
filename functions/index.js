@@ -95,6 +95,7 @@ app.get("/events", (req, res) => {
 app.post("/event", (req, res) =>{
    console.log("POST-request received from client");
    return model.EventModel.create({
+       organizerId: req.body.organizerId,
        eventName: req.body.eventName,
        address: req.body.eventAddress,
        description: req.body.eventDescription,
@@ -187,6 +188,12 @@ app.get("/user", (req, res) => {
    console.log("GET-request received from client");
    return model.UserModel.findAll().then(events => res.send(events))
        .catch(error => console.error(error));
+});
+
+app.get("/user/:id", (req, res) => {
+    console.log("GET-request received from client");
+    return model.UserModel.findOne({where: {userId: req.params.id }}).then(events => res.send(events))
+        .catch(error => console.error(error));
 });
 
 /**
