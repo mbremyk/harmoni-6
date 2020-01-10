@@ -60,13 +60,15 @@ export class LandingPage extends Component
 					<Row>
 
 						{this.events.map(event => (
-							<EventInfo image= {event.image}
+							<EventInfo image = {event.imageUrl}
 							           title= {event.eventName}
 							           address ={event.address}
 							           price = {this.getTicketPrice(event.eventId)}
 							           age_limit ={event.ageLimit}
 							           start_date ={event.startTime}
-							           end_date ={event.endTime}  />
+							           end_date ={event.endTime}
+							           uploaded = {event.createdAt}
+							/>
 						))}
 
 

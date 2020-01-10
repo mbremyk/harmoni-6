@@ -27,8 +27,11 @@ export class Event
 	ageLimit;
 	startTime;
 	endTime;
+	imageUrl;
 	image;
 	description;
+	createdAt;
+	updatedAt;
 
 
 }
@@ -63,7 +66,8 @@ class Services
 		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
 	}
 
-	getAccessToken(email, hashedPassword){
+	getAccessToken(email, hashedPassword)
+	{
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
 }

@@ -23,7 +23,8 @@ export class EventInfo extends Component
 
 				<Card>
 					<Card.Img variant="top"
-					          src={this.props.image}/>
+					          src={this.props.image}
+					          alt={this.title}/>
 					<Card.Body>
 
 
