@@ -30,6 +30,14 @@ export class Event
 
 }
 
+export class Gig
+{
+	artistId;
+	eventId;
+	rider;
+	contract;
+}
+
 
 
 
@@ -42,7 +50,11 @@ class Services
 	}
 
 	createEvent(event){
-		return axios.post(url + '/event', event).then(response => response.data);
+		return axios.post(url + '/event', event).then(response => response.insertId);
+	}
+
+	createGig(gig){
+		return axios.post(url + '/gig', gig).then(response => response.data);
 	}
 
 	getEvents()
