@@ -54,10 +54,9 @@ app.get("/events/search/:searchText", (req, res) => {
 
 app.post("/user", (req, res) => {
     console.log("POST-request received from client");
-
     hashPassword.hashPassword(req.body.password)
-        .then(credentials =>
-            {return model.UserModel.create({
+        .then(credentials => {
+            return model.UserModel.create({
                 username: req.body.username,
                 email: req.body.email,
                 password: credentials[0],
@@ -68,10 +67,11 @@ app.post("/user", (req, res) => {
                     console.error(error);
                     res.status(400);
                 });
-            })
+        })
         .catch(error => {
             console.error(error);
             res.status(400)
+        });
 });
 
 app.get("/salt/:email", (req, res) => {
@@ -84,12 +84,13 @@ app.get("/salt/:email", (req, res) => {
 
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
-    model.UserModel.findAll({where: {email: req.body.email}, attributes: ['salt']})
-        .then(salt => hashPassword.hashPassword(req.body.password, salt)
+
+    model.UserModel.findAll({where: {email: req.body.params.email}, attributes: ['salt']})
+        .then(salt => hashPassword.hashPassword(req.body.params.password, salt[0].dataValues.salt)
             .then(credentials => {
-                if(loginOk(req.body.email, credentials[0]))
+                if(loginOk(req.body.params.email, credentials[0]))
                 {
-                    let token = jwt.sign({email: req.body.email}, privateKey, {
+                    let token = jwt.sign({email: req.body.params.email}, privateKey, {
                         expiresIn: 1800
                     });
                     res.json({jwt: token})

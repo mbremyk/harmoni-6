@@ -40,6 +40,20 @@ export class CreateUserForm extends Component{
 		}
 
 		// check email and username availability
+		// TODO get usernames and emails
+		let usernames = [];
+		let emails = [];
+
+		if(usernames.includes(this.state.username))
+		{
+			alert('Brukernavn er tatt :(');
+			return;
+		}
+		if(emails.includes(this.state.email))
+		{
+			alert('Email er i bruk');
+			return;
+		}
 
 		// check password mismatch
 		if(this.state.password1 !== this.state.password2) {

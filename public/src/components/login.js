@@ -25,7 +25,7 @@ export class LoginForm extends Component{
     }
     handleLogin() {
         service.login(this.state.email, this.state.password)
-            .then(token => this.login(token))
+            .then(token => this.login(token.jwt))
             .catch(err => alert("En feil oppsto."));
     }
 
