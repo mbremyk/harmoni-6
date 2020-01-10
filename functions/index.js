@@ -3,12 +3,16 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
 const bodyParser = require("body-parser");
-const model = require('./model.js');
-model.syncModels();
-const sequelize = require("sequelize");
-const op = sequelize.Op;
 const jwt = require("jsonwebtoken");
 let cors = require("cors");
+
+// const model = require('./model.js');
+// model.syncModels();
+// const sequelize = require("sequelize");
+// const op = sequelize.Op;
+const dao = require('./dao.js');
+let db = new dao();
+
 
 let privateKey = (publicKey = "shhhhhverysecret");
 
@@ -85,11 +89,37 @@ app.get("/test", (req, res) => {
  *     description: Text
  * }
  */
-app.get("/events", (req, res) => {
-    console.log("GET-request received from client");
-    return model.EventModel.findAll({order: [['startTime', 'ASC']]})
-        .then(events => res.send(events))
-        .catch(error => console.error(error));
+app.get("/events", (req, res) =>
+{
+	console.log("GET-request received from client");
+	return db.getAllEvents().then(events =>
+	{
+		if (events !== null)
+		{res.status(201).send(events);}
+		else
+		{res.sendStatus(400);}
+	});
+});
+
+
+
+app.get("/events/search/:searchText", (req, res) =>
+{
+	return db.findEventsBySearch(req.params.searchText).then(events =>
+	{
+		if (events !== null)
+		{res.status(201).send(events);}
+		else
+		{res.sendStatus(400);}
+	});
+});
+
+
+
+app.post("/user", (req, res) =>
+{
+	return db.createUser(req.body)
+	         .then(success => success ? res.status(201) : res.status(400));
 });
 
 /**
@@ -144,10 +174,10 @@ app.post("/user", (req, res) => {
 /**
  * @deprecated
  */
-app.get("/salt/:email", (req, res) => {
+app.get("/salt/:email", (req, res) =>
+{
     console.log("GET-request received from client");
-
-    return model.UserModel.findAll({where: {email: req.params.email}, attributes: ['salt']})
+    return db.getSaltByEmail(req.params.email)
         .then(salt => res.send(salt))
         .catch(error => console.error(error));
 });
@@ -159,19 +189,21 @@ app.get("/salt/:email", (req, res) => {
  *
  *      }
  */
-app.post("/login", (req, res) => {
-    console.log("POST-request received from client");
-    loginOk(req.body.email, req.body.password).then(ok => {
-        if (ok) {
-            let token = jwt.sign({email: req.body.email}, privateKey, {
-                expiresIn: 1800
-            });
-            res.json({jwt: token})
-        } else {
-            res.status(401);
-            res.json({error: "Not authorized"});
-        }
-    });
+app.post("/login", (req, res) =>
+{
+	console.log("POST-request received from client");
+	if (db.loginOk(req.body.email, req.body.password))
+	{
+		let token = jwt.sign({email: req.body.email}, privateKey, {
+			expiresIn: 1800
+		});
+		res.json({jwt: token});
+	}
+	else
+	{
+		res.status(401);
+		res.json({error: "Not authorized"});
+	}
 });
 
 app.use("/auth", (req, res, next) => {
@@ -189,27 +221,26 @@ app.use("/auth", (req, res, next) => {
     })
 });
 
-app.get("/auth/user/:userId", (req, res) => {
-    console.log("GET-request received from client");
-    return model.UserModel.findAll({where: {[op.and]: [{userId: req.params.userId}, {email: req.body.email}]}})
-        .then(user => {
-            if (user.length === 1) {
-                return user;
-            } else {
-                res.sendStatus(503);
-            }
-        })
-        .then(user => res.send(user))
-        .catch(error => console.error(error));
+
+
+app.get("/auth/user/:userId", (req, res) =>
+{
+	console.log("GET-request received from client");
+	return db.findUser(req.params.userId, req.body.username)
+	         .then(user => res.send(user))
+	         .catch(error => console.error(error));
 });
 
-app.get("/tickets/:eventId", (req, res) => {
-    console.log("GET-request received from client");
 
-    return model.TicketModel.findAll({where: {eventId: req.params.eventId}})
-        .then(tickets => res.send(tickets))
-        .catch(error => console.error(error));
+
+app.get("/tickets/:eventId", (req, res) =>
+{
+	console.log("GET-request received from client");
+	return db.getTicketsForEvent(req.params.eventId)
+	         .then(tickets => res.status(201).send(tickets));
 });
+
+
 
 app.post("/auth/refresh", (req, res) => {
     console.log("POST-request received from client");
