@@ -19,11 +19,12 @@ class Dao
 	//returns array of all events in database
 	getAllEvents()
 	{
-		return model.EventModel.findAll();
+		return model.EventModel.findAll({order: [['startTime', 'ASC']]});
 	}
 
 
 
+	//returns a user if userid and username matches, else return null
 	findUser(userId, username)
 	{
 		model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
@@ -90,7 +91,7 @@ class Dao
 				endTime: event.endTime,
 				description: event.description
 			}
-		).then(updated => ({insertId: (updated.id)}));
+		).then(created => ({insertId: (created.id)}));
 	}
 
 
@@ -117,6 +118,23 @@ class Dao
 		     .then(response =>
 		     {
 			     return response.length === 1;
+		     });
+	}
+
+	getTicketsForEvent(eventId){
+		return model.TicketModel.findAll({where: {eventId: eventId}})
+		     .then(tickets => tickets)
+		     .catch(error => console.error(error));
+	}
+
+	getSaltByEmail(email)
+	{
+		model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+		     .then(salt => {return salt;})
+		     .catch(error =>
+		     {
+			     console.error(error);
+			     return null;
 		     });
 	}
 }
