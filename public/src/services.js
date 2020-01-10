@@ -73,7 +73,7 @@ class Services
 
 	searchForEvents(input)
 	{
-		return axios.get('/events/search/' + input).then(response => response.data);
+		return axios.get('/events/search/:' + encodeURIComponent(input)).then(response => response.data);
 	}
 
 

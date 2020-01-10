@@ -5,27 +5,22 @@ const op = sequelize.Op;
 let date_format = '\'%d %M %H:%i\'';
 
 
-
-class Dao
-{
-	//returns array of all users in the database
-	getAllUsers()
-	{
-		return model.UserModel.findAll();
-	}
+class Dao {
+    //returns array of all users in the database
+    getAllUsers() {
+        return model.UserModel.findAll();
+    }
 
 
-
-	//returns array of all events in database
-	getAllEvents()
-	{
-		return model.EventModel.findAll({order: [['startTime', 'ASC']]});
-	}
+    //returns array of all events in database
+    getAllEvents() {
+        return model.EventModel.findAll({order: [['startTime', 'ASC']]});
+    }
 
 
 
 	//returns a user if userid and username matches, else return null
-	findUser(userId, username)
+	getUser(userId, username)
 	{
 		return model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
 		            .then(user => user);
@@ -130,44 +125,46 @@ class Dao
 	}
 
 
-
-	//chekcs if username and password match, then reuturns true or false
-	loginOk(email, password)
-	{
-		model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}}).then(response =>
-		{
-			return response.length === 1;
-		}).catch(error =>
-		{
-			console.error(error);
-			return false;
-		});
-	}
-
-
-
-	getTicketsForEvent(eventId)
-	{
-		return model.TicketModel.findAll({where: {eventId: eventId}})
-		            .then(tickets => tickets)
-		            .catch(error => console.error(error));
-	}
+    /**
+     * Checks if the email address and password fits with a single user in the database
+     *
+     * @param email
+     * @param password
+     * @returns {Promise<boolean>}
+     */
+    loginOk(email, password) {
+        return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}}).then(response => {
+            return response.length === 1;
+        }).catch(error => {
+            console.error(error);
+            return false;
+        });
+    }
 
 
+    getTicketsForEvent(eventId) {
+        return model.TicketModel.findAll({where: {eventId: eventId}})
+            .then(tickets => tickets)
+            .catch(error => console.error(error));
+    }
 
-	getSaltByEmail(email)
-	{
-		model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
-		     .then(salt => {return salt;})
-		     .catch(error =>
-		     {
-			     console.error(error);
-			     return null;
-		     });
-	}
+
+    getSaltByEmail(email) {
+        model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+            .then(salt => {
+                return salt;
+            })
+            .catch(error => {
+                console.error(error);
+                return null;
+            });
+    }
+
+
+    getEventsUser(userId) {
+        return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
+    }
 }
-
-
 
 module.exports = Dao;
 
