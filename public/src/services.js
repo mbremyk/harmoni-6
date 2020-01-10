@@ -33,6 +33,14 @@ export class Event
 
 }
 
+export class Ticket
+{
+ eventId;
+ type;
+ price;
+ amount;
+ }
+
 
 
 class Services
@@ -48,6 +56,11 @@ class Services
 	getEvents()
 	{
 		return axios.get(url + '/events').then(response => response.data);
+	}
+
+	getTicketToEvent(eventId)
+	{
+		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
 	}
 
 	getAccessToken(email, hashedPassword){

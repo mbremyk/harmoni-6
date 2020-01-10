@@ -36,7 +36,7 @@ export class EventInfo extends Component
 
 
 							<div className="font-weight-bold">
-								Pris
+								Pris fra
 							</div>
 							{this.props.price}
 

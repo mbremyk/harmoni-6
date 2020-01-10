@@ -3,13 +3,14 @@ import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
 import {EventInfo} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
-import {Event, service} from '../services';
+import {Event, service, Ticket} from '../services';
 
 
 
 export class LandingPage extends Component
 {
 	events = [];
+	tickets = [];
 
 	render()
 	{
@@ -60,12 +61,12 @@ export class LandingPage extends Component
 
 						{this.events.map(event => (
 							<EventInfo image= {event.image}
-							           title= {event.title}
-							           address={event.address}
-							           price= "0"
-							           age_limit={event.ageLimit}
-							           start_date={event.startTime}
-							           end_date={event.endTime}  />
+							           title= {event.eventName}
+							           address ={event.address}
+							           price = {this.getTicketPrice(event.eventId)}
+							           age_limit ={event.ageLimit}
+							           start_date ={event.startTime}
+							           end_date ={event.endTime}  />
 						))}
 
 
@@ -83,16 +84,31 @@ export class LandingPage extends Component
 		service
 			.getEvents()
 			.then(events => (this.events = events))
-			.catch((error) => <Alert variant="danger"> error.message </Alert>);
+			.catch((error) => console.log(error));
 
 
 
 	}
 
-	logIn()
+	getTicketPrice(eventId)
 	{
-		//history.push('/logg-inn');
-
+		service
+			.getTicketToEvent(eventId)
+			.then(tickets =>
+			{
+				this.tickets = tickets;
+				let lowestPrice = tickets[0].price;
+				this.tickets.map(ticket =>
+				{
+					if(ticket.price < lowestPrice)
+					{
+						lowestPrice = ticket.price;
+						console.log(lowestPrice);
+					}
+				});
+				return lowestPrice;
+			})
+			.catch((error) => console.log(error));
 	}
 
 }
