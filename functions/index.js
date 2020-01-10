@@ -1,3 +1,6 @@
+import hashedPassword from './userhandling.js'
+import {credential} from "firebase-admin";
+
 Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
@@ -53,17 +56,24 @@ app.get("/events/search/:searchText", (req, res) => {
 
 app.post("/user", (req, res) => {
     console.log("POST-request received from client");
-    return model.UserModel.create({
-        username: req.body.username,
-        password: req.body.password,
-        salt: req.body.salt,
-        email: req.body.email
-    })
-        .then(res.status(201))
+
+    hashedPassword(req.body.password)
+        .then(credentials =>
+            {return model.UserModel.create({
+                username: req.body.username,
+                email: req.body.email,
+                password: credentials[0],
+                salt: credentials[1]
+            })
+                .then(res.status(201))
+                .catch(error => {
+                    console.error(error);
+                    res.status(400);
+                });
+            })
         .catch(error => {
             console.error(error);
-            res.status(400);
-        });
+            res.status(400)
 });
 
 app.get("/salt/:email", (req, res) => {

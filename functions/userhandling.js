@@ -1,5 +1,3 @@
-import service from './services'
-
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 

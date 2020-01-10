@@ -27,15 +27,14 @@ export class Event
 	Startdate;
 	Enddate;
 	discription;
-
 }
-
-
-
 
 class Services
 {
-
+	login(email, password)
+	{
+		return axios.post(url + '/login', {params: {email: email, password: password}}).then(response => response.data);
+	}
 
 	createUser(user)
 	{
@@ -46,18 +45,6 @@ class Services
 	getEvents()
 	{
 		//return axios.get<Events[]>('/events').then(response => response.data);
-	}
-
-
-
-	login(email, hashedPassword)
-	{
-		return axios.post(url + '/login', {params: {email: email, hashedPassword: hashedPassword}}).then(response => response.data);
-	}
-
-	getSalt(email)
-	{
-		return axios.get(url  + '/salt', {params: {email: email}}).then(response => response.data);
 	}
 }
 

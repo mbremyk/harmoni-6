@@ -5,7 +5,6 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {service} from "../services";
-import {hashPassword} from "../userhandling";
 
 export class LoginForm extends Component{
     constructor(props) {
@@ -16,7 +15,6 @@ export class LoginForm extends Component{
         };
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
-
     }
 
     handleEmailChange(event) {
@@ -26,30 +24,14 @@ export class LoginForm extends Component{
         this.setState({password: event.target.value});
     }
     handleLogin() {
-
-        // get salt
-        service.getSalt(this.state.email)
-
-            // hash password with salt
-            .then(salt => hashPassword(this.state.password, salt))
-
-                // get access token
-                .then(credentials => service.login(this.state.email, credentials[0]))
-
-                    // set local token and login
-                    .then(token => this.login(token))
-
-                    .catch(err => alert("En feil oppsto. token"))
-                .catch(err => alert("En feil oppsto. hash"))
-            .catch(err => alert("En feil oppsto. salt"))
+        service.login(this.state.email, this.state.password)
+            .then(token => this.login(token))
+            .catch(err => alert("En feil oppsto."));
     }
 
     login(token) {
-        window.localStorage.setItem('token', token)
-    }
-
-    getAccessToken(){
-        return service.getAccessToken(this.state.email)
+        window.localStorage.setItem('token', token);
+        alert('Innlogging velykket!\ntoken' + token);
     }
 
     render(){
@@ -65,7 +47,7 @@ export class LoginForm extends Component{
                         <Form.Control type="password" placeholder="Skriv inn passord" value={this.state.password} onChange={this.handlePasswordChange} />
                     </Form.Group>
 
-                    <Button onClick={() => alert("Email: " + this.state.email + " Password: " + this.state.password)} variant="primary" type="submit">
+                    <Button onClick={this.handleLogin} variant="primary" type="button">
                         Login
                     </Button>
                     <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
@@ -73,8 +55,4 @@ export class LoginForm extends Component{
             </Container>
         );
     }
-
-
-
 }
-
