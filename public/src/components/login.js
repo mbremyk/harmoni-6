@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {service} from "../services";
+import {authService} from "../AuthService";
 
 export class LoginForm extends Component{
     constructor(props) {
@@ -24,14 +25,23 @@ export class LoginForm extends Component{
         this.setState({password: event.target.value});
     }
     handleLogin() {
-        service.login(this.state.email, this.state.password)
-            .then(token => this.login(token.jwt))
-            .catch(err => alert("En feil oppsto."));
+        if(!this.state.email || !this.state.password) { return; }
+        authService.login(this.state.email, this.state.password)
+            .then(res => this.login());
     }
 
-    login(token) {
-        window.localStorage.setItem('token', token);
-        alert('Innlogging velykket!\ntoken' + token);
+    login() {
+        console.log('token '+ authService.getToken());
+        if(authService.loggedIn())
+        {
+            alert('Inn');
+        }
+        else
+        {
+            alert('out');
+        }
+        authService.logout();
+        console.log('token '+ authService.getToken());
     }
 
     render(){
@@ -49,6 +59,9 @@ export class LoginForm extends Component{
 
                     <Button onClick={this.handleLogin} variant="primary" type="button">
                         Login
+                    </Button>
+                    <Button href="/" variant="secondary" type="button">
+                        Avbryt
                     </Button>
                     <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
                 </Form>

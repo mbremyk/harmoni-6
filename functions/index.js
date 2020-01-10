@@ -86,20 +86,23 @@ app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
     model.UserModel.findAll({where: {email: req.body.params.email}, attributes: ['salt']})
-        .then(salt => hashPassword.hashPassword(req.body.params.password, salt[0].dataValues.salt)
-            .then(credentials => {
-                if(loginOk(req.body.params.email, credentials[0]))
-                {
-                    let token = jwt.sign({email: req.body.params.email}, privateKey, {
-                        expiresIn: 1800
-                    });
-                    res.json({jwt: token})
-                } else {
-                    res.status(401);
-                    res.json({error: "Not authorized"});
-                }
-            })
-            .catch(error => console.error(error)))
+        .then(salt => {
+            if(salt.length !== 1) { res.status(401); return; }
+            hashPassword.hashPassword(req.body.params.password, salt[0].dataValues.salt)
+                .then(credentials => {
+                    if(loginOk(req.body.params.email, credentials[0]))
+                    {
+                        let token = jwt.sign({email: req.body.params.email}, privateKey, {
+                            expiresIn: 1800
+                        });
+                        res.json({jwt: token})
+                    } else {
+                        res.status(401);
+                        res.json({error: "Not authorized"});
+                    }
+                })
+                .catch(error => console.error(error))
+        })
         .catch(error => console.error(error));
 });
 

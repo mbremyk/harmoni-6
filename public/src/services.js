@@ -33,7 +33,7 @@ class Services
 {
 	login(email, password)
 	{
-		return axios.post(url + '/login', {params: {email: email, password: password}}).then(response => response.data);
+		return axios.post(url + '/login', {params: {email: email, password: password}}).then(response => console.log(response.data));
 	}
 
 	createUser(user)

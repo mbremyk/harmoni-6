@@ -95,7 +95,7 @@ export class CreateUserForm extends Component{
 					<Button onClick={this.handleSubmit} variant="primary" type="button">
 						Opprett bruker
 					</Button>
-					<Button href="hjem" variant="secondary" type="button">
+					<Button href="/" variant="secondary" type="button">
 						Avbryt
 					</Button>
 				</Form>
