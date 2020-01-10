@@ -3,12 +3,16 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
 const bodyParser = require("body-parser");
-const model = require('./model.js');
-model.syncModels();
-const sequelize = require("sequelize");
-const op = sequelize.Op;
 const jwt = require("jsonwebtoken");
 let cors = require("cors");
+
+// const model = require('./model.js');
+// model.syncModels();
+// const sequelize = require("sequelize");
+// const op = sequelize.Op;
+const dao = require('./dao.js');
+let db = new dao();
+
 
 let privateKey = (publicKey = "shhhhhverysecret");
 
@@ -48,18 +52,10 @@ setInterval(() => {
     })
 }, 60 * 60 * 1000);
 
-/**
- * Checks if the email address and password fits with a single user in the database
- *
- * @param email
- * @param password
- * @returns {Promise<boolean>}
- */
-function loginOk(email, password) {
-    return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
-        .then(response => {
-            return response.length === 1;
-        });
+function getToken(user) {
+    return jwt.sign(user, privateKey, {
+        expiresIn: 1800
+    });
 }
 
 /**
@@ -71,7 +67,7 @@ app.get("/test", (req, res) => {
 });
 
 /**
- * Get all events in database
+ * Get all events in database as an array
  * {
  *     eventId: int
  *     organizerId: int -> user(userId)
@@ -87,9 +83,13 @@ app.get("/test", (req, res) => {
  */
 app.get("/events", (req, res) => {
     console.log("GET-request received from client");
-    return model.EventModel.findAll({order: [['startTime', 'ASC']]})
-        .then(events => res.send(events))
-        .catch(error => console.error(error));
+    return db.getAllEvents().then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
 });
 
 app.post("/event", (req, res) =>{
@@ -135,7 +135,7 @@ app.get("/events/:id", (req, res) => {
 });
 
 /**
- * Get all events where name or description contains searchText
+ * Get all events where eventName or description contains searchText
  * {
  *     eventId: int
  *     organizerId: int -> user(userId)
@@ -150,13 +150,14 @@ app.get("/events/:id", (req, res) => {
  * }
  */
 app.get("/events/search/:searchText", (req, res) => {
-    console.log("GET-request received from client");
-    return model.EventModel.findAll({
-        where: {[op.or]: [{eventName: {[op.like]: `%${req.params.searchText}%`}}, {description: {[op.like]: `%${req.params.searchText}%`}}]},
-        order: [['startTime', 'ASC']]
-    })
-        .then(events => res.send(events))
-        .catch(error => console.error(error));
+    let searchText = decodeURIComponent(req.params.searchText);
+    return db.getEventsMatching(searchText).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
 });
 
 /**
@@ -169,64 +170,48 @@ app.get("/events/search/:searchText", (req, res) => {
  *      }
  */
 app.post("/user", (req, res) => {
-    console.log("POST-request received from client");
-    return model.UserModel.create({
-        username: req.body.username,
-        password: req.body.password,
-        salt: req.body.salt,
-        email: req.body.email
-    })
-        .then(res.status(201))
-        .catch(error => {
-            console.error(error);
-            res.status(400);
-        });
-});
-
-app.get("/user", (req, res) => {
-   console.log("GET-request received from client");
-   return model.UserModel.findAll().then(events => res.send(events))
-       .catch(error => console.error(error));
-});
-
-/**
- * @deprecated
- */
-app.get("/salt/:email", (req, res) => {
-    console.log("GET-request received from client");
-
-    return model.UserModel.findAll({where: {email: req.params.email}, attributes: ['salt']})
-        .then(salt => res.send(salt))
-        .catch(error => console.error(error));
+    return db.createUser(req.body)
+        .then(success => success ? res.status(201) : res.status(400));
 });
 
 /**
  * Checks if a user with the given email and password exists in the database and returns a token if login information is valid
  * body:
  *      {
- *
+ *          email: string
+ *          password: string
  *      }
+ *
+ * @return {json} {jwt: token}
  */
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
-    loginOk(req.body.email, req.body.password).then(ok => {
+    db.loginOk(req.body.email, req.body.password).then(ok => {
         if (ok) {
-            let token = jwt.sign({email: req.body.email}, privateKey, {
-                expiresIn: 1800
-            });
-            res.json({jwt: token})
+            db.getUser(req.body.email).then(user => {
+                console.log(user[0].dataValues);
+                let token = getToken(user[0].dataValues);
+                res.json({jwt: token});
+            })
         } else {
             res.status(401);
-            res.json({error: "Not authorized"});
+            res.json({error: "Not authorized"})
         }
     });
 });
 
+/**
+ * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ */
 app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
     let token = req.headers["x-access-token"];
     jwt.verify(token, publicKey, (err, decoded) => {
-        if (err || decoded.email !== req.body.email || tokenIsBlacklisted(token)) {
+        if (err || tokenIsBlacklisted(token)) {
             console.log("Token not OK");
             res.status(401);
             res.json({error: "Not authorized"});
@@ -237,37 +222,52 @@ app.use("/auth", (req, res, next) => {
     })
 });
 
+/**
+ * Get information about a specific user based on userId
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ *
+ * body:
+ *      {
+ *          email: string
+ *      }
+ */
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
-    return model.UserModel.findAll({where: {[op.and]: [{userId: req.params.userId}, {email: req.body.email}]}})
-        .then(user => {
-            if (user.length === 1) {
-                return user;
-            } else {
-                res.sendStatus(503);
-            }
-        })
+    return db.getUser(req.params.userId, req.body.email)
         .then(user => res.send(user))
         .catch(error => console.error(error));
 });
 
+/**
+ * Get tickets for specific event
+ */
 app.get("/tickets/:eventId", (req, res) => {
     console.log("GET-request received from client");
-
-    return model.TicketModel.findAll({where: {eventId: req.params.eventId}})
-        .then(tickets => res.send(tickets))
-        .catch(error => console.error(error));
+    return db.getTicketsForEvent(req.params.eventId)
+        .then(tickets => res.status(201).send(tickets));
 });
 
+/**
+ * Invalidate old access token and get a new one
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ *
+ * @return {json} {jwt: token}
+ */
 app.post("/auth/refresh", (req, res) => {
     console.log("POST-request received from client");
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
-    token = jwt.sign({email: req.body.email}, privateKey, {
-        expiresIn: 1800
+    db.getUser(req.body.email).then(user => {
+        let token = getToken(user[0].dataValues);
+        res.json({jwt: token});
     });
-    res.json({jwt: token});
 });
 
 app.post("/auth/logout", (req, res) => {
@@ -277,14 +277,31 @@ app.post("/auth/logout", (req, res) => {
     jwtBlacklist.push(token);
 });
 
-app.put("/auth/user/:email", (req, res) => {
+app.put("/auth/user/:userId", (req, res) => {
     console.log("PUT-request received from client");
 
-    return model.UserModel.update({
-        username: req.body.username,
-        email: req.body.newemail,
-    }, {where: {email: req.params.email}})
+    return db.updateUser(req.body)
+        .then(res.sendStatus(200));
 });
 
+/**
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ */
+app.get("/auth/events/user/:userId", (req, res) => {
+    console.log("GET-request received from client");
+    let token = req.headers['x-access-token'];
+    let decoded = jwt.decode(token);
+    console.log(decoded);
+    if (decoded.userId == req.params.userId) {
+        return db.getEventsUser(decoded.userId)
+            .then(events => res.send(events))
+            .catch(error => console.error(error));
+    } else {
+        res.sendStatus(403);
+    }
+});
 
 console.log("Server initalized");

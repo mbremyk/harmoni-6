@@ -66,7 +66,7 @@ export class myPage extends Component {
         }
     }
     handleUsernameChange(event) {
-        this.setState({name: event.target.value});
+        this.setState({username: event.target.value});
     }
     handleEmailChange(event) {
         this.setState({email: event.target.value});

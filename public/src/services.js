@@ -20,10 +20,12 @@ export class User
 export class Event
 {
 	eventId;
+	organizerId;
 	eventName;
 	eventAddress;
 	ageLimit;
 	image;
+	imageUrl
 	startDate;
 	endDate;
 	description;
@@ -38,6 +40,13 @@ export class Gig
 	contract;
 }
 
+export class Ticket
+{
+ eventId;
+ type;
+ price;
+ amount;
+ }
 
 
 
@@ -65,7 +74,12 @@ class Services
 
 	getEvents()
 	{
-		//return axios.get<Events[]>('/events').then(response => response.data);
+		return axios.get(url + '/events').then(response => response.data);
+	}
+
+	getTicketToEvent(eventId)
+	{
+		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
 	}
 
 	getEvent()
@@ -74,9 +88,16 @@ class Services
 	}
 
 
-	getAccessToken(email, hashedPassword){
+	getAccessToken(email, hashedPassword)
+	{
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
+
+	searchForEvents(input)
+	{
+		return axios.get('/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+	}
+
 
 }
 

@@ -10,6 +10,7 @@ import {LandingPage} from "./components/frontpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
+import { GuardProvider, GuardedRoute } from 'react-router-guards';
 import {EditEvent} from "./components/editevent";
 import {AddEvent} from "./components/createevent";
 
@@ -50,11 +51,28 @@ if (root)
         <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
         <Route exact path="/logg-inn" component={LoginForm} />
-        <Route exact path="/" component={Test} />
+
         <Route exact path="/opprett-arrangement" component={AddEvent} />
         <Route exact path="/endre-arrangement" component={EditEvent} />
-
     </div>
     </BrowserRouter>,
 root
 );
+
+/*
+const GuardProvider = require('react-router-guards').GuardProvider;
+const GuardedRoute = require('react-router-guards').GuardedRoute;
+
+const App = () => (
+  <Router history={history}>
+    <GuardProvider loading={Loading} error={NotFound}>
+      <GuardedRoute path="/login" exact component={Login} />
+      <GuardProvider guards={[requireLogin]}>
+        <GuardedRoute path="/" exact component={Home} />
+        <GuardedRoute path="/about" exact component={About} />
+      </GuardProvider>
+      <GuardedRoute path="*" component={NotFound} />
+    </GuardProvider>
+  </Router>
+);
+ */
