@@ -117,15 +117,16 @@ class Dao
 
 	findEventsBySearch(searchText)
 	{
-		model.EventModel.findAll({
-			where: {[op.or]: [{eventName: {[op.like]: `%${searchText}%`}}, {description: {[op.like]: `%${searchText}%`}}]},
+		return model.EventModel.findAll({
+			where: {[op.or]: [{eventName: {[op.like]: '%'+searchText+'%'}}, {description: {[op.like]: `%${searchText}%`}}]},
 			order: [['startTime', 'ASC']]
-		}).then(events => {return events;})
-		     .catch(error =>
-		     {
-			     console.error(error);
-			     return null;
-		     });
+		})
+		            .then(events => (Array.isArray(events) && events.length) ? events : null)
+		            .catch(error =>
+		            {
+			            console.error(error);
+			            return null;
+		            });
 	}
 
 
