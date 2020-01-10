@@ -124,7 +124,6 @@ class Dao {
             });
     }
 
-
     /**
      * Checks if the email address and password fits with a single user in the database
      *
@@ -150,7 +149,7 @@ class Dao {
 
 
     getSaltByEmail(email) {
-        returnmodel.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+        return model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
             .then(salt => {
                 return salt;
             })

@@ -117,13 +117,6 @@ app.post("/gig", (req, res) => {
     });
 });
 
-app.get("/events/:id", (req, res) => {
-    console.log("GET-request received from client");
-    return model.EventModel.findOne({where: {eventId: req.params.id }})
-        .then(events => res.send(events))
-        .catch(error => console.error(error));
-});
-
 /**
  * Get all events where eventName or description contains searchText
  * {
