@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
+const hashPassword = require("./userhandling");
 let cors = require("cors");
 
 
@@ -143,17 +144,23 @@ app.post("/user", (req, res) => {
  */
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
-    db.loginOk(req.body.email, req.body.password).then(ok => {
-        if (ok) {
-            db.getUser(req.body.email).then(user => {
-                console.log(user[0].dataValues);
-                let token = getToken(user[0].dataValues);
-                res.json({jwt: token});
-            })
-        } else {
-            res.status(401);
-            res.json({error: "Not authorized"})
-        }
+
+    db.getSaltByEmail(req.body.email).then(salt => {
+       if(salt.length !== 1) { res.status(401); return; }
+       hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+           db.loginOk(req.body.email, credentials[0]).then(ok => {
+               if (ok) {
+                   db.getUser(req.body.email).then(user => {
+                       console.log(user[0].dataValues);
+                       let token = getToken(user[0].dataValues);
+                       res.json({jwt: token});
+                   })
+               } else {
+                   res.status(401);
+                   res.json({error: "Not authorized"})
+               }
+           });
+       })
     });
 });
 
