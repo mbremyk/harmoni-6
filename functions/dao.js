@@ -119,7 +119,7 @@ class Dao {
 
 
     getSaltByEmail(email) {
-        model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+        return model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
             .then(salt => {
                 return salt;
             })
@@ -132,7 +132,7 @@ class Dao {
     updateUser(user) {
         return model.UserModel.update({
             username: user.username,
-            email: user.newemail,
+            email: user.newEmail,
         }, {where: {email: user.email}})
     }
 
