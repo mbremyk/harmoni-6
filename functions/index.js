@@ -28,7 +28,6 @@ const deployed = true;
 
 
 
-
 app.get("/events", (req, res) =>
 {
 	console.log("GET-request received from client");
@@ -40,7 +39,6 @@ app.get("/events", (req, res) =>
 		{res.sendStatus(400);}
 	});
 });
-
 
 
 
@@ -57,13 +55,11 @@ app.get("/events/search/:searchText", (req, res) =>
 
 
 
-
 app.post("/user", (req, res) =>
 {
 	return db.createUser(req.body)
 	         .then(success => success ? res.status(201) : res.status(400));
 });
-
 
 
 
@@ -74,7 +70,6 @@ app.get("/salt/:email", (req, res) =>
 	         .then(salt => res.send(salt))
 	         .catch(error => console.error(error));
 });
-
 
 
 
@@ -94,7 +89,6 @@ app.post("/login", (req, res) =>
 		res.json({error: "Not authorized"});
 	}
 });
-
 
 
 
@@ -120,26 +114,13 @@ app.use("/auth", (req, res, next) =>
 
 
 
-
 app.get("/auth/user/:userId", (req, res) =>
 {
 	console.log("GET-request received from client");
-	return model.UserModel.findAll({where: {[op.and]: [{userId: req.params.userId}, {username: req.body.username}]}})
-	            .then(user =>
-	            {
-		            if (user.length === 1)
-		            {
-			            return user;
-		            }
-		            else
-		            {
-			            res.sendStatus(503);
-		            }
-	            })
-	            .then(user => res.send(user))
-	            .catch(error => console.error(error));
+	return db.findUser(req.params.userId, req.body.username)
+	         .then(user => res.send(user))
+	         .catch(error => console.error(error));
 });
-
 
 
 
@@ -149,7 +130,6 @@ app.get("/tickets/:eventId", (req, res) =>
 	return db.getTicketsForEvent(req.params.eventId)
 	         .then(tickets => res.status(201).send(tickets));
 });
-
 
 
 
