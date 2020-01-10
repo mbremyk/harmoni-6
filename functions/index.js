@@ -101,6 +101,12 @@ app.post("/user", (req, res) => {
         });
 });
 
+app.get("/user", (req, res) => {
+   console.log("GET-request received from client");
+   return model.UserModel.findAll().then(events => res.send(events))
+       .catch(error => console.error(error));
+});
+
 app.get("/salt/:email", (req, res) => {
     console.log("GET-request received from client");
 

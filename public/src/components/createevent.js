@@ -134,8 +134,8 @@ export class AddEvent extends Component{
 
         service.createEvent(ev)
             .then(updated =>
-            {this.state.artists.map(() =>
-                (service.createGig(updated.insertId, this.state.rider, this.state.contract)))}
+            {this.state.artists.map(artist =>
+                (service.createGig(artist.artistId, updated.insertId, this.state.rider, this.state.contract)))}
 
                 )
         .catch(err => alert('En feil oppsto!' + err.message))
@@ -194,10 +194,11 @@ export class AddEvent extends Component{
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu as={this.CustomMenu}>
-                                    <Dropdown.Item eventKey="Marius">Marius</Dropdown.Item>
-                                    <Dropdown.Item eventKey="Jakob">Jakob</Dropdown.Item>
-                                    <Dropdown.Item eventKey="Steffen">Steffen</Dropdown.Item>
-                                    <Dropdown.Item eventKey="Jan">Jan</Dropdown.Item>
+                                    {this.state.artists.map(artist => (
+                                        <Dropdown.Item eventKey={artist.userId}>
+                                            {artist.username}
+                                        </Dropdown.Item>
+                                        ))}
                                 </Dropdown.Menu>
 
                             </Dropdown>
@@ -208,9 +209,9 @@ export class AddEvent extends Component{
 
                             <ListGroup title={"Valgte artister"}>
                                 {this.state.artists.map(artist => (
-                                    <React.Fragment key={artist}>
+                                    <React.Fragment key={artist.userId}>
                                         <ListGroupItem>
-                                            {artist}
+                                            {artist.username}
                                         </ListGroupItem>
                                     </React.Fragment>))}
                             </ListGroup>
@@ -285,11 +286,11 @@ export class AddEvent extends Component{
                                         aria-label="btn-age"
                                         aria-describedby="btnGroupAddon"
                                     />
-
                                     <InputGroup.Append>
                                         <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
                                     </InputGroup.Append>
                                 </InputGroup>
+
                             </ButtonToolbar>
                         </Form.Group>
 
@@ -323,6 +324,13 @@ export class AddEvent extends Component{
                 </Form>
             </Container>
         );
+    }
+
+
+    mounted(){
+        service.getUsers()
+            .then(artister => this.state.artists = artister)
+            .catch((err) => alert(err.message));
     }
 
     changeDate(dateName, dateValue){

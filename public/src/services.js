@@ -49,7 +49,13 @@ class Services
 
 	}
 
-	createEvent(event){
+	getUsers()
+	{
+		return axios.get(url + 'user').then(response => response.data);
+	}
+
+	createEvent(event)
+	{
 		return axios.post(url + '/event', event).then(response => response.insertId);
 	}
 
