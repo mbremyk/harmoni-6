@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {service} from "../services";
-import {encrypt} from "../encryption";
+import {hashPassword} from "../userhandling";
 
 
 
@@ -51,7 +51,7 @@ export class LoginForm extends Component{
     }
 
     hashPassword(){
-        return encrypt(this.state.password);
+        return hashPassword(this.state.password);
     }
 
     getAccessToken(){

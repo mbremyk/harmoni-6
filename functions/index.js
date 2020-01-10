@@ -26,7 +26,17 @@ main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
 
+function loginOk(email, password) {
+    return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
+        .then(response => {
+            return response.length === 1;
+        });
+}
 
+app.get("/test", (req, res) => {
+    console.log(req);
+    res.send("test functional");
+});
 
 app.get("/events", (req, res) =>
 {

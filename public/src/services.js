@@ -19,22 +19,37 @@ export class User
 
 export class Event
 {
+
 	eventId;
+	organizerId;
 	eventName;
-	adress;
+	address;
 	ageLimit;
+	startTime;
+	endTime;
+	imageUrl;
 	image;
-	Startdate;
-	Enddate;
-	discription;
+	description;
+	createdAt;
+	updatedAt;
+
 
 }
 
+export class Ticket
+{
+ eventId;
+ type;
+ price;
+ amount;
+ }
 
 
 
 class Services
 {
+
+
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
@@ -43,12 +58,24 @@ class Services
 
 	getEvents()
 	{
-		//return axios.get<Events[]>('/events').then(response => response.data);
+		return axios.get(url + '/events').then(response => response.data);
 	}
 
-	getAccessToken(email, hashedPassword){
+	getTicketToEvent(eventId)
+	{
+		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
+	}
+
+	getAccessToken(email, hashedPassword)
+	{
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
+
+	searchForEvents(input)
+	{
+		return axios.get('/events/search/' + input).then(response => response.data);
+	}
+
 
 }
 

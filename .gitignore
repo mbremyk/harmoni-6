@@ -1,18 +1,3 @@
-
-
-#Harmoni exclusive
-debug
-functions/properties.js
-*/package-lock.json
-public/build/
-
-
-
-
-
-
-
-
 # Compiled class file
 *.class
 
@@ -429,3 +414,21 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+debug
+functions/properties.js
+*/package-lock.json
+functions/package-lock.json
+*/build
+public/build/static/js/runtime-main.451246c7.js
+public/build/static/js/main.f56acc47.chunk.js.map
+public/build/static/js/main.f56acc47.chunk.js
+public/build/static/js/2.8cea7ed2.chunk.js.map
+public/build/static/js/2.8cea7ed2.chunk.js.LICENSE
+public/build/static/js/2.8cea7ed2.chunk.js
+public/build/service-worker.js
+public/build/precache-manifest.d942c30c4aa70f6671d742ab7b41ba78.js
+public/build/index.html
+public/build/asset-manifest.json
+
+public/build/
