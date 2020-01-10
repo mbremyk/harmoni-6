@@ -1,6 +1,3 @@
-import hashedPassword from './userhandling.js'
-import {credential} from "firebase-admin";
-
 Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
@@ -11,6 +8,7 @@ model.syncModels();
 const sequelize = require("sequelize");
 const op = sequelize.Op;
 const jwt = require("jsonwebtoken");
+const hashPassword = require("./userhandling");
 let cors = require("cors");
 
 let privateKey = (publicKey = "shhhhhverysecret");
@@ -57,7 +55,7 @@ app.get("/events/search/:searchText", (req, res) => {
 app.post("/user", (req, res) => {
     console.log("POST-request received from client");
 
-    hashedPassword(req.body.password)
+    hashPassword.hashPassword(req.body.password)
         .then(credentials =>
             {return model.UserModel.create({
                 username: req.body.username,
@@ -86,15 +84,22 @@ app.get("/salt/:email", (req, res) => {
 
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
-    if (loginOk(req.body.email, req.body.password)) {
-        let token = jwt.sign({email: req.body.email}, privateKey, {
-            expiresIn: 1800
-        });
-        res.json({jwt: token})
-    } else {
-        res.status(401);
-        res.json({error: "Not authorized"});
-    }
+    model.UserModel.findAll({where: {email: req.body.email}, attributes: ['salt']})
+        .then(salt => hashPassword.hashPassword(req.body.password, salt)
+            .then(credentials => {
+                if(loginOk(req.body.email, credentials[0]))
+                {
+                    let token = jwt.sign({email: req.body.email}, privateKey, {
+                        expiresIn: 1800
+                    });
+                    res.json({jwt: token})
+                } else {
+                    res.status(401);
+                    res.json({error: "Not authorized"});
+                }
+            })
+            .catch(error => console.error(error)))
+        .catch(error => console.error(error));
 });
 
 app.use("/auth", (req, res, next) => {

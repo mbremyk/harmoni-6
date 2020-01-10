@@ -11,3 +11,5 @@ export async function hashPassword(password, salt = '')
 	password = undefined;
 	return [hash, salt];
 }
+
+module.exports = {hashPassword}

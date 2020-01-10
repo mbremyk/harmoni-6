@@ -39,6 +39,8 @@ export class CreateUserForm extends Component{
 			return;
 		}
 
+		// check email and username availability
+
 		// check password mismatch
 		if(this.state.password1 !== this.state.password2) {
 			alert('Passordene stemmer ikke');
