@@ -55,6 +55,7 @@ export class AddEvent extends Component{
         this.ageLimit = this.handleAgeLimitChange.bind(this);
         this.rider = this.handleRiderChange.bind(this);
         this.contract = this.handleContractChange.bind(this);
+        this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
 
         this.state = {
@@ -68,6 +69,7 @@ export class AddEvent extends Component{
             tTime: '00:00:00',
             rider: '',
             contract: '',
+            artistsAdd: [],
             artists: [],
         };
     }
@@ -95,6 +97,11 @@ export class AddEvent extends Component{
     handleContractChange(event){
         this.setState({contract: event.target.value})
     }
+
+    handleArtistsAdd(event){
+        this.setState({artistsAdd: event.target.value})
+    }
+
 
     handleArtists(event){
         this.setState({artists: event.target.value})
@@ -134,8 +141,8 @@ export class AddEvent extends Component{
 
         service.createEvent(ev)
             .then(updated =>
-            {this.state.artists.map(artist =>
-                (service.createGig(artist.artistId, updated.insertId, this.state.rider, this.state.contract)))}
+            {this.state.artistsAdd.map(artist =>
+                (service.createGig(artist.userId, updated.insertId, this.state.rider, this.state.contract)))}
 
                 )
         .catch(err => alert('En feil oppsto!' + err.message))
@@ -144,6 +151,9 @@ export class AddEvent extends Component{
     }
 
     render(){
+
+        if(!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
+
         return(
             <Container>
                 <Form>
@@ -194,9 +204,10 @@ export class AddEvent extends Component{
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu as={this.CustomMenu}>
-                                    {this.state.artists.map(artist => (
-                                        <Dropdown.Item eventKey={artist.userId}>
+                                    {this.state.artists[0].map(artist => (
+                                        <Dropdown.Item eventKey={artist}>
                                             {artist.username}
+                                            {console.log(artist)}
                                         </Dropdown.Item>
                                         ))}
                                 </Dropdown.Menu>
@@ -208,7 +219,7 @@ export class AddEvent extends Component{
                         <Form.Group as={Col} sm={"10"}>
 
                             <ListGroup title={"Valgte artister"}>
-                                {this.state.artists.map(artist => (
+                                {this.state.artistsAdd.map(artist => (
                                     <React.Fragment key={artist.userId}>
                                         <ListGroupItem>
                                             {artist.username}
@@ -327,9 +338,15 @@ export class AddEvent extends Component{
     }
 
 
-    mounted(){
+    mounted() {
+        console.log("test");
+        console.log(this.state.artists);
         service.getUsers()
-            .then(artister => this.state.artists = artister)
+            .then(artists => {
+                this.setState({artists: [...this.state.artists, artists]});
+                console.log(this.state.artists);
+                console.log(this.state.artists[0]);
+            })
             .catch((err) => alert(err.message));
     }
 
@@ -372,8 +389,9 @@ export class AddEvent extends Component{
     }
 
     addArtist(eventKey) {
+        console.log(eventKey);
         this.setState({
-            artists: [...this.state.artists, eventKey]
+            artistsAdd: [...this.state.artistsAdd, eventKey]
         })
     }
 }

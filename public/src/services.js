@@ -51,7 +51,7 @@ class Services
 
 	getUsers()
 	{
-		return axios.get(url + 'user').then(response => response.data);
+		return axios.get(url + '/user').then(response => response.data);
 	}
 
 	createEvent(event)
