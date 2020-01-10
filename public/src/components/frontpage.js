@@ -1,13 +1,33 @@
 import {Component} from "react-simplified";
-import {Container, Row, Col, Button, Form} from "react-bootstrap";
+import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
 import {EventInfo} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
+import {Event, service, Ticket} from '../services';
+
+
+
 
 
 export class LandingPage extends Component
 {
-	events;
+	events = [];
+	tickets = [];
+	searchevents = [];
+
+	/*
+	 <Container>
+	 <Row>
+	 <Col>
+
+	 <Form.Control placeholder="Søk etter arragement"/>
+
+
+	 </Col>
+	 </Row>
+
+	 </Container>
+	*/
 
 	render()
 	{
@@ -39,16 +59,7 @@ export class LandingPage extends Component
 				</div>
 
 
-				<Container>
-					<Row>
-						<Col>
 
-							<Form.Control placeholder="Søk etter arragement"/>
-
-						</Col>
-					</Row>
-
-				</Container>
 
 
 				<Container>
@@ -56,52 +67,17 @@ export class LandingPage extends Component
 
 					<Row>
 
+						{this.events.map(event => (
+							<EventInfo imageUrl={event.imageUrl}
+							           title={event.eventName}
+							           address={event.address}
+							           age_limit={event.ageLimit}
+							           start_date={event.startTime}
+							           end_date={event.endTime}
+							           uploaded={event.createdAt}
+							/>
+						))}
 
-
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
-
-						<EventInfo
-							image="https://m.baerumkulturhus.no/sites/default/files/styles/mobile_event_722x418_/public/191012_hakkebakkeskogen.jpg?itok=JC_cgMkB"
-							title="Bamse har show"
-							adress="Hakkebakkeskogen 23"
-							price="20kr"
-							age_limit="18+"
-							start_date="1 Februar 2020 20:00"
-							end_date="1 Februar 2020 22:00"
-
-						/>
 
 					</Row>
 				</Container>
@@ -113,19 +89,53 @@ export class LandingPage extends Component
 
 	mounted()
 	{
-		/*service
+		service
 			.getEvents()
-			.then(events => (this.events = Array.from(events)))
-			.catch((error) => Alert.danger(error.message));*/
+			.then(events => (this.events = events))
+			.catch((error) => console.log(error));
 
 
 
 	}
 
-	logIn()
+	getTicketPrice(eventId)
 	{
-		//history.push('/logg-inn');
+		service
+			.getTicketToEvent(eventId)
+			.then(tickets =>
+			{
+				this.tickets = tickets;
+				let lowestPrice = tickets[0].price;
+				for (let i = 0; i < tickets.length; i++)
+				{
+					if (tickets[i].price < lowestPrice)
+					{
+						lowestPrice = tickets[i].price;
+						console.log(lowestPrice);
+					}
+				}
+				/*this.tickets.map(ticket =>
+				 {
+				 if(ticket.price < lowestPrice)
+				 {
+				 lowestPrice = ticket.price;
+				 console.log(lowestPrice);
+				 }
+				 });*/
+				return lowestPrice;
+			})
+			.catch((error) => console.log(error));
+	}
+
+	/*
+	searchForEvents(input)
+	{
+		service
+			.searchForEvents(input)
+			.then(searchevents => this.searchevents = searchevents)
+			.catch((error) => console.log(error));
 
 	}
+	*/
 
 }
