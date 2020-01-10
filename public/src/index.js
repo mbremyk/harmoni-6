@@ -60,12 +60,17 @@ class UploadWidget extends Component{
     fileHandler = (e) => {
         e.preventDefault();
         let selectedFile =  e.target.files[0];
-        console.log(selectedFile);
+        //console.log(selectedFile);
         const formData = new FormData();
         formData.append('file', selectedFile);
-
-        service.uploadFile(formData)
-            .then(res => console.log(res));
+        const reader = new FileReader();
+        let send;
+        //send = selectedFile.toDataURL("text/txt");
+        selectedFile.arrayBuffer().then(readRes => {
+            console.log(readRes);
+            service.uploadFile(readRes)
+                .then(res => console.log(res));
+        });
         //console.log(formData);
     };
 }
@@ -83,7 +88,7 @@ if (root)
         <Route exact path="/logg-inn" component={LoginForm} />
 
 
-    <Route exact path="/" component={UploadWidget} />
+    <Route exact path="/Upload" component={UploadWidget} />
     <Route exact path="/opprett-arrangement" component={addEvent} />
     </div>
     </BrowserRouter>,

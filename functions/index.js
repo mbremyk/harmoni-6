@@ -89,8 +89,44 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/file", (req, res) => {
-    fileHandler.setContract(res.body);
+    console.log("server says:");
+    let dataBlob = req.body;
+    console.log(req.body);
+    console.log("Data: "+new ArrayBuffer(dataBlob));
+    model.GigModel.findOne({where:{eventId: 1, artistId: 1 } })
+        .then(gig => {
+            console.log("updating: ");
+            gig.update({contract: dataBlob});
+        }).then(() => res.send("done"));
+    console.log("upload done");
 });
+
+function setContract(dataBlob, gig, artist) {
+    /*console.log("Uploading: ");*/
+    console.log("Data: "+new ArrayBuffer(dataBlob));
+    model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+        .then(gig => {
+            console.log("updating: ");
+            gig.update({contract: dataBlob});
+        });
+    console.log("upload done");
+
+    model.GigModel.findOne({where:{eventId: 1, artistId: 1 }})
+        .then(gig => {
+                //console.log(gig.rider);
+                console.log(gig.contract);
+                let reader = new FileReader();
+
+                reader.onload = function() {
+                    console.log(reader.result);
+                }
+                console.log(gig.rider.toString());
+
+            }
+        );
+
+
+}
 
 app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");

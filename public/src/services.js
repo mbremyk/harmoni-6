@@ -48,7 +48,7 @@ class Services
 
 	uploadFile(formData)
 	{
-		return axios.post("/file", formData).then(response => response.data);
+		return axios.post(url+"/file", formData).then(response => console.log(response.data));
 	}
 
 	getAccessToken(email, hashedPassword){

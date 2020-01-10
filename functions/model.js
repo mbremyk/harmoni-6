@@ -12,7 +12,8 @@ function init() {
         return sequelize;
     } else {
         let test = (process.env.NODE_ENV === 'test');
-        let pr = test ? new properties.TestProperties() : new properties.Properties();
+        let pr = test ? new properties.TestProperties() : new properties.SebProperties();
+        console.log(pr.databaseUser);
         let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
             host: pr.databaseURL,
             dialect: pr.dialect,
@@ -21,7 +22,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
-            logging: false
+            //logging: true
         });
         return sequelize;
     }
@@ -91,7 +92,7 @@ let EventModel = sequelize.define('event', {
     contract;
 }*/
 
-let GigModel = sequelize.define('gig', {
+let GigModel = sequelize.define('gigs', {
     artistId: {type: Sequelize.INTEGER, primaryKey: true},
     eventId: {type: Sequelize.INTEGER, primaryKey: true},
     rider: Sequelize.BLOB,
@@ -137,7 +138,7 @@ let PersonnelModel = sequelize.define('personnel', {
     }
 }, {tableName: 'personnel'});
 
-let syncModels = () => sequelize.sync({force: true}).then().catch(error => console.log(error));
+let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
 /*
 creates tables in the testdatabase and inserts the test data
