@@ -145,6 +145,14 @@ class Dao
 			     return null;
 		     });
 	}
+
+	//returns an array with all events by one organizerId
+	getEventsByOrganizerId(organizerId)
+	{
+		return model.EventModel.findAll({where: {organizerId: organizerId}});
+
+	}
+
 }
 
 
