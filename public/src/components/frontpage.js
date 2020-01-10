@@ -7,10 +7,27 @@ import {Event, service, Ticket} from '../services';
 
 
 
+
+
 export class LandingPage extends Component
 {
 	events = [];
 	tickets = [];
+	searchevents = [];
+
+	/*
+	 <Container>
+	 <Row>
+	 <Col>
+
+	 <Form.Control placeholder="Søk etter arragement"/>
+
+
+	 </Col>
+	 </Row>
+
+	 </Container>
+	*/
 
 	render()
 	{
@@ -42,16 +59,7 @@ export class LandingPage extends Component
 				</div>
 
 
-				<Container>
-					<Row>
-						<Col>
 
-							<Form.Control placeholder="Søk etter arragement"/>
-
-						</Col>
-					</Row>
-
-				</Container>
 
 
 				<Container>
@@ -60,17 +68,15 @@ export class LandingPage extends Component
 					<Row>
 
 						{this.events.map(event => (
-							<EventInfo image = {event.imageUrl}
-							           title= {event.eventName}
-							           address ={event.address}
-							           price = {this.getTicketPrice(event.eventId)}
-							           age_limit ={event.ageLimit}
-							           start_date ={event.startTime}
-							           end_date ={event.endTime}
-							           uploaded = {event.createdAt}
+							<EventInfo imageUrl={event.imageUrl}
+							           title={event.eventName}
+							           address={event.address}
+							           age_limit={event.ageLimit}
+							           start_date={event.startTime}
+							           end_date={event.endTime}
+							           uploaded={event.createdAt}
 							/>
 						))}
-
 
 
 					</Row>
@@ -100,17 +106,36 @@ export class LandingPage extends Component
 			{
 				this.tickets = tickets;
 				let lowestPrice = tickets[0].price;
-				this.tickets.map(ticket =>
+				for (let i = 0; i < tickets.length; i++)
 				{
-					if(ticket.price < lowestPrice)
+					if (tickets[i].price < lowestPrice)
 					{
-						lowestPrice = ticket.price;
+						lowestPrice = tickets[i].price;
 						console.log(lowestPrice);
 					}
-				});
+				}
+				/*this.tickets.map(ticket =>
+				 {
+				 if(ticket.price < lowestPrice)
+				 {
+				 lowestPrice = ticket.price;
+				 console.log(lowestPrice);
+				 }
+				 });*/
 				return lowestPrice;
 			})
 			.catch((error) => console.log(error));
 	}
+
+	/*
+	searchForEvents(input)
+	{
+		service
+			.searchForEvents(input)
+			.then(searchevents => this.searchevents = searchevents)
+			.catch((error) => console.log(error));
+
+	}
+	*/
 
 }

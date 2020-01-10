@@ -70,6 +70,13 @@ class Services
 	{
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
+
+	searchForEvents(input)
+	{
+		return axios.get('/events/search/' + input).then(response => response.data);
+	}
+
+
 }
 
 export let service = new Services();

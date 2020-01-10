@@ -5,7 +5,7 @@ import * as React from 'react';
 
 export class EventInfo extends Component
 {
-	image;
+	imageUrl;
 	title;
 	address;
 	price;
@@ -13,6 +13,11 @@ export class EventInfo extends Component
 	start_date;
 	end_date;
 	uploaded;
+
+	/*<div className="font-weight-bold">
+	 Pris fra
+	 </div>
+	 {this.props.price}*/
 
 	render()
 	{
@@ -23,7 +28,7 @@ export class EventInfo extends Component
 
 				<Card>
 					<Card.Img variant="top"
-					          src={this.props.image}
+					          src={this.props.imageUrl}
 					          alt={this.title}/>
 					<Card.Body>
 
@@ -34,13 +39,6 @@ export class EventInfo extends Component
 								Adresse
 							</div>
 							{this.props.address}
-
-
-							<div className="font-weight-bold">
-								Pris fra
-							</div>
-							{this.props.price}
-
 
 							<div className="font-weight-bold">
 								Aldersgrense
