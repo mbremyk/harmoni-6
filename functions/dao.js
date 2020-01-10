@@ -23,14 +23,17 @@ class Dao
 	}
 
 
-
-	//returns a user if userid and username matches, else return null
-	getUser(userId, username)
-	{
-		return model.UserModel.findAll({where: {[op.and]: [{userId: userId}, {username: username}]}})
-		            .then(user => user);
-	}
-
+    //returns a user if userid and username matches, else return null
+    getUser(email, userId = null) {
+    	let where = userId ? {[op.and]: [{userId: userId}, {email: email}]} : {email: email};
+        return model.UserModel.findAll({where: where})
+            .then(user => {
+                if (user.length === 1) {
+                    return user;
+                }
+                return null;
+            });
+    }
 
 
 	//returns true if user was created, false if something went wrong
@@ -59,8 +62,6 @@ class Dao
 		return model.UserModel.update(
 			{
 				username: user.username,
-				password: user.password,
-				salt: user.salt,
 				email: user.email
 			},
 			{where: {userId: user.userId}}
@@ -160,20 +161,16 @@ class Dao
 	}
 
 
-
-	getSaltByEmail(email)
-	{
-		model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
-		     .then(salt =>
-		     {
-			     return salt;
-		     })
-		     .catch(error =>
-		     {
-			     console.error(error);
-			     return null;
-		     });
-	}
+    getSaltByEmail(email) {
+        return model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
+            .then(salt => {
+                return salt;
+            })
+            .catch(error => {
+                console.error(error);
+                return null;
+            });
+    }
 
 
 
