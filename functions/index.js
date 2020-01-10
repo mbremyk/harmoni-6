@@ -17,7 +17,7 @@ main.use('/api/v1', app);
 main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 
-//Sequalize
+//Sequelize
 const model = require('./model.js');
 const dao = require('./dao.js');
 let db = new dao();
@@ -233,6 +233,30 @@ app.post("/auth/refresh", (req, res) => {
         res.json({jwt: token});
     });
 });
+app.get("/events/:organizerId", (req, res) =>
+{
+	console.log("GET-request received from client");
+	return db.getEventsByOrganizerId(req.params.organizerId).then(events =>
+	{
+		if (events !== null)
+		{res.status(201).send(events);}
+		else
+		{res.sendStatus(400);}
+	});
+});
+
+app.get("/events/eventdetails/:eventId", (req, res) =>
+{
+	console.log("GET-request received from client");
+	return db.getEventByEventId(req.params.eventId).then(events =>
+	{
+		if (events !== null)
+		{res.status(201).send(events);}
+		else
+		{res.sendStatus(400);}
+	});
+});
+
 
 /**
  * Invalidates your access token

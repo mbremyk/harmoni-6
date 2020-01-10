@@ -72,6 +72,18 @@ class Services
 	{
 		return axios.get('/events/search/:' + encodeURIComponent(input)).then(response => response.data);
 	}
+
+	getEventsByOrganizer(organizerId)
+	{
+		return axios.get('/events/' + organizerId).then(response => response.data);
+	}
+
+	getEventByEventId(eventId)
+	{
+		return axios.get('/events/eventdetails/' + eventId).then(response => response.data);
+	}
+
+
 }
 
 export let service = new Services();
