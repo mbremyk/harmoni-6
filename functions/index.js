@@ -186,8 +186,11 @@ app.get("/salt/:email", (req, res) =>
  * Checks if a user with the given email and password exists in the database and returns a token if login information is valid
  * body:
  *      {
- *
+ *          email: string
+ *          password: string
  *      }
+ *
+ * @return {json} {jwt: token}
  */
 app.post("/login", (req, res) =>
 {
@@ -206,6 +209,9 @@ app.post("/login", (req, res) =>
 	}
 });
 
+/**
+ * Checks if x-access-token is active and not blacklisted
+ */
 app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
     let token = req.headers["x-access-token"];
@@ -220,7 +226,6 @@ app.use("/auth", (req, res, next) => {
         }
     })
 });
-
 
 
 app.get("/auth/user/:userId", (req, res) =>
