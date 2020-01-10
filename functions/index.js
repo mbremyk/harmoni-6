@@ -236,16 +236,6 @@ app.post("/auth/refresh", (req, res) => {
         res.json({jwt: token});
     });
 });
-app.get("/events/:organizerId", (req, res) => {
-    console.log("GET-request received from client");
-    return db.getEventsByOrganizerId(req.params.organizerId).then(events => {
-        if (events !== null) {
-            res.status(201).send(events);
-        } else {
-            res.sendStatus(400);
-        }
-    });
-});
 
 app.get("/events/eventdetails/:eventId", (req, res) => {
     console.log("GET-request received from client");
@@ -301,7 +291,7 @@ app.get("/auth/events/user/:userId", (req, res) => {
     let decoded = jwt.decode(token);
     console.log(decoded);
     if (decoded.userId == req.params.userId) {
-        return db.getEventsUser(decoded.userId)
+        return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
             .catch(error => console.error(error));
     } else {
