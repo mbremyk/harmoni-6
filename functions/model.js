@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const properties = require('./properties.js');
 const isCI = require('is-ci');
+const test = (process.env.NODE_ENV === 'test');
 
 function init() {
     if (isCI) {
@@ -11,11 +12,13 @@ function init() {
         });
         return sequelize;
     } else {
-        let test = (process.env.NODE_ENV === 'test');
         let pr = test ? new properties.TestProperties() : new properties.Properties();
         let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
             host: pr.databaseURL,
             dialect: pr.dialect,
+            dialectOptions: {
+                dateStrings: true,
+            },
             pool: {
                 max: 10,
                 min: 0,
@@ -80,6 +83,7 @@ let EventModel = sequelize.define('event', {
     ageLimit: Sequelize.INTEGER,
     startTime: Sequelize.DATE,
     endTime: Sequelize.DATE,
+    imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
     description: Sequelize.TEXT,
 });
@@ -92,8 +96,18 @@ let EventModel = sequelize.define('event', {
 }*/
 
 let GigModel = sequelize.define('gig', {
-    artistId: {type: Sequelize.INTEGER, primaryKey: true},
-    eventId: {type: Sequelize.INTEGER, primaryKey: true},
+    artistId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: UserModel,
+            key: 'userId'
+        }
+    },
+    eventId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: EventModel,
+            key: 'eventId'
+        }
+    },
     rider: Sequelize.BLOB,
     contract: Sequelize.BLOB
 });
@@ -136,6 +150,7 @@ let PersonnelModel = sequelize.define('personnel', {
         }
     }
 }, {tableName: 'personnel'});
+
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
@@ -187,7 +202,8 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
                     eventName: 'Test1',
                     address: 'Adresse1',
                     ageLimit: '12',
-                    dateTime: 'Soon',
+                    startTime: null,
+                    endTime: null,
                     description: 'Konsert for barn'
                 },
                 {
@@ -195,7 +211,8 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
                     eventName: 'Test1',
                     address: 'Adresse2',
                     ageLimit: '20',
-                    dateTime: 'Kinda soon',
+                    startTime: null,
+                    endTime: null,
                     description: 'Konsert for voksne'
                 }]).then(() => {
                 GigModel.bulkCreate([

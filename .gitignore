@@ -432,6 +432,5 @@ public/build/index.html
 public/build/asset-manifest.json
 
 public/build/
-public/build/asset-manifest.json
-public/build/index.html
-public/build/service-worker.js
+*/build/
+build/
