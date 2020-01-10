@@ -381,10 +381,4 @@ export class AddEvent extends Component{
         }
     }
 
-    addArtist(eventKey) {
-        console.log(eventKey);
-        this.setState({
-            artistsAdd: [...this.state.artistsAdd, eventKey]
-        })
-    }
 }

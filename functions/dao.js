@@ -30,6 +30,16 @@ class Dao {
             });
     }
 
+    getUserById(userId) {
+        return model.UserModel.findOne(userId)
+            .then(user => {
+                if (user.length === 1) {
+                    return user;
+                }
+                return null;
+            });
+    }
+
 
     //returns true if user was created, false if something went wrong
     createUser(user) {

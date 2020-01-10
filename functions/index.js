@@ -157,6 +157,37 @@ app.post("/user", (req, res) => {
         .then(success => success ? res.status(201) : res.status(400));
 });
 
+
+/**
+ *
+ */
+
+app.get("/users", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getAllUsers().then(users => {
+        if (users !== null) {
+            res.status(201).send(users);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+
+/**
+ * Get one user by id
+ */
+app.get("/users/:userId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getUserById(req.params.userId).then(user => {
+        if (user !== null) {
+            res.status(201).send(user);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
 /**
  * Checks if a user with the given email and password exists in the database and returns a token if login information is valid
  * body:

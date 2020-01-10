@@ -71,12 +71,12 @@ class Services
 
 	getUsers()
 	{
-		return axios.get(url + '/user').then(response => response.data);
+		return axios.get(url + '/users').then(response => response.data);
 	}
 
 	getUser(id)
 	{
-		return axios.get(url + '/user/' + id).then(response => response.data);
+		return axios.get(url + '/users/' + id).then(response => response.data);
 	}
 
 	createEvent(event)
