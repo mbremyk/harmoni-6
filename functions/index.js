@@ -10,7 +10,7 @@ let cors = require("cors");
 // model.syncModels();
 // const sequelize = require("sequelize");
 // const op = sequelize.Op;
-const dao = require('../dao.js');
+const dao = require('./dao.js');
 let db = new dao();
 
 
@@ -26,32 +26,37 @@ main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
 
-app.get("/test", (req, res) =>
-{
-	console.log(req);
-	res.send("test functional");
-});
+
+
 
 app.get("/events", (req, res) =>
 {
 	console.log("GET-request received from client");
-	return model.EventModel.findAll({order: [['startTime', 'ASC']]})
-	            .then(events => res.send(events))
-	            .catch(error => console.error(error));
+	return db.getAllEvents().then(events =>
+	{
+		if (events !== null)
+		{res.status(201).send(events);}
+		else
+		{res.sendStatus(400);}
+	});
 });
+
+
+
 
 app.get("/events/search/:searchText", (req, res) =>
 {
-	return db.findEventsBySearch(req.params.searchText)
-	         .then(events =>
-	         {
-		         if (events !== null)
-		         {res.status(201).send(events);}
-		         else
-		         {res.sendStatus(400);}
-	         })
-	         .catch(error => console.error(error));
+	return db.findEventsBySearch(req.params.searchText).then(events =>
+	{
+		if (events !== null)
+		{res.status(201).send(events);}
+		else
+		{res.sendStatus(400);}
+	});
 });
+
+
+
 
 app.post("/user", (req, res) =>
 {
@@ -59,13 +64,19 @@ app.post("/user", (req, res) =>
 	         .then(success => success ? res.status(201) : res.status(400));
 });
 
+
+
+
 app.get("/salt/:email", (req, res) =>
 {
 	console.log("GET-request received from client");
-	return model.UserModel.findAll({where: {email: req.params.email}, attributes: ['salt']})
-	            .then(salt => res.send(salt))
-	            .catch(error => console.error(error));
+	return db.getSaltByEmail(req.params.email)
+	         .then(salt => res.send(salt))
+	         .catch(error => console.error(error));
 });
+
+
+
 
 app.post("/login", (req, res) =>
 {
@@ -83,6 +94,9 @@ app.post("/login", (req, res) =>
 		res.json({error: "Not authorized"});
 	}
 });
+
+
+
 
 app.use("/auth", (req, res, next) =>
 {
@@ -104,6 +118,9 @@ app.use("/auth", (req, res, next) =>
 	});
 });
 
+
+
+
 app.get("/auth/user/:userId", (req, res) =>
 {
 	console.log("GET-request received from client");
@@ -123,13 +140,17 @@ app.get("/auth/user/:userId", (req, res) =>
 	            .catch(error => console.error(error));
 });
 
+
+
+
 app.get("/tickets/:eventId", (req, res) =>
 {
 	console.log("GET-request received from client");
-
-	return model.TicketModel.findAll({where: {eventId: req.params.eventId}})
-	            .then(tickets => res.send(tickets))
-	            .catch(error => console.error(error));
+	return db.getTicketsForEvent(req.params.eventId)
+	         .then(tickets => res.status(201).send(tickets));
 });
+
+
+
 
 console.log("Server initalized");
