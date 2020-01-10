@@ -114,18 +114,26 @@ class Dao
 	//chekcs if username and password match, then reuturns true or false
 	loginOk(email, password)
 	{
-		model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}})
-		     .then(response =>
-		     {
-			     return response.length === 1;
-		     });
+		model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}}).then(response =>
+		{
+			return response.length === 1;
+		}).catch(error =>
+		{
+			console.error(error);
+			return false;
+		});
 	}
 
-	getTicketsForEvent(eventId){
+
+
+	getTicketsForEvent(eventId)
+	{
 		return model.TicketModel.findAll({where: {eventId: eventId}})
-		     .then(tickets => tickets)
-		     .catch(error => console.error(error));
+		            .then(tickets => tickets)
+		            .catch(error => console.error(error));
 	}
+
+
 
 	getSaltByEmail(email)
 	{
