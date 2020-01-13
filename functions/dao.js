@@ -251,7 +251,7 @@ class Dao {
      * @param gig
      * @returns {Promise<boolean>}
      */
-    createGig(gig) {
+    addGig(gig) {
         return model.GigModel.create({
             artistId: gig.artistId,
             eventId: gig.eventId,
@@ -291,7 +291,7 @@ class Dao {
     addPersonnel(personnel) {
         return model.PersonnelModel.create(
             {
-                personnelId: personnel.userId,
+                personnelId: personnel.personnelId,
                 eventId: personnel.eventId,
                 role: personnel.role
             }
@@ -328,7 +328,7 @@ class Dao {
      * @param ticket
      * @returns {Promise<boolean>}
      */
-    createTicket(ticket) {
+    addTicket(ticket) {
         return model.TicketModel.create({
             eventId: ticket.eventId,
             type: ticket.type,
