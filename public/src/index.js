@@ -6,12 +6,14 @@ import { createHashHistory, createBrowserHistory } from 'history';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
 import {CreateUserForm} from '../src/components/createuser';
-import {LandingPage} from "./components/frontpage";
+import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
 import { GuardProvider, GuardedRoute } from 'react-router-guards';
 import {addEvent} from '../src/components/createevent.js';
+import {HomePage} from "./components/homepage";
+import{EventPage} from "./components/eventpage";
 import AuthService from "./AuthService";
 
 //const history = createHashHistory();
@@ -30,6 +32,12 @@ if (root)
         <Route exact path="/logg-inn" component={LoginForm}/>
         <Route exact path="/logg-ut" component={Logout}/>
         <Route exact path="/opprett-arrangement" component={addEvent} />
+        <Route exact path="/hjem" component={HomePage} />
+        <Route exact path="/arrangement/:id" component={EventPage} />
+
+
+
+
     </div>
     </BrowserRouter>,
 root

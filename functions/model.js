@@ -148,7 +148,8 @@ let PersonnelModel = sequelize.define('personnel', {
             model: EventModel,
             key: 'eventId'
         }
-    }
+    },
+    role: Sequelize.STRING
 }, {tableName: 'personnel'});
 
 
@@ -182,7 +183,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
             },
             {
                 username: 'Sebastian I',
-                password: 'TestBruker1',
+                password: 'SI',
                 salt: 'salt',
                 email: 'sebastian@mail.com'
             },

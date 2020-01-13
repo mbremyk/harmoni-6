@@ -17,7 +17,7 @@ main.use('/api/v1', app);
 main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 
-//Sequalize
+//Sequelize
 const model = require('./model.js');
 const dao = require('./dao.js');
 let db = new dao();
@@ -128,8 +128,23 @@ app.get("/events/search/:searchText", (req, res) => {
  * }
  */
 app.post("/user", (req, res) => {
-    return db.createUser(req.body)
-        .then(success => success ? res.status(201) : res.status(400));
+    return db.getUser(req.body.email)
+        .then(user => {
+            if (user) {
+                res.sendStatus(409);
+            } else {
+                return hashPassword.hashPassword(req.body.password).then(credentials => {
+                    db.createUser({
+                        username: req.body.username,
+                        email: req.body.email,
+                        password: credentials[0],
+                        salt: credentials[1]
+                    })
+                        .then(success => success ? res.status(201) : res.status(400))
+                        .catch(error => console.error(error));
+                });
+            }
+        });
 });
 
 /**
@@ -145,22 +160,25 @@ app.post("/user", (req, res) => {
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
-    db.getSaltByEmail(req.body.email).then(salt => {
-       if(salt.length !== 1) { res.status(401); return; }
-       hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
-           db.loginOk(req.body.email, credentials[0]).then(ok => {
-               if (ok) {
-                   db.getUser(req.body.email).then(user => {
-                       console.log(user[0].dataValues);
-                       let token = getToken(user[0].dataValues);
-                       res.json({jwt: token});
-                   })
-               } else {
-                   res.status(401);
-                   res.json({error: "Not authorized"})
-               }
-           });
-       })
+    return db.getSaltByEmail(req.body.email).then(salt => {
+        if (salt.length !== 1) {
+            res.status(401);
+            return;
+        }
+        hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+            db.loginOk(req.body.email, credentials[0]).then(ok => {
+                if (ok) {
+                    db.getUser(req.body.email).then(user => {
+                        console.log(user.dataValues);
+                        let token = getToken(user.dataValues);
+                        res.json({jwt: token});
+                    })
+                } else {
+                    res.status(401);
+                    res.json({error: "Not authorized"})
+                }
+            });
+        })
     });
 });
 
@@ -234,6 +252,18 @@ app.post("/auth/refresh", (req, res) => {
     });
 });
 
+app.get("/events/eventdetails/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getEventByEventId(req.params.eventId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+
 /**
  * Invalidates your access token
  * header:
@@ -276,7 +306,7 @@ app.get("/auth/events/user/:userId", (req, res) => {
     let decoded = jwt.decode(token);
     console.log(decoded);
     if (decoded.userId == req.params.userId) {
-        return db.getEventsUser(decoded.userId)
+        return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
             .catch(error => console.error(error));
     } else {
