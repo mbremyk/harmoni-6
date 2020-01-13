@@ -139,7 +139,7 @@ export class EditEvent extends Component{
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
 
-        service.createEvent(ev)
+        service.updateEvent(ev)
             .then(updated =>
             {this.state.artistsAdd.map(artist =>
                 (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
@@ -232,7 +232,7 @@ export class EditEvent extends Component{
                                 className="m-4 font-weight-bold"
                                 id = 'fromDatePicker'
                                 name = 'fdate'
-                                format="y-MM-dd"
+                                format="dd-MM-y"
                                 selected={this.state.fDate}
                                 value={this.state.fDate}
                                 onChange={date => this.changeDate('fdate', date)}
@@ -242,7 +242,7 @@ export class EditEvent extends Component{
                                 className="m-4 font-weight-bold"
                                 name='fTime'
                                 disableClock={false}
-                                format="HH:mm:ss"
+                                format="HH:mm"
                                 locale="sv-sv-sv"
                                 selected={this.state.fTime}
                                 value={this.state.fTime}
@@ -257,7 +257,7 @@ export class EditEvent extends Component{
                                 className="m-4 font-weight-bold"
                                 id='toDatePicker'
                                 name='tdate'
-                                format="y-MM-dd"
+                                format="dd-MM-y"
                                 selected={this.state.tDate}
                                 value={this.state.tDate}
                                 onChange={date => this.changeDate('tdate', date)}
@@ -268,7 +268,7 @@ export class EditEvent extends Component{
                                 name='tTime'
                                 locale="sv-sv-sv"
                                 disableClock={false}
-                                format="HH:mm:ss"
+                                format="HH:mm"
                                 selected={this.state.tTime}
                                 value={this.state.tTime}
                                 onChange={time => this.changeTime('tTime', time)}
@@ -323,7 +323,7 @@ export class EditEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                            <Button type="submit" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                            <Button type="submit" onClick={this.handleSubmit}>Endre arragament</Button>
                         </Form.Group>
 
                     </Form.Row>
@@ -335,18 +335,33 @@ export class EditEvent extends Component{
 
     mounted() {
         service.getEventByEventId(this.props.match.params.id).then(event => {
-            console.log(event)
+            let fromDateTime = event.startTime.split(" ");
+            let toDateTime = event.endTime.split(" ");
+
+            let fromDate = fromDateTime[0].split("/");
+            let toDate = toDateTime[0].split("/");
+
+            let fromTime = fromDateTime[1];
+            let toTime = toDateTime[1];
+
             console.log(event.startTime)
-            console.log(event.startTime.split(" ")[0], "test");
-            console.log(event.startTime.split(" ")[1])
+            console.log(event.endTime)
+
+            console.log(fromDate);
+            console.log(toDate);
+            console.log(fromTime);
+            console.log(toTime);
+            console.log(fromDate[1]-1);
+
             this.setState({eventName: event.eventName});
             this.setState({eventAddress: event.address});
             this.setState({eventDescription: event.description});
             this.setState({ageLimit: event.ageLimit});
-            this.setState({fDate: event.startTime.split(" ")[0]});
-            this.setState({tDate: event.endTime.split(" ")[0]});
-            this.setState({fTime: event.startTime.split(" ")[1]});
-            this.setState({tTime: event.endTime.split("")[1]});
+            this.setState({fDate: new Date(fromDate[2],fromDate[1]-1,fromDate[0])});
+            this.setState({tDate: new Date(toDate[2], toDate[1]-1, toDate[0])});
+            this.setState({fTime: fromTime});
+            this.setState({tTime: toTime});
+
 
             service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
         }).catch((error) => console.log(error));
