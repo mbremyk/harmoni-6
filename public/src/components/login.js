@@ -27,14 +27,17 @@ export class LoginForm extends Component {
     handleLogin() {
         if(!this.state.email || !this.state.password) { return; }
         authService.login(this.state.email, this.state.password)
-            .then(res => this.login(res));
+            .then(res => this.login(res))
     }
 
     login(res) {
         console.log('token '+ authService.getToken());
         if(authService.loggedIn())
         {
-            this.props.history.push("/hjem");
+            console.log('Push to homepage');
+            this.context.history.push('/hjem');
+            // this.props.history.push('/path')
+            // history.push("/hjem");
         }
         else
         {
