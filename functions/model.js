@@ -203,11 +203,12 @@ creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
 let syncTestData = () => sequelize.sync({force: true}).then(() => {
-    return (UserModel.bulkCreate(testData.users).then(() => {
+    return (
+        UserModel.bulkCreate(testData.users).then(() => {
             EventModel.bulkCreate(testData.events).then(() => {
-                GigModel.bulkCreate(testData.gigs).then(() => {
-                    PersonnelModel.bulkCreate(testData.personnel).then(() => {
-                        TicketModel.bulkCreate(testData.tickets);
+                PersonnelModel.bulkCreate(testData.personnel).then(() => {
+                    TicketModel.bulkCreate(testData.tickets).then(() => {
+                        GigModel.bulkCreate(testData.gigs);
                     });
                 });
             });
