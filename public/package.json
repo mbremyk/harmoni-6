@@ -24,6 +24,8 @@
     "scripts": "^0.1.0"
   },
   "devDependencies": {
+    "FileSaver": "^0.10.0",
+    "file-saver": "^2.0.2",
     "history": "^4.10.1",
     "react-router-dom": "^5.1.2"
   },

@@ -67,10 +67,10 @@ function test() {
         }
     );
     //let testBlob = fs.readFileSync(testfile, 'utf8');
-   // console.log(testBlob);
+   // console.log(testBlob);*/
 
-    setContract(testString, 1, 1);*/
-    //setRider(testString, 1, 1);
+    setContract(testString, 1, 1);
+    setRider(testString, 1, 1);
 
     GigModel.findOne({where:{eventId: 1, artistId: 1 }})
         .then(gig => {

@@ -152,7 +152,7 @@ class Dao
 			.then(gig => {
 				console.log(contract);
 				let b = new Blob([contract]);
-				gig.update({contract: b});
+				gig.update({contract: null });
 			}
 		);
 		console.log(contract);
