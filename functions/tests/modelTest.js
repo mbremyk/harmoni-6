@@ -3,10 +3,14 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeAll(() => Models.syncTestData());
+beforeAll(() => Models.syncTestData().then(() => function(){}));
 
 
-describe('Login Test', () => {
+/*
+TODO: USERS
+ */
+
+describe('Login', () => {
     it('Login Fail on wrong password', done => {
         db.loginOk('steffen@mail.com', 'FeilPassord').then(ok => {
             expect(ok).toBeFalsy();
@@ -24,41 +28,7 @@ describe('Login Test', () => {
 });
 
 
-describe('User Tests', () => {
-    it('correct data in users', done => {
-        db.getAllUsers().then(users => {
-            expect(users.length).toBeGreaterThanOrEqual(9);
-            done();
-        });
-    });
-
-
-    it('find user by email', done => {
-        db.getUserByEmail("steffen@mail.com").then(users => {
-            expect(users
-                .map(user => user.toJSON())
-                .map(user => (
-                    {
-                        userId: user.userId,
-                        username: user.username,
-                        password: user.password,
-                        salt: user.salt,
-                        email: user.email,
-
-                    })))
-                .toEqual([
-                    {
-                        userId: 1,
-                        username: 'Steffen T',
-                        password: 'ST',
-                        salt: 'salt',
-                        email: 'steffen@mail.com'
-                    }
-                ]);
-            done();
-        });
-    });
-
+describe('Users', () => {
 
     it('create user', done => {
         let user = {
@@ -73,12 +43,11 @@ describe('User Tests', () => {
         });
     });
 
-
     it('update user success', done => {
         let user = {
-            userId: '1',
-            username: 'UsernameUpdated',
-            password: 'PasswordUpdated',
+            userId: '7',
+            username: 'UPDATED',
+            password: 'UPDATED',
             email: 'NEW@mail.com'
         };
         db.updateUser(user).then(response => {
@@ -87,8 +56,7 @@ describe('User Tests', () => {
         });
     });
 
-
-    it('update user fail', done => {
+    it('update user fail - id doesnt exist', done => {
         let user = {
             userId: '-1',
             username: 'FAIL',
@@ -101,23 +69,67 @@ describe('User Tests', () => {
             done();
         });
     });
-});
 
-
-describe('Event Tests', () => {
-    it('correct data in events', done => {
-        db.getAllEvents().then(events => {
-            expect(events.length).toBeGreaterThanOrEqual(5);
+    it('correct data in users', done => {
+        db.getAllUsers().then(users => {
+            expect(users.length).toBeGreaterThanOrEqual(9);
             done();
         });
     });
 
 
+    it('find user by email', done => {
+        db.getUserByEmail("steffen@mail.com").then(user => {
+            expect({
+                userId: user.userId,
+                username: user.username,
+                password: user.password,
+                salt: user.salt,
+                email: user.email,
+            }).toEqual({
+                    userId: 1,
+                    username: 'Steffen T',
+                    password: 'ST',
+                    salt: 'salt',
+                    email: 'steffen@mail.com'
+                }
+            );
+            done();
+        });
+    });
+
+    it('find user by ID', done => {
+        db.getUserById(1).then(user => {
+            expect({
+                userId: user.userId,
+                username: user.username,
+                password: user.password,
+                salt: user.salt,
+                email: user.email,
+            }).toEqual({
+                    userId: 1,
+                    username: 'Steffen T',
+                    password: 'ST',
+                    salt: 'salt',
+                    email: 'steffen@mail.com'
+                }
+            );
+            done();
+        });
+    });
+});
+
+/*
+TODO: EVENTS
+ */
+
+describe('Events', () => {
+
     it('create event', done => {
         let event = {
             organizerId: '3',
-            eventName: 'CreateEvent',
-            address: 'event.address,',
+            eventName: 'CREATED',
+            address: 'CREATED',
             ageLimit: '45',
             startTime: null,
             endTime: null,
@@ -128,7 +140,6 @@ describe('Event Tests', () => {
             done();
         });
     });
-
 
     it('update event success', done => {
         let event = {
@@ -162,28 +173,16 @@ describe('Event Tests', () => {
             done();
         });
     });
-});
 
-
-describe('Personnel Tests', () => {
-    it('correct data in personnel', done => {
-        db.getPersonnel(4).then(personnel => {
-            expect(personnel.length).toBe(2);
-            done();
-        });
-    });
-
-
-    it('add personnel to event', done => {
-        db.addPersonnel(1, 1, 'JEG VIL JOBBE').then(response => {
-            expect(response).toBeTruthy();
+    it('correct data in events', done => {
+        db.getAllEvents().then(events => {
+            expect(events.length).toBeGreaterThanOrEqual(5);
             done();
         });
     });
 });
 
-
-describe('Search', () => {
+describe('Events - search', () => {
     it('search several results', done => {
         db.getEventsMatching('konsert').then(events => {
             expect(events.length).toBe(3);
@@ -229,27 +228,141 @@ describe('Search', () => {
     });
 });
 
+/*
+TODO: PERSONNEL
+ */
+
+describe('Personnel', () => {
+    it('add personnel to event', done => {
+        let personnel = {
+            eventId: 1,
+            personnelId: 1,
+            role: 'JEG VIL JOBBE'
+        };
+        db.addPersonnel(personnel).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('update personnel', done => {
+        let personnel = {
+            eventId: 4,
+            personnelId: 8,
+            role: 'UPDATED'
+        };
+        db.updatePersonnel(personnel).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('remove personnel', done => {
+        let personnel = {
+            eventId: 5,
+            personnelId: 3,
+            role: 'DELETE'
+        };
+        db.removePersonnel(personnel).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct data in personnel', done => {
+        db.getPersonnel(4).then(personnel => {
+            expect(personnel.length).toBe(2);
+            done();
+        });
+    });
+});
+
+
+/*
+TODO: GIGS
+ */
+
+describe('Gigs', () => {
+    it('create Gig', done => {
+        let gig = {
+            eventId: 1,
+            artistId: 2,
+            contract: null,
+            rider: null,
+        };
+        db.addGig(gig).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct data in gig', done => {
+        db.getGig(4).then(gig => {
+            expect(gig.artistId).toBe(8);
+            done();
+        });
+    });
+});
+
+
+/*
+TODO: TICKETS
+ */
+
+describe('Tickets', () => {
+    it('create Ticket', done => {
+        let ticket = {
+            eventId: 4,
+            type: 'CREATED',
+            price: 69,
+            amount: 69,
+
+        };
+        db.addTicket(ticket).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('update Ticket', done => {
+        let ticket = {
+            eventId: 4,
+            type: 'Golden Circle',
+            price: 1234,
+            amount: 56,
+        };
+        db.updateTicket(ticket).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('remove Ticket', done => {
+        let ticket = {
+            eventId: 1,
+            type: 'Inngang',
+            price: 50,
+            amount: 40,
+        };
+        db.removeTicket(ticket).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct data in tickets', done => {
+        db.getTickets(4).then(tickets => {
+            expect(tickets.length).toBeGreaterThanOrEqual(3);
+            done();
+        });
+    });
+});
+
 
 describe('Uncategorized', () => {
     it('1+1=2', done => {
         expect(1 + 1).toBe(2);
         done();
-    });
-
-
-    it('correct data in gigs', done => {
-        db.getGig(4).then(gig => {
-            expect(gig.length).toBe(1);
-            done();
-        });
-    });
-
-
-    it('correct data in tickets', done => {
-        db.getTickets(4).then(tickets => {
-            expect(tickets.length).toBe(3);
-            done();
-        });
     });
 });
 
