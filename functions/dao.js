@@ -4,7 +4,6 @@ const op = sequelize.Op;
 
 let date_format = '\'%d %M %H:%i\'';
 
-
 class Dao {
     //returns array of all users in the database
     getAllUsers() {
@@ -157,6 +156,17 @@ class Dao {
             });
     }
 
+	//returns an array with all events by one organizerId
+	getEventsByOrganizerId(userId) {
+		return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
+	}
+
+	//returns an event with the same id
+	getEventByEventId(eventId)
+	{
+		return model.EventModel.findOne({where: {eventId: eventId}});
+
+	}
     getEventsUser(userId) {
         return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
     }

@@ -17,7 +17,7 @@ main.use('/api/v1', app);
 main.use(bodyParser.json());
 exports.webApi = functions.https.onRequest(main);
 
-//Sequalize
+//Sequelize
 const model = require('./model.js');
 const dao = require('./dao.js');
 let db = new dao();
@@ -121,11 +121,11 @@ app.get("/events/search/:searchText", (req, res) => {
 /**
  * Create new user
  * body:
- *      {
- *          username: string
- *          password: string
- *          email: string
- *      }
+ * {
+ *     username: string
+ *     password: string
+ *     email: string
+ * }
  */
 app.post("/user", (req, res) => {
     return db.createUser(req.body)
@@ -135,10 +135,10 @@ app.post("/user", (req, res) => {
 /**
  * Checks if a user with the given email and password exists in the database and returns a token if login information is valid
  * body:
- *      {
- *          email: string
- *          password: string
- *      }
+ * {
+ *     email: string
+ *     password: string
+ * }
  *
  * @return {json} {jwt: token}
  */
@@ -167,9 +167,9 @@ app.post("/login", (req, res) => {
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:
- *      {
- *          x-access-token: string
- *      }
+ * {
+ *     x-access-token: string
+ * }
  */
 app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
@@ -194,9 +194,9 @@ app.use("/auth", (req, res, next) => {
  *      }
  *
  * body:
- *      {
- *          email: string
- *      }
+ * {
+ *     email: string
+ * }
  */
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
@@ -217,9 +217,9 @@ app.get("/tickets/:eventId", (req, res) => {
 /**
  * Invalidate old access token and get a new one
  * header:
- *      {
- *          x-access-token: string
- *      }
+ * {
+ *      x-access-token: string
+ * }
  *
  * @return {json} {jwt: token}
  */
@@ -292,5 +292,55 @@ app.get("/events/eventdetails/:eventId", (req, res) =>
 	});
 });
 
+
+/**
+ * Invalidates your access token
+ * header:
+ * {
+ *     x-access-token: string
+ * }
+ */
+app.post("/auth/logout", (req, res) => {
+    console.log("POST-request received from client");
+
+    let token = req.headers["x-access-token"];
+    jwtBlacklist.push(token);
+});
+
+/**
+ * Update user information
+ * body:
+ * {
+ *     username: string
+ *     email: string
+ *     newEmail: string
+ * }
+ */
+app.put("/auth/user/:userId", (req, res) => {
+    console.log("PUT-request received from client");
+
+    return db.updateUser(req.body)
+        .then(res.sendStatus(200));
+});
+
+/**
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ */
+app.get("/auth/events/user/:userId", (req, res) => {
+    console.log("GET-request received from client");
+    let token = req.headers['x-access-token'];
+    let decoded = jwt.decode(token);
+    console.log(decoded);
+    if (decoded.userId == req.params.userId) {
+        return db.getEventsUser(decoded.userId)
+            .then(events => res.send(events))
+            .catch(error => console.error(error));
+    } else {
+        res.sendStatus(403);
+    }
+});
 
 console.log("Server initalized");
