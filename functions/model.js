@@ -437,4 +437,4 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
     ).catch(error => console.log(error));
 });
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels, syncTestData, update};
+module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels, syncTestData};

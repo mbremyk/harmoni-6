@@ -259,26 +259,27 @@ app.post("/gig", (req, res) => {
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
-    return db.getSaltByEmail(req.body.email).then(salt => {
-        if (salt.length !== 1) {
-            res.sendStatus(401);
-            return;
-        }
-        hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
-            db.loginOk(req.body.email, credentials[0]).then(ok => {
-                if (ok) {
-                    db.getUserByEmail(req.body.email).then(user => {
-                        console.log(user.dataValues);
-                        let token = getToken(user.dataValues);
-                        res.json({jwt: token});
-                    })
-                } else {
-                    res.status(401);
-                    res.json({error: "Not authorized"})
-                }
-            });
-        })
-    });
+    return db.getSaltByEmail(req.body.email)
+            .then(salt => {
+            if (salt.length !== 1) {
+                res.sendStatus(401);
+                return;
+            }
+            hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+                db.loginOk(req.body.email, credentials[0]).then(ok => {
+                    if (ok) {
+                        db.getUserByEmail(req.body.email).then(user => {
+                            console.log(user.dataValues);
+                            let token = getToken(user.dataValues);
+                            res.json({jwt: token});
+                        })
+                    } else {
+                        res.status(401);
+                        res.json({error: "Not authorized"})
+                    }
+                });
+            })
+        });
 });
 
 app.post("/contract/:eventId/:artistId", (req, res) => {
@@ -325,20 +326,17 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
 app.use("/auth", (req, res, next) => {
     console.log("Authorization request received from client");
     let token = req.headers["x-access-token"];
-    jwt.verify(token, publicKey, (err, decoded) =>
-	{
-		if (err || decoded.username !== req.body.username)
-		{
-			console.log("Token not OK");
-			res.status(401);
-			res.json({error: "Not authorized"});
-		}
-		else
-		{
-			console.log("Token OK");
-			next();
-		}
-	});
+    jwt.verify(token, publicKey, (err, decoded) => {
+        if (err || decoded.username !== req.body.username) {
+            console.log("Token not OK");
+            res.status(401);
+            res.json({error: "Not authorized"});
+        } else {
+            console.log("Token OK");
+            next();
+        }
+    });
+});
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:

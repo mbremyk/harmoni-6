@@ -354,6 +354,7 @@ class Dao {
                 console.error(error);
                 return []
             });
+    }
 
 	setContract(contract, gig, artist ){
 		return model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
@@ -381,7 +382,6 @@ class Dao {
 			}
 		);
 	}
-}
 
     /*
     TODO: FILE STUFF
