@@ -138,13 +138,17 @@ let TicketModel = sequelize.define('ticket', {
 
 let PersonnelModel = sequelize.define('personnel', {
     personnelId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
             model: UserModel,
             key: 'userId'
         }
     },
     eventId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
             model: EventModel,
             key: 'eventId'
         }
@@ -152,15 +156,35 @@ let PersonnelModel = sequelize.define('personnel', {
     role: Sequelize.STRING
 }, {tableName: 'personnel'});
 
+let FileModel = sequelize.define('file', {
+    fileId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true
+    },
+    path: Sequelize.STRING
+});
+
+let FileAccessModel = sequelize.define('fileAccess', {
+    fileId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: FileModel,
+            key: 'fileId'
+        }
+    },
+    userId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        }
+    }
+});
+
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
-
-
-
-
-
-
-
 
 
 /*

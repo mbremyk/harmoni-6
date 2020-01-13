@@ -33,8 +33,8 @@ describe('User Tests', () => {
     });
 
 
-    it('find user by id and username', done => {
-        db.getUser("steffen@mail.com", 1).then(users => {
+    it('find user by email', done => {
+        db.getUserByEmail("steffen@mail.com").then(users => {
             expect(users
                 .map(user => user.toJSON())
                 .map(user => (

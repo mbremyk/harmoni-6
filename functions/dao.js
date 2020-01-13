@@ -19,8 +19,8 @@ class Dao {
 
 
     //returns a user if userid and username matches, else return null
-    getUser(email, userId = null) {
-        let where = userId ? {[op.and]: [{userId: userId}, {email: email}]} : {email: email};
+    getUserByEmail(email) {
+        let where = {email: email};
         return model.UserModel.findOne({where: where})
             .then(user => {
                 if (user) {
@@ -30,6 +30,38 @@ class Dao {
             });
     }
 
+    getUserById(userId) {
+        let where = {userId: userId};
+        return model.UserModel.findOne({where: where})
+            .then(user => {
+                if (user) {
+                    return user;
+                }
+                return null;
+            });
+    }
+
+    getUserByUsername(username) {
+        let where = {username: username};
+        return model.UserModel.findOne({where: where})
+            .then(user => {
+                if (user) {
+                    return user;
+                }
+                return null;
+            });
+    }
+
+    getUserByEmailOrUsername(email, username) {
+        let where = {[op.or]: [{email: email}, {username: username}]};
+        return model.UserModel.findOne({where: where})
+            .then(user => {
+                if (user) {
+                    return user;
+                }
+                return null;
+            });
+    }
 
     //returns true if user was created, false if something went wrong
     createUser(user) {
@@ -63,6 +95,18 @@ class Dao {
             });
     }
 
+    createGig(gig) {
+        return model.GigModel.create({
+            artistId: gig.artistId,
+            eventId: gig.eventId,
+            rider: gig.rider,
+            contract: gig.contract,
+        }).then(response => response.id !== null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
 
     //returns true if an event is updated, false if too many, or noone is
     updateEvent(event) {
@@ -99,7 +143,6 @@ class Dao {
         ).then(created => ({insertId: (created.eventId)}));
     }
 
-
     getEventsMatching(searchText) {
         return model.EventModel.findAll({
             where: {[op.or]: [{eventName: {[op.like]: `%${searchText}%`}}, {description: {[op.like]: `%${searchText}%`}}]},
@@ -112,7 +155,6 @@ class Dao {
                 return null;
             });
     }
-
 
     /**
      * Checks if the email address and password fits with a single user in the database

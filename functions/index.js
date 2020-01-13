@@ -128,7 +128,7 @@ app.get("/events/search/:searchText", (req, res) => {
  * }
  */
 app.post("/user", (req, res) => {
-    return db.getUser(req.body.email)
+    return db.getUserByEmailOrUsername(req.body.email, req.body.username)
         .then(user => {
             if (user) {
                 res.sendStatus(409);
@@ -168,7 +168,7 @@ app.post("/login", (req, res) => {
         hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
             db.loginOk(req.body.email, credentials[0]).then(ok => {
                 if (ok) {
-                    db.getUser(req.body.email).then(user => {
+                    db.getUserByEmail(req.body.email).then(user => {
                         console.log(user.dataValues);
                         let token = getToken(user.dataValues);
                         res.json({jwt: token});
@@ -218,7 +218,7 @@ app.use("/auth", (req, res, next) => {
  */
 app.get("/auth/user/:userId", (req, res) => {
     console.log("GET-request received from client");
-    return db.getUser(req.params.userId, req.body.email)
+    return db.getUserByEmail(req.params.userId, req.body.email)
         .then(user => res.send(user))
         .catch(error => console.error(error));
 });
@@ -246,7 +246,7 @@ app.post("/auth/refresh", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
-    db.getUser(req.body.email).then(user => {
+    db.getUserByEmail(req.body.email).then(user => {
         let token = getToken(user[0].dataValues);
         res.json({jwt: token});
     });
