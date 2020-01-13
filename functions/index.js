@@ -162,7 +162,7 @@ app.post("/login", (req, res) => {
 
     return db.getSaltByEmail(req.body.email).then(salt => {
         if (salt.length !== 1) {
-            res.status(401);
+            res.sendStatus(401);
             return;
         }
         hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {

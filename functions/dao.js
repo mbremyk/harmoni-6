@@ -72,7 +72,8 @@ class Dao {
                 salt: user.salt,
                 email: user.email
             }
-        ).then(response => response.id !== null)
+        )
+            .then(response => response.id !== null)
             .catch(error => {
                 console.error(error);
                 return false;
