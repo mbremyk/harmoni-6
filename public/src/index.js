@@ -10,18 +10,20 @@ import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
 import {HarmoniNavbar} from "./components/harmoniNavbar.js";
 import {myPage} from "./components/mypage.js";
-import { GuardProvider, GuardedRoute } from 'react-router-guards';
-import {addEvent} from '../src/components/createevent.js';
-import AuthService from "./AuthService";
+import {AddEvent} from './components/createevent.js';
 import {HomePage} from "./components/homepage";
-import{EventPage} from "./components/eventpage";
+import {EventPage} from "./components/eventpage";
+import {Logout} from './components/logout'
 import {EditEvent} from "./components/editevent";
-import {AddEvent} from "./components/createevent";
+
+import {authService} from "./AuthService";
+import {PrivateRoute} from "./components/PrivateRoute";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
 
+// PrivateRoute sends user to /logg-inn if loggedIn() is false
 const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
@@ -29,34 +31,49 @@ if (root)
     <div>
         <HarmoniNavbar/>
         {/*<Route path="/" component={harmoniNavbar}/>*/}
+        <Route path="/" component={navbar}/>
         <Route exact path="/" component={LandingPage}/>
-        <Route exact path="/ny-bruker" component={CreateUserForm} />
-        <Route exact path="/min-side" component={myPage}/>
-        <Route exact path="/logg-inn" component={LoginForm} />
-        <Route exact path="/hjem" component={HomePage} />
-        <Route exact path="/arrangement/:id" component={EventPage} />
-        <Route exact path="/opprett-arrangement" component={AddEvent} />
-        <Route exact path="/endre-arrangement" component={EditEvent} />
+        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+        <Route exact path="/arrangement/:id" component={EventPage}/>
+        <Route exact path="/logg-inn" component={LoginForm}/>
 
+        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
     </div>
     </BrowserRouter>,
 root
 );
 
 /*
-const GuardProvider = require('react-router-guards').GuardProvider;
-const GuardedRoute = require('react-router-guards').GuardedRoute;
 
-const App = () => (
-  <Router history={history}>
-    <GuardProvider loading={Loading} error={NotFound}>
-      <GuardedRoute path="/login" exact component={Login} />
-      <GuardProvider guards={[requireLogin]}>
-        <GuardedRoute path="/" exact component={Home} />
-        <GuardedRoute path="/about" exact component={About} />
-      </GuardProvider>
-      <GuardedRoute path="*" component={NotFound} />
-    </GuardProvider>
-  </Router>
-);
+router with router guard.
+
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+        <Route exact path="/arrangement/:id" component={EventPage}/>
+        <Route exact path="/logg-inn" component={LoginForm}/>
+
+        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
+
+router without router guard
+
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm} />
+        <Route exact path="/min-side" component={myPage}/>
+        <Route exact path="/logg-inn" component={LoginForm} />
+        <Route exact path="/logg-ut" component={Logout}/>
+        <Route exact path="/hjem" component={HomePage} />
+        <Route exact path="/arrangement/:id" component={EventPage} />
+        <Route exact path="/opprett-arrangement" component={AddEvent} />
+        <Route exact path="/endre-arrangement" component={EditEvent} />
+
  */
