@@ -18,7 +18,6 @@ import {authService} from "../AuthService";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
-//TODO: Hente ut organizerId fra bruker
 //TODO: Legge til annet personell
 //TODO: Legge til bilde
 
@@ -67,7 +66,7 @@ export class AddEvent extends Component{
         this.imageUrl = this.handleImageUrlChange.bind(this);
 
         this.state = {
-            organizerId: null,
+            organizerId: '',
             eventName: '',
             eventAddress: '',
             eventDescription: '',
@@ -384,7 +383,9 @@ export class AddEvent extends Component{
         let decoded = jwt.decode(token);
         let userId = decoded.userId;
         this.setState({organizerId: userId});
-        console.log(this.state.organizerId);
+        console.log(token);
+        console.log(decoded);
+        console.log(userId);
         service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
     }
 

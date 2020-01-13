@@ -120,7 +120,7 @@ app.get("/events", (req, res) => {
     });
 });
 
-app.post("/auth/event", (req, res) =>{
+app.post("/auth/events", (req, res) =>{
    console.log("POST-request received from client");
    return db.createEvent(req.body).then(response => {
        if (response.insertId !== undefined) {

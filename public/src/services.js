@@ -90,7 +90,7 @@ class Services
 
 	createEvent(event)
 	{
-		return axios.post(url + '/events', event).then(response => response.insertId);
+		return axios.post(url + '/auth/events', event).then(response => response.insertId);
 	}
 
 	createGig(gig)
