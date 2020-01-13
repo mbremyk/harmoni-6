@@ -5,7 +5,7 @@ const op = sequelize.Op;
 
 class Dao {
     /*
-    TODO: USERS
+                                    USERS
      */
 
     /**
@@ -126,7 +126,7 @@ class Dao {
 
 
     /*
-    TODO: EVENTS
+                                      EVENTS
      */
 
     /**
@@ -170,7 +170,9 @@ class Dao {
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
-                description: event.description
+                image: event.image,
+                imageUrl: event.imageUrl,
+                description: event.description,
             },
             {where: {eventId: event.eventId}})
             .then(response => response[0] === 1 /*affected rows === 1*/)
@@ -178,6 +180,35 @@ class Dao {
                 console.error(error);
                 return false;
             });
+    }
+
+
+    cancelEvent(eventId) {
+        return model.EventModel.update(
+            {
+                //TODO
+            },
+            {where: {eventId: eventId}})
+            .then(response => response[0] === 1 /*affected rows === 1*/)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    deleteEvent(eventId) {
+
+        return (
+            (model.GigModel.destroy({where: {eventId: eventId}}).then(() => {
+                model.TicketModel.destroy({where: {eventId: eventId}}).then(() => {
+                    model.PersonnelModel.destroy({where: {eventId: eventId}}).then(() => {
+                        model.EventModel.destroy({where: {eventId: eventId}}).then(() => true)
+                    })
+                })
+            })).catch(error => {
+                console.error(error);
+                return false;
+            }))
     }
 
     /**
@@ -240,7 +271,7 @@ class Dao {
     }
 
     /*
-    TODO: GIG
+                                 GIG
      */
 
     /**
@@ -280,7 +311,7 @@ class Dao {
     }
 
     /*
-    TODO: PERSONNEL
+                            PERSONNEL
      */
 
     /**
@@ -353,7 +384,7 @@ class Dao {
 
 
     /*
-    TODO: TICKETS
+                            TICKETS
      */
 
     /**
@@ -427,7 +458,7 @@ class Dao {
     }
 
     /*
-    TODO: FILE STUFF
+                           FILE STUFF
      */
 }
 
