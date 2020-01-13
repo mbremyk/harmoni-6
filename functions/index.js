@@ -43,14 +43,21 @@ function tokenIsBlacklisted(token) {
     return jwtBlacklist.includes(token);
 }
 
+let interval = 60 * 1000;
+
 /**
  * Goes through the blacklist every hour and removes timed out tokens
  */
 setInterval(() => {
+    console.log("Removing expired tokens");
+    console.log("Token count: " + jwtBlacklist.length);
     jwtBlacklist = jwtBlacklist.filter(token => {
-        token.isValid();
-    })
-}, 60 * 60 * 1000);
+        jwt.verify(token, privateKey, (err, decoded) => {
+            return Date.now() > decoded.exp * 1000;
+        });
+    });
+    console.log("Tokens after purge: " + jwtBlacklist.length);
+}, interval);
 
 /**
  * Creates a token based on the specified user information
@@ -322,7 +329,7 @@ app.use("/auth", (req, res, next) => {
  */
 app.get("/auth/users/:userId", (req, res) => {
     console.log("GET-request received from client");
-    return db.getUserByEmail(req.params.userId, req.body.email)
+    return db.getUserById(req.params.userId)
         .then(user => res.send(user))
         .catch(error => console.error(error));
 });
@@ -333,7 +340,7 @@ app.get("/auth/users/:userId", (req, res) => {
  *          x-access-token: string
  *      }
  */
-app.get("/auth/events/user/:userId", (req, res) => {
+app.get("/auth/events/users/:userId", (req, res) => {
     console.log("GET-request received from client");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
@@ -379,6 +386,10 @@ app.post("/auth/logout", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
+
+    console.log(jwtBlacklist.length);
+
+    res.sendStatus(201);
 });
 
 /**
