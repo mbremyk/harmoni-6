@@ -31,7 +31,6 @@ if (root)
     <div>
         <HarmoniNavbar/>
         {/*<Route path="/" component={harmoniNavbar}/>*/}
-        <Route path="/" component={navbar}/>
         <Route exact path="/" component={LandingPage}/>
         <Route exact path="/ny-bruker" component={CreateUserForm}/>
         <Route exact path="/arrangement/:id" component={EventPage}/>
