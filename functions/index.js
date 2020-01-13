@@ -276,6 +276,7 @@ app.post("/auth/logout", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
+    res.sendStatus(201);
 });
 
 /**

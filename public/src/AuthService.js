@@ -43,7 +43,7 @@ class AuthService {
 
 	logout() {
 		// Clear user token and profile data from localStorage
-		service.logout().then(res => {localStorage.removeItem('token');});
+		return service.logout().then(res => localStorage.removeItem('token'));
 	}
 
 	_checkStatus(response) {

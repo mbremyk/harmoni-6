@@ -15,13 +15,14 @@ import {HomePage} from "./components/homepage";
 import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
 
-import {GuardProvider, GuardedRoute} from 'react-router-guards';
 import {authService} from "./AuthService";
+import {PrivateRoute} from "./components/PrivateRoute";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
 
+// PrivateRoute sends user to /logg-inn if loggedIn() is false
 const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
@@ -36,25 +37,8 @@ if (root)
         <Route exact path="/opprett-arrangement" component={addEvent} />
         <Route exact path="/hjem" component={HomePage} />
         <Route exact path="/arrangement/:id" component={EventPage} />
+        <PrivateRoute authed={authService.loggedIn()} path='/private' component={myPage}/>
     </div>
     </BrowserRouter>,
 root
 );
-
-/*
-const GuardProvider = require('react-router-guards').GuardProvider;
-const GuardedRoute = require('react-router-guards').GuardedRoute;
-
-const App = () => (
-  <Router history={history}>
-    <GuardProvider loading={Loading} error={NotFound}>
-      <GuardedRoute path="/login" exact component={Login} />
-      <GuardProvider guards={[requireLogin]}>
-        <GuardedRoute path="/" exact component={Home} />
-        <GuardedRoute path="/about" exact component={About} />
-      </GuardProvider>
-      <GuardedRoute path="*" component={NotFound} />
-    </GuardProvider>
-  </Router>
-);
- */

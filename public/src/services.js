@@ -51,7 +51,7 @@ class Services
 
 	logout()
 	{
-		return axios.post(url + '/logout', {}, {headers: {'x-access-token': authService.getToken()}})
+		return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
 	}
 
 	createUser(user)

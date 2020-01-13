@@ -12,4 +12,10 @@ export class Logout extends Component {
 			console.log(res);
 		})
 	}
+
+	render() {
+		return(
+			<div/>
+		)
+	}
 }
