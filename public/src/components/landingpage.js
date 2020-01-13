@@ -66,7 +66,7 @@ export class LandingPage extends Component
 
 						{this.events.map(event => (
 							<EventInfo
-								link={event.eventName}
+								link={event.eventId}
 								imageUrl={event.imageUrl}
 								title={event.eventName}
 								address={event.address}
