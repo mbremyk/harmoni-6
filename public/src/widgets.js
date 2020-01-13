@@ -86,7 +86,7 @@ export class EventInfo extends Component
 										<small className="text-muted"> Publisert {this.props.uploaded}</small>
 									</Col>
 									<Col>
-										<Button href="ny-bruker" variant="primary" size="sm">Rediger Arragement</Button>
+										<Button href={"/endre-arrangement/"  + this.props.link} variant="primary" size="sm">Rediger Arragement</Button>
 									</Col>
 								</Row>
 
