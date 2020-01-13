@@ -15,19 +15,25 @@
     "axios": "^0.19.1",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^4.4.1",
+    "firebase-tools": "^7.11.0",
     "npm": "^6.13.4",
     "react": "^16.12.0",
     "react-bootstrap": "^1.0.0-beta.16",
+    "react-date-picker": "^7.10.0",
     "react-datetime-picker": "^2.9.0",
+    "react-router": "^5.1.2",
     "react-scripts": "^3.3.0",
     "react-simplified": "^1.6.1",
+    "react-time-picker": "^3.9.0",
     "scripts": "^0.1.0"
   },
   "devDependencies": {
     "FileSaver": "^0.10.0",
     "file-saver": "^2.0.2",
     "history": "^4.10.1",
-    "react-router-dom": "^5.1.2"
+    "jwt-decode": "^2.2.0",
+    "react-router-dom": "^5.1.2",
+    "react-router-guards": "^1.0.1"
   },
   "browserslist": {
     "production": [

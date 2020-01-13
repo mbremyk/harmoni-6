@@ -1,5 +1,6 @@
 //const axios = require('axios');
 import axios from 'axios'
+import {authService} from './AuthService'
 
 var url = '';
 if(window.location.href.includes('localhost')){
@@ -20,30 +21,76 @@ export class User
 export class Event
 {
 	eventId;
+	organizerId;
 	eventName;
-	adress;
+	address;
 	ageLimit;
+	startTime;
+	endTime;
+	imageUrl;
 	image;
-	Startdate;
-	Enddate;
-	discription;
+	description;
 
 }
 
+export class Gig {
 
+	artistId;
+	eventId;
+	rider;
+	contract;
 
+	constructor(artistId, eventId, rider, contract) {
+		this.artistId = artistId;
+		this.eventId = eventId;
+		this.rider = rider;
+		this.contract = contract;
+	}
+}
+
+export class Ticket
+{
+    eventId;
+    type;
+    price;
+    amount;
+}
 
 class Services
 {
+	login(email, password)
+	{
+		return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
+	}
+
+	logout()
+	{
+		return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
+	}
+
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
+	}
 
+	getUsers()
+	{
+		return axios.get(url + '/users').then(response => response.data);
+	}
+
+	getUser(id)
+	{
+		return axios.get(url + '/users/' + id).then(response => response.data);
 	}
 
 	getEvents()
 	{
-		//return axios.get<Events[]>('/events').then(response => response.data);
+		return axios.get(url + '/events').then(response => response.data);
+	}
+
+	createEvent(event)
+	{
+		return axios.post(url + '/events', event).then(response => response.insertId);
 	}
 
 	uploadContract(formData, event, artist)
@@ -59,8 +106,30 @@ class Services
 
 	getAccessToken(email, hashedPassword){
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
+	createGig(gig)
+	{
+		return axios.post(url + '/gig', gig).then(response => response.data);
 	}
 
+	getTicketToEvent(eventId)
+	{
+		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
+	}
+
+	searchForEvents(input)
+	{
+		return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+	}
+
+	getEventsByOrganizer(userId)
+	{
+		return axios.get(url + '/auth/events/user/' + userId).then(response => response.data);
+	}
+
+	getEventByEventId(eventId)
+	{
+		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+	}
 }
 
 export let service = new Services();

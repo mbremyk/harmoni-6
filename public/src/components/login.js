@@ -5,11 +5,9 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {service} from "../services";
-import {encrypt} from "../encryption";
+import {authService} from "../AuthService";
 
-
-
-export class LoginForm extends Component{
+export class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,7 +16,6 @@ export class LoginForm extends Component{
         };
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
-
     }
 
     handleEmailChange(event) {
@@ -27,6 +24,23 @@ export class LoginForm extends Component{
     handlePasswordChange(event) {
         this.setState({password: event.target.value});
     }
+    handleLogin() {
+        if(!this.state.email || !this.state.password) { return; }
+        authService.login(this.state.email, this.state.password)
+            .then(res => this.login(res));
+    }
+
+    login(res) {
+        console.log('token '+ authService.getToken());
+        if(authService.loggedIn())
+        {
+            this.props.history.push("/hjem");
+        }
+        else
+        {
+            alert('Innlogging feilet.');
+        }
+    }
 
     render(){
         return(
@@ -34,33 +48,36 @@ export class LoginForm extends Component{
                 <Form>
                     <Form.Group controlId="formBasicEmail">
                         <Form.Label>Email</Form.Label>
-                        <Form.Control type="email" placeholder="Skriv inn email" value={this.state.email} onChange={this.handleEmailChange} />
+                        <Form.Control
+                            type="email"
+                            placeholder="Skriv inn email"
+                            value={this.state.email}
+                            onChange={this.handleEmailChange} />
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword">
                         <Form.Label>Passord</Form.Label>
-                        <Form.Control type="password" placeholder="Skriv inn passord" value={this.state.password} onChange={this.handlePasswordChange} />
+                        <Form.Control
+                            type="password"
+                            placeholder="Skriv inn passord"
+                            value={this.state.password}
+                            onChange={this.handlePasswordChange} />
                     </Form.Group>
 
-                    <Button onClick={() => alert("Email: " + this.state.email + " Password: " + this.state.password)} variant="primary" type="submit">
+                    <Button
+                        onClick={this.handleLogin}
+                        variant="primary"
+                        type="button">
                         Login
+                    </Button>
+                    <Button
+                        href="/"
+                        variant="secondary"
+                        type="button">
+                        Avbryt
                     </Button>
                     <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
                 </Form>
             </Container>
         );
     }
-
-    hashPassword(){
-        return encrypt(this.state.password);
-    }
-
-    getAccessToken(){
-        return service.getAccessToken(this.state.email, this.hashPassword(this.state.password))
-    }
-
-
-
-
-
 }
-
