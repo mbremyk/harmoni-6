@@ -8,7 +8,7 @@ import "@fortawesome/fontawesome-free"
 import {CreateUserForm} from '../src/components/createuser';
 import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
-import {navbar} from "./components/navbar.js";
+import {HarmoniNavbar} from "./components/harmoniNavbar.js";
 import {myPage} from "./components/mypage.js";
 import {AddEvent} from './components/createevent.js';
 import {HomePage} from "./components/homepage";
@@ -29,6 +29,8 @@ if (root)
     ReactDOM.render(
     <BrowserRouter>
     <div>
+        <HarmoniNavbar/>
+        {/*<Route path="/" component={harmoniNavbar}/>*/}
         <Route path="/" component={navbar}/>
         <Route exact path="/" component={LandingPage}/>
         <Route exact path="/ny-bruker" component={CreateUserForm}/>

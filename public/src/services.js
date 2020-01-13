@@ -88,7 +88,8 @@ class Services
 		return axios.post(url + '/event', event).then(response => response.insertId);
 	}
 
-	createGig(gig){
+	createGig(gig)
+	{
 		return axios.post(url + '/gig', gig).then(response => response.data);
 	}
 
@@ -109,17 +110,18 @@ class Services
 
 	searchForEvents(input)
 	{
-		return axios.get('/events/search/' + encodeURIComponent(input)).then(response => response.data);
+		return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
 	}
 
-	getEventsByOrganizer(organizerId)
+	getEventsByOrganizer(userId)
 	{
-		return axios.get('/auth/events/user/' + organizerId).then(response => response.data);
+		return axios.get(url + '/auth/events/user/' + userId).then(response => response.data);
 	}
 
 	getEventByEventId(eventId)
 	{
-		return axios.get('/events/eventdetails/' + eventId).then(response => response.data);
+		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+
 	}
 }
 

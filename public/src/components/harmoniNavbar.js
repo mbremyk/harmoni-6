@@ -7,9 +7,9 @@ import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 
-export class navbar extends Component {
+export class HarmoniNavbar extends Component {
     render() {
-        if (this.props.location.pathname != "/") {
+         // if (this.props.location.pathname != "/") {
             return (
                 <div>
                     <Navbar bg="light">
@@ -18,7 +18,7 @@ export class navbar extends Component {
                         </Navbar.Brand>
                     </Navbar>
                     <Navbar bg="light" expand="lg">
-                        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+                        <Navbar.Toggle aria-controls="basic-harmoniNavbar-nav"/>
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="mr-auto">
                                 <Nav.Link href="/hjem">Hjem</Nav.Link>
@@ -38,12 +38,12 @@ export class navbar extends Component {
                     </Navbar>
                 </div>
             );
-        } else {
+        } /*else {
             return(
                 <div></div>
             )
         }
-    }
+    }*/
     search() {
         alert("Search clicked");
     }
