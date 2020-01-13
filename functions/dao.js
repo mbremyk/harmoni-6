@@ -19,8 +19,8 @@ class Dao {
 
 
     //returns a user if userid and username matches, else return null
-    getUser(email, userId = null) {
-        let where = userId ? {[op.and]: [{userId: userId}, {email: email}]} : {email: email};
+    getUserByEmail(email) {
+        let where = {email: email};
         return model.UserModel.findOne({where: where})
             .then(user => {
                 if (user) {
@@ -31,9 +31,37 @@ class Dao {
     }
 
     getUserById(userId) {
-        return model.UserModel.findOne({where: {userId: userId}})
+        let where = {userId: userId};
+        return model.UserModel.findOne({where: where})
+            .then(user => {
+                if (user) {
+                    return user;
+                }
+                return null;
+            });
     }
 
+    getUserByUsername(username) {
+        let where = {username: username};
+        return model.UserModel.findOne({where: where})
+            .then(user => {
+                if (user) {
+                    return user;
+                }
+                return null;
+            });
+    }
+
+    getUserByEmailOrUsername(email, username) {
+        let where = {[op.or]: [{email: email}, {username: username}]};
+        return model.UserModel.findOne({where: where})
+            .then(user => {
+                if (user) {
+                    return user;
+                }
+                return null;
+            });
+    }
 
     //returns true if user was created, false if something went wrong
     createUser(user) {
@@ -44,7 +72,8 @@ class Dao {
                 salt: user.salt,
                 email: user.email
             }
-        ).then(response => response.id !== null)
+        )
+            .then(response => response.id !== null)
             .catch(error => {
                 console.error(error);
                 return false;
