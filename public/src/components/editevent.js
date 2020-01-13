@@ -59,6 +59,7 @@ export class EditEvent extends Component{
         this.artists = this.handleArtists.bind(this);
 
         this.state = {
+            eventId: 0,
             eventName: '',
             eventAddress: '',
             eventDescription: '',
@@ -107,42 +108,11 @@ export class EditEvent extends Component{
     }
 
     handleSubmit() {
-        if(this.state.eventName === '' ||
-            this.state.eventAddress === '' ||
-            this.state.eventDescription === ''){
-            alert('Tomme felter! Vennligst fyll ut alle felt');
-            return;
-        }else if(
-            this.state.tDate < this.state.fDate ||
-            this.state.tTime < this.state.fTime
-        ){
-            alert('Fra-tidspunkt må være større enn til-tidspunkt!');
-            return;
-        }
         this.submit()
     }
 
     mergeDateTime(fdate, ftime) {
         return fdate.toISOString().split("T")[0] + " " + ftime;
-    }
-
-    submit() {
-
-        let ev = new Event();
-        ev.address = this.state.eventAddress;
-        ev.organizerId = 1;
-        ev.ageLimit = this.state.ageLimit;
-        ev.description = this.state.eventDescription;
-        ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
-        ev.endTime = this.mergeDateTime(this.state.tDate, this.state.tTime);
-        ev.eventName = this.state.eventName;
-        ev.rider = this.state.rider;
-        ev.contract = this.state.contract;
-
-        service.updateEvent(ev).then(updated =>
-        {this.state.artistsAdd.map(artist =>
-            (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
-            .catch((error) => console.log(error.message));
     }
 
     render(){
@@ -343,6 +313,7 @@ export class EditEvent extends Component{
             let fromTime = fromDateTime[1];
             let toTime = toDateTime[1];
 
+            this.setState({eventId: event.eventId});
             this.setState({eventName: event.eventName});
             this.setState({eventAddress: event.address});
             this.setState({eventDescription: event.description});
@@ -351,7 +322,6 @@ export class EditEvent extends Component{
             this.setState({tDate: new Date(toDate[2], toDate[1]-1, toDate[0])});
             this.setState({fTime: fromTime});
             this.setState({tTime: toTime});
-
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
@@ -393,5 +363,16 @@ export class EditEvent extends Component{
             this.state.ageLimit--;
             this.setState({ageLimit: this.state.ageLimit})
         }
+    }
+
+    submit() {
+
+        let fDate = this.mergeDateTime(this.state.fDate, this.state.fTime);
+        let tDate = this.mergeDateTime(this.state.tDate, this.state.tTime);
+
+        let ev = new Event(this.state.eventId, 1, this.state.eventName, this.state.eventAddress,
+            this.state.ageLimit, this.state.eventDescription, fDate, tDate, "", "");
+
+        service.updateEvent(ev)
     }
 }
