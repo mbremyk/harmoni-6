@@ -60,6 +60,7 @@ export class HomePage extends Component
 							start_date={event.startTime}
 							end_date={event.endTime}
 							uploaded={event.createdAt}
+							myEvent = {true}
 
 						/>
 					))}
@@ -83,6 +84,7 @@ export class HomePage extends Component
 							start_date={event.startTime}
 							end_date={event.endTime}
 							uploaded={event.createdAt}
+							myEvent={false}
 
 						/>
 					))}
@@ -98,12 +100,16 @@ export class HomePage extends Component
 
 	mounted()
 	{
+		let token = jwt.decode(authService.getToken());
 
 		service
-			.getEventsByOrganizer(jwt.decode(authService.getToken()))
+			.getEventsByOrganizer(token.userId)
 			.then(myEvents => (this.myEvents = myEvents))
 			.catch((error) => console.log(error));
 		this.getOtherevents()
+		//console.log(this.myEvents);
+		console.log(this.myEvents.map(e => e.title))
+
 
 
 
