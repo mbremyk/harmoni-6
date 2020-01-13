@@ -9,5 +9,5 @@ test:
   services:
     - mysql:5 # The JS mysql-library does not yet support the newest mysql protocol
   script:
-    - cd server && npm install && npm test
+    - cd functions && npm install && npm test
     #- cd ../client && npm install && npm test && flow check src
