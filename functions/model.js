@@ -14,23 +14,23 @@ function init() {
         });
         return sequelize;
     } else {
-        let pr = test ? new properties.TestProperties() : new properties.Properties();
+        let test = (process.env.NODE_ENV === 'test');
+        let pr = test ? new properties.TestProperties() : new properties.SebProperties();
+        console.log(pr.databaseUser);
         let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
             host: pr.databaseURL,
             dialect: pr.dialect,
-            dialectOptions: {
-                dateStrings: true,
-            },
             pool: {
                 max: 10,
                 min: 0,
                 idle: 10000
             },
-            logging: false
+            //logging: true
         });
         return sequelize;
     }
 }
+
 
 let sequelize = init();
 
@@ -132,7 +132,7 @@ let EventModel = sequelize.define('event', {
     contract;
 }*/
 
-let GigModel = sequelize.define('gig', {
+let GigModel = sequelize.define('gigs', {
     artistId: {
         type: Sequelize.INTEGER, primaryKey: true, references: {
             model: UserModel,

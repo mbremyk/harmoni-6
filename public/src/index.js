@@ -3,6 +3,7 @@ import { Component, sharedComponentData } from 'react-simplified';
 import { HashRouter, BrowserRouter, Route,  NavLink } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import { createHashHistory, createBrowserHistory } from 'history';
+import { service } from "./services.js";
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
 import {CreateUserForm} from '../src/components/createuser';
@@ -15,6 +16,7 @@ import {HomePage} from "./components/homepage";
 import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
 import {EditEvent} from "./components/editevent";
+import { UploadWidget, DownloadWidget} from "./widgets";
 
 import {authService} from "./AuthService";
 import {PrivateRoute} from "./components/PrivateRoute";
@@ -41,6 +43,8 @@ if (root)
         <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
         <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
         <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
+        <Route exact path="/Upload" component={UploadWidget} />
+        <Route exact path="/Upload" component={DownloadWidget} />
     </div>
     </BrowserRouter>,
 root
