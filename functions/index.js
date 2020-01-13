@@ -82,7 +82,7 @@ app.get("/test", (req, res) => {
  * }
  */
 app.get("/events", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events");
     return db.getAllEvents().then(events => {
         if (events !== null) {
             res.status(201).send(events);
@@ -93,7 +93,7 @@ app.get("/events", (req, res) => {
 });
 
 app.post("/events", (req, res) =>{
-   console.log("POST-request received from client");
+   console.log("POST-request - /events");
    return db.createEvent(req.body).then(response => {
        if (response.insertId !== undefined) {
            res.status(201).send(response)
@@ -107,7 +107,7 @@ app.post("/events", (req, res) =>{
 
 
 app.post("/gig", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /gig");
     db.createGig(req.body).then(response => {
         if (response) {
             res.status(201).send(response)
@@ -133,6 +133,7 @@ app.post("/gig", (req, res) => {
  * }
  */
 app.get("/events/search/:searchText", (req, res) => {
+    console.log('GET-request - /events/search/:searchText');
     let searchText = decodeURIComponent(req.params.searchText);
     return db.getEventsMatching(searchText).then(events => {
         if (events !== null) {
@@ -153,6 +154,7 @@ app.get("/events/search/:searchText", (req, res) => {
  * }
  */
 app.post("/user", (req, res) => {
+    console.log('POST-request - /user');
     return db.getUserByEmailOrUsername(req.body.email, req.body.username)
         .then(user => {
             if (user) {
@@ -178,7 +180,7 @@ app.post("/user", (req, res) => {
  */
 
 app.get("/users", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /users");
     return db.getAllUsers().then(users => {
         if (users !== null) {
             res.status(201).send(users);
@@ -193,7 +195,7 @@ app.get("/users", (req, res) => {
  * Get one user by id
  */
 app.get("/users/:userId", (req, res) => {
-    console.log("GET-request received from client for get one user by id");
+    console.log("GET-request - /users/:userId");
     return db.getUserById(req.params.userId).then(user => {
         if (user !== null) {
             res.status(201).send(user);
@@ -214,7 +216,7 @@ app.get("/users/:userId", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/login", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /login");
 
     return db.getSaltByEmail(req.body.email).then(salt => {
         if (salt.length !== 1) {
@@ -273,7 +275,7 @@ app.use("/auth", (req, res, next) => {
  * }
  */
 app.get("/auth/user/:userId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /user/:userId");
     return db.getUserByEmail(req.params.userId, req.body.email)
         .then(user => res.send(user))
         .catch(error => console.error(error));
@@ -283,7 +285,7 @@ app.get("/auth/user/:userId", (req, res) => {
  * Get tickets for specific event
  */
 app.get("/tickets/:eventId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /tickets/:eventId");
     return db.getTicketsForEvent(req.params.eventId)
         .then(tickets => res.status(201).send(tickets));
 });
@@ -298,7 +300,7 @@ app.get("/tickets/:eventId", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/auth/refresh", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /auth/refresh");
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
@@ -309,7 +311,7 @@ app.post("/auth/refresh", (req, res) => {
 });
 
 app.get("/events/eventdetails/:eventId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events/eventdeteails/:eventId");
     return db.getEventByEventId(req.params.eventId).then(events => {
         if (events !== null) {
             res.status(201).send(events);
@@ -328,7 +330,7 @@ app.get("/events/eventdetails/:eventId", (req, res) => {
  * }
  */
 app.post("/auth/logout", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /logout");
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
@@ -345,7 +347,7 @@ app.post("/auth/logout", (req, res) => {
  * }
  */
 app.put("/auth/user/:userId", (req, res) => {
-    console.log("PUT-request received from client");
+    console.log("PUT-request - auth/user/:userId");
 
     return db.updateUser(req.body)
         .then(res.sendStatus(200));
@@ -358,7 +360,7 @@ app.put("/auth/user/:userId", (req, res) => {
  *      }
  */
 app.get("/auth/events/user/:userId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events/user/:userId");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
     console.log(decoded);
