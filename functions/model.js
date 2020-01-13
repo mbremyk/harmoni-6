@@ -3,6 +3,7 @@ const properties = require('./properties.js');
 const isCI = require('is-ci');
 const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
+moment.locale('nb');
 
 function init() {
     if (isCI) {
