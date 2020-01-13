@@ -67,6 +67,34 @@ app.get("/test", (req, res) => {
 });
 
 /**
+ *
+ */
+app.get("/users", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getAllUsers().then(users => {
+        if (users !== null) {
+            res.status(201).send(users);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+/**
+ * Get one user by id
+ */
+app.get("/users/:userId", (req, res) => {
+    console.log("GET-request received from client for get one user by id");
+    return db.getUserById(req.params.userId).then(user => {
+        if (user !== null) {
+            res.status(201).send(user);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+/**
  * Get all events in database as an array
  * {
  *     eventId: int
@@ -88,31 +116,6 @@ app.get("/events", (req, res) => {
             res.status(201).send(events);
         } else {
             res.sendStatus(400);
-        }
-    });
-});
-
-app.post("/events", (req, res) =>{
-   console.log("POST-request received from client");
-   return db.createEvent(req.body).then(response => {
-       if (response.insertId !== undefined) {
-           res.status(201).send(response)
-       }
-       else {
-           res.status(400);
-       }
-   })
-});
-
-
-
-app.post("/gig", (req, res) => {
-    console.log("POST-request received from client");
-    db.createGig(req.body).then(response => {
-        if (response) {
-            res.status(201).send(response)
-        } else {
-            res.status(400);
         }
     });
 });
@@ -141,6 +144,26 @@ app.get("/events/search/:searchText", (req, res) => {
             res.sendStatus(400);
         }
     });
+});
+
+app.get("/events/eventdetails/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getEventByEventId(req.params.eventId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+/**
+ * Get tickets for specific event
+ */
+app.get("/tickets/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getTicketsForEvent(req.params.eventId)
+        .then(tickets => res.status(201).send(tickets));
 });
 
 /**
@@ -172,33 +195,31 @@ app.post("/user", (req, res) => {
         });
 });
 
-
 /**
  *
  */
-
-app.get("/users", (req, res) => {
-    console.log("GET-request received from client");
-    return db.getAllUsers().then(users => {
-        if (users !== null) {
-            res.status(201).send(users);
-        } else {
-            res.sendStatus(400);
+app.post("/event", (req, res) =>{
+    console.log("POST-request received from client");
+    return db.createEvent(req.body).then(response => {
+        if (response.insertId !== undefined) {
+            res.status(201).send(response)
         }
-    });
+        else {
+            res.status(400);
+        }
+    })
 });
 
-
 /**
- * Get one user by id
+ * 
  */
-app.get("/users/:userId", (req, res) => {
-    console.log("GET-request received from client for get one user by id");
-    return db.getUserById(req.params.userId).then(user => {
-        if (user !== null) {
-            res.status(201).send(user);
+app.post("/gig", (req, res) => {
+    console.log("POST-request received from client");
+    db.createGig(req.body).then(response => {
+        if (response) {
+            res.status(201).send(response)
         } else {
-            res.sendStatus(400);
+            res.status(400);
         }
     });
 });
@@ -280,12 +301,23 @@ app.get("/auth/user/:userId", (req, res) => {
 });
 
 /**
- * Get tickets for specific event
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
  */
-app.get("/tickets/:eventId", (req, res) => {
+app.get("/auth/events/user/:userId", (req, res) => {
     console.log("GET-request received from client");
-    return db.getTicketsForEvent(req.params.eventId)
-        .then(tickets => res.status(201).send(tickets));
+    let token = req.headers['x-access-token'];
+    let decoded = jwt.decode(token);
+    console.log(decoded);
+    if (decoded.userId == req.params.userId) {
+        return db.getEventsByOrganizerId(decoded.userId)
+            .then(events => res.send(events))
+            .catch(error => console.error(error));
+    } else {
+        res.sendStatus(403);
+    }
 });
 
 /**
@@ -308,18 +340,6 @@ app.post("/auth/refresh", (req, res) => {
     });
 });
 
-app.get("/events/eventdetails/:eventId", (req, res) => {
-    console.log("GET-request received from client");
-    return db.getEventByEventId(req.params.eventId).then(events => {
-        if (events !== null) {
-            res.status(201).send(events);
-        } else {
-            res.sendStatus(400);
-        }
-    });
-});
-
-
 /**
  * Invalidates your access token
  * header:
@@ -332,7 +352,6 @@ app.post("/auth/logout", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
-    res.sendStatus(201);
 });
 
 /**
@@ -349,26 +368,6 @@ app.put("/auth/user/:userId", (req, res) => {
 
     return db.updateUser(req.body)
         .then(res.sendStatus(200));
-});
-
-/**
- * header:
- *      {
- *          x-access-token: string
- *      }
- */
-app.get("/auth/events/user/:userId", (req, res) => {
-    console.log("GET-request received from client");
-    let token = req.headers['x-access-token'];
-    let decoded = jwt.decode(token);
-    console.log(decoded);
-    if (decoded.userId === req.params.userId) {
-        return db.getEventsByOrganizerId(decoded.userId)
-            .then(events => res.send(events))
-            .catch(error => console.error(error));
-    } else {
-        res.sendStatus(403);
-    }
 });
 
 console.log("Server initalized");
