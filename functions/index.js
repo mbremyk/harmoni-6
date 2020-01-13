@@ -52,6 +52,12 @@ setInterval(() => {
     })
 }, 60 * 60 * 1000);
 
+/**
+ * Creates a token based on the specified user information
+ *
+ * @param user JSON object containing user information, usually fetched from database
+ * @returns {string} token
+ */
 function getToken(user) {
     return jwt.sign(user, privateKey, {
         expiresIn: 1800
