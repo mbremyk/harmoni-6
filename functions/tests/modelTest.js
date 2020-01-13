@@ -3,7 +3,7 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeAll(() => Models.syncTestData());
+beforeAll(() => Models.syncTestData().then(() => function(){}));
 
 
 /*
@@ -245,6 +245,30 @@ describe('Personnel', () => {
         });
     });
 
+    it('update personnel', done => {
+        let personnel = {
+            eventId: 4,
+            personnelId: 8,
+            role: 'UPDATED'
+        };
+        db.updatePersonnel(personnel).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('remove personnel', done => {
+        let personnel = {
+            eventId: 5,
+            personnelId: 3,
+            role: 'DELETE'
+        };
+        db.removePersonnel(personnel).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
     it('correct data in personnel', done => {
         db.getPersonnel(4).then(personnel => {
             expect(personnel.length).toBe(2);
@@ -295,6 +319,32 @@ describe('Tickets', () => {
 
         };
         db.addTicket(ticket).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('update Ticket', done => {
+        let ticket = {
+            eventId: 4,
+            type: 'Golden Circle',
+            price: 1234,
+            amount: 56,
+        };
+        db.updateTicket(ticket).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('remove Ticket', done => {
+        let ticket = {
+            eventId: 1,
+            type: 'Inngang',
+            price: 50,
+            amount: 40,
+        };
+        db.removeTicket(ticket).then(response => {
             expect(response).toBeTruthy();
             done();
         });
