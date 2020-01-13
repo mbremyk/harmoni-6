@@ -68,8 +68,8 @@ export class CreateUserForm extends Component{
 
 		service.createUser(user)
 			.then(res => console.log('Submit user status: ' + res))
+			.then(this.props.history.push("/logg-inn"))
 			.catch(err => alert("En feil oppsto."));
-		this.props.history.push("/logg-inn");
 	}
 
 	render(){

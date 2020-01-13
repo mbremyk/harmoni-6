@@ -35,12 +35,11 @@ export class LoginForm extends Component{
         console.log('token '+ authService.getToken());
         if(authService.loggedIn())
         {
-            alert('Inn');
-            this.props.history.push("/min-side");
+            this.props.history.push("/hjem");
         }
         else
         {
-            alert('out');
+            alert('Innlogging feilet.');
         }
         authService.logout();
         console.log('token '+ authService.getToken());
