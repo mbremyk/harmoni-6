@@ -31,6 +31,40 @@ if (root)
     <div>
         <Route path="/" component={navbar}/>
         <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+        <Route exact path="/arrangement/:id" component={EventPage}/>
+        <Route exact path="/logg-inn" component={LoginForm}/>
+
+        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
+    </div>
+    </BrowserRouter>,
+root
+);
+
+/*
+
+router with router guard.
+
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+        <Route exact path="/arrangement/:id" component={EventPage}/>
+        <Route exact path="/logg-inn" component={LoginForm}/>
+
+        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
+
+router without router guard
+
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={LandingPage}/>
         <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
         <Route exact path="/logg-inn" component={LoginForm} />
@@ -40,8 +74,4 @@ if (root)
         <Route exact path="/opprett-arrangement" component={AddEvent} />
         <Route exact path="/endre-arrangement" component={EditEvent} />
 
-        <PrivateRoute authed={authService.loggedIn()} path='/private' component={myPage}/>
-    </div>
-    </BrowserRouter>,
-root
-);
+ */

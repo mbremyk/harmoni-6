@@ -71,8 +71,7 @@ class Services
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
-	};
-
+	}
 
 	getUsers()
 	{
