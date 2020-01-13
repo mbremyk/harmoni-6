@@ -1,6 +1,6 @@
 //const axios = require('axios');
 import axios from 'axios'
-import AuthService from './AuthService'
+import {authService} from './AuthService'
 
 var url = '';
 if(window.location.href.includes('localhost')){
@@ -51,7 +51,7 @@ class Services
 
 	logout()
 	{
-		return axios.post(url + '/logout', {}, {headers: {'x-access-token': AuthService.getToken()}})
+		return axios.post(url + '/logout', {}, {headers: {'x-access-token': authService.getToken()}})
 	}
 
 	createUser(user)

@@ -3,12 +3,13 @@ import * as React from "react";
 
 import {authService} from "../AuthService";
 
-export class LoginForm extends Component {
+export class Logout extends Component {
 	constructor(props) {
 		super(props);
 
 		authService.logout().then(res => {
 			// history.push('/');
+			console.log(res);
 		})
 	}
 }

@@ -10,11 +10,13 @@ import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
-import { GuardProvider, GuardedRoute } from 'react-router-guards';
 import {addEvent} from '../src/components/createevent.js';
 import {HomePage} from "./components/homepage";
-import{EventPage} from "./components/eventpage";
-import AuthService from "./AuthService";
+import {EventPage} from "./components/eventpage";
+import {Logout} from './components/logout'
+
+import {GuardProvider, GuardedRoute} from 'react-router-guards';
+import {authService} from "./AuthService";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -34,10 +36,6 @@ if (root)
         <Route exact path="/opprett-arrangement" component={addEvent} />
         <Route exact path="/hjem" component={HomePage} />
         <Route exact path="/arrangement/:id" component={EventPage} />
-
-
-
-
     </div>
     </BrowserRouter>,
 root
