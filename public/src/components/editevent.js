@@ -334,9 +334,20 @@ export class EditEvent extends Component{
 
 
     mounted() {
-        console.log(this.props.match.params.id)
-        service.getEventByEventId(this.props.match.params.id).then(e => {
-            console.log(e, e.eventAddress);
+        service.getEventByEventId(this.props.match.params.id).then(event => {
+            console.log(event)
+            console.log(event.startTime)
+            console.log(event.startTime.split(" ")[0], "test");
+            console.log(event.startTime.split(" ")[1])
+            this.setState({eventName: event.eventName});
+            this.setState({eventAddress: event.address});
+            this.setState({eventDescription: event.description});
+            this.setState({ageLimit: event.ageLimit});
+            this.setState({fDate: event.startTime.split(" ")[0]});
+            this.setState({tDate: event.endTime.split(" ")[0]});
+            this.setState({fTime: event.startTime.split(" ")[1]});
+            this.setState({tTime: event.endTime.split("")[1]});
+
             service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
         }).catch((error) => console.log(error));
     }

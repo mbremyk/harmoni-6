@@ -15,7 +15,6 @@ import {addEvent} from '../src/components/createevent.js';
 import AuthService from "./AuthService";
 import {HomePage} from "./components/homepage";
 import{EventPage} from "./components/eventpage";
-import AuthService from "./AuthService";
 import {EditEvent} from "./components/editevent";
 import {AddEvent} from "./components/createevent";
 

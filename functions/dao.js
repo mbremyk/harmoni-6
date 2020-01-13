@@ -163,7 +163,7 @@ class Dao {
             });
     }
 
-	}
+
     getEventsUser(userId) {
         return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
     }
