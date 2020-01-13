@@ -8,7 +8,7 @@ import "@fortawesome/fontawesome-free"
 import {CreateUserForm} from '../src/components/createuser';
 import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
-import {HarmoniNavbar} from "./components/harmoniNavbar.js";
+import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
 import { GuardProvider, GuardedRoute } from 'react-router-guards';
 import {addEvent} from '../src/components/createevent.js';
@@ -25,23 +25,22 @@ const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
 const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
-    <BrowserRouter>
-    <div>
-        <HarmoniNavbar/>
-        {/*<Route path="/" component={harmoniNavbar}/>*/}
-        <Route exact path="/" component={LandingPage}/>
-        <Route exact path="/ny-bruker" component={CreateUserForm} />
-        <Route exact path="/min-side" component={myPage}/>
-        <Route exact path="/logg-inn" component={LoginForm} />
-        <Route exact path="/hjem" component={HomePage} />
-        <Route exact path="/arrangement/:id" component={EventPage} />
-        <Route exact path="/opprett-arrangement" component={AddEvent} />
-        <Route exact path="/endre-arrangement" component={EditEvent} />
+        <BrowserRouter>
+            <div>
+                <Route path="/" component={navbar}/>
+                <Route exact path="/" component={LandingPage}/>
+                <Route exact path="/ny-bruker" component={CreateUserForm} />
+                <Route exact path="/min-side" component={myPage}/>
+                <Route exact path="/logg-inn" component={LoginForm} />
+                <Route exact path="/hjem" component={HomePage} />
+                <Route exact path="/arrangement/:id" component={EventPage} />
+                <Route exact path="/opprett-arrangement" component={AddEvent} />
+                <Route exact path="/endre-arrangement" component={EditEvent} />
 
-    </div>
-    </BrowserRouter>,
-root
-);
+            </div>
+        </BrowserRouter>,
+        root
+    );
 
 /*
 const GuardProvider = require('react-router-guards').GuardProvider;
