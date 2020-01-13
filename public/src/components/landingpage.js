@@ -1,6 +1,8 @@
 import {Component} from "react-simplified";
 import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
 import {EventInfo} from '../widgets.js';
+import {SortingOptions} from './sortingOptions';
+
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
@@ -11,7 +13,12 @@ import {Event, service, Ticket} from '../services';
 
 export class LandingPage extends Component
 {
-	events = [];
+	state = {
+		sortOption: {field: '', order: 'asc'},
+		events : []
+	};
+
+
 	tickets = [];
 	searchevents = [];
 
@@ -31,6 +38,7 @@ export class LandingPage extends Component
 
 	render()
 	{
+		console.log("render kjørt!")
 		return (
 
 			<div>
@@ -49,8 +57,8 @@ export class LandingPage extends Component
 						<Row>
 							<Col md={{span: 3, offset: 5}}>
 								<Button variant="primary"
-								        size="lg"
-								        onClick={() => this.logIn()} href="logg-inn">Logg inn</Button>
+										size="lg"
+										onClick={() => this.logIn()} href="logg-inn">Logg inn</Button>
 							</Col>
 
 						</Row>
@@ -60,11 +68,11 @@ export class LandingPage extends Component
 
 
 				<Container>
-
+					<SortingOptions onSort={this.handleSortingOption}/>
 
 					<Row>
 
-						{this.events.map(event => (
+						{this.state.events.map(event => (
 							<EventInfo
 								link={event.eventId}
 								imageUrl={event.imageUrl}
@@ -86,11 +94,72 @@ export class LandingPage extends Component
 
 	}
 
+	handleSortingOption = (option) =>{
+		console.log(option);
+		switch (option) {
+			case 'PriceAsc':
+				//TODO
+				break;
+			case 'PriceDesc':
+				//TODO
+				break;
+			case 'AgeLimitAsc':
+				this.setState({events: this.state.events.sort(this.compareValues('ageLimit'))});
+				break;
+			case 'AgeLimitDesc':
+				this.setState({events: this.state.events.sort(this.compareValues('ageLimit', 'desc'))});
+				break;
+			case 'DateAsc':
+				this.setState({events: this.state.events.sort(this.compareValues('startTime'))});
+				break;
+			case 'DateDesc':
+				this.setState({events: this.state.events.sort(this.compareValues('startTime', 'desc'))});
+				break;
+			case 'AddressAsc':
+				this.setState({events: this.state.events.sort(this.compareValues('address'))});
+				break;
+			case 'AddressDesc':
+				this.setState({events: this.state.events.sort(this.compareValues('address', 'desc'))});
+				break;
+		}
+	};
+
+	compareValues(key, order = 'asc') {
+		console.log(key);
+		return function innerSort(a, b) {
+			if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+				// property doesn't exist on either object
+				console.log("No key found: comparator");
+				return 0;
+			}
+
+			const varA = (typeof a[key] === 'string')
+				? a[key].toUpperCase() : a[key];
+			const varB = (typeof b[key] === 'string')
+				? b[key].toUpperCase() : b[key];
+
+			let comparison = 0;
+			if (varA > varB) {
+				comparison = 1;
+			} else if (varA < varB) {
+				comparison = -1;
+			}
+			return (
+				(order === 'desc') ? (comparison * -1) : comparison
+			);
+		};
+	}
+
+
+	handleEvents = (events) => {
+		this.setState({events : events})
+	};
+
 	mounted()
 	{
 		service
 			.getEvents()
-			.then(events => (this.events = events))
+			.then(events => (this.handleEvents(events)))
 			.catch((error) => console.log(error));
 
 

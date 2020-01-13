@@ -4,6 +4,7 @@ import {EventInfo} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
+import Dropdown from "react-bootstrap/Dropdown";
 
 
 
@@ -34,6 +35,7 @@ export class HomePage extends Component
 
 
 			<Container>
+
 
 
 				<Row>
