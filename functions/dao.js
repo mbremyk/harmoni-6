@@ -163,30 +163,42 @@ class Dao {
             });
     }
 
-    //returns an array with all events by one organizerId
-    getEventsByOrganizerId(userId) {
+	}
+    getEventsUser(userId) {
         return model.EventModel.findAll({where: {organizerId: userId}, order: [['startTime', 'ASC']]});
     }
 
-    //returns an event with the same id
-    getEventByEventId(eventId) {
-        return model.EventModel.findOne({where: {eventId: eventId}});
+	//returns an array with all events by one organizerId
+	getEventsByOrganizerId(organizerId)
+	{
+		return model.EventModel.findAll({where: {organizerId: organizerId}});
 
-    }
+	}
 
-    getPersonnel(eventId) {
+	//returns an event with the same id
+	getEventByEventId(eventId)
+	{
+		return model.EventModel.findOne({where: {eventId: eventId}});
+
+	}
+
+    getPersonnel(eventId)
+	{
         return model.PersonnelModel.findAll({where: {eventId: eventId}});
     }
 
-    getGig(eventId) {
+    getGig(eventId)
+	{
         return model.GigModel.findAll({where: {eventId: eventId}});
     }
 
-    getTickets(eventId) {
+    getTickets(eventId)
+	{
         return model.TicketModel.findAll({where: {eventId: eventId}});
     }
 
-    addPersonnel(eventId, userId, role) {
+    addPersonnel(eventId, userId, role)
+	{
         return model.PersonnelModel.create(
             {
                 personnelId: userId,

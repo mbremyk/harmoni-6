@@ -47,7 +47,7 @@ export class HomePage extends Component
 					{this.myEvents.map(event => (
 						<EventInfo
 
-							link={event.eventName}
+							link={event.eventId}
 							imageUrl={event.imageUrl}
 							title={event.eventName}
 							address={event.address}
