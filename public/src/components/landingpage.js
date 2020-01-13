@@ -42,7 +42,7 @@ export class LandingPage extends Component
 
 						<Row>
 							<Col md={{span: 3, offset: 5}}>
-								<h1> Harmoni </h1>
+								<h1>Harmoni</h1>
 							</Col>
 						</Row>
 
@@ -66,7 +66,7 @@ export class LandingPage extends Component
 
 						{this.events.map(event => (
 							<EventInfo
-								link={event.eventName}
+								link={event.eventId}
 								imageUrl={event.imageUrl}
 								title={event.eventName}
 								address={event.address}

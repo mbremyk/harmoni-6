@@ -2,10 +2,6 @@ import {Component} from "react-simplified";
 import {Col, Card} from "react-bootstrap";
 import * as React from 'react';
 
-
-
-
-
 export class EventInfo extends Component
 {
 	imageUrl;
@@ -78,9 +74,6 @@ export class EventInfo extends Component
 
 
 			</Col>
-
-
-
 		);
 	}
 }
