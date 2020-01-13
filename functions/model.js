@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const properties = require('./properties.js');
+//const properties = require('./properties.js');
 const isCI = require('is-ci');
 const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
