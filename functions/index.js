@@ -92,6 +92,31 @@ app.get("/events", (req, res) => {
     });
 });
 
+app.post("/event", (req, res) =>{
+   console.log("POST-request received from client");
+   return db.createEvent(req.body).then(response => {
+       if (response.insertId !== undefined) {
+           res.status(201).send(response)
+       }
+       else {
+           res.status(400);
+       }
+   })
+});
+
+
+
+app.post("/gig", (req, res) => {
+    console.log("POST-request received from client");
+    db.createGig(req.body).then(response => {
+        if (response) {
+            res.status(201).send(response)
+        } else {
+            res.status(400);
+        }
+    });
+});
+
 /**
  * Get all events where eventName or description contains searchText
  * {
@@ -128,8 +153,54 @@ app.get("/events/search/:searchText", (req, res) => {
  * }
  */
 app.post("/user", (req, res) => {
-    return db.createUser(req.body)
-        .then(success => success ? res.status(201) : res.status(400));
+    return db.getUser(req.body.email)
+        .then(user => {
+            if (user) {
+                res.sendStatus(409);
+            } else {
+                return hashPassword.hashPassword(req.body.password).then(credentials => {
+                    db.createUser({
+                        username: req.body.username,
+                        email: req.body.email,
+                        password: credentials[0],
+                        salt: credentials[1]
+                    })
+                        .then(success => success ? res.status(201) : res.status(400))
+                        .catch(error => console.error(error));
+                });
+            }
+        });
+});
+
+
+/**
+ *
+ */
+
+app.get("/users", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getAllUsers().then(users => {
+        if (users !== null) {
+            res.status(201).send(users);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+
+/**
+ * Get one user by id
+ */
+app.get("/users/:userId", (req, res) => {
+    console.log("GET-request received from client for get one user by id");
+    return db.getUserById(req.params.userId).then(user => {
+        if (user !== null) {
+            res.status(201).send(user);
+        } else {
+            res.sendStatus(400);
+        }
+    });
 });
 
 /**
@@ -145,22 +216,25 @@ app.post("/user", (req, res) => {
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
-    db.getSaltByEmail(req.body.email).then(salt => {
-       if(salt.length !== 1) { res.status(401); return; }
-       hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
-           db.loginOk(req.body.email, credentials[0]).then(ok => {
-               if (ok) {
-                   db.getUser(req.body.email).then(user => {
-                       console.log(user[0].dataValues);
-                       let token = getToken(user[0].dataValues);
-                       res.json({jwt: token});
-                   })
-               } else {
-                   res.status(401);
-                   res.json({error: "Not authorized"})
-               }
-           });
-       })
+    return db.getSaltByEmail(req.body.email).then(salt => {
+        if (salt.length !== 1) {
+            res.status(401);
+            return;
+        }
+        hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+            db.loginOk(req.body.email, credentials[0]).then(ok => {
+                if (ok) {
+                    db.getUser(req.body.email).then(user => {
+                        console.log(user.dataValues);
+                        let token = getToken(user.dataValues);
+                        res.json({jwt: token});
+                    })
+                } else {
+                    res.status(401);
+                    res.json({error: "Not authorized"})
+                }
+            });
+        })
     });
 });
 
@@ -234,62 +308,15 @@ app.post("/auth/refresh", (req, res) => {
     });
 });
 
-app.post("/auth/logout", (req, res) => {
-    console.log("POST-request received from client");
-
-    let token = req.headers["x-access-token"];
-    jwtBlacklist.push(token);
-});
-
-app.put("/auth/user/:userId", (req, res) => {
-    console.log("PUT-request received from client");
-
-    return db.updateUser(req.body)
-        .then(res.sendStatus(200));
-});
-
-/**
- * header:
- *      {
- *          x-access-token: string
- *      }
- */
-app.get("/auth/events/user/:userId", (req, res) => {
+app.get("/events/eventdetails/:eventId", (req, res) => {
     console.log("GET-request received from client");
-    let token = req.headers['x-access-token'];
-    let decoded = jwt.decode(token);
-    console.log(decoded);
-    if (decoded.userId == req.params.userId) {
-        return db.getEventsUser(decoded.userId)
-            .then(events => res.send(events))
-            .catch(error => console.error(error));
-    } else {
-        res.sendStatus(403);
-    }
-});
-
-app.get("/events/:organizerId", (req, res) =>
-{
-	console.log("GET-request received from client");
-	return db.getEventsByOrganizerId(req.params.organizerId).then(events =>
-	{
-		if (events !== null)
-		{res.status(201).send(events);}
-		else
-		{res.sendStatus(400);}
-	});
-});
-
-app.get("/events/eventdetails/:eventId", (req, res) =>
-{
-	console.log("GET-request received from client");
-	return db.getEventByEventId(req.params.eventId).then(events =>
-	{
-		if (events !== null)
-		{res.status(201).send(events);}
-		else
-		{res.sendStatus(400);}
-	});
+    return db.getEventByEventId(req.params.eventId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
 });
 
 
@@ -335,7 +362,7 @@ app.get("/auth/events/user/:userId", (req, res) => {
     let decoded = jwt.decode(token);
     console.log(decoded);
     if (decoded.userId == req.params.userId) {
-        return db.getEventsUser(decoded.userId)
+        return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
             .catch(error => console.error(error));
     } else {
