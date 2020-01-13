@@ -19,7 +19,7 @@ import TimePicker from "react-time-picker";
 //TODO: Hente ut organizerId fra bruker
 //TODO: Legge til annet personell
 //TODO: Legge til bilde
-
+//TODO: legge til bilde-url
 
 export class AddEvent extends Component{
 
@@ -63,6 +63,7 @@ export class AddEvent extends Component{
         this.contract = this.handleContractChange.bind(this);
         this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
+        this.imageUrl = this.handleImageUrlChange.bind(this);
 
         this.state = {
             eventName: '',
@@ -75,6 +76,8 @@ export class AddEvent extends Component{
             tTime: '00:00:00',
             rider: '',
             contract: '',
+            image: '',
+            imageUrl: '',
             artistsAdd: [],
             artists: [],
         };
@@ -82,7 +85,7 @@ export class AddEvent extends Component{
 
     handleEventNameChange(event){
         this.setState({eventName: event.target.value});
-    }
+    };
 
     handleEventAddressChange(event){
         this.setState({eventAddress: event.target.value});
@@ -102,6 +105,14 @@ export class AddEvent extends Component{
 
     handleContractChange(event){
         this.setState({contract: event.target.value})
+    }
+
+    handleImageUpload(event){
+        this.setState({image: event.target.value})
+    }
+
+    handleImageUrlChange(event){
+        this.setState({imageUrl: event.target.value})
     }
 
     handleArtistsAdd(event){
@@ -125,7 +136,7 @@ export class AddEvent extends Component{
             alert('Fra-tidspunkt må være større enn til-tidspunkt!');
             return;
         }
-        this.submit()
+        this.submit();
     }
 
     mergeDateTime(fdate, ftime){
@@ -144,11 +155,18 @@ export class AddEvent extends Component{
         ev.eventName = this.state.eventName;
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
+        ev.imageUrl = this.state.imageUrl;
 
         service.createEvent(ev)
             .then(updated =>
-            {this.state.artistsAdd.map(artist =>
-                (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
+                {this.state.artistsAdd.map(artist =>
+                    (service.createGig(
+                        new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract)
+                    )
+                    )
+                )
+                }
+            ).then(this.props.history.push("/opprett-arrangement"))
         .catch(err => alert('En feil oppsto!' + err.message))
     }
 
@@ -282,28 +300,23 @@ export class AddEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
+                            <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                            <InputGroup className="mb-5">
+                                <FormControl
+                                    type="file"
+                                    value={this.state.image}
+                                    onChange={this.handleImageUpload}
+                                />
+                            </InputGroup>
+                        </Form.Group>
 
-                            <Form.Label>Aldersgrense</Form.Label>
-                            <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
-                                <ButtonGroup className="mr-2" aria-label="button-group">
-                                    <Button onClick={this.decrementAge}>-</Button>
-                                    <Button onClick={this.IncrementAge}>+</Button>
-                                </ButtonGroup>
-
-                                <InputGroup>
-                                    <FormControl
-                                        type="input"
-                                        value={this.state.ageLimit}
-                                        onChange={this.handleAgeLimitChange}
-                                        aria-label="btn-age"
-                                        aria-describedby="btnGroupAddon"
-                                    />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
-                                    </InputGroup.Append>
-                                </InputGroup>
-
-                            </ButtonToolbar>
+                        <Form.Group as={Col} sm={"12"}>
+                            <Form.Label>Eller legg inn en bilde-url</Form.Label>
+                            <Form.Control
+                                placeholder="Bilde-url"
+                                value={this.state.imageUrl}
+                                onChange={this.handleImageUrlChange}
+                            />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
@@ -326,6 +339,31 @@ export class AddEvent extends Component{
                                     onChange={this.handleRiderChange}
                                 />
                             </InputGroup>
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"6"}>
+
+                            <Form.Label>Aldersgrense</Form.Label>
+                            <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
+                                <ButtonGroup className="mr-2" aria-label="button-group">
+                                    <Button onClick={this.decrementAge}>-</Button>
+                                    <Button onClick={this.IncrementAge}>+</Button>
+                                </ButtonGroup>
+
+                                <InputGroup>
+                                    <FormControl
+                                        type="input"
+                                        value={this.state.ageLimit}
+                                        onChange={this.handleAgeLimitChange}
+                                        aria-label="btn-age"
+                                        aria-describedby="btnGroupAddon"
+                                    />
+                                    <InputGroup.Append>
+                                        <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
+                                    </InputGroup.Append>
+                                </InputGroup>
+
+                            </ButtonToolbar>
                         </Form.Group>
 
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
