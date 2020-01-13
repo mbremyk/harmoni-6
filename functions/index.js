@@ -448,4 +448,24 @@ app.put("/auth/user/:userId", (req, res) => {
         .then(res.sendStatus(200));
 });
 
+/**
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ */
+app.get("/auth/events/user/:userId", (req, res) => {
+    console.log("GET-request received from client");
+    let token = req.headers['x-access-token'];
+    let decoded = jwt.decode(token);
+    console.log(decoded);
+    if (decoded.userId == req.params.userId) {
+        return db.getEventsByOrganizerId(decoded.userId)
+            .then(events => res.send(events))
+            .catch(error => console.error(error));
+    } else {
+        res.sendStatus(403);
+    }
+});
+
 console.log("Server initalized");
