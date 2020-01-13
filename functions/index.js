@@ -176,7 +176,7 @@ app.get("/events/search/:searchText", (req, res) => {
 });
 
 app.get("/events/eventDetails/:eventId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events/eventDetails/:eventId");
     return db.getEventByEventId(req.params.eventId).then(events => {
         if (events !== null) {
             res.status(201).send(events);
@@ -229,8 +229,8 @@ app.post("/users", (req, res) => {
  *
  */
 
-app.post("/event", (req, res) => {
-    console.log("POST-request received from client");
+app.post("/events", (req, res) => {
+    console.log("POST-request -/events");
     return db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.status(400));
 });
 
@@ -245,7 +245,8 @@ app.post("/event", (req, res) => {
  * @return {json} {jwt: token}
  */
 
-app.put('/auth/event/:eventId', (req, res) => {
+app.put('/auth/events', (req, res) => {
+    console.log("PUT-request - /auth/events");
     db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
@@ -259,7 +260,7 @@ app.put('/auth/event/:eventId', (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/gigs", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /gigs");
     db.addGig(req.body).then(response => response ? res.status(201).send(response) : res.status(400));
 });
 
@@ -347,7 +348,7 @@ app.get("/auth/users/:userId", (req, res) => {
  */
 
 app.get("/auth/events/user/:userId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events/user/:userId");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
     console.log(decoded);

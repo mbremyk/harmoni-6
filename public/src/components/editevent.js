@@ -122,7 +122,7 @@ export class EditEvent extends Component{
         this.submit()
     }
 
-    mergeDateTime(fdate, ftime){
+    mergeDateTime(fdate, ftime) {
         return fdate.toISOString().split("T")[0] + " " + ftime;
     }
 
@@ -139,11 +139,10 @@ export class EditEvent extends Component{
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
 
-        service.updateEvent(ev)
-            .then(updated =>
-            {this.state.artistsAdd.map(artist =>
-                (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
-            .catch(err => alert('En feil oppsto!' + err.message))
+        service.updateEvent(ev).then(updated =>
+        {this.state.artistsAdd.map(artist =>
+            (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
+            .catch((error) => console.log(error.message));
     }
 
     render(){
@@ -344,15 +343,6 @@ export class EditEvent extends Component{
             let fromTime = fromDateTime[1];
             let toTime = toDateTime[1];
 
-            console.log(event.startTime)
-            console.log(event.endTime)
-
-            console.log(fromDate);
-            console.log(toDate);
-            console.log(fromTime);
-            console.log(toTime);
-            console.log(fromDate[1]-1);
-
             this.setState({eventName: event.eventName});
             this.setState({eventAddress: event.address});
             this.setState({eventDescription: event.description});
@@ -363,8 +353,8 @@ export class EditEvent extends Component{
             this.setState({tTime: toTime});
 
 
-            service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
-        }).catch((error) => console.log(error));
+            service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
+        }).catch((error) => console.log(error.message));
     }
 
     changeDate(dateName, dateValue){

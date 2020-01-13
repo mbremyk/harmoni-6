@@ -93,6 +93,10 @@ class Services
 		return axios.post(url + '/events', event).then(response => response.insertId);
 	}
 
+	updateEvent(event) {
+		return axios.put(url + "/auth/events", event).then(response => response.insertId);
+	}
+
 	createGig(gig)
 	{
 		return axios.post(url + '/gigs', gig).then(response => response.data);
