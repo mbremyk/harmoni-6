@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const properties = require('./properties.js');
 const isCI = require('is-ci');
 const test = (process.env.NODE_ENV === 'test');
+const moment = require('moment');
 
 function init() {
     if (isCI) {
@@ -108,8 +109,16 @@ let EventModel = sequelize.define('event', {
     eventName: {type: Sequelize.STRING, allowNull: false},
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
-    startTime: Sequelize.DATE,
-    endTime: Sequelize.DATE,
+    startTime: {
+        type:Sequelize.DATE,
+        get(){
+            return moment(this.getDataValue('startTime')).format('DD/MM/YYYY hh:mm');
+        }
+    },
+    endTime: {type:Sequelize.DATE,
+        get(){
+            return moment(this.getDataValue('endTime')).format('DD/MM/YYYY hh:mm');
+        }},
     imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
     description: Sequelize.TEXT,
