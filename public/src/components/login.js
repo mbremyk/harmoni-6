@@ -41,8 +41,6 @@ export class LoginForm extends Component{
         {
             alert('Innlogging feilet.');
         }
-        authService.logout();
-        console.log('token '+ authService.getToken());
     }
 
     render(){
