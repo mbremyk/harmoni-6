@@ -132,9 +132,9 @@ export class AddEvent extends Component{
         return fdate.toISOString().split("T")[0] + " " + ftime;
     }
 
-    submit(){
+    submit() {
+
         let ev = new Event();
-        console.log(this.state)
         ev.address = this.state.eventAddress;
         ev.organizerId = 1;
         ev.ageLimit = this.state.ageLimit;
@@ -144,9 +144,6 @@ export class AddEvent extends Component{
         ev.eventName = this.state.eventName;
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
-
-        console.log(ev);
-
 
         service.createEvent(ev)
             .then(updated =>
