@@ -29,8 +29,22 @@ export class Event
 	imageUrl;
 	image;
 	description;
-	createdAt;
-	updatedAt;
+
+}
+
+export class Gig {
+
+	artistId;
+	eventId;
+	rider;
+	contract;
+
+	constructor(artistId, eventId, rider, contract) {
+		this.artistId = artistId;
+		this.eventId = eventId;
+		this.rider = rider;
+		this.contract = contract;
+	}
 }
 
 export class Ticket
@@ -51,6 +65,26 @@ class Services
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
+	};
+
+
+	getUsers()
+	{
+		return axios.get(url + '/users').then(response => response.data);
+	}
+
+	getUser(id)
+	{
+		return axios.get(url + '/users/' + id).then(response => response.data);
+	}
+
+	createEvent(event)
+	{
+		return axios.post(url + '/event', event).then(response => response.insertId);
+	}
+
+	createGig(gig){
+		return axios.post(url + '/gig', gig).then(response => response.data);
 	}
 
 	getEvents()
@@ -65,6 +99,15 @@ class Services
 
 	getAccessToken(email, hashedPassword)
 	{
+
+    }
+	getEvent(id)
+	{
+		return axios.get<Event>('/events/' + id).then(response => response.data);
+	}
+
+
+	getAccessToken(email, hashedPassword){
 		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
 

@@ -59,6 +59,33 @@ let UserModel = sequelize.define('user', {
     timestamps: true
 });
 
+let FileModel = sequelize.define('file', {
+    fileId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true
+    },
+    path: Sequelize.STRING
+});
+
+let FileAccessModel = sequelize.define('fileAccess', {
+    fileId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: FileModel,
+            key: 'fileId'
+        }
+    },
+    userId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        }
+    }
+});
+
 /*class Event {
     eventId;
     organizerId;    //userId
@@ -108,8 +135,20 @@ let GigModel = sequelize.define('gig', {
             key: 'eventId'
         }
     },
-    rider: Sequelize.BLOB,
-    contract: Sequelize.BLOB
+    rider: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: FileModel,
+            key: 'fileId'
+        }
+    },
+    contract: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: FileModel,
+            key: 'fileId'
+        }
+    }
 });
 
 /*class Ticket {
@@ -138,13 +177,17 @@ let TicketModel = sequelize.define('ticket', {
 
 let PersonnelModel = sequelize.define('personnel', {
     personnelId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
             model: UserModel,
             key: 'userId'
         }
     },
     eventId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
             model: EventModel,
             key: 'eventId'
         }
@@ -152,15 +195,7 @@ let PersonnelModel = sequelize.define('personnel', {
     role: Sequelize.STRING
 }, {tableName: 'personnel'});
 
-
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
-
-
-
-
-
-
-
 
 
 /*
@@ -223,6 +258,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
                 salt: 'salt',
                 email: 'sabine@mail.com'
             }]).then(() => {
+            console.log();
             EventModel.bulkCreate([
                 {
                     organizerId: '9',
@@ -381,7 +417,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
                             {
                                 eventId: '5',
                                 type: 'Pris per øl',
-                                price: '69kr',
+                                price: '69',
                                 amount: null
                             }
                         ]);
