@@ -3,6 +3,7 @@ const properties = require('./properties.js');
 const isCI = require('is-ci');
 const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
+moment.locale('nb');
 
 function init() {
     if (isCI) {
@@ -112,12 +113,12 @@ let EventModel = sequelize.define('event', {
     startTime: {
         type:Sequelize.DATE,
         get(){
-            return moment(this.getDataValue('startTime')).format('DD/MM/YYYY hh:mm');
+            return moment(this.getDataValue('startTime')).format('DD/MM/YYYY HH:mm');
         }
     },
     endTime: {type:Sequelize.DATE,
         get(){
-            return moment(this.getDataValue('endTime')).format('DD/MM/YYYY hh:mm');
+            return moment(this.getDataValue('endTime')).format('DD/MM/YYYY HH:mm');
         }},
     imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
