@@ -42,6 +42,7 @@ class Test extends Component{
 }
 
 class DownloadWidget extends Component{
+    //TODO: Add event keys to fetch correct contract/rider
     render (){
         return(
             <button onClick={this.download}>Dowload the file</button>
@@ -49,45 +50,13 @@ class DownloadWidget extends Component{
     }
 
     download(){
+        //For the time being this only fetches the file with the 1-1 key.
         window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
-        //service.downloadContract(1, 1);
-           /* .then(res =>{
-                console.log(res);
-                var blob = new Blob([res.data], res.headers.contentType);
-                /*var link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = "bro.txt";*/
-               /* var url = URL.createObjectURL(blob);
-                window.open(url,"_blank","");*/
-                //document.body.appendChild(link);
-
-               // link.click();
-
-
-
-
-                //saveAs(res, "file.txt")
-
-
-                /*const link = document.createElement( 'a' );
-                link.style.display = 'none';
-                document.body.appendChild( link );
-
-
-                const blob = new Blob(  [res], { type: 'application/octet-binary;charset=utf-8' } );
-                const objectURL = URL.createObjectURL( blob );
-
-                console.log(blob);
-
-                link.href = objectURL;
-                link.href = URL.createObjectURL( blob );
-                link.download =  'data.txt';
-                link.click();*/
-            //})
     }
 }
 
 class UploadWidget extends Component{
+    //TODO: Make sexy
     render(){
         return(
             <div className="container">
@@ -107,20 +76,10 @@ class UploadWidget extends Component{
         e.preventDefault();
         let selectedFile =  e.target.files[0];
         let data = new FormData();
-        //data.encType = "multipart/form-data";
         data.append("file", selectedFile);
         console.log(data);
-        //const reader = new FileReader();
-        let send;
         service.uploadContract(data, 1, 1)
             .then(res => console.log(res));
-        //send = selectedFile.toDataURL("text/txt");
-      /*selectedFile.arrayBuffer().then(readRes => {
-            console.log(readRes);
-            service.uploadContract(readRes, 1, 1)
-                .then(res => console.log(res));
-        });*/
-        //console.log(formData);
     };
 
 }

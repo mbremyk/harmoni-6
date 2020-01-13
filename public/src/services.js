@@ -53,7 +53,8 @@ class Services
 
 	downloadContract(event, artist)
 	{
-		return axios.get(url+"/contract/"+event+"/"+artist)/*.then(response => response)*/;
+		//This approach to downloading the files does not work
+		//return axios.get(url+"/contract/"+event+"/"+artist)/*.then(response => response)*/;
 	}
 
 	getAccessToken(email, hashedPassword){

@@ -5,33 +5,9 @@ const fb = require("./fbConfig");
 const express = require("express");
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
-const fileHandler = require("./filehandler");
 let cors = require("cors");
-const fileUpload = require('express-fileupload');
-const morgan = require('morgan');
-var multer  = require('multer');
 let fs = require("fs");
-let formidable = require("formidable");
 
-/*var storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, 'uploads')
-	},
-	filename: function (req, file, cb) {
-		cb(null, file.fieldname + '-' + Date.now())
-	}
-});
-
-var upload = multer({ storage: storage });*/
-
-//var upload = multer({ dest: 'uploads/' });
-
-//var bb = require('express-busboy');
-
-// const model = require('./model.js');
-// model.syncModels();
-// const sequelize = require("sequelize");
-// const op = sequelize.Op;
 const dao = require('./dao.js');
 let db = new dao();
 
@@ -57,22 +33,9 @@ app.use(fileParser({
 }));
 app.use(cors({origin: true}));
 
-//app.use(fileUpload());
-//app.use(bodyParser.json());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(morgan('dev'));
 const path = require('path');
-
-/*bb.extend(app, {
-    upload: true,
-    path: '/uploads',
-    allowedPath: /./
-});*/
-
-/*app.use(fileUpload({
-	createParentPath: true,
-	useTempFiles: true
-}));*/
 
 const main = express();
 main.use('/api/v1', app);
@@ -81,16 +44,6 @@ main.use(bodyParser.urlencoded({extended: true}));*/
 exports.webApi = functions.https.onRequest(main);
 const deployed = true;
 
-/*main.use(fileUpload({
-	createParentPath: true,
-	useTempFiles: true
-}));*/
-
-/*bb.extend(app,{
-	upload: true,
-	path: path.join(__dirname, 'uploads'),
-	allowedPath: /./
-});*/
 
 
 app.get("/events", (req, res) =>
@@ -159,8 +112,6 @@ app.post("/login", (req, res) =>
 
 app.post("/contract/:eventId/:artistId", (req, res) => {
 	console.log("Calling setContract");
-
-
     const {
         fieldname,
         originalname,
@@ -172,59 +123,15 @@ app.post("/contract/:eventId/:artistId", (req, res) => {
     console.log(req.files[0].originalname);
     console.log(req.files[0]);
 
-	//var writeStream = fs.createWriteStream('./uploads/'+file.originalname);
-
 	fs.writeFile(`${__dirname}/uploads/`+file.originalname, file.buffer, (err) => {
-		if (err) throw err;
-		console.log('The file has been saved!');
-	});
-
-	// This pipes the POST data to the file
-	/*req.files.pipe(writeStream);
-
-	// After all the data is saved, respond with a simple html form so they can post more data
-	req.on('end', function () {
-		/*res.writeHead(200, {"content-type":"text/html"});
-		res.end('<form method="POST"><input name="test" /><input type="submit"></form>');*/
-	//});
-
-	// This is here incase any errors occur
-	/*writeStream.on('error', function (err) {
-		console.log(err);
-	});*/
-
-   res.send("done")
-	//console.log("Body: "+req.files.file.name);
-
-	/*try {*/
-		/*if(req.files) {
-			res.send({
-				status: false,
-				message: 'No file uploaded'
-			});
-		} else {
-			//Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
-			let avatar = req.files.file;
-
-			//Use the mv() method to place the file in upload directory (i.e. "uploads")
-			avatar.mv('./uploads/' + avatar.name);
-
-			//send response
-			res.send({
-				status: true,
-				message: 'File is uploaded',
-				data: {
-					name: avatar.name,
-					mimetype: avatar.mimetype,
-					size: avatar.size
-				}
-			});
+		if (err){
+			res.send(err);
+		}else{
+			console.log('The file has been saved!');
+			res.send("done");
 		}
-	/*} catch (err) {
-		console.log("Error");
-
-		res.status(500).send(err);
-	}*/
+	});
+	//Todo set access here
     /*db.setContract(req.body, req.params.eventId, req.params.artistId)
 		.then(() => res.send("Change made"));*/
 });
@@ -233,14 +140,15 @@ app.post("/contract/:eventId/:artistId", (req, res) => {
 app.get("/contract/:eventId/:artistId", (req, res) => {
 	console.log("downloading file");
 
-	const file = `${__dirname}/uploads/test.png`;
-	res.download(file); // Set disposition and send it.
+    //Todo check access here
+    /*db.getContract(req.params.eventId, req.params.artistId)
+        .then(result => {
+            res.send(JSON.stringify(result));
+            }
+        );*/
 
-	/*db.getContract(req.params.eventId, req.params.artistId)
-		.then(result => {
-			res.send(JSON.stringify(result));
-			}
-		);*/
+	const file = `${__dirname}/uploads/nativelog.txt`;
+	res.download(file); // Set disposition and send it.
 });
 
 app.use("/auth", (req, res, next) => {

@@ -1,6 +1,7 @@
 import {Component} from "react-simplified";
 import {Col,Card} from "react-bootstrap";
 import * as React from 'react';
+import {service} from "./services";
 
 
 export class EventInfo extends Component
@@ -75,4 +76,47 @@ export class EventInfo extends Component
 
 		);
 	}
+}
+
+export class DownloadWidget extends Component{
+	//TODO: Add event keys to fetch correct contract/rider
+	render (){
+		return(
+			<button onClick={this.download}>Download the file</button>
+		)
+	}
+
+	download(){
+		//For the time being this only fetches the file with the 1-1 key.
+		window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
+	}
+}
+
+export class UploadWidget extends Component{
+	//TODO: Make sexy
+	render(){
+		return(
+			<div className="container">
+				<div className="row">
+					<div className="col-md-6">
+						<div className="form-group files color">
+							<label>Upload Your File </label>
+							<input type="file" className="form-control" encType="multipart/form-data" name="file" onChange={this.fileHandler}/>
+						</div>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	fileHandler = (e) => {
+		e.preventDefault();
+		let selectedFile =  e.target.files[0];
+		let data = new FormData();
+		data.append("file", selectedFile);
+		console.log(data);
+		service.uploadContract(data, 1, 1)
+			.then(res => console.log(res));
+	};
+
 }
