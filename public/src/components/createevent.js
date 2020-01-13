@@ -14,12 +14,13 @@ import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import DatePicker from "react-date-picker";
 import TimePicker from "react-time-picker";
+import {authService} from "../AuthService";
+const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
 //TODO: Hente ut organizerId fra bruker
 //TODO: Legge til annet personell
 //TODO: Legge til bilde
-//TODO: legge til bilde-url
 
 export class AddEvent extends Component{
 
@@ -66,6 +67,7 @@ export class AddEvent extends Component{
         this.imageUrl = this.handleImageUrlChange.bind(this);
 
         this.state = {
+            organizerId: null,
             eventName: '',
             eventAddress: '',
             eventDescription: '',
@@ -147,7 +149,7 @@ export class AddEvent extends Component{
 
         let ev = new Event();
         ev.address = this.state.eventAddress;
-        ev.organizerId = 1;
+        ev.organizerId = this.state.organizerId;
         ev.ageLimit = this.state.ageLimit;
         ev.description = this.state.eventDescription;
         ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
@@ -378,6 +380,11 @@ export class AddEvent extends Component{
 
 
     mounted() {
+        let token = authService.getToken();
+        let decoded = jwt.decode(token);
+        let userId = decoded.userId;
+        this.setState({organizerId: userId});
+        console.log(this.state.organizerId);
         service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
     }
 
