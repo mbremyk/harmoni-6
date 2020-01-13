@@ -65,7 +65,7 @@ function getToken(user) {
 }
 
 /**
- * Endpoints:
+ * ENDPOINTS:
  * get /test
  * get /users
  * get /users/:userId
@@ -73,16 +73,22 @@ function getToken(user) {
  * get /events/search/:searchText
  * get /events/eventDetails/:eventId
  * get /tickets/:eventId
+ *
  * post /users
  * post /events
  * post /gig
  * post /login
+ *
  * use /auth
+ *
  * get /auth/users/:userId
  * get /auth/events/users/:userId
+ *
  * post /auth/refresh
  * post /auth/logout
+ *
  * put /auth/user/:userId
+ * put /auth/event/:eventId
  */
 
 /**
@@ -98,13 +104,7 @@ app.get("/test", (req, res) => {
  */
 app.get("/users", (req, res) => {
     console.log("GET-request received from client");
-    return db.getAllUsers().then(users => {
-        if (users !== null) {
-            res.status(201).send(users);
-        } else {
-            res.sendStatus(400);
-        }
-    });
+    return db.getAllUsers().then(users => users ? res.status(201).send(users) : res.sendStatus(400));
 });
 
 /**
@@ -112,13 +112,7 @@ app.get("/users", (req, res) => {
  */
 app.get("/users/:userId", (req, res) => {
     console.log("GET-request received from client for get one user by id");
-    return db.getUserById(req.params.userId).then(user => {
-        if (user !== null) {
-            res.status(201).send(user);
-        } else {
-            res.sendStatus(400);
-        }
-    });
+    return db.getUserById(req.params.userId).then(user => (user !== null) ? res.status(201).send(user) : res.sendStatus(400));
 });
 
 /**
@@ -138,13 +132,7 @@ app.get("/users/:userId", (req, res) => {
  */
 app.get("/events", (req, res) => {
     console.log("GET-request received from client");
-    return db.getAllEvents().then(events => {
-        if (events !== null) {
-            res.status(201).send(events);
-        } else {
-            res.sendStatus(400);
-        }
-    });
+    return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
 
 /**
@@ -164,24 +152,13 @@ app.get("/events", (req, res) => {
  */
 app.get("/events/search/:searchText", (req, res) => {
     let searchText = decodeURIComponent(req.params.searchText);
-    return db.getEventsMatching(searchText).then(events => {
-        if (events !== null) {
-            res.status(201).send(events);
-        } else {
-            res.sendStatus(400);
-        }
-    });
+    db.getEventsMatching(searchText).then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
+
 
 app.get("/events/eventDetails/:eventId", (req, res) => {
     console.log("GET-request received from client");
-    return db.getEventByEventId(req.params.eventId).then(events => {
-        if (events !== null) {
-            res.status(201).send(events);
-        } else {
-            res.sendStatus(400);
-        }
-    });
+    return db.getEventByEventId(req.params.eventId).then(event => (event !== {}) ? res.status(201).send(event) : res.sendStatus(404));
 });
 
 /**
@@ -189,8 +166,7 @@ app.get("/events/eventDetails/:eventId", (req, res) => {
  */
 app.get("/tickets/:eventId", (req, res) => {
     console.log("GET-request received from client");
-    return db.getTicketsForEvent(req.params.eventId)
-        .then(tickets => res.status(201).send(tickets));
+    return db.getTickets(req.params.eventId).then(tickets => tickets ? res.status(201).send(tickets) : res.status(400));
 });
 
 /**
@@ -227,7 +203,7 @@ app.post("/users", (req, res) => {
  */
 app.post("/event", (req, res) => {
     console.log("POST-request received from client");
-    return db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.status(400));
+    return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
 });
 
 
@@ -255,7 +231,7 @@ app.put('/auth/event/:eventId', (req, res) => {
  */
 app.post("/gigs", (req, res) => {
     console.log("POST-request received from client");
-    db.addGig(req.body).then(response => response ? res.status(201).send(response) : res.status(400));
+    db.addGig(req.body).then(insertOk => insertOk ? res.status(201).send(response) : res.status(400));
 });
 
 /**
@@ -329,9 +305,7 @@ app.use("/auth", (req, res, next) => {
  */
 app.get("/auth/users/:userId", (req, res) => {
     console.log("GET-request received from client");
-    return db.getUserByEmail(req.params.userId, req.body.email)
-        .then(user => res.send(user))
-        .catch(error => console.error(error));
+    return db.getUserByEmail(req.body.email).then(user => user ? res.status(201).send(user) : res.status(400))
 });
 
 /**
@@ -399,9 +373,7 @@ app.post("/auth/logout", (req, res) => {
  */
 app.put("/auth/users/:userId", (req, res) => {
     console.log("PUT-request received from client");
-
-    return db.updateUser(req.body)
-        .then(res.sendStatus(200));
+    return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
 });
 
 console.log("Server initalized");
