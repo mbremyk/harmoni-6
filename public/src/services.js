@@ -122,7 +122,7 @@ class Services
 
 	getEventByEventId(eventId)
 	{
-		return axios.get('/events/eventdetails/' + eventId).then(response => response.data);
+		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
 	}
 
 

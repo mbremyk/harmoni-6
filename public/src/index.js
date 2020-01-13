@@ -35,7 +35,7 @@ if (root)
         <Route exact path="/hjem" component={HomePage} />
         <Route exact path="/arrangement/:id" component={EventPage} />
         <Route exact path="/opprett-arrangement" component={AddEvent} />
-        <Route exact path="/endre-arrangement" component={EditEvent} />
+        <Route exact path="/endre-arrangement/:id" component={EditEvent} />
 
     </div>
     </BrowserRouter>,

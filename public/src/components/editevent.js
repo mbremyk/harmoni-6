@@ -1,22 +1,21 @@
-import React, {Component} from "react";
-import FormControl from "react-bootstrap/FormControl";
+import {service, Event, Gig} from "../services";
+import {Component} from "react-simplified";
+import React from "react";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
+import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import FormControl from "react-bootstrap/FormControl";
 import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import DatePicker from "react-date-picker";
 import TimePicker from "react-time-picker";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Button from "react-bootstrap/Button";
-import InputGroup from "react-bootstrap/InputGroup";
-import {Event, service} from "../services";
 
-export class EditEvent extends Component {
-
-    event;
+export class EditEvent extends Component{
 
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
@@ -56,24 +55,26 @@ export class EditEvent extends Component {
         this.ageLimit = this.handleAgeLimitChange.bind(this);
         this.rider = this.handleRiderChange.bind(this);
         this.contract = this.handleContractChange.bind(this);
+        this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
 
         this.state = {
-            eventName: this.event.eventName,
-            eventAddress: this.event.eventAddress,
-            eventDescription: this.event.eventDescription,
-            ageLimit: this.event.ageLimit,
+            eventName: '',
+            eventAddress: '',
+            eventDescription: '',
+            ageLimit: 0,
             fDate: new Date(),
             tDate: new Date(),
             fTime: '00:00:00',
             tTime: '00:00:00',
             rider: '',
             contract: '',
+            artistsAdd: [],
             artists: [],
         };
     }
 
-    handleEventNameChange(event){
+    handleEventNameChange(event) {
         this.setState({eventName: event.target.value});
     }
 
@@ -97,11 +98,15 @@ export class EditEvent extends Component {
         this.setState({contract: event.target.value})
     }
 
-    handleArtists(event){
-        this.setState({artists: event.target.value})
+    handleArtistsAdd(event){
+        service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
     }
 
-    handleSubmit(){
+    handleArtists(event){
+        this.setState({artists: [...this.state.artists, ...event]})
+    }
+
+    handleSubmit() {
         if(this.state.eventName === '' ||
             this.state.eventAddress === '' ||
             this.state.eventDescription === ''){
@@ -118,37 +123,33 @@ export class EditEvent extends Component {
     }
 
     mergeDateTime(fdate, ftime){
-        return fdate + " " + ftime;
+        return fdate.toISOString().split("T")[0] + " " + ftime;
     }
 
-    unmergeDateTime(fdate, ftime) {
+    submit() {
 
-    }
-
-    submit(){
         let ev = new Event();
-        ev.adress = this.state.eventAddress;
+        ev.address = this.state.eventAddress;
+        ev.organizerId = 1;
         ev.ageLimit = this.state.ageLimit;
         ev.description = this.state.eventDescription;
-        ev.startDate = this.mergeDateTime(this.state.fDate, this.state.fTime);
-        ev.endDate = this.mergeDateTime(this.state.tDate, this.state.tTime);
+        ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
+        ev.endTime = this.mergeDateTime(this.state.tDate, this.state.tTime);
         ev.eventName = this.state.eventName;
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
 
-
         service.createEvent(ev)
             .then(updated =>
-                {this.state.artists.map(artist =>
-                    (service.createGig(artist.artistId, updated.insertId, this.state.rider, this.state.contract)))}
-
-            )
+            {this.state.artistsAdd.map(artist =>
+                (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
             .catch(err => alert('En feil oppsto!' + err.message))
-
-
     }
 
     render(){
+
+        if(!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
+
         return(
             <Container>
                 <Form>
@@ -192,7 +193,7 @@ export class EditEvent extends Component {
 
                             <Form.Label>Artist</Form.Label>
 
-                            <Dropdown onSelect={(eventKey) => this.addArtist(eventKey)}>
+                            <Dropdown onSelect={this.handleArtistsAdd}>
 
                                 <Dropdown.Toggle variant={"success"} id="dropdown">
                                     Velg artist
@@ -213,7 +214,7 @@ export class EditEvent extends Component {
                         <Form.Group as={Col} sm={"10"}>
 
                             <ListGroup title={"Valgte artister"}>
-                                {this.state.artists.map(artist => (
+                                {this.state.artistsAdd.map(artist => (
                                     <React.Fragment key={artist.userId}>
                                         <ListGroupItem>
                                             {artist.username}
@@ -231,7 +232,7 @@ export class EditEvent extends Component {
                                 className="m-4 font-weight-bold"
                                 id = 'fromDatePicker'
                                 name = 'fdate'
-                                format={"yyyy-MM-dd"}
+                                format="y-MM-dd"
                                 selected={this.state.fDate}
                                 value={this.state.fDate}
                                 onChange={date => this.changeDate('fdate', date)}
@@ -256,7 +257,7 @@ export class EditEvent extends Component {
                                 className="m-4 font-weight-bold"
                                 id='toDatePicker'
                                 name='tdate'
-                                format="yyyy-MM-dd"
+                                format="y-MM-dd"
                                 selected={this.state.tDate}
                                 value={this.state.tDate}
                                 onChange={date => this.changeDate('tdate', date)}
@@ -332,10 +333,12 @@ export class EditEvent extends Component {
     }
 
 
-    mounted(){
-        service.getUsers()
-            .then(artister => this.state.artists = artister)
-            .catch((err) => alert(err.message));
+    mounted() {
+        console.log(this.props.match.params.id)
+        service.getEventByEventId(this.props.match.params.id).then(e => {
+            console.log(e, e.eventAddress);
+            service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
+        }).catch((error) => console.log(error));
     }
 
     changeDate(dateName, dateValue){
@@ -375,15 +378,4 @@ export class EditEvent extends Component {
             this.setState({ageLimit: this.state.ageLimit})
         }
     }
-
-    addArtist(eventKey) {
-        this.setState({
-            artists: [...this.state.artists, eventKey]
-        })
-    }
-
-    mounted() {
-        service.getEvent().then(event => (this.event = event))
-    }
 }
-
