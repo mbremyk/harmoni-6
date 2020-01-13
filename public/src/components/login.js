@@ -31,7 +31,6 @@ export class LoginForm extends Component {
     }
 
     login(res) {
-        console.log('res n ' + res);
         console.log('token '+ authService.getToken());
         if(authService.loggedIn())
         {
@@ -41,8 +40,6 @@ export class LoginForm extends Component {
         {
             alert('out');
         }
-        authService.logout();
-        console.log('token '+ authService.getToken());
     }
 
     render(){
@@ -51,17 +48,31 @@ export class LoginForm extends Component {
                 <Form>
                     <Form.Group controlId="formBasicEmail">
                         <Form.Label>Email</Form.Label>
-                        <Form.Control type="email" placeholder="Skriv inn email" value={this.state.email} onChange={this.handleEmailChange} />
+                        <Form.Control
+                            type="email"
+                            placeholder="Skriv inn email"
+                            value={this.state.email}
+                            onChange={this.handleEmailChange} />
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword">
                         <Form.Label>Passord</Form.Label>
-                        <Form.Control type="password" placeholder="Skriv inn passord" value={this.state.password} onChange={this.handlePasswordChange} />
+                        <Form.Control
+                            type="password"
+                            placeholder="Skriv inn passord"
+                            value={this.state.password}
+                            onChange={this.handlePasswordChange} />
                     </Form.Group>
 
-                    <Button onClick={this.handleLogin} variant="primary" type="button">
+                    <Button
+                        onClick={this.handleLogin}
+                        variant="primary"
+                        type="button">
                         Login
                     </Button>
-                    <Button href="/" variant="secondary" type="button">
+                    <Button
+                        href="/"
+                        variant="secondary"
+                        type="button">
                         Avbryt
                     </Button>
                     <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>

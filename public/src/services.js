@@ -102,18 +102,9 @@ class Services
 		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
 	}
 
-	getAccessToken(email, hashedPassword)
-	{
-
-    }
 	getEvent(id)
 	{
 		return axios.get<Event>('/events/' + id).then(response => response.data);
-	}
-
-
-	getAccessToken(email, hashedPassword){
-		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
 
 	searchForEvents(input)
@@ -130,8 +121,6 @@ class Services
 	{
 		return axios.get('/events/eventdetails/' + eventId).then(response => response.data);
 	}
-
-
 }
 
 export let service = new Services();

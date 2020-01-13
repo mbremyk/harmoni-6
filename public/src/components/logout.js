@@ -7,10 +7,8 @@ export class Logout extends Component {
 	constructor(props) {
 		super(props);
 
-		authService.logout().then(res => {
-			// history.push('/');
-			console.log(res);
-		})
+		authService.logout().then(res =>
+		this.props.history.push('/'));
 	}
 
 	render() {

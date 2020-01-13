@@ -10,7 +10,7 @@ import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
 import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
-import {addEvent} from '../src/components/createevent.js';
+import {AddEvent} from './components/createevent.js';
 import {HomePage} from "./components/homepage";
 import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
