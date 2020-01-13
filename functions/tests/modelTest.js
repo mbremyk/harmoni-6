@@ -33,40 +33,28 @@ describe('User Tests', () => {
     });
 
 
-    it('get user by Email', done => {
-        db.getUser("steffen@mail.com").then(user => {
-            expect({
-                userId: user.userId,
-                username: user.username,
-                password: user.password,
-                salt: user.salt,
-                email: user.email
-            }).toEqual({
-                userId: 1,
-                username: 'Steffen T',
-                password: 'ST',
-                salt: 'salt',
-                email: 'steffen@mail.com'
-            });
-            done();
-        });
-    });
+    it('find user by email', done => {
+        db.getUserByEmail("steffen@mail.com").then(users => {
+            expect(users
+                .map(user => user.toJSON())
+                .map(user => (
+                    {
+                        userId: user.userId,
+                        username: user.username,
+                        password: user.password,
+                        salt: user.salt,
+                        email: user.email,
 
-    it('get user by ID', done => {
-        db.getUserById(1).then(user => {
-            expect({
-                userId: user.userId,
-                username: user.username,
-                password: user.password,
-                salt: user.salt,
-                email: user.email,
-            }).toEqual({
-                userId: 1,
-                username: 'Steffen T',
-                password: 'ST',
-                salt: 'salt',
-                email: 'steffen@mail.com'
-            });
+                    })))
+                .toEqual([
+                    {
+                        userId: 1,
+                        username: 'Steffen T',
+                        password: 'ST',
+                        salt: 'salt',
+                        email: 'steffen@mail.com'
+                    }
+                ]);
             done();
         });
     });
