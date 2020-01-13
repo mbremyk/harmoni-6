@@ -1,27 +1,22 @@
-import {service, Event, Gig} from "../services";
-import {Component} from "react-simplified";
-import React from "react";
+import React, {Component} from "react";
+import FormControl from "react-bootstrap/FormControl";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Button from "react-bootstrap/Button";
-import InputGroup from "react-bootstrap/InputGroup";
-import FormControl from "react-bootstrap/FormControl";
 import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import DatePicker from "react-date-picker";
 import TimePicker from "react-time-picker";
+import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import {Event, service} from "../services";
 
-//TODO: Sjekke om artist er allerede lagt inn
-//TODO: Hente ut organizerId fra bruker
-//TODO: Legge til annet personell
-//TODO: Legge til bilde
+export class EditEvent extends Component {
 
-
-export class AddEvent extends Component{
+    event;
 
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
@@ -61,21 +56,19 @@ export class AddEvent extends Component{
         this.ageLimit = this.handleAgeLimitChange.bind(this);
         this.rider = this.handleRiderChange.bind(this);
         this.contract = this.handleContractChange.bind(this);
-        this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
 
         this.state = {
-            eventName: '',
-            eventAddress: '',
-            eventDescription: '',
-            ageLimit: 0,
+            eventName: this.event.eventName,
+            eventAddress: this.event.eventAddress,
+            eventDescription: this.event.eventDescription,
+            ageLimit: this.event.ageLimit,
             fDate: new Date(),
             tDate: new Date(),
             fTime: '00:00:00',
             tTime: '00:00:00',
             rider: '',
             contract: '',
-            artistsAdd: [],
             artists: [],
         };
     }
@@ -104,15 +97,11 @@ export class AddEvent extends Component{
         this.setState({contract: event.target.value})
     }
 
-    handleArtistsAdd(event){
-        service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
-    }
-
     handleArtists(event){
-        this.setState({artists: [...this.state.artists, ...event]})
+        this.setState({artists: event.target.value})
     }
 
-    handleSubmit() {
+    handleSubmit(){
         if(this.state.eventName === '' ||
             this.state.eventAddress === '' ||
             this.state.eventDescription === ''){
@@ -129,33 +118,37 @@ export class AddEvent extends Component{
     }
 
     mergeDateTime(fdate, ftime){
-        return fdate.toISOString().split("T")[0] + " " + ftime;
+        return fdate + " " + ftime;
     }
 
-    submit() {
+    unmergeDateTime(fdate, ftime) {
 
+    }
+
+    submit(){
         let ev = new Event();
-        ev.address = this.state.eventAddress;
-        ev.organizerId = 1;
+        ev.adress = this.state.eventAddress;
         ev.ageLimit = this.state.ageLimit;
         ev.description = this.state.eventDescription;
-        ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
-        ev.endTime = this.mergeDateTime(this.state.tDate, this.state.tTime);
+        ev.startDate = this.mergeDateTime(this.state.fDate, this.state.fTime);
+        ev.endDate = this.mergeDateTime(this.state.tDate, this.state.tTime);
         ev.eventName = this.state.eventName;
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
 
+
         service.createEvent(ev)
             .then(updated =>
-            {this.state.artistsAdd.map(artist =>
-                (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
-        .catch(err => alert('En feil oppsto!' + err.message))
+                {this.state.artists.map(artist =>
+                    (service.createGig(artist.artistId, updated.insertId, this.state.rider, this.state.contract)))}
+
+            )
+            .catch(err => alert('En feil oppsto!' + err.message))
+
+
     }
 
     render(){
-
-        if(!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
-
         return(
             <Container>
                 <Form>
@@ -199,7 +192,7 @@ export class AddEvent extends Component{
 
                             <Form.Label>Artist</Form.Label>
 
-                            <Dropdown onSelect={this.handleArtistsAdd}>
+                            <Dropdown onSelect={(eventKey) => this.addArtist(eventKey)}>
 
                                 <Dropdown.Toggle variant={"success"} id="dropdown">
                                     Velg artist
@@ -210,7 +203,7 @@ export class AddEvent extends Component{
                                         <Dropdown.Item eventKey={artist.userId}>
                                             {artist.username}
                                         </Dropdown.Item>
-                                        ))}
+                                    ))}
                                 </Dropdown.Menu>
 
                             </Dropdown>
@@ -220,7 +213,7 @@ export class AddEvent extends Component{
                         <Form.Group as={Col} sm={"10"}>
 
                             <ListGroup title={"Valgte artister"}>
-                                {this.state.artistsAdd.map(artist => (
+                                {this.state.artists.map(artist => (
                                     <React.Fragment key={artist.userId}>
                                         <ListGroupItem>
                                             {artist.username}
@@ -238,7 +231,7 @@ export class AddEvent extends Component{
                                 className="m-4 font-weight-bold"
                                 id = 'fromDatePicker'
                                 name = 'fdate'
-                                format="y-MM-dd"
+                                format={"yyyy-MM-dd"}
                                 selected={this.state.fDate}
                                 value={this.state.fDate}
                                 onChange={date => this.changeDate('fdate', date)}
@@ -263,7 +256,7 @@ export class AddEvent extends Component{
                                 className="m-4 font-weight-bold"
                                 id='toDatePicker'
                                 name='tdate'
-                                format="y-MM-dd"
+                                format="yyyy-MM-dd"
                                 selected={this.state.tDate}
                                 value={this.state.tDate}
                                 onChange={date => this.changeDate('tdate', date)}
@@ -329,7 +322,7 @@ export class AddEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                                <Button type="submit" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                            <Button type="submit" onClick={this.handleSubmit}>Opprett arrangementet</Button>
                         </Form.Group>
 
                     </Form.Row>
@@ -339,8 +332,10 @@ export class AddEvent extends Component{
     }
 
 
-    mounted() {
-        service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
+    mounted(){
+        service.getUsers()
+            .then(artister => this.state.artists = artister)
+            .catch((err) => alert(err.message));
     }
 
     changeDate(dateName, dateValue){
@@ -381,4 +376,14 @@ export class AddEvent extends Component{
         }
     }
 
+    addArtist(eventKey) {
+        this.setState({
+            artists: [...this.state.artists, eventKey]
+        })
+    }
+
+    mounted() {
+        service.getEvent().then(event => (this.event = event))
+    }
 }
+

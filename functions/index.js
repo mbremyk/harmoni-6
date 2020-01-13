@@ -92,6 +92,31 @@ app.get("/events", (req, res) => {
     });
 });
 
+app.post("/event", (req, res) =>{
+   console.log("POST-request received from client");
+   return db.createEvent(req.body).then(response => {
+       if (response.insertId !== undefined) {
+           res.status(201).send(response)
+       }
+       else {
+           res.status(400);
+       }
+   })
+});
+
+
+
+app.post("/gig", (req, res) => {
+    console.log("POST-request received from client");
+    db.createGig(req.body).then(response => {
+        if (response) {
+            res.status(201).send(response)
+        } else {
+            res.status(400);
+        }
+    });
+});
+
 /**
  * Get all events where eventName or description contains searchText
  * {
@@ -145,6 +170,37 @@ app.post("/user", (req, res) => {
                 });
             }
         });
+});
+
+
+/**
+ *
+ */
+
+app.get("/users", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getAllUsers().then(users => {
+        if (users !== null) {
+            res.status(201).send(users);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+
+/**
+ * Get one user by id
+ */
+app.get("/users/:userId", (req, res) => {
+    console.log("GET-request received from client for get one user by id");
+    return db.getUserById(req.params.userId).then(user => {
+        if (user !== null) {
+            res.status(201).send(user);
+        } else {
+            res.sendStatus(400);
+        }
+    });
 });
 
 /**
