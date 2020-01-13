@@ -36,6 +36,7 @@ export class LoginForm extends Component{
         if(authService.loggedIn())
         {
             alert('Inn');
+            this.props.history.push("/min-side");
         }
         else
         {
