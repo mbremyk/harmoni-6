@@ -82,7 +82,8 @@ class Services
 		return axios.post(url + '/event', event).then(response => response.insertId);
 	}
 
-	createGig(gig){
+	createGig(gig)
+	{
 		return axios.post(url + '/gig', gig).then(response => response.data);
 	}
 
@@ -122,7 +123,6 @@ class Services
 
 	getEventByEventId(eventId)
 	{
-		console.log('Axios get event by id kjørt!');
 		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
 
 	}
