@@ -4,7 +4,10 @@ import {EventInfo} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
-import Dropdown from "react-bootstrap/Dropdown";
+import {authService} from '../AuthService'
+const jwt = require("jsonwebtoken");
+
+
 
 
 
@@ -14,6 +17,7 @@ export class HomePage extends Component
 {
 	myEvents = [];
 	otherEvents = [];
+
 
 	/*
 	 <Container>
@@ -35,7 +39,6 @@ export class HomePage extends Component
 
 
 			<Container>
-
 
 
 				<Row>
@@ -68,6 +71,22 @@ export class HomePage extends Component
 						<h1>Andre Arrangementer</h1>
 					</Col>
 				</Row>
+				<Row>
+					{this.otherEvents.map(event => (
+						<EventInfo
+
+							link={event.eventId}
+							imageUrl={event.imageUrl}
+							title={event.eventName}
+							address={event.address}
+							age_limit={event.ageLimit}
+							start_date={event.startTime}
+							end_date={event.endTime}
+							uploaded={event.createdAt}
+
+						/>
+					))}
+				</Row>
 
 
 			</Container>
@@ -79,14 +98,25 @@ export class HomePage extends Component
 
 	mounted()
 	{
+
 		service
-			.getEvents()
+			.getEventsByOrganizer(jwt.decode(authService.getToken()))
 			.then(myEvents => (this.myEvents = myEvents))
 			.catch((error) => console.log(error));
+		this.getOtherevents()
 
 
 
 	}
+
+	getOtherevents()
+	{
+		service
+			.getEvents()
+			.then(otherEvents => (this.otherEvents = otherEvents))
+			.catch((error) => console.log(error));
+	}
+
 
 
 }

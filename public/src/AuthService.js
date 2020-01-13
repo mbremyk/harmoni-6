@@ -1,7 +1,7 @@
 import { service } from "./services"
 import decode from 'jwt-decode';
 
-class AuthService {
+export class AuthService {
 
 	// Initializing important variables
 	constructor() {
@@ -43,7 +43,7 @@ class AuthService {
 
 	logout() {
 		// Clear user token and profile data from localStorage
-		localStorage.removeItem('token');
+		return service.logout().then(res => localStorage.removeItem('token'));
 	}
 
 	_checkStatus(response) {

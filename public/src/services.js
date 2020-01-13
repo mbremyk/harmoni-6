@@ -1,5 +1,6 @@
 //const axios = require('axios');
 import axios from 'axios'
+import {authService} from './AuthService'
 
 var url = '';
 if(window.location.href.includes('localhost')){
@@ -55,79 +56,75 @@ export class Ticket
     amount;
 }
 
-class Services
-{
-	login(email, password)
-	{
+class Services {
+	login(email, password) {
 		return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
 	}
 
-	createUser(user)
-	{
+	logout() {
+		return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
+	}
+
+	createUser(user) {
 		return axios.post(url + '/user', user).then(response => response.data);
 	}
 
-	getUsers()
-	{
+	getUsers() {
 		return axios.get(url + '/users').then(response => response.data);
 	}
 
-	getUser(id)
-	{
+	getUser(id) {
 		return axios.get(url + '/users/' + id).then(response => response.data);
 	}
 
-	createEvent(event)
-	{
-		return axios.post(url + '/event', event).then(response => response.insertId);
-	}
-
-	createGig(gig){
-		return axios.post(url + '/gig', gig).then(response => response.data);
-	}
-
-	getEvents()
-	{
+	getEvents() {
 		return axios.get(url + '/events').then(response => response.data);
 	}
 
-	getTicketToEvent(eventId)
-	{
-		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
+	createEvent(event) {
+		return axios.post(url + '/events', event).then(response => response.insertId);
 	}
 
-	getAccessToken(email, hashedPassword)
-	{
-
-    }
-	getEvent(id)
-	{
-		return axios.get<Event>('/events/' + id).then(response => response.data);
+	uploadContract(formData, event, artist) {
+		return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
 	}
 
-
-	getAccessToken(email, hashedPassword){
-		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
-	}
-
-	searchForEvents(input)
+	/*downloadContract(event, artist)
 	{
-		return axios.get('/events/search/' + encodeURIComponent(input)).then(response => response.data);
+		//This approach to downloading the files does not work
+		//return axios.get(url+"/contract/"+event+"/"+artist).then(response => response);
+	}*/
+
+	getAccessToken(email, hashedPassword) {
+		return axios.post(url + '/accesstoken/', {
+			email: email,
+			hashedPassword: hashedPassword
+		}).then(response => response.data);
 	}
+		createGig(gig)
+		{
+			return axios.post(url + '/gig', gig).then(response => response.data);
+		}
 
-	getEventsByOrganizer(organizerId)
-	{
-		return axios.get('/auth/events/user/' + organizerId).then(response => response.data);
+		getTicketToEvent(eventId)
+		{
+			return axios.get(url + '/tickets/' + eventId).then(response => response.data);
+		}
+
+		searchForEvents(input)
+		{
+			return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+		}
+
+		getEventsByOrganizer(userId)
+		{
+			return axios.get(url + '/auth/events/user/' + userId).then(response => response.data);
+		}
+
+		getEventByEventId(eventId)
+		{
+			return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+		}
 	}
-
-	getEventByEventId(eventId)
-	{
-		console.log('Axios get event by id kjørt!');
-		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
-
-	}
-
-
-}
 
 export let service = new Services();

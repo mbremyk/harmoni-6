@@ -50,7 +50,7 @@ export class LandingPage extends Component
 
 						<Row>
 							<Col md={{span: 3, offset: 5}}>
-								<h1> Harmoni </h1>
+								<h1>Harmoni</h1>
 							</Col>
 						</Row>
 
