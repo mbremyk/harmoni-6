@@ -14,6 +14,7 @@ import {addEvent} from '../src/components/createevent.js';
 import {HomePage} from "./components/homepage";
 import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
+import {EditEvent} from "./components/editevent";
 
 import {authService} from "./AuthService";
 import {PrivateRoute} from "./components/PrivateRoute";
@@ -32,11 +33,13 @@ if (root)
         <Route exact path="/" component={LandingPage}/>
         <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
-        <Route exact path="/logg-inn" component={LoginForm}/>
+        <Route exact path="/logg-inn" component={LoginForm} />
         <Route exact path="/logg-ut" component={Logout}/>
-        <Route exact path="/opprett-arrangement" component={addEvent} />
         <Route exact path="/hjem" component={HomePage} />
         <Route exact path="/arrangement/:id" component={EventPage} />
+        <Route exact path="/opprett-arrangement" component={AddEvent} />
+        <Route exact path="/endre-arrangement" component={EditEvent} />
+
         <PrivateRoute authed={authService.loggedIn()} path='/private' component={myPage}/>
     </div>
     </BrowserRouter>,
