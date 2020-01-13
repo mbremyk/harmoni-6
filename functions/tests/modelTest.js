@@ -33,35 +33,52 @@ describe('User Tests', () => {
     });
 
 
-    it('find user by id and username', done => {
-        db.getUser("steffen@mail.com", 1).then(users => {
-            expect(users
-                .map(user => user.toJSON())
-                .map(user => (
-                    {
-                        userId: user.userId,
-                        username: user.username,
-                        password: user.password,
-                        salt: user.salt,
-                        email: user.email,
+    it('get user by Email', done => {
+        db.getUser("steffen@mail.com").then(user => {
+            expect({
+                userId: user.userId,
+                username: user.username,
+                password: user.password,
+                salt: user.salt,
+                email: user.email
+            }).toEqual({
+                userId: 1,
+                username: 'Steffen T',
+                password: 'ST',
+                salt: 'salt',
+                email: 'steffen@mail.com'
+            });
+            done();
+        });
+    });
 
-                    })))
-                .toEqual([
-                    {
-                        userId: 1,
-                        username: 'Steffen T',
-                        password: 'ST',
-                        salt: 'salt',
-                        email: 'steffen@mail.com'
-                    }
-                ]);
+    it('get user by ID', done => {
+        db.getUserById(1).then(user => {
+            expect({
+                userId: user.userId,
+                username: user.username,
+                password: user.password,
+                salt: user.salt,
+                email: user.email,
+            }).toEqual({
+                userId: 1,
+                username: 'Steffen T',
+                password: 'ST',
+                salt: 'salt',
+                email: 'steffen@mail.com'
+            });
             done();
         });
     });
 
 
     it('create user', done => {
-        let user = {username: 'TestBrukerCreated', password: 'Passord', salt: ':(', email: '7@mail.com'};
+        let user = {
+            username: 'TestBrukerCreated',
+            password: 'Passord',
+            salt: ':(',
+            email: '7@mail.com'
+        };
         db.createUser(user).then(response => {
             expect(response).toBeTruthy();
             done();
@@ -74,7 +91,6 @@ describe('User Tests', () => {
             userId: '1',
             username: 'UsernameUpdated',
             password: 'PasswordUpdated',
-            salt: ':)',
             email: 'NEW@mail.com'
         };
         db.updateUser(user).then(response => {
@@ -120,7 +136,6 @@ describe('Event Tests', () => {
             description: 'if you can see this the event was created properly'
         };
         db.createEvent(event).then(response => {
-            console.log(response);
             expect(response.insertId).toEqual(6);
             done();
         });
@@ -129,14 +144,11 @@ describe('Event Tests', () => {
 
     it('update event success', done => {
         let event = {
-            eventId: 2,
+            eventId: 5,
             organizerId: 7,
             eventName: 'KANSELLERT',
             address: 'KANSELLERT',
             ageLimit: 18,
-            startTime: null,
-            endTime: null,
-            imageUrl: 'https://www.bakgaarden.no/wp-content/uploads/2019/08/DDE-1-crop%C2%A9LineBerre-1030x686.jpg',
             description: 'UPDATED'
         };
         db.updateEvent(event).then(response => {
@@ -186,21 +198,23 @@ describe('Personnel Tests', () => {
 describe('Search', () => {
     it('search several results', done => {
         db.getEventsMatching('konsert').then(events => {
-            events.map(event => console.log(event));
-            expect(events
-                .map(event => event.toJSON())
-                .map(event => (
-                    {
-                        eventName: event.eventName,
-                    })))
-                .toEqual([
-                    {
-                        eventName: 'D.D.E',
-                    },
-                    {
-                        eventName: 'Kygokonsert på torget',
-                    }
-                ]);
+            expect(events.length).toBe(3);
+            expect(events.map(event =>
+                event.toJSON()).map(event => (
+                {
+                    eventName: event.eventName,
+                }
+            ))).toEqual([
+                {
+                    eventName: 'Ungdomskonsert',
+                },
+                {
+                    eventName: 'D.D.E',
+                },
+                {
+                    eventName: 'Kygokonsert på torget',
+                }
+            ]);
             done();
         });
     });
@@ -208,17 +222,12 @@ describe('Search', () => {
 
     it('search one results', done => {
         db.getEventsMatching('Kygo').then(events => {
-            expect(events
-                .map(event => event.toJSON())
-                .map(event => (
-                    {
-                        eventName: event.eventName,
-                    })))
-                .toEqual([
-                    {
-                        eventName: 'Kygokonsert på torget',
-                    }
-                ]);
+            expect(events.length).toBe(1);
+            expect({
+                eventName: events[0].eventName,
+            }).toEqual({
+                eventName: 'Kygokonsert på torget',
+            });
             done();
         });
     });

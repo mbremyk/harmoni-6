@@ -381,7 +381,7 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
                             {
                                 eventId: '5',
                                 type: 'Pris per øl',
-                                price: '69kr',
+                                price: '69',
                                 amount: null
                             }
                         ]);
