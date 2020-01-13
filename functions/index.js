@@ -198,30 +198,37 @@ app.post("/user", (req, res) => {
 /**
  *
  */
-app.post("/event", (req, res) =>{
+app.post("/event", (req, res) => {
     console.log("POST-request received from client");
-    return db.createEvent(req.body).then(response => {
-        if (response.insertId !== undefined) {
-            res.status(201).send(response)
-        }
-        else {
-            res.status(400);
-        }
-    })
+    return db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.status(400));
+});
+
+
+/**
+ * Changes the information of an Event
+ * body:
+ * {
+ *     event: Event
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.put('/auth/event/:eventId', (req, res) => {
+    db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
 /**
- * 
+ * Creates a Gig
+ * body:
+ * {
+ *     gig: Gig
+ * }
+ *
+ * @return {json} {jwt: token}
  */
 app.post("/gig", (req, res) => {
     console.log("POST-request received from client");
-    db.createGig(req.body).then(response => {
-        if (response) {
-            res.status(201).send(response)
-        } else {
-            res.status(400);
-        }
-    });
+    db.addGig(req.body).then(response => response ? res.status(201).send(response) : res.status(400));
 });
 
 /**
