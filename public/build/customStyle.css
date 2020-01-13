@@ -6,5 +6,15 @@
     background-position: center;
     background-repeat: no-repeat;
     color: white;
+}
 
+.error {
+    position: relative;
+    animation: shake .1s linear;
+    animation-iteration-count: 3;
+}
+
+@keyframes shake {
+    0% { left: -5px; }
+    100% { right: -5px; }
 }
