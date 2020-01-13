@@ -15,6 +15,8 @@ import {addEvent} from '../src/components/createevent.js';
 import {HomePage} from "./components/homepage";
 import{EventPage} from "./components/eventpage";
 import AuthService from "./AuthService";
+import {EditEvent} from "./components/editevent";
+import {AddEvent} from "./components/createevent";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -31,12 +33,10 @@ if (root)
         <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
         <Route exact path="/logg-inn" component={LoginForm} />
-        <Route exact path="/opprett-arrangement" component={addEvent} />
         <Route exact path="/hjem" component={HomePage} />
         <Route exact path="/arrangement/:id" component={EventPage} />
-
-
-
+        <Route exact path="/opprett-arrangement" component={AddEvent} />
+        <Route exact path="/endre-arrangement" component={EditEvent} />
 
     </div>
     </BrowserRouter>,
