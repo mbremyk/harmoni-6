@@ -32,7 +32,8 @@
     "mysql": "^2.17.1",
     "bcryptjs": "^2.4.3",
     "is-ci": "latest",
-    "jsonwebtoken": "latest"
+    "jsonwebtoken": "latest",
+    "moment": "latest"
   },
   "devDependencies": {
     "babel-jest": "^24.9.0",

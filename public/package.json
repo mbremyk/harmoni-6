@@ -21,6 +21,7 @@
     "react-bootstrap": "^1.0.0-beta.16",
     "react-date-picker": "^7.10.0",
     "react-datetime-picker": "^2.9.0",
+    "react-router": "^5.1.2",
     "react-scripts": "^3.3.0",
     "react-simplified": "^1.6.1",
     "react-time-picker": "^3.9.0",
