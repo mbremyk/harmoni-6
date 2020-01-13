@@ -92,7 +92,7 @@ app.get("/events", (req, res) => {
     });
 });
 
-app.post("/event", (req, res) =>{
+app.post("/events", (req, res) =>{
    console.log("POST-request received from client");
    return db.createEvent(req.body).then(response => {
        if (response.insertId !== undefined) {
@@ -332,6 +332,7 @@ app.post("/auth/logout", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
+    res.sendStatus(201);
 });
 
 /**
@@ -361,7 +362,7 @@ app.get("/auth/events/user/:userId", (req, res) => {
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
     console.log(decoded);
-    if (decoded.userId == req.params.userId) {
+    if (decoded.userId === req.params.userId) {
         return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
             .catch(error => console.error(error));

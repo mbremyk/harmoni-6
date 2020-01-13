@@ -57,7 +57,19 @@ export class CreateUserForm extends Component{
 
 		// check password mismatch
 		if(this.state.password1 !== this.state.password2) {
-			alert('Passordene stemmer ikke');
+			console.log('Password mismatch');
+
+			var field1 = document.getElementById('formBasicPassword1');
+			var field2 = document.getElementById('formBasicPassword2');
+
+			field1.classList.add('error');
+			field2.classList.add('error');
+
+			setTimeout(function() {
+				field1.classList.remove('error');
+				field2.classList.remove('error');
+			}, 300);
+
 			return;
 		}
 
