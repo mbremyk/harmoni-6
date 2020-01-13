@@ -1,7 +1,7 @@
 import { service } from "./services"
 import decode from 'jwt-decode';
 
-class AuthService {
+export class AuthService {
 
 	// Initializing important variables
 	constructor() {

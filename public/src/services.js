@@ -116,9 +116,9 @@ class Services
 		return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
 	}
 
-	getEventsByOrganizer(organizerId)
+	getEventsByOrganizer(userId)
 	{
-		return axios.get(url + '/events/' + organizerId).then(response => response.data);
+		return axios.get(url + '/auth/events/user/' + userId).then(response => response.data);
 	}
 
 	getEventByEventId(eventId)
