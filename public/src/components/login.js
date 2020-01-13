@@ -7,7 +7,7 @@ import NavLink from "react-bootstrap/NavLink";
 import {service} from "../services";
 import {authService} from "../AuthService";
 
-export class LoginForm extends Component{
+export class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {

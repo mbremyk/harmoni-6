@@ -24,7 +24,7 @@ export class navbar extends Component {
                                 <Nav.Link href="/hjem">Hjem</Nav.Link>
                                 <Nav.Link href="/opprett-arrangement">Opprett arrangement</Nav.Link>
                                 <Nav.Link href="/min-side">Min side</Nav.Link>
-                                <Nav.Link href="/logg-inn">Logg inn</Nav.Link>
+                                <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
                             </Nav>
                             <Form inline>
                                 <FormControl type="text" placeholder="Søk" className="mr-sm-2" onKeyPress={event => {

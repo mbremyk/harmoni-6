@@ -1,5 +1,6 @@
 //const axios = require('axios');
 import axios from 'axios'
+import AuthService from './AuthService'
 
 var url = '';
 if(window.location.href.includes('localhost')){
@@ -48,6 +49,11 @@ class Services
 		return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
 	}
 
+	logout()
+	{
+		return axios.post(url + '/logout', {}, {headers: {'x-access-token': AuthService.getToken()}})
+	}
+
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
@@ -61,11 +67,6 @@ class Services
 	getTicketToEvent(eventId)
 	{
 		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
-	}
-
-	getAccessToken(email, hashedPassword)
-	{
-		return axios.post(url + '/accesstoken/',{email: email, hashedPassword: hashedPassword}).then(response => response.data);
 	}
 
 	searchForEvents(input)

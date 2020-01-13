@@ -27,7 +27,8 @@ if (root)
         <Route exact path="/" component={LandingPage}/>
         <Route exact path="/ny-bruker" component={CreateUserForm} />
         <Route exact path="/min-side" component={myPage}/>
-        <Route exact path="/logg-inn" component={LoginForm} />
+        <Route exact path="/logg-inn" component={LoginForm}/>
+        <Route exact path="/logg-ut" component={Logout}/>
         <Route exact path="/opprett-arrangement" component={addEvent} />
     </div>
     </BrowserRouter>,
