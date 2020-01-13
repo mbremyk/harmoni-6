@@ -52,11 +52,38 @@ setInterval(() => {
     })
 }, 60 * 60 * 1000);
 
+/**
+ * Creates a token based on the specified user information
+ *
+ * @param user JSON object containing user information, usually fetched from database
+ * @returns {string} token
+ */
 function getToken(user) {
     return jwt.sign(user, privateKey, {
         expiresIn: 1800
     });
 }
+
+/**
+ * Endpoints:
+ * get /test
+ * get /users
+ * get /users/:userId
+ * get /events
+ * get /events/search/:searchText
+ * get /events/eventDetails/:eventId
+ * get /tickets/:eventId
+ * post /users
+ * post /events
+ * post /gig
+ * post /login
+ * use /auth
+ * get /auth/users/:userId
+ * get /auth/events/users/:userId
+ * post /auth/refresh
+ * post /auth/logout
+ * put /auth/user/:userId
+ */
 
 /**
  * Test endpoint. Use at own risk
@@ -102,8 +129,8 @@ app.get("/users/:userId", (req, res) => {
  *     eventName: string
  *     address: string
  *     ageLimit: int
- *     startTime: Date, yyyy-MM-dd hh-mm-ss
- *     endTime: Date, yyyy-MM-dd hh-mm-ss
+ *     startTime: Date, dd/MM/YYYY hh:mm
+ *     endTime: Date, dd/MM/YYYY hh:mm
  *     imageUrl: string
  *     image: Blob
  *     description: Text
@@ -146,7 +173,7 @@ app.get("/events/search/:searchText", (req, res) => {
     });
 });
 
-app.get("/events/eventdetails/:eventId", (req, res) => {
+app.get("/events/eventDetails/:eventId", (req, res) => {
     console.log("GET-request received from client");
     return db.getEventByEventId(req.params.eventId).then(events => {
         if (events !== null) {
@@ -175,7 +202,7 @@ app.get("/tickets/:eventId", (req, res) => {
  *     email: string
  * }
  */
-app.post("/user", (req, res) => {
+app.post("/users", (req, res) => {
     return db.getUserByEmailOrUsername(req.body.email, req.body.username)
         .then(user => {
             if (user) {
@@ -226,7 +253,7 @@ app.put('/auth/event/:eventId', (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.post("/gig", (req, res) => {
+app.post("/gigs", (req, res) => {
     console.log("POST-request received from client");
     db.addGig(req.body).then(response => response ? res.status(201).send(response) : res.status(400));
 });
@@ -300,7 +327,7 @@ app.use("/auth", (req, res, next) => {
  *     email: string
  * }
  */
-app.get("/auth/user/:userId", (req, res) => {
+app.get("/auth/users/:userId", (req, res) => {
     console.log("GET-request received from client");
     return db.getUserByEmail(req.params.userId, req.body.email)
         .then(user => res.send(user))
@@ -370,7 +397,7 @@ app.post("/auth/logout", (req, res) => {
  *     newEmail: string
  * }
  */
-app.put("/auth/user/:userId", (req, res) => {
+app.put("/auth/users/:userId", (req, res) => {
     console.log("PUT-request received from client");
 
     return db.updateUser(req.body)
