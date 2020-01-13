@@ -70,17 +70,19 @@ class Services
 
 	searchForEvents(input)
 	{
-		return axios.get('/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+		return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
 	}
 
 	getEventsByOrganizer(organizerId)
 	{
-		return axios.get('/events/' + organizerId).then(response => response.data);
+		return axios.get(url + '/events/' + organizerId).then(response => response.data);
 	}
 
 	getEventByEventId(eventId)
 	{
-		return axios.get('/events/eventdetails/' + eventId).then(response => response.data);
+		console.log('Axios get event by id kjørt!');
+		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+
 	}
 
 

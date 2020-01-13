@@ -19,30 +19,32 @@ export class EventPage extends Component
 		}
 	}
 
-	event;
+	e = new Event();
 
 	render()
+
 	{
+		if (!this.e) return null;
 		return (
 
 
 
 			<Container>
 
-						<Image src={this.event.imageUrl} height="auto" width="100%"/>
+						<Image src={this.e.imageUrl} height="auto" width="100%"/>
 
 				<Row>
 					<Col>
-						<h1>{this.event.eventName}</h1>
+						<h1>{this.e.eventName}</h1>
 					</Col>
 				</Row>
 				<Row>
 					<Col md={4}>
-						<h4>fra {this.event.startTime} til {this.event.endTime}</h4>
+						<h4>fra {this.e.startTime} til {this.e.endTime}</h4>
 					</Col>
 
 					<Col md={{offset: 6}}>
-						<h4>Aldersgrense {this.event.ageLimit}</h4>
+						<h4>Aldersgrense {this.e.ageLimit}</h4>
 					</Col>
 
 
@@ -50,7 +52,7 @@ export class EventPage extends Component
 
 				<Row>
 					<Col>
-					<h2>{this.event.address}</h2>
+					<h2>{this.e.address}</h2>
 					</Col>
 				</Row>
 				<Row>
@@ -61,7 +63,7 @@ export class EventPage extends Component
 
 				<Row>
 					<Col>
-					<p>{this.event.description}</p>
+					<p>{this.e.description}</p>
 					</Col>
 				</Row>
 
@@ -71,14 +73,18 @@ export class EventPage extends Component
 
 
 		);
+		}
 
-	}
+
 	mounted()
 	{
+
 		service
 			.getEventByEventId(this.props.match.params.id)
-			.then(event => (this.event = event))
+			.then(e => (this.e = e))
 			.catch((error) => console.log(error));
+		console.log(this.e.ageLimit)
+
 
 	}
 }
