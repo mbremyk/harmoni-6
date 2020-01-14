@@ -1,42 +1,32 @@
 const Sequelize = require('sequelize');
 const isCI = require('is-ci');
-const properties = require(isCI ? './testProperties.js' : './properties.js');
+const properties = (isCI ? null : require('./properties.js'));
 const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
 moment.locale('nb');
 
+
 function init() {
     if (isCI) {
         console.log("CI");
-        let sequelize = new Sequelize('School', 'root', '', {
-            host: 'mysql',
-            dialect: 'mysql'
-        });
-        return sequelize;
+        return new Sequelize('School', 'root', '', {host: 'mysql', dialect: 'mysql'});
     } else {
         let pr = test ? new properties.TestProperties() : new properties.Properties();
-        console.log(pr.databaseUser);
-        let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-            host: pr.databaseURL,
-            dialect: pr.dialect,
-            dialectOptions: {
-                dateStrings: true,
-            },
-            pool: {
-                max: 10,
-                min: 0,
-                idle: 10000
-            },
-            logging: false
-        });
-        return sequelize;
+        console.log('Connected to db: ' + pr.databaseUser);
+        return new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword,
+            {
+                host: pr.databaseURL,
+                dialect: pr.dialect,
+                dialectOptions: {dateStrings: true,},
+                pool: {max: 10, min: 0, idle: 10000},
+                logging: false
+            });
     }
 }
 
 let sequelize = init();
 
-sequelize
-    .authenticate()
+sequelize.authenticate()
     .then(() => {
         console.log('Connection has been established successfully.');
     })
@@ -51,7 +41,6 @@ sequelize
     salt;
     email;
 };*/
-
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     username: {type: Sequelize.STRING, unique: true, allowNull: false},
@@ -62,6 +51,11 @@ let UserModel = sequelize.define('user', {
     timestamps: true
 });
 
+
+/*class File {
+    fileId;
+    path;
+ */
 let FileModel = sequelize.define('file', {
     fileId: {
         type: Sequelize.INTEGER,
@@ -70,26 +64,6 @@ let FileModel = sequelize.define('file', {
     path: Sequelize.STRING
 });
 
-/*
-let FileAccessModel = sequelize.define('fileAccess', {
-    fileId: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        references: {
-            model: FileModel,
-            key: 'fileId'
-        }
-    },
-    userId: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        references: {
-            model: UserModel,
-            key: 'userId'
-        }
-    }
-});
-*/
 
 /*class Event {
     eventId;
@@ -100,7 +74,6 @@ let FileAccessModel = sequelize.define('fileAccess', {
     dateTime;
     description;
 }*/
-
 let EventModel = sequelize.define('event', {
     eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     organizerId: {
@@ -114,15 +87,17 @@ let EventModel = sequelize.define('event', {
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
     startTime: {
-        type:Sequelize.DATE,
-        get(){
+        type: Sequelize.DATE,
+        get() {
             return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    endTime: {type:Sequelize.DATE,
-        get(){
+    endTime: {
+        type: Sequelize.DATE,
+        get() {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
-        }},
+        }
+    },
     imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
     description: Sequelize.TEXT,
@@ -186,6 +161,7 @@ let TicketModel = sequelize.define('ticket', {
 /*class Personnel {
     personnelId;
     eventId;
+    role;
 }*/
 
 let PersonnelModel = sequelize.define('personnel', {
