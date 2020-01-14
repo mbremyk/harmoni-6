@@ -3,8 +3,10 @@ import {Component} from "react-simplified";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {Services} from "../services";
+import {service} from "../services";
 import {authService} from "../AuthService";
+import * as jwt from "jsonwebtoken";
+
 
 
 /*
@@ -14,11 +16,11 @@ export class myPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: "Navn Navnesen",
-            email: "epost@epost.no",
-            password: "",
-            newpass: "",
-            repnewpass: ""
+            username: '',
+            email: '',
+            newemail: '',
+            newpass: '',
+            repnewpass: ''
         }
     }
     render() {
@@ -36,11 +38,6 @@ export class myPage extends Component {
                         <Form.Control autocomplete="email" value={this.state.email} onChange={this.handleEmailChange}>
                         </Form.Control>
                     </Form.Group>
-                    <Form.Group controlId="formBasicPassword">
-                        <Form.Label>Passord</Form.Label>
-                        <text className="text-danger"> *</text>
-                        <Form.Control autocomplete="current-password"  type="password" autocom placeholder="Passord" value={this.state.password} onChange={this.handlePasswordChange}  />
-                    </Form.Group>
                     <Form.Group controlId="formNewPassword">
                         <Form.Label>Nytt passord</Form.Label>
                         <Form.Control autocomplete="new-password" type="password" placeholder="Nytt passord" value={this.state.newpass} onChange={this.handleNewPasswordChange} />
@@ -57,25 +54,33 @@ export class myPage extends Component {
         );
     }
     mounted() {
-        //authService.refresh().then(res => console.log('Refresh: ' + res));
+        if(authService.loggedIn()) {
+            console.log("I am logged in");
+            let token = jwt.decode(authService.getToken());
+            this.setState({
+                username: token.username,
+                email: token.email
+            });
+            console.log(jwt.decode(authService.getToken()));
+        } else {
+            console.log("Not logged in");
+            this.props.history.push('/logg-inn');
+        }
+
     }
     save() {
-        if (this.state.password === "123") {
-            if (this.state.newpass === "" && this.state.repnewpass === "") {
-                alert("Saved. Name: " + this.state.name + " Email: " + this.state.email);
-            } else if (this.state.newpass === this.state.repnewpass) {
+        if (this.state.newpass === "" && this.state.repnewpass === "") {
+            alert("Saved. Name: " + this.state.name + " Email: " + this.state.email);
+        } else if (this.state.newpass === this.state.repnewpass) {
                 alert("password changed to: " + this.state.newpass);
             }
-        }
+        service.getUser(authService.getToken().id)
     }
     handleUsernameChange(event) {
         this.setState({username: event.target.value});
     }
     handleEmailChange(event) {
         this.setState({email: event.target.value});
-    }
-    handlePasswordChange(event) {
-        this.setState({password: event.target.value});
     }
     handleNewPasswordChange(event) {
         this.setState({newpass: event.target.value});

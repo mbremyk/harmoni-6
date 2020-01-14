@@ -2,128 +2,132 @@ import axios from 'axios'
 import {authService} from './AuthService'
 
 var url = '';
-if(window.location.href.includes('localhost')){
-	url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
-}else{
-	url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
+if (window.location.href.includes('localhost')) {
+    url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
+} else {
+    url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
 
-export class User
-{
-	userId;
-	username;
-	password;
-	salt;
-	email;
+export class User {
+    userId;
+    username;
+    password;
+    salt;
+    email;
 }
 
-export class Event
-{
-	eventId;
-	organizerId;
-	eventName;
-	address;
-	ageLimit;
-	startTime;
-	endTime;
-	imageUrl;
-	image;
-	description;
+export class Event {
+    eventId;
+    organizerId;
+    eventName;
+    address;
+    ageLimit;
+    startTime;
+    endTime;
+    imageUrl;
+    image;
+    description;
 
 }
 
 export class Gig {
 
-	artistId;
-	eventId;
-	rider;
-	contract;
+    artistId;
+    eventId;
+    rider;
+    contract;
 
-	constructor(artistId, eventId, rider, contract) {
-		this.artistId = artistId;
-		this.eventId = eventId;
-		this.rider = rider;
-		this.contract = contract;
-	}
+    constructor(artistId, eventId, rider, contract) {
+        this.artistId = artistId;
+        this.eventId = eventId;
+        this.rider = rider;
+        this.contract = contract;
+    }
 }
 
-export class Ticket
-{
+export class Ticket {
     eventId;
     type;
     price;
     amount;
 }
 
-class Services
-{
-	login(email, password)
-	{
-		return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
-	}
+class Services {
+    login(email, password) {
+        return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
+    }
 
-	logout()
-	{
-		return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
-	}
+    logout() {
+        return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
+    }
 
-	refreshToken()
-	{
+    createUser(user) {
+        return axios.post(url + '/user', user).then(response => response.data);
+    }
+
+	refreshToken() {
 		return axios.post(url + '/auth/refresh', {}, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
 	}
 
-	createUser(user)
-	{
-		return axios.post(url + '/user', user).then(response => response.data);
-	}
 
-	getUsers()
-	{
-		return axios.get(url + '/users').then(response => response.data);
-	}
+    getUsers() {
+        return axios.get(url + '/users').then(response => response.data);
+    }
 
-	getUser(id)
-	{
-		return axios.get(url + '/users/' + id).then(response => response.data);
-	}
+    getUser(id) {
+        return axios.get(url + '/users/' + id).then(response => response.data);
+    }
 
-	getEvents()
-	{
-		return axios.get(url + '/events').then(response => response.data);
-	}
+    getEvents() {
+        return axios.get(url + '/events').then(response => response.data);
+    }
 
-	createEvent(event)
-	{
-		return axios.post(url + '/events', event).then(response => response.insertId);
-	}
+    createEvent(event) {
+        return axios.post(url + '/events', event).then(response => response.insertId);
+    }
 
-	createGig(gig)
-	{
-		return axios.post(url + '/gig', gig).then(response => response.data);
-	}
+    uploadContract(formData, event, artist) {
+        return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
+    }
 
-	getTicketToEvent(eventId)
-	{
-		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
-	}
+    /*downloadContract(event, artist)
+    {
+        //This approach to downloading the files does not work
+        //return axios.get(url+"/contract/"+event+"/"+artist).then(response => response);
+    }*/
 
-	searchForEvents(input)
-	{
-		return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
-	}
+    getAccessToken(email, hashedPassword) {
+        return axios.post(url + '/accesstoken/', {
+            email: email,
+            hashedPassword: hashedPassword
+        }).then(response => response.data);
+    }
 
-	getEventsByOrganizer(userId)
-	{
-		return axios.get(url + '/auth/events/user/' + userId).then(response => response.data);
-	}
+    createGig(gig) {
+        return axios.post(url + '/gig', gig).then(response => response.data);
+    }
 
-	getEventByEventId(eventId)
-	{
+    getTicketToEvent(eventId) {
+        return axios.get(url + '/tickets/' + eventId).then(response => response.data);
+    }
+
+    searchForEvents(input) {
+        return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+    }
+
+    getEventsByOrganizer(userId) {
+        return axios.get(url + '/auth/events/user/' + userId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
+    getEventByEventId(eventId) {
+        return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+    }
+
+	getEventByEventId(eventId) {
 		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
 	}
 
-	validateUsername(username)
-	{
+	validateUsername(username) {
 		return axios.get(url + '/validate/username/' + username).then(response => response.data);
 	}
 

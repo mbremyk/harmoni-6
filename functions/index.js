@@ -6,15 +6,36 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const hashPassword = require("./userhandling");
 let cors = require("cors");
-
+let fs = require("fs");
 
 //Express
 const express = require("express");
 const app = express();
+
+const {
+    fileParser
+} = require('express-multipart-file-parser');
+
+app.use(fileParser({
+    rawBodyOptions: {
+        limit: '15mb',  //file size limit
+    },
+    busboyOptions: {
+        limits: {
+            fields: 20   //Number text fields allowed
+        }
+    },
+}));
 app.use(cors({origin: true}));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+const path = require('path');
+
 const main = express();
 main.use('/api/v1', app);
-main.use(bodyParser.json());
+/*main.use(bodyParser.json());
+main.use(bodyParser.urlencoded({extended: true}));*/
 exports.webApi = functions.https.onRequest(main);
 
 //Sequelize
@@ -67,6 +88,34 @@ app.get("/test", (req, res) => {
 });
 
 /**
+ *
+ */
+app.get("/users", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getAllUsers().then(users => {
+        if (users !== null) {
+            res.status(201).send(users);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+/**
+ * Get one user by id
+ */
+app.get("/users/:userId", (req, res) => {
+    console.log("GET-request received from client for get one user by id");
+    return db.getUserById(req.params.userId).then(user => {
+        if (user !== null) {
+            res.status(201).send(user);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+/**
  * Get all events in database as an array
  * {
  *     eventId: int
@@ -104,19 +153,6 @@ app.post("/events", (req, res) =>{
    })
 });
 
-
-
-app.post("/gig", (req, res) => {
-    console.log("POST-request - /gig");
-    db.createGig(req.body).then(response => {
-        if (response) {
-            res.status(201).send(response)
-        } else {
-            res.status(400);
-        }
-    });
-});
-
 /**
  * Get all events where eventName or description contains searchText
  * {
@@ -142,6 +178,26 @@ app.get("/events/search/:searchText", (req, res) => {
             res.sendStatus(400);
         }
     });
+});
+
+app.get("/events/eventdetails/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getEventByEventId(req.params.eventId).then(events => {
+        if (events !== null) {
+            res.status(201).send(events);
+        } else {
+            res.sendStatus(400);
+        }
+    });
+});
+
+/**
+ * Get tickets for specific event
+ */
+app.get("/tickets/:eventId", (req, res) => {
+    console.log("GET-request received from client");
+    return db.getTicketsForEvent(req.params.eventId)
+        .then(tickets => res.status(201).send(tickets));
 });
 
 /**
@@ -174,35 +230,33 @@ app.post("/user", (req, res) => {
         });
 });
 
+/**
+ *
+ */
+app.post("/event", (req, res) =>{
+	console.log("POST-request received from client");
+	return db.createEvent(req.body).then(response => {
+		if (response.insertId !== undefined) {
+			res.status(201).send(response)
+		}
+		else {
+			res.status(400);
+		}
+	})
+});
 
 /**
  *
  */
-
-app.get("/users", (req, res) => {
-    console.log("GET-request - /users");
-    return db.getAllUsers().then(users => {
-        if (users !== null) {
-            res.status(201).send(users);
-        } else {
-            res.sendStatus(400);
-        }
-    });
-});
-
-
-/**
- * Get one user by id
- */
-app.get("/users/:userId", (req, res) => {
-    console.log("GET-request - /users/:userId");
-    return db.getUserById(req.params.userId).then(user => {
-        if (user !== null) {
-            res.status(201).send(user);
-        } else {
-            res.sendStatus(400);
-        }
-    });
+app.post("/gig", (req, res) => {
+	console.log("POST-request received from client");
+	db.createGig(req.body).then(response => {
+		if (response) {
+			res.status(201).send(response)
+		} else {
+			res.status(400);
+		}
+	});
 });
 
 /**
@@ -218,28 +272,84 @@ app.get("/users/:userId", (req, res) => {
 app.post("/login", (req, res) => {
     console.log("POST-request - /login");
 
-    return db.getSaltByEmail(req.body.email).then(salt => {
-        if (salt.length !== 1) {
-            res.sendStatus(401);
-            return;
-        }
-        hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
-            db.loginOk(req.body.email, credentials[0]).then(ok => {
-                if (ok) {
-                    db.getUserByEmail(req.body.email).then(user => {
-                        console.log(user.dataValues);
-                        let token = getToken(user.dataValues);
-                        res.json({jwt: token});
-                    })
-                } else {
-                    res.status(401);
-                    res.json({error: "Not authorized"})
-                }
-            });
-        })
-    });
+    return db.getSaltByEmail(req.body.email)
+            .then(salt => {
+            if (salt.length !== 1) {
+                res.sendStatus(401);
+                return;
+            }
+            hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+                db.loginOk(req.body.email, credentials[0]).then(ok => {
+                    if (ok) {
+                        db.getUserByEmail(req.body.email).then(user => {
+                            console.log(user.dataValues);
+                            let token = getToken(user.dataValues);
+                            res.json({jwt: token});
+                        })
+                    } else {
+                        res.status(401);
+                        res.json({error: "Not authorized"})
+                    }
+                });
+            })
+        });
 });
 
+app.post("/contract/:eventId/:artistId", (req, res) => {
+	console.log("Calling setContract");
+    const {
+        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        buffer,
+    } = req.files[0];
+    let file = req.files[0];
+    console.log(req.files[0].originalname);
+    console.log(req.files[0]);
+
+	fs.writeFile(`${__dirname}/uploads/`+file.originalname, file.buffer, (err) => {
+		if (err){
+			res.send(err);
+		}else{
+			console.log('The file has been saved!');
+			res.send("done");
+		}
+	});
+	//Todo set access here
+    /*db.setContract(req.body, req.params.eventId, req.params.artistId)
+		.then(() => res.send("Change made"));*/
+});
+
+
+app.get("/contract/:eventId/:artistId", (req, res) => {
+	console.log("downloading file");
+
+    //Todo check access here
+    /*db.getContract(req.params.eventId, req.params.artistId)
+        .then(result => {
+            res.send(JSON.stringify(result));
+            }
+        );*/
+
+	const file = `${__dirname}/uploads/nativelog.txt`;
+	res.download(file); // Set disposition and send it.
+});
+
+app.use("/auth", (req, res, next) => {
+    console.log("Authorization request received from client");
+    let token = req.headers["x-access-token"];
+    jwt.verify(token, publicKey, (err, decoded) => {
+        if (err || decoded.username !== req.body.username) {
+            console.log("Token not OK");
+            res.status(401);
+            res.json({error: "Not authorized"});
+        } else {
+            console.log("Token OK");
+            next();
+        }
+    });
+});
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:
@@ -282,12 +392,23 @@ app.get("/auth/user/:userId", (req, res) => {
 });
 
 /**
- * Get tickets for specific event
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
  */
-app.get("/tickets/:eventId", (req, res) => {
+app.get("/auth/events/user/:userId", (req, res) => {
     console.log("GET-request - /tickets/:eventId");
-    return db.getTicketsForEvent(req.params.eventId)
-        .then(tickets => res.status(201).send(tickets));
+    let token = req.headers['x-access-token'];
+    let decoded = jwt.decode(token);
+    console.log(decoded);
+    if (decoded.userId == req.params.userId) {
+        return db.getEventsByOrganizerId(decoded.userId)
+            .then(events => res.send(events))
+            .catch(error => console.error(error));
+    } else {
+        res.sendStatus(403);
+    }
 });
 
 /**
@@ -310,18 +431,6 @@ app.post("/auth/refresh", (req, res) => {
     });
 });
 
-app.get("/events/eventdetails/:eventId", (req, res) => {
-    console.log("GET-request - /events/eventdeteails/:eventId");
-    return db.getEventByEventId(req.params.eventId).then(events => {
-        if (events !== null) {
-            res.status(201).send(events);
-        } else {
-            res.sendStatus(400);
-        }
-    });
-});
-
-
 /**
  * Invalidates your access token
  * header:
@@ -334,7 +443,6 @@ app.post("/auth/logout", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
-    res.sendStatus(201);
 });
 
 /**
@@ -364,7 +472,7 @@ app.get("/auth/events/user/:userId", (req, res) => {
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
     console.log(decoded);
-    if (decoded.userId === req.params.userId) {
+    if (decoded.userId == req.params.userId) {
         return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
             .catch(error => console.error(error));
