@@ -379,6 +379,7 @@ app.use("/auth", (req, res, next) => {
     let token = req.headers["x-access-token"];
     jwt.verify(token, publicKey, (err, decoded) => {
         if (err || tokenIsBlacklisted(token)) {
+            console.log(req);
             console.log("Token not OK");
             res.status(401);
             res.json({error: "Not authorized"});
