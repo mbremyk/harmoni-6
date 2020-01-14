@@ -1,28 +1,22 @@
 const model = require('./model.js');
-const testData = require('./tests/testData.js');
 const Blob = require("cross-blob");
+const fs = require("fs");
+var FileReader = require('filereader');
 
-let GigModel = model.GigModel;
+//Todo: Convert and serve images to base64
+//Todo: Set read/write access in db
+//Todo: check read/write how?
 
-const testString = {hello: "world"};
-const testBlob = new Blob([JSON.stringify(testString, null, 2)], {type : 'application/json'});
 
-function setContract(dataBlob, gig) {
-    GigModel.findOne({where:{gigId: gig } })
-        .then(gig => {
-            gig.update({contract: datablob});
-        });
+function setContract(path, gig, artist) {
+
 }
 
 function getContract(concert){
-
 }
 
-function setRider(dataBlob, gig){
-    GigModel.findOne({where:{gigId: gig } })
-        .then(gig => {
-            gig.update({rider: datablob});
-        });
+function setRider(path, gig, artist){
+
 }
 
 function getRider(gig){
@@ -30,12 +24,39 @@ function getRider(gig){
 }
 
 function test() {
-    testData.syncTestData().then(() => {
-        setContract(testBlob, 1);
-        setRider(testBlob, 1);
+    console.log("running test");
+   // model.syncModels();
+   /*model.syncTestData().then(() => {
+        /*setContract(testBlob, 1, 1);
+        setRider(testBlob, 1, 1);
         }
     );
+    //let testBlob = fs.readFileSync(testfile, 'utf8');
+   // console.log(testBlob);*/
+
+    setContract(testString, 1, 1);
+    setRider(testString, 1, 1);
+
+    GigModel.findOne({where:{eventId: 1, artistId: 1 }})
+        .then(gig => {
+            //console.log(gig.rider);
+            console.log(gig.contract);
+            let reader = new FileReader();
+
+            reader.onload = function() {
+                console.log(reader.result);
+            }
+            console.log("result: "+gig.contract.toString());
+
+        }
+    );
+
 }
 
-test();
+module.exports = {getContract, getRider, setRider, setContract};
+    //new File(new Blob(["test"], {type : 'text'}), "test");
+//setContract(new ArrayBuffer(8), 1, 1);
+//data.append('file', new File(new Blob(["test"], {type : 'text'}), "test"));
+//test();
+
 

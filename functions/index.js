@@ -33,7 +33,8 @@ const path = require('path');
 
 const main = express();
 main.use('/api/v1', app);
-main.use(bodyParser.json());
+/*main.use(bodyParser.json());
+main.use(bodyParser.urlencoded({extended: true}));*/
 exports.webApi = functions.https.onRequest(main);
 
 //Sequelize
@@ -365,7 +366,6 @@ app.use("/auth", (req, res, next) => {
     let token = req.headers["x-access-token"];
     jwt.verify(token, publicKey, (err, decoded) => {
         if (err || tokenIsBlacklisted(token)) {
-            console.log(req);
             console.log("Token not OK");
             res.status(401);
             res.json({error: "Not authorized"});
@@ -446,8 +446,6 @@ app.post("/auth/logout", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
-
-    console.log(jwtBlacklist.length);
 
     res.sendStatus(201);
 });

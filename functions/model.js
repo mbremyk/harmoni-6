@@ -17,6 +17,7 @@ function init() {
         let test = (process.env.NODE_ENV === 'test');
         let pr = test ? new properties.TestProperties() : new properties.Properties();
         console.log(pr.databaseUser);
+        console.log(pr.databaseUser);
         let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
             host: pr.databaseURL,
             dialect: pr.dialect,

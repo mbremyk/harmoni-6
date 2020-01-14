@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 
 export class HomePage extends Component {
     myEvents = [];
-    otherEvents = [];
+    allEvents = [];
 
 
     /*
@@ -54,6 +54,7 @@ export class HomePage extends Component {
                             start_date={event.startTime}
                             end_date={event.endTime}
                             uploaded={event.createdAt}
+							myEvent = {true}
 
                         />
                     ))}
@@ -66,7 +67,10 @@ export class HomePage extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    {this.otherEvents.map(event => (
+                    {this.getOtherEvents().map(event =>
+
+
+
                         <EventInfo
 
                             link={event.eventId}
@@ -77,9 +81,10 @@ export class HomePage extends Component {
                             start_date={event.startTime}
                             end_date={event.endTime}
                             uploaded={event.createdAt}
+							myEvent={false}
 
                         />
-                    ))}
+                    )}
                 </Row>
 
 
@@ -99,7 +104,6 @@ export class HomePage extends Component {
 			.catch((error) => console.log(error));
 
 		this.getAllEvents()
-
 
 
 

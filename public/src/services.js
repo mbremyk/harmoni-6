@@ -62,10 +62,9 @@ class Services {
         return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
     }
 
-	createUser(user)
-	{
-		return axios.post(url + '/users', user).then(response => response.data);
-	}
+    createUser(user) {
+        return axios.post(url + '/users', user).then(response => response.data);
+    }
 
     getUsers() {
         return axios.get(url + '/users').then(response => response.data);
@@ -108,20 +107,17 @@ class Services {
         return axios.get(url + '/tickets/' + eventId).then(response => response.data);
     }
 
-	searchForEvents(input)
-	{
-		return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
-	}
+    searchForEvents(input) {
+        return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+    }
 
-	getEventsByOrganizer(userId)
-	{
-		return axios.get(url + '/auth/events/users/' + userId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
-	}
+    getEventsByOrganizer(userId) {
+        return axios.get(url + '/auth/events/users/' + userId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
 
-	getEventByEventId(eventId)
-	{
-		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
-	}
+    getEventByEventId(eventId) {
+        return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
+    }
 }
 
 export let service = new Services();
