@@ -126,7 +126,7 @@ class Services {
     }
 
 	getEventByEventId(eventId) {
-		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
 	}
 
 	validateUsername(username) {

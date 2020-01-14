@@ -105,7 +105,7 @@ function getToken(user) {
  * post /gig
  * post /login
  *
- * put /auth/event/:eventId
+ * put /auth/events/:eventId
  *
  *          PERSONNEL
  * post /events/:eventId/personnel
@@ -271,7 +271,7 @@ app.post("/events/:eventId/tickets", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.put('/event/:eventId/tickets', (req, res) => {
+app.put('/events/:eventId/tickets', (req, res) => {
     db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
@@ -286,7 +286,7 @@ app.put('/event/:eventId/tickets', (req, res) => {
  *      amount: number
  *  }
  */
-app.get("/event/:eventId/tickets", (req, res) => {
+app.get("/events/:eventId/tickets", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     db.getTickets(eventId).then(tickets => (tickets !== null) ? res.status(201).send(tickets) : res.sendStatus(400));
 });
@@ -304,7 +304,7 @@ app.get("/event/:eventId/tickets", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.delete('/event/:eventId/tickets', (req, res) => {
+app.delete('/events/:eventId/tickets', (req, res) => {
     db.removeTicket(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
@@ -336,7 +336,7 @@ app.post("/events/:eventId/personnel", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.put('/event/:eventId/personnel', (req, res) => {
+app.put('/events/:eventId/personnel', (req, res) => {
     db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
@@ -349,7 +349,7 @@ app.put('/event/:eventId/personnel', (req, res) => {
  *      role: string
  *  }
  */
-app.get("/event/:eventId/personnel", (req, res) => {
+app.get("/events/:eventId/personnel", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(400));
 });
@@ -365,7 +365,7 @@ app.get("/event/:eventId/personnel", (req, res) => {
  *      rider: int
  *  }
  */
-app.get("/event/:eventId/gig", (req, res) => {
+app.get("/events/:eventId/gig", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
@@ -382,7 +382,7 @@ app.get("/event/:eventId/gig", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.delete('/event/:eventId/tickets', (req, res) => {
+app.delete('/events/:eventId/tickets', (req, res) => {
     db.removePersonnel(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
@@ -396,7 +396,7 @@ app.delete('/event/:eventId/tickets', (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.put('/auth/event/:eventId', (req, res) => {
+app.put('/auth/events/:eventId', (req, res) => {
     db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
@@ -409,7 +409,7 @@ app.put('/auth/event/:eventId', (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.put('/auth/event/:eventId', (req, res) => {
+app.put('/auth/events/:eventId', (req, res) => {
     db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
@@ -587,7 +587,7 @@ app.post("/auth/refresh", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
-    db.getUserByEmail(req.body.email).then(user => {
+    return db.getUserByEmail(req.body.email).then(user => {
         let token = getToken(user[0].dataValues);
         res.json({jwt: token});
     });
@@ -606,7 +606,7 @@ app.post("/auth/logout", (req, res) => {
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
 
-    res.sendStatus(201);
+    return res.sendStatus(201);
 });
 
 /**
