@@ -42,7 +42,7 @@ if (root)
                 <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
                 <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
                 <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
-                <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
+                <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
                 <Route exact path="/Upload" component={UploadWidget}/>
                 <Route exact path="/Upload" component={DownloadWidget}/>
             </div>
