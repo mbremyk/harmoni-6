@@ -5,7 +5,6 @@ const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
 moment.locale('nb');
 
-
 function init() {
     if (isCI) {
         console.log("CI");
@@ -41,6 +40,7 @@ sequelize.authenticate()
     salt;
     email;
 };*/
+
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     username: {type: Sequelize.STRING, unique: true, allowNull: false},
@@ -55,7 +55,9 @@ let UserModel = sequelize.define('user', {
 /*class File {
     fileId;
     path;
+}
  */
+
 let FileModel = sequelize.define('file', {
     fileId: {
         type: Sequelize.INTEGER,
@@ -64,6 +66,26 @@ let FileModel = sequelize.define('file', {
     path: Sequelize.STRING
 });
 
+/*
+let FileAccessModel = sequelize.define('fileAccess', {
+    fileId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: FileModel,
+            key: 'fileId'
+        }
+    },
+    userId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        }
+    }
+});
+*/
 
 /*class Event {
     eventId;
@@ -74,6 +96,7 @@ let FileModel = sequelize.define('file', {
     dateTime;
     description;
 }*/
+
 let EventModel = sequelize.define('event', {
     eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     organizerId: {
@@ -183,6 +206,21 @@ let PersonnelModel = sequelize.define('personnel', {
     },
     role: Sequelize.STRING
 }, {tableName: 'personnel'});
+
+UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
+EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
+
+UserModel.hasMany(GigModel, {foreignKey: 'artistId'});
+GigModel.belongsTo(UserModel, {foreignKey: 'artistId'});
+
+EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
+GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+FileModel.hasOne(GigModel, {foreignKey: 'contract'});
+GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
+
+FileModel.hasOne(GigModel, {foreignKey: 'rider'});
+GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 

@@ -26,8 +26,8 @@ class Dao {
     }
 
     /**
-     * creates a new User in the Database, returs true if user was
-     * created successfully and false, if somethng went wrong
+     * creates a new User in the Database, returns true if user was
+     * created successfully and false, if something went wrong
      *
      * @param user
      * @returns {Promise<boolean>}
@@ -293,7 +293,7 @@ class Dao {
      * @param gig
      * @returns {Promise<boolean>}
      */
-    addGig(gig) {
+    createGig(gig) {
         return model.GigModel.create(
             {
                 artistId: gig.artistId,
