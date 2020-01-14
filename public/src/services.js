@@ -117,6 +117,16 @@ class Services
 	{
 		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
 	}
+
+	getPersonellForEvent(eventId)
+	{
+		return axios.get(url + '/event/' + eventId + '/personnel').then(response => response.data);
+	}
+
+	getGigForEvent(eventId)
+	{
+		//return axios.get(url + '')
+	}
 }
 
 export let service = new Services();

@@ -11,15 +11,8 @@ import {Event, service, Ticket} from '../services';
 
 export class EventPage extends Component
 {
-	constructor(props){
-		super(props);
-
-		this.state = {
-			id : this.props.match.params.id
-		}
-	}
-
 	e = new Event();
+	personell = [];
 
 	render()
 
@@ -31,7 +24,7 @@ export class EventPage extends Component
 
 			<Container>
 
-						<Image src={this.e.imageUrl} height="auto" width="100%"/>
+				<Image src={this.e.imageUrl} height="auto" width="100%"/>
 
 				<Row>
 					<Col>
@@ -52,7 +45,7 @@ export class EventPage extends Component
 
 				<Row>
 					<Col>
-					<h2>{this.e.address}</h2>
+						<h2>{this.e.address}</h2>
 					</Col>
 				</Row>
 				<Row>
@@ -63,17 +56,16 @@ export class EventPage extends Component
 
 				<Row>
 					<Col>
-					<p>{this.e.description}</p>
+						<p>{this.e.description}</p>
 					</Col>
 				</Row>
-
 
 
 			</Container>
 
 
 		);
-		}
+	}
 
 
 	mounted()
@@ -83,9 +75,23 @@ export class EventPage extends Component
 			.getEventByEventId(this.props.match.params.id)
 			.then(e => (this.e = e))
 			.catch((error) => console.log(error));
-		console.log(this.e.ageLimit)
 
 
 	}
+
+	getPersonellForEvent()
+	{
+		service
+			.getPersonellForEvent(this.props.match.params.id)
+			.then(personell => (this.personell = personell))
+			.catch((error) => console.log(error));
+
+	}
+
+	getArtistsForEvent()
+	{
+		//TODO
+	}   
+
 }
 
