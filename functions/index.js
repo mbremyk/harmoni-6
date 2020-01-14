@@ -402,21 +402,6 @@ app.put('/auth/events/:eventId', (req, res) => {
 });
 
 /**
- * Changes the information of an Event
- * body:
- * {
- *     event: Event
- * }
- *
- * @return {json} {jwt: token}
- */
-
-app.put('/auth/events', (req, res) => {
-    console.log("PUT-request - /auth/events");
-    return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
-});
-
-/**
  * Creates a Gig
  * body:
  * {
