@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
-const properties = require('./properties.js');
 const isCI = require('is-ci');
+const properties = require(isCI ? './testProperties.js' : './properties.js');
 const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
 moment.locale('nb');
@@ -14,7 +14,6 @@ function init() {
         });
         return sequelize;
     } else {
-        let test = (process.env.NODE_ENV === 'test');
         let pr = test ? new properties.TestProperties() : new properties.Properties();
         console.log(pr.databaseUser);
         let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
@@ -71,7 +70,8 @@ let FileModel = sequelize.define('file', {
     path: Sequelize.STRING
 });
 
-/*let FileAccessModel = sequelize.define('fileAccess', {
+/*
+let FileAccessModel = sequelize.define('fileAccess', {
     fileId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -88,7 +88,8 @@ let FileModel = sequelize.define('file', {
             key: 'userId'
         }
     }
-});*/
+});
+*/
 
 /*class Event {
     eventId;
@@ -113,15 +114,17 @@ let EventModel = sequelize.define('event', {
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
     startTime: {
-        type:Sequelize.DATE,
-        get(){
+        type: Sequelize.DATE,
+        get() {
             return moment(this.getDataValue('startTime')).format('DD-MM-YYYY HH:mm');
         }
     },
-    endTime: {type:Sequelize.DATE,
-        get(){
+    endTime: {
+        type: Sequelize.DATE,
+        get() {
             return moment(this.getDataValue('endTime')).format('DD-MM-YYYY HH:mm');
-        }},
+        }
+    },
     imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
     description: Sequelize.TEXT,
