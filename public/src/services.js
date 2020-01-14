@@ -61,6 +61,13 @@ export class Personnel
 	personnelId;
 	eventId;
 	role;
+
+	constructor(personnelId, eventId, role){
+		this.personnelId = personnelId;
+		this.eventId = eventId;
+		this.role = role;
+	}
+
 }
 
 class Services
@@ -97,7 +104,7 @@ class Services
 
 	createEvent(event)
 	{
-		return axios.post(url + '/auth/events', event).then(response => response.insertId);
+		return axios.post(url + '/auth/events', event).then(response => response);
 	}
 
 	createGig(gig)
@@ -105,9 +112,9 @@ class Services
 		return axios.post(url + '/gigs', gig).then(response => response.data);
 	}
 
-	createPersonnel(personnel, id)
+	createPersonnel(personnel, eventId)
 	{
-		return axios.post(url + '/event' + id + '/personell', personnel).then(response => response.data);
+		return axios.post(url + '/event/' + eventId + '/personell', personnel).then(response => response.data);
 	}
 
 	getPersonnel(id)

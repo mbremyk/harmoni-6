@@ -169,8 +169,14 @@ export class AddEvent extends Component{
 
         service.createEvent(ev)
             .then(updated =>
+            {
                 this.state.artistsAdd.map(artist =>
-                    (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))
+                    (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))));
+                this.state.personnelAdd.map( personnel =>
+                    service.createPersonnel(new Personnel(updated.insertId, personnel.userId, personnel.role), updated.insertId));
+
+            }
+
             ).then(() => this.props.history.push("/opprett-arrangement"))
         .catch(err => alert('En feil oppsto!' + err.message))
     }
