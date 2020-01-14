@@ -135,7 +135,7 @@ class Services {
     }
 
     getPersonellForEvent(eventId) {
-        return axios.get(url + '/event/' + eventId + '/personnel').then(response => response.data);
+        return axios.get(url + '/events/' + eventId + '/personnel').then(response => response.data);
     }
 
     getGigForEvent(eventId) {

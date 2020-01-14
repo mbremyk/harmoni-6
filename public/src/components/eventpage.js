@@ -11,12 +11,11 @@ const jwt = require("jsonwebtoken");
 
 export class EventPage extends Component {
     e = new Event();
-    personell = [];
-    isPersonell = false;
+    personnel = [];
+    isPersonnel = false;
 
     render() {
-        if (!this.e)
-        {
+        if (!this.e) {
             return null
         } else if (this.e) {
             return (
@@ -122,14 +121,16 @@ export class EventPage extends Component {
             .getEventByEventId(this.props.match.params.id)
             .then(e => (this.e = e))
             .catch((error) => console.log(error));
+        this.getPersonnelForEvent();
+        console.log(this.checkForId());
 
 
     }
 
-    getPersonellForEvent() {
+    getPersonnelForEvent() {
         service
             .getPersonellForEvent(this.props.match.params.id)
-            .then(personell => (this.personell = personell))
+            .then(personnel => (this.personnel = personnel))
             .catch((error) => console.log(error));
 
     }
@@ -140,7 +141,7 @@ export class EventPage extends Component {
 
     checkForId() {
         let token = jwt.decode(authService.getToken())
-        this.personell.map(person => {
+        this.personnel.map(person => {
                 if (person.personellId == token.userId) {
                     return true;
                 }
