@@ -15,102 +15,110 @@ export class EventPage extends Component {
     isPersonnel = false;
 
     render() {
-        if (!this.e) {
+        if (!this.e)
+        {
             return null
-        } else if (this.e) {
-            return (
+        } else if (this.e)
+        {
+            if(!this.isPersonnel)
+            {
+                return (
 
 
-                <Container>
+                    <Container>
 
-                    <Image src={this.e.imageUrl} height="auto" width="100%"/>
+                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
 
-                    <Row>
-                        <Col>
-                            <h1>{this.e.eventName}</h1>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={4}>
-                            <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
-                        </Col>
+                        <Row>
+                            <Col>
+                                <h1>{this.e.eventName}</h1>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md={4}>
+                                <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
+                            </Col>
 
-                        <Col md={{offset: 6}}>
-                            <h4>Aldersgrense {this.e.ageLimit}</h4>
-                        </Col>
-
-
-                    </Row>
-
-                    <Row>
-                        <Col>
-                            <h2>{this.e.address}</h2>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <h4>Artist 1 og Artist 2</h4>
-                        </Col>
-                    </Row>
-
-                    <Row>
-                        <Col>
-                            <p>{this.e.description}</p>
-                        </Col>
-                    </Row>
+                            <Col md={{offset: 6}}>
+                                <h4>Aldersgrense {this.e.ageLimit}</h4>
+                            </Col>
 
 
-                </Container>
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <h2>{this.e.address}</h2>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <h4>Artist 1 og Artist 2</h4>
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <p>{this.e.description}</p>
+                            </Col>
+                        </Row>
 
 
-            );
-        } else if (this.checkForId()) {
-            return (
-
-                <Container>
-
-                    <Image src={this.e.imageUrl} height="auto" width="100%"/>
-
-                    <Row>
-                        <Col>
-                            <h1>{this.e.eventName}</h1>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={4}>
-                            <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
-                        </Col>
-
-                        <Col md={{offset: 6}}>
-                            <h4>Aldersgrense {this.e.ageLimit}</h4>
-                        </Col>
+                    </Container>
 
 
-                    </Row>
+                );
 
-                    <Row>
-                        <Col>
-                            <h2>{this.e.address}</h2>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <h4>Ass</h4>
-                        </Col>
-                    </Row>
+            }
+            else if (this.isPersonnel == true) {
+                return (
 
-                    <Row>
-                        <Col>
-                            <p>{this.e.description}</p>
-                        </Col>
-                    </Row>
+                    <Container>
+
+                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
+
+                        <Row>
+                            <Col>
+                                <h1>{this.e.eventName}</h1>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md={4}>
+                                <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
+                            </Col>
+
+                            <Col md={{offset: 6}}>
+                                <h4>Aldersgrense {this.e.ageLimit}</h4>
+                            </Col>
 
 
-                </Container>
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <h2>{this.e.address}</h2>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <h4>Ass</h4>
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <p>{this.e.description}</p>
+                            </Col>
+                        </Row>
 
 
-            );
+                    </Container>
 
+
+                );
+
+
+            }
         }
     }
 
@@ -121,16 +129,27 @@ export class EventPage extends Component {
             .getEventByEventId(this.props.match.params.id)
             .then(e => (this.e = e))
             .catch((error) => console.log(error));
-        this.getPersonnelForEvent();
-        console.log(this.checkForId());
+        this.getPersonnelForEvent()
 
 
     }
 
+    //works
     getPersonnelForEvent() {
         service
             .getPersonellForEvent(this.props.match.params.id)
-            .then(personnel => (this.personnel = personnel))
+            .then(personnel => {
+                this.personnel = personnel;
+                let token = jwt.decode(authService.getToken());
+                this.personnel.map(person => {
+                    if (person.personnelId == token.userId) {
+                        this.isPersonnel = true;
+                        console.log(this.isPersonnel);
+                    }
+                });
+
+
+            })
             .catch((error) => console.log(error));
 
     }
@@ -139,18 +158,20 @@ export class EventPage extends Component {
         //TODO
     }
 
-    checkForId() {
-        let token = jwt.decode(authService.getToken())
-        this.personnel.map(person => {
-                if (person.personellId == token.userId) {
-                    return true;
+    /*
+        checkForId() {
+            let token = jwt.decode(authService.getToken())
+            this.personnel.map(person => {
+                    if (person.personnelId == token.userId) {
+                        console.log(person.role)
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        )
+            )
 
 
-    }
+        }*/
 
 }
 
