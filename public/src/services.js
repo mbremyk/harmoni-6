@@ -128,11 +128,6 @@ class Services {
 		return axios.post(url + '/events/' + eventId + '/personnel', personnel).then(response => response.data);
 	}
 
-	getPersonnel(id)
-	{
-		return axios.get(url + '/personnel').then(response => response.data);
-	}
-
     uploadContract(formData, event, artist) {
         return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
     }
