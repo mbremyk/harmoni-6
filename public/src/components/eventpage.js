@@ -3,6 +3,8 @@ import {Container, Row, Col, Button, Form, Alert, Image} from "react-bootstrap";
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
 import {authService} from "../AuthService";
+import {HarmoniNavbar} from "./navbar";
+import NavLink from "react-bootstrap/NavLink";
 
 export class EventPage extends Component
 {
@@ -21,6 +23,7 @@ export class EventPage extends Component
 		if (!this.e) return null;
 		return (
 			<div>
+				{authService.loggedIn()? <HarmoniNavbar/> : <NavLink href={'/'}>Harmoni</NavLink>}
 				<Container>
 						<Image src={this.e.imageUrl} height="auto" width="100%"/>
 					<Row>

@@ -1,5 +1,6 @@
 import {service, Event, Gig} from "../services";
 import {Component} from "react-simplified";
+import {HarmoniNavbar} from "./navbar";
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -19,7 +20,6 @@ import TimePicker from "react-time-picker";
 //TODO: Hente ut organizerId fra bruker
 //TODO: Legge til annet personell
 //TODO: Legge til bilde
-
 
 export class AddEvent extends Component{
 
@@ -158,6 +158,7 @@ export class AddEvent extends Component{
 
         return(
             <div>
+	            <HarmoniNavbar/>
                 <Container>
                     <Form>
                         <Form.Row>

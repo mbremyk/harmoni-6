@@ -4,8 +4,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
-import {service} from "../services";
 import {authService} from "../AuthService";
+import {history} from "./history"
 
 export class LoginForm extends Component {
     constructor(props) {
@@ -27,10 +27,7 @@ export class LoginForm extends Component {
     handleLogin() {
         if(!this.state.email || !this.state.password) { return; }
         authService.login(this.state.email, this.state.password).then(res => {
-            console.log('token = ' + authService.getToken());
-            {authService.loggedIn()? this.props.history.push('/hjem') : alert('Innlogging feilet.'); }
-            console.log('logged in? : ' + authService.loggedIn());
-        })
+            this.props.history.push('/hjem') })
     }
 
     render(){
@@ -67,6 +64,7 @@ export class LoginForm extends Component {
                         Avbryt
                     </Button>
                     <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
+                    <NavLink href={'/hjem'}>Trykk her om du ikke bli sent videre..</NavLink>
                 </Form>
             </Container>
         );
