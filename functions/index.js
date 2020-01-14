@@ -6,15 +6,37 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const hashPassword = require("./userhandling");
 let cors = require("cors");
+let fs = require("fs");
 
 
 //Express
 const express = require("express");
 const app = express();
+
+const {
+    fileParser
+} = require('express-multipart-file-parser');
+
+app.use(fileParser({
+    rawBodyOptions: {
+        limit: '15mb',  //file size limit
+    },
+    busboyOptions: {
+        limits: {
+            fields: 20   //Number text fields allowed
+        }
+    },
+}));
 app.use(cors({origin: true}));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+const path = require('path');
+
 const main = express();
 main.use('/api/v1', app);
-main.use(bodyParser.json());
+/*main.use(bodyParser.json());
+main.use(bodyParser.urlencoded({extended: true}));*/
 exports.webApi = functions.https.onRequest(main);
 
 //Sequelize
@@ -386,28 +408,84 @@ app.post("/gigs", (req, res) => {
 app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
-    return db.getSaltByEmail(req.body.email).then(salt => {
-        if (salt.length !== 1) {
-            res.sendStatus(401);
-            return;
-        }
-        hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
-            db.loginOk(req.body.email, credentials[0]).then(ok => {
-                if (ok) {
-                    db.getUserByEmail(req.body.email).then(user => {
-                        console.log(user.dataValues);
-                        let token = getToken(user.dataValues);
-                        res.json({jwt: token});
-                    })
-                } else {
-                    res.status(401);
-                    res.json({error: "Not authorized"})
-                }
-            });
-        })
-    });
+    return db.getSaltByEmail(req.body.email)
+            .then(salt => {
+            if (salt.length !== 1) {
+                res.sendStatus(401);
+                return;
+            }
+            hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
+                db.loginOk(req.body.email, credentials[0]).then(ok => {
+                    if (ok) {
+                        db.getUserByEmail(req.body.email).then(user => {
+                            console.log(user.dataValues);
+                            let token = getToken(user.dataValues);
+                            res.json({jwt: token});
+                        })
+                    } else {
+                        res.status(401);
+                        res.json({error: "Not authorized"})
+                    }
+                });
+            })
+        });
 });
 
+app.post("/contract/:eventId/:artistId", (req, res) => {
+	console.log("Calling setContract");
+    const {
+        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        buffer,
+    } = req.files[0];
+    let file = req.files[0];
+    console.log(req.files[0].originalname);
+    console.log(req.files[0]);
+
+	fs.writeFile(`${__dirname}/uploads/`+file.originalname, file.buffer, (err) => {
+		if (err){
+			res.send(err);
+		}else{
+			console.log('The file has been saved!');
+			res.send("done");
+		}
+	});
+	//Todo set access here
+    /*db.setContract(req.body, req.params.eventId, req.params.artistId)
+		.then(() => res.send("Change made"));*/
+});
+
+
+app.get("/contract/:eventId/:artistId", (req, res) => {
+	console.log("downloading file");
+
+    //Todo check access here
+    /*db.getContract(req.params.eventId, req.params.artistId)
+        .then(result => {
+            res.send(JSON.stringify(result));
+            }
+        );*/
+
+	const file = `${__dirname}/uploads/nativelog.txt`;
+	res.download(file); // Set disposition and send it.
+});
+
+app.use("/auth", (req, res, next) => {
+    console.log("Authorization request received from client");
+    let token = req.headers["x-access-token"];
+    jwt.verify(token, publicKey, (err, decoded) => {
+        if (err || decoded.username !== req.body.username) {
+            console.log("Token not OK");
+            res.status(401);
+            res.json({error: "Not authorized"});
+        } else {
+            console.log("Token OK");
+            next();
+        }
+    });
+});
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:

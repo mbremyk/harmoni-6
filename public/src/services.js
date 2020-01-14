@@ -3,10 +3,10 @@ import axios from 'axios'
 import {authService} from './AuthService'
 
 var url = '';
-if(window.location.href.includes('localhost')){
-	url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
-}else{
-	url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
+if (window.location.href.includes('localhost')) {
+    url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
+} else {
+    url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
 
 export class User
@@ -91,6 +91,25 @@ class Services
 	createEvent(event)
 	{
 		return axios.post(url + '/events', event).then(response => response.insertId);
+	}
+
+	uploadContract(formData, event, artist)
+	{
+		return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
+	}
+
+	/*downloadContract(event, artist)
+	 {
+	 //This approach to downloading the files does not work
+	 //return axios.get(url+"/contract/"+event+"/"+artist).then(response => response);
+	 }*/
+
+	getAccessToken(email, hashedPassword)
+	{
+		return axios.post(url + '/accesstoken/', {
+			email: email,
+			hashedPassword: hashedPassword
+		}).then(response => response.data);
 	}
 
 	createGig(gig)
