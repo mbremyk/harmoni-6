@@ -15,7 +15,7 @@ import {AddEvent} from './components/createevent.js';
 import {HomePage} from "./components/homepage";
 import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
-import {EditEvent} from "./components/editevent";
+import EditEvent from "./components/editevent";
 import {UploadWidget, DownloadWidget} from "./widgets";
 
 import {authService} from "./AuthService";
@@ -24,6 +24,8 @@ import {PrivateRoute} from "./components/PrivateRoute";
 //const history = createHashHistory();
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
+
+const test = <EditEvent />
 
 // PrivateRoute sends user to /logg-inn if loggedIn() is false
 const root = document.getElementById('root');
