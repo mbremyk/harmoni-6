@@ -4,48 +4,54 @@ import * as React from 'react';
 import {service} from '../services';
 import Dropdown from "react-bootstrap/Dropdown";
 import {EventInfo} from "../widgets";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
 
 export class SortedEventView extends Component{
     state = {
-        events : []
+        events : [],
+        eventsBackup: [],
+        order: "asc",
+        sortingOption: "createdAt"
+    };
+
+    sortEvents = (sortingOption, order) =>{
+        this.setState({events: this.state.events.sort(this.compareValues(sortingOption, order))});
     };
 
     handleSortingOption = (option) =>{
-        console.log(option);
-        switch (option) {
-            case 'PriceAsc':
-                //TODO
-                break;
-            case 'PriceDesc':
-                //TODO
-                break;
-            case 'AgeLimitAsc':
-                this.setState({events: this.state.events.sort(this.compareValues('ageLimit'))});
-                break;
-            case 'AgeLimitDesc':
-                this.setState({events: this.state.events.sort(this.compareValues('ageLimit', 'desc'))});
-                break;
-            case 'DateAsc':
-                this.setState({events: this.state.events.sort(this.compareValues('startTime'))});
-                break;
-            case 'DateDesc':
-                this.setState({events: this.state.events.sort(this.compareValues('startTime', 'desc'))});
-                break;
-            case 'AddressAsc':
-                this.setState({events: this.state.events.sort(this.compareValues('address'))});
-                break;
-            case 'AddressDesc':
-                this.setState({events: this.state.events.sort(this.compareValues('address', 'desc'))});
-                break;
-        }
+        this.setState({sortingOption: option});
+        this.sortEvents(option, this.state.order);
     };
 
+    handleFilterOption(filter) {
+        switch (filter) {
+            case 'ChildFriendly':
+                this.setState({events: this.state.events.filter(e => e.ageLimit < 7)});
+                break;
+        }
+    }
+
+    handleReset() {
+        this.setState({events: this.state.eventsBackup})
+    }
+
+    handleOrder(order) {
+        this.setState({order: order});
+        this.sortEvents(this.state.sortingOption, order);
+    }
+
+    handleEvents = (events) => {
+        this.setState({events : events, eventsBackup : events})
+    };
+
+
     compareValues(key, order = 'asc') {
-        console.log(key);
         return function innerSort(a, b) {
             if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
                 // property doesn't exist on either object
-                console.log("No key found: comparator");
+                console.log("Error: not comparable!");
                 return 0;
             }
 
@@ -66,31 +72,47 @@ export class SortedEventView extends Component{
         };
     }
 
-
-    handleEvents = (events) => {
-        this.setState({events : events})
-    };
-
     render() {
         return(
             <Container>
-                <Dropdown>
-                    <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                        Sorter arrangementer
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('PriceAsc')}>Pris (Stigende) TODO</Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('PriceDesc')}>Pris (Synkende) TODO</Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('AgeLimitAsc')}>Aldersgrense (Stigende)</Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('AgeLimitDesc')}>Aldersgrense (Synkende)</Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('DateAsc')}>Eldst først TODO </Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('DateAsc')}>Nyest Først TODO </Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('AddressAsc')}>Adresse (Stigende) </Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.handleSortingOption('AddressDesc')}>Adresse (Synkende) </Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
+                <Card>
+                <Row>
+                    <Col>
+                        <Dropdown>
+                            <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                Sorter arrangementer
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris TODO</Dropdown.Item>
+                                <Dropdown.Item onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
+                                <Dropdown.Item onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
+                                <Dropdown.Item onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
 
-
+                    </Col>
+                    <Col>
+                        <Dropdown>
+                            <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                Filtere
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig (6 år) </Dropdown.Item>
+                                <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis Arrangementer TODO </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </Col>
+                    <Col>
+                        <Button onClick={() => this.handleOrder("asc")} variant={"light"}>Økende ↑</Button>
+                    </Col>
+                    <Col>
+                        <Button onClick={() => this.handleOrder("desc")} variant={"light"}>Synkende ↓</Button>
+                    </Col>
+                    <Col>
+                        <Button variant={"danger"} onClick={this.handleReset}>Nullstill</Button>
+                    </Col>
+                </Row>
+                </Card>
                 <Row>
 
                     {this.state.events.map(event => (
@@ -122,5 +144,7 @@ export class SortedEventView extends Component{
 
 
     }
+
+
 }
 

@@ -38,7 +38,6 @@ export class LandingPage extends Component
 
 	render()
 	{
-		console.log("render kjørt!")
 		return (
 
 			<div>
