@@ -67,6 +67,20 @@ export class Ticket {
     amount;
 }
 
+export class Personnel
+{
+    personnelId;
+    eventId;
+    role;
+
+    constructor(personnelId, eventId, role){
+        this.personnelId = personnelId;
+        this.eventId = eventId;
+        this.role = role;
+    }
+
+}
+
 class Services {
     login(email, password) {
         return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
