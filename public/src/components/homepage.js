@@ -5,7 +5,7 @@ import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
 import {authService} from '../AuthService'
-
+import {SortedEventView} from "./sortedeventview";
 const jwt = require("jsonwebtoken");
 
 
@@ -51,33 +51,20 @@ export class HomePage extends Component {
 	                            uploaded={event.createdAt}
 								myEvent = {true}
 
-	                        />
-	                    ))}
-	                </Row>
-	                <Row>
-	                    <Col md={{span: 12, offset: 4}}>
-	                        <h1>Andre Arrangementer</h1>
-	                    </Col>
-	                </Row>
-	                <Row>
-	                    {this.getOtherEvents().map(event =>
-	                        <EventInfo
+                        />
+                    ))}
+                </Row>
 
-	                            link={event.eventId}
-	                            imageUrl={event.imageUrl}
-	                            title={event.eventName}
-	                            address={event.address}
-	                            age_limit={event.ageLimit}
-	                            start_date={event.startTime}
-	                            end_date={event.endTime}
-	                            uploaded={event.createdAt}
-								myEvent={false}
 
-	                        />
-	                    )}
-	                </Row>
-	            </Container>
-	        </div>
+				<Row>
+					<Col md={{span: 12, offset: 4}}>
+						<h1>Andre Arrangementer</h1>
+					</Col>
+				</Row>
+				<SortedEventView otherEvents={this.getOtherEvents()}/>
+			</Container>
+
+
         );
     }
 
