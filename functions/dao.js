@@ -293,7 +293,7 @@ class Dao {
      * @param gig
      * @returns {Promise<boolean>}
      */
-    createGig(gig) {
+    addGig(gig) {
         return model.GigModel.create(
             {
                 artistId: gig.artistId,
