@@ -136,7 +136,7 @@ function getToken(user) {
  *
  */
 app.get("/users", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /users");
     return db.getAllUsers().then(users => users ? res.status(201).send(users) : res.sendStatus(400));
 });
 
@@ -144,7 +144,7 @@ app.get("/users", (req, res) => {
  * Get one user by id
  */
 app.get("/users/:userId", (req, res) => {
-    console.log("GET-request received from client for get one user by id");
+    console.log("GET-request - /users/:userId");
     return db.getUserById(req.params.userId).then(user => (user !== null) ? res.status(201).send(user) : res.sendStatus(400));
 });
 
@@ -156,15 +156,16 @@ app.get("/users/:userId", (req, res) => {
  *     eventName: string
  *     address: string
  *     ageLimit: int
- *     startTime: Date, dd/MM/YYYY hh:mm
- *     endTime: Date, dd/MM/YYYY hh:mm
+ *     startTime: Date, YYYY-MM-DD HH:mm
+ *     endTime: Date, YYYY-MM-DD HH:mm
  *     imageUrl: string
  *     image: Blob
  *     description: Text
  * }
  */
+
 app.get("/events", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events");
     return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
 
@@ -191,7 +192,7 @@ app.get("/events/search/:searchText", (req, res) => {
 
 
 app.get("/events/eventDetails/:eventId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events/eventDetails/:eventId");
     return db.getEventByEventId(req.params.eventId).then(event => (event !== {}) ? res.status(201).send(event) : res.sendStatus(404));
 });
 
@@ -199,7 +200,7 @@ app.get("/events/eventDetails/:eventId", (req, res) => {
  * Get tickets for specific event
  */
 app.get("/tickets/:eventId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /tickets/:eventId");
     return db.getTickets(req.params.eventId).then(tickets => tickets ? res.status(201).send(tickets) : res.status(400));
 });
 
@@ -237,7 +238,7 @@ app.post("/users", (req, res) => {
  *
  */
 app.post("/events", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /events");
     return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
 });
 
@@ -271,8 +272,8 @@ app.post("/events/:eventId/tickets", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.put('/event/:eventId/tickets', (req, res) => {
-    db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+app.put('/events/:eventId/tickets', (req, res) => {
+    return db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
 
@@ -286,9 +287,9 @@ app.put('/event/:eventId/tickets', (req, res) => {
  *      amount: number
  *  }
  */
-app.get("/event/:eventId/tickets", (req, res) => {
+app.get("/events/:eventId/tickets", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    db.getTickets(eventId).then(tickets => (tickets !== null) ? res.status(201).send(tickets) : res.sendStatus(400));
+    return db.getTickets(eventId).then(tickets => (tickets !== null) ? res.status(201).send(tickets) : res.sendStatus(400));
 });
 
 
@@ -304,8 +305,8 @@ app.get("/event/:eventId/tickets", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.delete('/event/:eventId/tickets', (req, res) => {
-    db.removeTicket(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+app.delete('/events/:eventId/tickets', (req, res) => {
+    return db.removeTicket(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
 
@@ -336,8 +337,8 @@ app.post("/events/:eventId/personnel", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.put('/event/:eventId/personnel', (req, res) => {
-    db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+app.put('/events/:eventId/personnel', (req, res) => {
+    return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
 /**
@@ -349,9 +350,9 @@ app.put('/event/:eventId/personnel', (req, res) => {
  *      role: string
  *  }
  */
-app.get("/event/:eventId/personnel", (req, res) => {
+app.get("/events/:eventId/personnel", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(400));
+    return db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(400));
 });
 
 
@@ -365,9 +366,9 @@ app.get("/event/:eventId/personnel", (req, res) => {
  *      rider: int
  *  }
  */
-app.get("/event/:eventId/gig", (req, res) => {
+app.get("/events/:eventId/gig", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+    return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
 
@@ -382,8 +383,8 @@ app.get("/event/:eventId/gig", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.delete('/event/:eventId/tickets', (req, res) => {
-    db.removePersonnel(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+app.delete('/events/:eventId/tickets', (req, res) => {
+    return db.removePersonnel(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
 
@@ -396,21 +397,8 @@ app.delete('/event/:eventId/tickets', (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.put('/auth/event/:eventId', (req, res) => {
-    db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
-});
-
-/**
- * Changes the information of an Event
- * body:
- * {
- *     event: Event
- * }
- *
- * @return {json} {jwt: token}
- */
-app.put('/auth/event/:eventId', (req, res) => {
-    db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+app.put('/auth/events/:eventId', (req, res) => {
+    return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
 /**
@@ -427,7 +415,7 @@ app.put('/auth/event/:eventId', (req, res) => {
  */
 app.post("/gigs", (req, res) => {
 	console.log("POST-request - /gigs");
-	db.createGig(req.body).then(response => {
+	return db.createGig(req.body).then(response => {
 		if (response) {
 			res.status(201).send(response)
 		} else {
@@ -561,7 +549,7 @@ app.get("/auth/users/:userId", (req, res) => {
  *      }
  */
 app.get("/auth/events/users/:userId", (req, res) => {
-    console.log("GET-request - /tickets/:eventId");
+    console.log("GET-request - /events/user/:userId");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
     if (decoded.userId == req.params.userId) {

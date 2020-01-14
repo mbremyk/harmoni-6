@@ -28,6 +28,21 @@ export class Event {
     image;
     description;
 
+	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
+		this.eventId = eventId;
+		this.organizerId = organizerId;
+		this.eventName = eventName;
+		this.address = address;
+		this.description = description;
+		this.ageLimit = ageLimit;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.imageUrl = imageURL;
+		this.image = image;
+	}
+
+
+
 }
 
 export class Gig {
@@ -82,6 +97,7 @@ class Services {
     getUsers() {
         return axios.get(url + '/users').then(response => response.data);
     }
+
     updateUser(user) {
         return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
@@ -117,13 +133,16 @@ class Services {
     createGig(gig) {
         return axios.post(url + '/gigs', gig).then(response => response.data);
     }
+	updateEvent(event) {
+		return axios.put(url + "/auth/events/" + event.eventId, event).then(response => response.insertId);
+	}
 
     getTicketToEvent(eventId) {
         return axios.get(url + '/tickets/' + eventId).then(response => response.data);
     }
 
     searchForEvents(input) {
-        return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+        return axios.get(url + '/events/search/' + encodeURIComponent(input)).then(response => response.data);
     }
 
     getEventsByOrganizer(userId) {
