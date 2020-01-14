@@ -14,8 +14,43 @@
     animation-iteration-count: 3;
 }
 
-
 @keyframes shake {
     0% { left: -5px; }
     100% { right: -5px; }
+}
+
+/*Styling for eventinfo*/
+.eventinfo
+ {
+     color: black;
+     text-decoration: none;
+
+ }
+
+.eventinfo a:hover
+{
+    color: black;
+    text-decoration: none;
+
+}
+
+.eventinfo a:active
+{
+    color: black;
+    text-decoration: none;
+
+}
+
+.eventinfo a:link
+{
+    color: black;
+    text-decoration: none;
+
+}
+
+.eventinfo a:visited
+{
+    color: black;
+    text-decoration: none;
+
 }

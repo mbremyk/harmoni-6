@@ -3,7 +3,10 @@ import {Component} from "react-simplified";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {Services} from "../services";
+import {service, User} from "../services";
+import {authService} from "../AuthService";
+import * as jwt from "jsonwebtoken";
+
 
 
 /*
@@ -13,11 +16,11 @@ export class myPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: "Navn Navnesen",
-            email: "epost@epost.no",
-            password: "",
-            newpass: "",
-            repnewpass: ""
+            userId: '',
+            username: '',
+            email: '',
+            password1: '',
+            password2: ''
         }
     }
     render() {
@@ -26,7 +29,7 @@ export class myPage extends Component {
                 <Form>
                     <h1>Min side</h1>
                     <Form.Group>
-                        <Form.Label>Navn</Form.Label>
+                        <Form.Label>Brukernavn</Form.Label>
                         <Form.Control autocomplete="username" value={this.state.username} onChange={this.handleUsernameChange}>
                         </Form.Control>
                     </Form.Group>
@@ -35,18 +38,13 @@ export class myPage extends Component {
                         <Form.Control autocomplete="email" value={this.state.email} onChange={this.handleEmailChange}>
                         </Form.Control>
                     </Form.Group>
-                    <Form.Group controlId="formBasicPassword">
-                        <Form.Label>Passord</Form.Label>
-                        <text className="text-danger"> *</text>
-                        <Form.Control autocomplete="current-password"  type="password" autocom placeholder="Passord" value={this.state.password} onChange={this.handlePasswordChange}  />
-                    </Form.Group>
                     <Form.Group controlId="formNewPassword">
                         <Form.Label>Nytt passord</Form.Label>
-                        <Form.Control autocomplete="new-password" type="password" placeholder="Nytt passord" value={this.state.newpass} onChange={this.handleNewPasswordChange} />
+                        <Form.Control autocomplete="new-password" type="password" placeholder="Nytt passord" value={this.state.password1} onChange={this.handleNewPassword1Change} />
                     </Form.Group>
                     <Form.Group controlId="formRepNewPassword">
                         <Form.Label>Gjenta nytt passord</Form.Label>
-                        <Form.Control autocomplete="new-password" type="password" placeholder="Gjenta nytt passord" value={this.state.repnewpass} onChange={this.handleRepNewPasswordChange}/>
+                        <Form.Control autocomplete="new-password" type="password" placeholder="Gjenta nytt passord" value={this.state.password2} onChange={this.handleNewPassword2Change}/>
                     </Form.Group>
                     <Button variant="primary" type="submit" onClick={this.save}>
                         Lagre
@@ -56,14 +54,41 @@ export class myPage extends Component {
         );
     }
     mounted() {
+        if(authService.loggedIn()) {
+            let user = new User();
+            service.getUser(jwt.decode(authService.getToken()).userId)
+                .then(u => {
+                    user.email = u.email;
+                    user.username = u.username;
+                    this.setState({
+                        username: u.username,
+                        email: u.email,
+                        userId: u.userId
+                    });
+                })
+                .catch(err => alert("En feil har oppstått: " + err.message));
+        } else {
+            console.log("Not logged in");
+            this.props.history.push('/logg-inn');
+        }
+
     }
     save() {
-        if (this.state.password === "123") {
-            if (this.state.newpass === "" && this.state.repnewpass === "") {
-                alert("Saved. Name: " + this.state.name + " Email: " + this.state.email);
-            } else if (this.state.newpass === this.state.repnewpass) {
-                alert("password changed to: " + this.state.newpass);
-            }
+        let user      = new User();
+        user.email    = this.state.email;
+        user.username = this.state.username;
+        user.userId   = this.state.userId;
+
+        if (this.state.password1 != this.state.password2) {
+            alert("Passordene er ulike.");
+            return;
+        }
+        if (this.state.password1 == "") {
+            service.updateUser(user)
+                .then(res => console.log("User updated: " + res))
+                .catch(err => alert("En feil har oppståt: t" + err.message));
+            alert("Bruker oppdatert. Ny epost: " + user.email + ". Nytt brukernavn: " + user.username);
+            return;
         }
     }
     handleUsernameChange(event) {
@@ -72,13 +97,10 @@ export class myPage extends Component {
     handleEmailChange(event) {
         this.setState({email: event.target.value});
     }
-    handlePasswordChange(event) {
-        this.setState({password: event.target.value});
+    handleNewPassword1Change(event) {
+        this.setState({password1: event.target.value});
     }
-    handleNewPasswordChange(event) {
-        this.setState({newpass: event.target.value});
-    }
-    handleRepNewPasswordChange(event) {
-        this.setState({repnewpass: event.target.value});
+    handleNewPassword2Change(event) {
+        this.setState({password2: event.target.value});
     }
 }
