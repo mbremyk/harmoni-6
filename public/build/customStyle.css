@@ -14,6 +14,7 @@
     animation-iteration-count: 3;
 }
 
+
 @keyframes shake {
     0% { left: -5px; }
     100% { right: -5px; }

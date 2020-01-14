@@ -234,7 +234,7 @@ export class AddEvent extends Component{
                                     Velg artist
                                 </Dropdown.Toggle>
 
-                                <Dropdown.Menu as={this.CustomMenu}>
+                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}}  as={this.CustomMenu}>
                                     {this.state.artists.map(artist => (
                                         <Dropdown.Item eventKey={artist.userId}>
                                             {artist.username}
@@ -270,7 +270,7 @@ export class AddEvent extends Component{
                                     Velg personell
                                 </Dropdown.Toggle>
 
-                                <Dropdown.Menu as={this.CustomMenu}>
+                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
                                     {this.state.artists.map(artist => (
                                         <Dropdown.Item eventKey={artist.userId}>
                                             {artist.username}
