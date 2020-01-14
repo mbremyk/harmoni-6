@@ -46,7 +46,9 @@ export class HomePage extends Component {
 
 
 					<Row>
-						{this.myEvents.map(event => (
+						<SortedEventView myEvent={true} events={this.myEvents}/>
+
+						{/*{this.myEvents.map(event => (
 							<EventInfo
 
 								link={event.eventId}
@@ -60,7 +62,7 @@ export class HomePage extends Component {
 								myEvent = {true}
 
 							/>
-						))}
+						))}*/}
 					</Row>
 
 
@@ -69,23 +71,7 @@ export class HomePage extends Component {
 							<h1>Andre Arrangementer</h1>
 						</Col>
 					</Row>
-					{/*<Row>
-						{this.getOtherEvents().map(event => (
-							<EventInfo
 
-								link={event.eventId}
-								imageUrl={event.imageUrl}
-								title={event.eventName}
-								address={event.address}
-								age_limit={event.ageLimit}
-								start_date={event.startTime}
-								end_date={event.endTime}
-								uploaded={event.createdAt}
-								myEvent = {false}
-
-							/>
-						))}
-					</Row>*/}
 					<SortedEventView events={this.getOtherEvents()}/>
 
 

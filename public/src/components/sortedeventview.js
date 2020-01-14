@@ -27,7 +27,7 @@ export class SortedEventView extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.events !== prevProps.events) {
-            //this.fetchData(this.props.userID);
+
             console.log("Props updated");
             this.handleEvents(this.props.events);
         }
@@ -142,6 +142,7 @@ export class SortedEventView extends Component {
                                 start_date={event.startTime}
                                 end_date={event.endTime}
                                 uploaded={event.createdAt}
+                                myEvent={this.props.myEvent}
                             />
                         ))}
 
