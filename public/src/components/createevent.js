@@ -169,12 +169,13 @@ export class AddEvent extends Component{
 
         service.createEvent(ev)
             .then(updated =>
+
             {
-                this.state.artistsAdd.map(artist =>
-                    (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))));
+                this.state.artistsAdd.map(a =>
+                    (service.createGig(new Gig(a.userId, updated.insertId, null, null))));
                 this.state.personnelAdd.map( personnel =>
                     service.createPersonnel(new Personnel(updated.insertId, personnel.userId, personnel.role), updated.insertId));
-
+                console.log(updated.insertId);
             }
 
             ).then(() => this.props.history.push("/opprett-arrangement"))
@@ -421,7 +422,7 @@ export class AddEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                                <Button type="submit" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                                <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
                         </Form.Group>
 
                     </Form.Row>

@@ -104,7 +104,7 @@ class Services
 
 	createEvent(event)
 	{
-		return axios.post(url + '/auth/events', event).then(response => response);
+		return axios.post(url + '/auth/events', event).then(response => response.data);
 	}
 
 	createGig(gig)
