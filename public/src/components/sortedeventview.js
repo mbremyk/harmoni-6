@@ -46,7 +46,6 @@ export class SortedEventView extends Component{
         this.setState({events : events, eventsBackup : events})
     };
 
-
     compareValues(key, order = 'asc') {
         return function innerSort(a, b) {
             if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
@@ -76,42 +75,42 @@ export class SortedEventView extends Component{
         return(
             <Container>
                 <Card>
-                <Row>
-                    <Col>
-                        <Dropdown>
-                            <Dropdown.Toggle variant="light" id="dropdown-basic">
-                                Sorter arrangementer
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris TODO</Dropdown.Item>
-                                <Dropdown.Item onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
-                                <Dropdown.Item onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
-                                <Dropdown.Item onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
+                    <Row>
+                        <Col>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                    Sorter arrangementer
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris TODO</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
 
-                    </Col>
-                    <Col>
-                        <Dropdown>
-                            <Dropdown.Toggle variant="light" id="dropdown-basic">
-                                Filtere
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig (6 år) </Dropdown.Item>
-                                <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis Arrangementer TODO </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </Col>
-                    <Col>
-                        <Button onClick={() => this.handleOrder("asc")} variant={"light"}>Økende ↑</Button>
-                    </Col>
-                    <Col>
-                        <Button onClick={() => this.handleOrder("desc")} variant={"light"}>Synkende ↓</Button>
-                    </Col>
-                    <Col>
-                        <Button variant={"danger"} onClick={this.handleReset}>Nullstill</Button>
-                    </Col>
-                </Row>
+                        </Col>
+                        <Col>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                    Filtere
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig (6 år) </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis Arrangementer TODO </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Col>
+                        <Col>
+                            <Button onClick={() => this.handleOrder("asc")} variant={"light"}>Økende ↑</Button>
+                        </Col>
+                        <Col>
+                            <Button onClick={() => this.handleOrder("desc")} variant={"light"}>Synkende ↓</Button>
+                        </Col>
+                        <Col>
+                            <Button variant={"danger"} onClick={this.handleReset}>Nullstill</Button>
+                        </Col>
+                    </Row>
                 </Card>
                 <Row>
 
@@ -136,13 +135,13 @@ export class SortedEventView extends Component{
 
     mounted()
     {
+        if(this.props.otherEvents){
+            this.handleEvents(this.props.otherEvents);
+        }
         service
             .getEvents()
             .then(events => (this.handleEvents(events)))
             .catch((error) => console.log(error));
-
-
-
     }
 
 
