@@ -115,12 +115,12 @@ let EventModel = sequelize.define('event', {
     startTime: {
         type:Sequelize.DATE,
         get(){
-            return moment(this.getDataValue('startTime')).format('DD/MM/YYYY HH:mm');
+            return moment(this.getDataValue('startTime')).format('DD-MM-YYYY HH:mm');
         }
     },
     endTime: {type:Sequelize.DATE,
         get(){
-            return moment(this.getDataValue('endTime')).format('DD/MM/YYYY HH:mm');
+            return moment(this.getDataValue('endTime')).format('DD-MM-YYYY HH:mm');
         }},
     imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
@@ -206,6 +206,21 @@ let PersonnelModel = sequelize.define('personnel', {
     },
     role: Sequelize.STRING
 }, {tableName: 'personnel'});
+
+UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
+EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
+
+UserModel.hasMany(GigModel, {foreignKey: 'artistId'});
+GigModel.belongsTo(UserModel, {foreignKey: 'artistId'});
+
+EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
+GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+FileModel.hasOne(GigModel, {foreignKey: 'contract'});
+GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
+
+FileModel.hasOne(GigModel, {foreignKey: 'rider'});
+GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 

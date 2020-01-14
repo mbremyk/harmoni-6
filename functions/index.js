@@ -62,7 +62,7 @@ function tokenIsBlacklisted(token) {
     return jwtBlacklist.includes(token);
 }
 
-let interval = 60 * 1000;
+let interval = 60 * 60 * 1000;
 
 /**
  * Goes through the blacklist every hour and removes timed out tokens
