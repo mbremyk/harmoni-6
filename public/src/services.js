@@ -95,7 +95,7 @@ class Services
 
 	createGig(gig)
 	{
-		return axios.post(url + '/gig', gig).then(response => response.data);
+		return axios.post(url + '/gigs', gig).then(response => response.data);
 	}
 
 	getTicketToEvent(eventId)

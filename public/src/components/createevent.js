@@ -64,6 +64,7 @@ export class AddEvent extends Component{
         this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
         this.imageUrl = this.handleImageUrlChange.bind(this);
+        this.image = this.handleImageUpload.bind(this);
 
         this.state = {
             organizerId: '',
@@ -80,7 +81,7 @@ export class AddEvent extends Component{
             image: '',
             imageUrl: '',
             artistsAdd: [],
-            artists: [],
+            artists: []
         };
     }
 
@@ -116,7 +117,7 @@ export class AddEvent extends Component{
         this.setState({imageUrl: event.target.value})
     }
 
-    handleArtistsAdd(event){
+    handleArtistsAdd(event) {
         service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
     }
 
@@ -160,14 +161,9 @@ export class AddEvent extends Component{
 
         service.createEvent(ev)
             .then(updated =>
-                {this.state.artistsAdd.map(artist =>
-                    (service.createGig(
-                        new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract)
-                    )
-                    )
-                )
-                }
-            ).then(this.props.history.push("/opprett-arrangement"))
+                this.state.artistsAdd.map(artist =>
+                    (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))
+            ).then(() => this.props.history.push("/opprett-arrangement"))
         .catch(err => alert('En feil oppsto!' + err.message))
     }
 
@@ -381,12 +377,10 @@ export class AddEvent extends Component{
     mounted() {
         let token = authService.getToken();
         let decoded = jwt.decode(token);
-        let userId = decoded.userId;
-        this.setState({organizerId: userId});
-        console.log(token);
-        console.log(decoded);
-        console.log(userId);
+        let uId = decoded.userId;
+        this.setState({organizerId: uId});
         service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
+        //service.createGig(new Gig(2, 23, null, null));
     }
 
     changeDate(dateName, dateValue){

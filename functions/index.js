@@ -134,9 +134,9 @@ app.post("/auth/events", (req, res) =>{
 
 
 
-app.post("/gig", (req, res) => {
-    console.log("POST-request received from client");
-    db.createGig(req.body).then(response => {
+app.post("/gigs", (req, res) => {
+    console.log("Trying to create gig");
+    db.addGig(req.body).then(response => {
         if (response) {
             res.status(201).send(response)
         } else {
@@ -233,20 +233,6 @@ app.post("/event", (req, res) =>{
             res.status(400);
         }
     })
-});
-
-/**
- *
- */
-app.post("/gig", (req, res) => {
-    console.log("POST-request received from client");
-    db.createGig(req.body).then(response => {
-        if (response) {
-            res.status(201).send(response)
-        } else {
-            res.status(400);
-        }
-    });
 });
 
 /**

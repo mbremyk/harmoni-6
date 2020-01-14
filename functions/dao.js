@@ -258,7 +258,7 @@ class Dao {
             artistId: gig.artistId,
             eventId: gig.eventId,
             rider: gig.rider,
-            contract: gig.contract,
+            contract: gig.contract
         }).then(response => response.id !== null)
             .catch(error => {
                 console.error(error);
