@@ -8,14 +8,11 @@ const hashPassword = require("./userhandling");
 let cors = require("cors");
 let fs = require("fs");
 
-
 //Express
 const express = require("express");
 const app = express();
 
-const {
-    fileParser
-} = require('express-multipart-file-parser');
+const {fileParser} = require('express-multipart-file-parser');
 
 app.use(fileParser({
     rawBodyOptions: {
@@ -65,14 +62,21 @@ function tokenIsBlacklisted(token) {
     return jwtBlacklist.includes(token);
 }
 
+let interval = 60 * 1000;
+
 /**
  * Goes through the blacklist every hour and removes timed out tokens
  */
 setInterval(() => {
+    console.log("Removing expired tokens");
+    console.log("Token count: " + jwtBlacklist.length);
     jwtBlacklist = jwtBlacklist.filter(token => {
-        token.isValid();
-    })
-}, 60 * 60 * 1000);
+        jwt.verify(token, privateKey, (err, decoded) => {
+            return Date.now() > decoded.exp * 1000;
+        });
+    });
+    console.log("Tokens after purge: " + jwtBlacklist.length);
+}, interval);
 
 
 /**
@@ -152,8 +156,8 @@ app.get("/users/:userId", (req, res) => {
  *     eventName: string
  *     address: string
  *     ageLimit: int
- *     startTime: Date, yyyy-MM-dd hh-mm-ss
- *     endTime: Date, yyyy-MM-dd hh-mm-ss
+ *     startTime: Date, dd/MM/YYYY hh:mm
+ *     endTime: Date, dd/MM/YYYY hh:mm
  *     imageUrl: string
  *     image: Blob
  *     description: Text
@@ -180,6 +184,7 @@ app.get("/events", (req, res) => {
  * }
  */
 app.get("/events/search/:searchText", (req, res) => {
+    console.log('GET-request - /events/search/:searchText');
     let searchText = decodeURIComponent(req.params.searchText);
     db.getEventsMatching(searchText).then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
@@ -208,9 +213,10 @@ app.get("/tickets/:eventId", (req, res) => {
  * }
  */
 app.post("/users", (req, res) => {
+    console.log('POST-request - /user');
     return db.getUserByEmailOrUsername(req.body.email, req.body.username)
         .then(user => {
-            if (user) {
+            if (user.length !== 0) {
                 res.sendStatus(409);
             } else {
                 return hashPassword.hashPassword(req.body.password).then(credentials => {
@@ -230,7 +236,7 @@ app.post("/users", (req, res) => {
 /**
  *
  */
-app.post("/event", (req, res) => {
+app.post("/events", (req, res) => {
     console.log("POST-request received from client");
     return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
 });
@@ -420,8 +426,14 @@ app.put('/auth/event/:eventId', (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/gigs", (req, res) => {
-    console.log("POST-request received from client");
-    db.addGig(req.body).then(insertOk => insertOk ? res.status(201).send(response) : res.status(400));
+	console.log("POST-request - /gigs");
+	db.createGig(req.body).then(response => {
+		if (response) {
+			res.status(201).send(response)
+		} else {
+			res.status(400);
+		}
+	});
 });
 
 /**
@@ -435,10 +447,10 @@ app.post("/gigs", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/login", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /login");
 
     return db.getSaltByEmail(req.body.email)
-            .then(salt => {
+        .then(salt => {
             if (salt.length !== 1) {
                 res.sendStatus(401);
                 return;
@@ -460,8 +472,8 @@ app.post("/login", (req, res) => {
         });
 });
 
-app.post("/contract/:eventId/:artistId", (req, res) => {
-	console.log("Calling setContract");
+app.post("/contracts/:eventId/:artistId", (req, res) => {
+    console.log("Calling setContract");
     const {
         fieldname,
         originalname,
@@ -473,22 +485,22 @@ app.post("/contract/:eventId/:artistId", (req, res) => {
     console.log(req.files[0].originalname);
     console.log(req.files[0]);
 
-	fs.writeFile(`${__dirname}/uploads/`+file.originalname, file.buffer, (err) => {
-		if (err){
-			res.send(err);
-		}else{
-			console.log('The file has been saved!');
-			res.send("done");
-		}
-	});
-	//Todo set access here
+    fs.writeFile(`${__dirname}/uploads/` + file.originalname, file.buffer, (err) => {
+        if (err) {
+            res.send(err);
+        } else {
+            console.log('The file has been saved!');
+            res.send("done");
+        }
+    });
+    //Todo set access here
     /*db.setContract(req.body, req.params.eventId, req.params.artistId)
 		.then(() => res.send("Change made"));*/
 });
 
 
 app.get("/contract/:eventId/:artistId", (req, res) => {
-	console.log("downloading file");
+    console.log("downloading file");
 
     //Todo check access here
     /*db.getContract(req.params.eventId, req.params.artistId)
@@ -497,24 +509,10 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
             }
         );*/
 
-	const file = `${__dirname}/uploads/nativelog.txt`;
-	res.download(file); // Set disposition and send it.
+    const file = `${__dirname}/uploads/nativelog.txt`;
+    res.download(file); // Set disposition and send it.
 });
 
-app.use("/auth", (req, res, next) => {
-    console.log("Authorization request received from client");
-    let token = req.headers["x-access-token"];
-    jwt.verify(token, publicKey, (err, decoded) => {
-        if (err || decoded.username !== req.body.username) {
-            console.log("Token not OK");
-            res.status(401);
-            res.json({error: "Not authorized"});
-        } else {
-            console.log("Token OK");
-            next();
-        }
-    });
-});
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:
@@ -550,8 +548,10 @@ app.use("/auth", (req, res, next) => {
  * }
  */
 app.get("/auth/users/:userId", (req, res) => {
-    console.log("GET-request received from client");
-    return db.getUserByEmail(req.body.email).then(user => user ? res.status(201).send(user) : res.status(400))
+    console.log("GET-request - /user/:userId");
+    return db.getUserById(req.params.userId)
+        .then(user => res.send(user))
+        .catch(error => console.error(error));
 });
 
 /**
@@ -560,11 +560,10 @@ app.get("/auth/users/:userId", (req, res) => {
  *          x-access-token: string
  *      }
  */
-app.get("/auth/events/user/:userId", (req, res) => {
-    console.log("GET-request received from client");
+app.get("/auth/events/users/:userId", (req, res) => {
+    console.log("GET-request - /tickets/:eventId");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
-    console.log(decoded);
     if (decoded.userId == req.params.userId) {
         return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
@@ -584,7 +583,7 @@ app.get("/auth/events/user/:userId", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/auth/refresh", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /auth/refresh");
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
@@ -602,10 +601,12 @@ app.post("/auth/refresh", (req, res) => {
  * }
  */
 app.post("/auth/logout", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /logout");
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
+
+    res.sendStatus(201);
 });
 
 /**
@@ -618,7 +619,7 @@ app.post("/auth/logout", (req, res) => {
  * }
  */
 app.put("/auth/users/:userId", (req, res) => {
-    console.log("PUT-request received from client");
+    console.log("PUT-request - auth/user/:userId");
     return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
 });
 
@@ -629,7 +630,7 @@ app.put("/auth/users/:userId", (req, res) => {
  *      }
  */
 app.get("/auth/events/user/:userId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events/user/:userId");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
     console.log(decoded);
@@ -640,6 +641,20 @@ app.get("/auth/events/user/:userId", (req, res) => {
     } else {
         res.sendStatus(403);
     }
+});
+
+app.get("/validate/username/:username", (req, res) => {
+    console.log("GET-request - /validate/username/:username");
+    return db.getUserByEmailOrUsername('', req.params.username).then(result => {
+        console.log(result);
+        res.send(result.length === 1)})
+});
+
+app.get("/validate/email/:email", (req, res) => {
+    console.log("GET-request - /validate/email/:email");
+    return db.getUserByEmail(req.params.email).then(result => {
+        console.log(result);
+        res.send(result !== null)})
 });
 
 console.log("Server initalized");

@@ -438,3 +438,5 @@ build/
 
 build
 /build
+public/build/service-worker.js
+public/build/service-worker.js

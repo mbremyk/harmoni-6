@@ -17,6 +17,13 @@ export class AuthService {
 			})
 	}
 
+	refresh() {
+		return service.refreshToken().then(res => {
+			this.setToken(res.jwt);
+			return res
+		})
+	}
+
 	loggedIn() {
 		// Checks if there is a saved token and it's still valid
 		const token = this.getToken(); // Getting token from localstorage
@@ -41,9 +48,13 @@ export class AuthService {
 		return localStorage.getItem('token')
 	}
 
+	deleteToken() {
+		localStorage.removeItem('token')
+	}
+
 	logout() {
 		// Clear user token and profile data from localStorage
-		return service.logout().then(res => localStorage.removeItem('token'));
+		return service.logout().then(res => this.deleteToken());
 	}
 
 	_checkStatus(response) {
