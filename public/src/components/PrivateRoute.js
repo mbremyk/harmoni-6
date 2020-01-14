@@ -3,6 +3,7 @@ import React from "react";
 import Route from "react-router-dom/es/Route";
 
 export function PrivateRoute ({component: Component, authed, ...rest}) {
+	console.log('REDIRECTED');
 	return (
 		<Route
 			{...rest}

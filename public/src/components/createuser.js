@@ -3,9 +3,7 @@ import * as React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import NavLink from "react-bootstrap/NavLink";
 import {service, User} from "../services";
-import { createHashHistory } from 'history';
 
 export class CreateUserForm extends Component{
 	constructor(props) {
@@ -18,8 +16,8 @@ export class CreateUserForm extends Component{
 			salt: '',
 			hash: '',
 		};
-		this.handleEmailChange     = this.handleEmailChange.bind(this);
-		this.handleUsernameChange  = this.handleUsernameChange.bind(this);
+		this.handleEmailChange = this.handleEmailChange.bind(this);
+		this.handleUsernameChange = this.handleUsernameChange.bind(this);
 		this.handlePassword1Change = this.handlePassword1Change.bind(this);
 		this.handlePassword2Change = this.handlePassword2Change.bind(this);
 	}
@@ -39,80 +37,96 @@ export class CreateUserForm extends Component{
 			return;
 		}
 
-		// check email and username availability
-		// TODO get usernames and emails
-		let usernames = [];
-		let emails = [];
-
-		if(usernames.includes(this.state.username))
-		{
-			alert('Brukernavn er tatt :(');
-			return;
-		}
-		if(emails.includes(this.state.email))
-		{
-			alert('Email er i bruk');
-			return;
-		}
-
 		// check password mismatch
 		if(this.state.password1 !== this.state.password2) {
-			console.log('Password mismatch');
-
-			var field1 = document.getElementById('formBasicPassword1');
-			var field2 = document.getElementById('formBasicPassword2');
-
-			field1.classList.add('error');
-			field2.classList.add('error');
-
-			setTimeout(function() {
-				field1.classList.remove('error');
-				field2.classList.remove('error');
-			}, 300);
-
+			alert('Password mismatch');
 			return;
 		}
 
-		let user      = new User();
-		user.email    = this.state.email;
+		let user = new User();
+		user.email = this.state.email;
 		user.username = this.state.username;
 		user.password = this.state.password1;
 
-		service.createUser(user)
-			.then(res => console.log('Submit user status: ' + res))
-			.then(this.props.history.push("/logg-inn"))
-			.catch(err => alert("En feil oppsto."));
+		// check username availability
+		service.validateUsername(user.username).then(res => {
+			console.log(res);
+			if(false){ alert('Brukernavn er i bruk :('); } else {
+
+				// check email availability
+				service.validateEmail(user.email).then(ok2 => {
+					if(!ok2) { alert('Epost er i bruk'); } else {
+
+						service.createUser(user)
+							.then(res => console.log('Submit user status: ' + res))
+							.then(this.props.history.push("/logg-inn"))
+							.catch(err => alert("En feil oppsto."));
+					}
+				})
+			}
+		});
 	}
 
 	render(){
 		return(
 			<Container>
 				<Form>
+
 					<Form.Group controlId="formBasicUsername">
 						<Form.Label>Brukernavn</Form.Label>
-						<Form.Control type="username" placeholder="Skriv inn brukernavn" value={this.state.username} onChange={this.handleUsernameChange} />
-					</Form.Group>
-					<Form.Group controlId="formBasicEmail">
-						<Form.Label>Email</Form.Label>
-						<Form.Control type="email" placeholder="Skriv inn email" value={this.state.email} onChange={this.handleEmailChange} />
-					</Form.Group>
-					<Form.Group controlId="formBasicPassword1">
-						<Form.Label>Passord</Form.Label>
-						<Form.Control type="password" placeholder="Skriv inn passord" value={this.state.password1} onChange={this.handlePassword1Change} />
-					</Form.Group>
-					<Form.Group controlId="formBasicPassword2">
-						<Form.Label>Gjenta passord</Form.Label>
-						<Form.Control type="password" placeholder="Gjenta passord" value={this.state.password2} onChange={this.handlePassword2Change} />
+						<Form.Control
+							type="username"
+							placeholder="Skriv inn brukernavn"
+							value={this.state.username}
+							onChange={this.handleUsernameChange} />
 					</Form.Group>
 
-					<Button onClick={this.handleSubmit} variant="primary" type="button">
+					<Form.Group controlId="formBasicEmail">
+						<Form.Label>Email</Form.Label>
+						<Form.Control
+							type="email"
+							placeholder="Skriv inn email"
+							value={this.state.email}
+							onChange={this.handleEmailChange} />
+					</Form.Group>
+
+					<Form.Group controlId="formBasicPassword1">
+						<Form.Label>Passord</Form.Label>
+						<Form.Control
+							type="password"
+							placeholder="Skriv inn passord"
+							value={this.state.password1}
+							onChange={this.handlePassword1Change} />
+					</Form.Group>
+
+					<Form.Group controlId="formBasicPassword2">
+						<Form.Label>Gjenta passord</Form.Label>
+						<Form.Control
+							type="password"
+							placeholder="Gjenta passord"
+							value={this.state.password2}
+							onChange={this.handlePassword2Change} />
+					</Form.Group>
+
+					<Button
+						onClick={this.handleSubmit}
+						variant="primary"
+						type="button">
 						Opprett bruker
 					</Button>
-					<Button href="/" variant="secondary" type="button">
+
+					<Button
+						href="/"
+						variant="secondary"
+						type="button">
 						Avbryt
 					</Button>
+
 				</Form>
 			</Container>
 		);
+	}
+
+	mounted() {
 	}
 }

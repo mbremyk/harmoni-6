@@ -4,6 +4,7 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {Services} from "../services";
+import {authService} from "../AuthService";
 
 
 /*
@@ -56,6 +57,7 @@ export class myPage extends Component {
         );
     }
     mounted() {
+        //authService.refresh().then(res => console.log('Refresh: ' + res));
     }
     save() {
         if (this.state.password === "123") {

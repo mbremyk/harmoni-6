@@ -1,4 +1,3 @@
-//const axios = require('axios');
 import axios from 'axios'
 import {authService} from './AuthService'
 
@@ -68,6 +67,11 @@ class Services
 		return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
 	}
 
+	refreshToken()
+	{
+		return axios.post(url + '/auth/refresh', {}, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+	}
+
 	createUser(user)
 	{
 		return axios.post(url + '/user', user).then(response => response.data);
@@ -116,6 +120,16 @@ class Services
 	getEventByEventId(eventId)
 	{
 		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+	}
+
+	validateUsername(username)
+	{
+		return axios.get(url + '/validate/username/' + username).then(response => response.data);
+	}
+
+	validateEmail(email)
+	{
+		return axios.get(url + '/validate/email/' + email).then(response => response.data);
 	}
 }
 

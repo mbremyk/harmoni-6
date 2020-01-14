@@ -373,4 +373,13 @@ app.get("/auth/events/user/:userId", (req, res) => {
     }
 });
 
+app.get("/validate/username/:username", (req, res) => {
+    console.log("GET-request - /validate/username/:username");
+});
+
+app.get("/validate/email/:email", (req, res) => {
+    console.log("GET-request - /validate/username/:email");
+    return db.getUserByEmail(req.params.email).then(result => res.send(result.length === 1));
+});
+
 console.log("Server initalized");

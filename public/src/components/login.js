@@ -32,15 +32,10 @@ export class LoginForm extends Component {
 
     login(res) {
         console.log('token '+ authService.getToken());
-        if(authService.loggedIn())
-        {
+        if(authService.loggedIn()) {
             console.log('Push to homepage');
-            this.context.history.push('/hjem');
-            // this.props.history.push('/path')
-            // history.push("/hjem");
-        }
-        else
-        {
+            this.props.history.push('/hjem')
+        } else {
             alert('Innlogging feilet.');
         }
     }
