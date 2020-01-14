@@ -70,7 +70,7 @@ class Services
 
 	createUser(user)
 	{
-		return axios.post(url + '/user', user).then(response => response.data);
+		return axios.post(url + '/users', user).then(response => response.data);
 	}
 
 	getUsers()
@@ -95,7 +95,7 @@ class Services
 
 	createGig(gig)
 	{
-		return axios.post(url + '/gig', gig).then(response => response.data);
+		return axios.post(url + '/gigs', gig).then(response => response.data);
 	}
 
 	getTicketToEvent(eventId)
@@ -115,7 +115,7 @@ class Services
 
 	getEventByEventId(eventId)
 	{
-		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
 	}
 }
 

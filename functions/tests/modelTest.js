@@ -7,7 +7,7 @@ beforeAll(() => Models.syncTestData().then(() => function(){}));
 
 
 /*
-TODO: USERS
+                            USERS
  */
 
 describe('Login', () => {
@@ -120,7 +120,7 @@ describe('Users', () => {
 });
 
 /*
-TODO: EVENTS
+                    EVENTS
  */
 
 describe('Events', () => {
@@ -173,6 +173,14 @@ describe('Events', () => {
             done();
         });
     });
+
+    // it('delete Event', done => {
+    //     db.deleteEvent(2).then(response => {
+    //         expect(response).toBeTruthy();
+    //         done();
+    //     });
+    // });
+
 
     it('correct data in events', done => {
         db.getAllEvents().then(events => {
@@ -229,7 +237,7 @@ describe('Events - search', () => {
 });
 
 /*
-TODO: PERSONNEL
+                    PERSONNEL
  */
 
 describe('Personnel', () => {
@@ -279,7 +287,7 @@ describe('Personnel', () => {
 
 
 /*
-TODO: GIGS
+                    GIGS
  */
 
 describe('Gigs', () => {
@@ -306,7 +314,7 @@ describe('Gigs', () => {
 
 
 /*
-TODO: TICKETS
+                TICKETS
  */
 
 describe('Tickets', () => {
