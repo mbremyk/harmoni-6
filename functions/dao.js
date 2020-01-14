@@ -113,12 +113,22 @@ class Dao {
      * Return the user by their ID
      *
      * @param userId
-     * @returns {Promise<User>}
+     * @returns {Promise<{}>}
      */
     getUserById(userId) {
         return model.UserModel.findOne({where: {userId: userId}})
             .then(user => user ? user : {})
             .catch(error => {
+                console.error(error);
+                return {};
+            });
+    }
+
+    getUserByEmailOrUsername(email, username){
+        let where = {[op.or]: [{email: email},{username: username}]};
+        return model.UserModel.findAll({where: where})
+            .then(users => users)
+            .error(error => {
                 console.error(error);
                 return {};
             });

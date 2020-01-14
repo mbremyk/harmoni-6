@@ -1,6 +1,8 @@
 import {Component} from "react-simplified";
 import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
 import {EventInfo} from '../widgets.js';
+import {SortedEventView, SortingOptions} from './sortedeventview';
+
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
@@ -11,7 +13,12 @@ import {Event, service, Ticket} from '../services';
 
 export class LandingPage extends Component
 {
-	events = [];
+	state = {
+		sortOption: {field: '', order: 'asc'},
+		events : []
+	};
+
+
 	tickets = [];
 	searchevents = [];
 
@@ -49,8 +56,8 @@ export class LandingPage extends Component
 						<Row>
 							<Col md={{span: 3, offset: 5}}>
 								<Button variant="primary"
-								        size="lg"
-								        onClick={() => this.logIn()} href="logg-inn">Logg inn</Button>
+										size="lg"
+										onClick={() => this.logIn()} href="logg-inn">Logg inn</Button>
 							</Col>
 
 						</Row>
@@ -59,38 +66,19 @@ export class LandingPage extends Component
 				</div>
 
 
-				<Container>
-
-
-					<Row>
-
-						{this.events.map(event => (
-							<EventInfo
-								link={event.eventId}
-								imageUrl={event.imageUrl}
-								title={event.eventName}
-								address={event.address}
-								age_limit={event.ageLimit}
-								start_date={event.startTime}
-								end_date={event.endTime}
-								uploaded={event.createdAt}
-							/>
-						))}
-
-
-					</Row>
-				</Container>
+				<SortedEventView/>
 			</div>
 
 		);
 
 	}
 
+
 	mounted()
 	{
 		service
 			.getEvents()
-			.then(events => (this.events = events))
+			.then(events => (this.handleEvents(events)))
 			.catch((error) => console.log(error));
 
 
