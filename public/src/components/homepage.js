@@ -33,8 +33,8 @@ export class HomePage extends Component {
 			return (
 
 
-				<Container>
 
+					<div>
 
 					<Row>
 						<Col md={{span: 12, offset: 4}}>
@@ -57,8 +57,8 @@ export class HomePage extends Component {
 
 					<SortedEventView events={this.getOtherEvents()}/>
 
+					</div>
 
-				</Container>
 
 
 			);
