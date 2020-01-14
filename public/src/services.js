@@ -132,6 +132,7 @@ class Services {
 	{
 		return axios.get(url + '/personnel').then(response => response.data);
 	}
+
     uploadContract(formData, event, artist) {
         return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
     }
@@ -152,6 +153,7 @@ class Services {
     createGig(gig) {
         return axios.post(url + '/gigs', gig).then(response => response.data);
     }
+
 	updateEvent(event) {
 		return axios.put(url + "/auth/events/" + event.eventId, event).then(response => response.insertId);
 	}
@@ -171,6 +173,10 @@ class Services {
     getEventByEventId(eventId) {
         return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
     }
+
+	getEventByEventId(eventId) {
+		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
+	}
 
 	validateUsername(username) {
 		return axios.get(url + '/validate/username/' + username).then(response => response.data);
