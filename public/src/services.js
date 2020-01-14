@@ -52,69 +52,6 @@ export class Ticket {
     amount;
 }
 
-
-class Services
-{
-	login(email, password)
-	{
-		return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
-	}
-
-	logout()
-	{
-		return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
-	}
-
-	createUser(user)
-	{
-		return axios.post(url + '/users', user).then(response => response.data);
-	}
-
-	getUsers()
-	{
-		return axios.get(url + '/users').then(response => response.data);
-	}
-
-	getUser(id)
-	{
-		return axios.get(url + '/users/' + id).then(response => response.data);
-	}
-
-	getEvents()
-	{
-		return axios.get(url + '/events').then(response => response.data);
-	}
-
-	createEvent(event)
-	{
-		return axios.post(url + '/events', event).then(response => response.insertId);
-	}
-
-	createGig(gig)
-	{
-		return axios.post(url + '/gigs', gig).then(response => response.data);
-	}
-
-	getTicketToEvent(eventId)
-	{
-		return axios.get(url + '/tickets/' + eventId).then(response => response.data);
-	}
-
-	searchForEvents(input)
-	{
-		return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
-	}
-
-	getEventsByOrganizer(userId)
-	{
-		return axios.get(url + '/auth/events/user/' + userId).then(response => response.data);
-	}
-
-	getEventByEventId(eventId)
-	{
-		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
-	}
-=========
 class Services {
     login(email, password) {
         return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
