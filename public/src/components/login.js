@@ -29,6 +29,7 @@ export class LoginForm extends Component {
         authService.login(this.state.email, this.state.password).then(res => {
             console.log('token = ' + authService.getToken());
             {authService.loggedIn()? this.props.history.push('/hjem') : alert('Innlogging feilet.'); }
+            console.log('logged in? : ' + authService.loggedIn());
         })
     }
 

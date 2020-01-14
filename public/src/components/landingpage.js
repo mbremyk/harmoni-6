@@ -5,65 +5,34 @@ import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
 
-
-
-
-
 export class LandingPage extends Component
 {
 	events = [];
 	tickets = [];
 	searchevents = [];
 
-	/*
-	 <Container>
-	 <Row>
-	 <Col>
-
-	 <Form.Control placeholder="Søk etter arragement"/>
-
-
-	 </Col>
-	 </Row>
-
-	 </Container>
-	 */
-
 	render()
 	{
 		return (
-
 			<div>
-
 				<div className="landingpage">
-
 					<Container>
-
-
 						<Row>
 							<Col md={{span: 3, offset: 5}}>
 								<h1>Harmoni</h1>
 							</Col>
 						</Row>
-
 						<Row>
 							<Col md={{span: 3, offset: 5}}>
 								<Button variant="primary"
 								        size="lg"
 								        onClick={() => this.logIn()} href="logg-inn">Logg inn</Button>
 							</Col>
-
 						</Row>
 					</Container>
-
 				</div>
-
-
 				<Container>
-
-
 					<Row>
-
 						{this.events.map(event => (
 							<EventInfo
 								link={event.eventId}
@@ -76,14 +45,10 @@ export class LandingPage extends Component
 								uploaded={event.createdAt}
 							/>
 						))}
-
-
 					</Row>
 				</Container>
 			</div>
-
 		);
-
 	}
 
 	mounted()
@@ -92,11 +57,7 @@ export class LandingPage extends Component
 			.getEvents()
 			.then(events => (this.events = events))
 			.catch((error) => console.log(error));
-
-
-
 	}
-
 	getTicketPrice(eventId)
 	{
 		service
@@ -113,28 +74,8 @@ export class LandingPage extends Component
 						console.log(lowestPrice);
 					}
 				}
-				/*this.tickets.map(ticket =>
-				 {
-				 if(ticket.price < lowestPrice)
-				 {
-				 lowestPrice = ticket.price;
-				 console.log(lowestPrice);
-				 }
-				 });*/
 				return lowestPrice;
 			})
 			.catch((error) => console.log(error));
 	}
-
-	/*
-	 searchForEvents(input)
-	 {
-	 service
-	 .searchForEvents(input)
-	 .then(searchevents => this.searchevents = searchevents)
-	 .catch((error) => console.log(error));
-
-	 }
-	 */
-
 }

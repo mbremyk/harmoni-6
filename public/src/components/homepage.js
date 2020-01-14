@@ -30,69 +30,55 @@ export class HomePage extends Component {
 
     render() {
         return (
+	        <div>
+	            <Container>
+	                <Row>
+	                    <Col md={{span: 12, offset: 4}}>
+	                        <h1>Mine Arrangementer</h1>
+	                    </Col>
+	                </Row>
+	                <Row>
+	                    {this.myEvents.map(event => (
+	                        <EventInfo
 
+	                            link={event.eventId}
+	                            imageUrl={event.imageUrl}
+	                            title={event.eventName}
+	                            address={event.address}
+	                            age_limit={event.ageLimit}
+	                            start_date={event.startTime}
+	                            end_date={event.endTime}
+	                            uploaded={event.createdAt}
+								myEvent = {true}
 
-            <Container>
+	                        />
+	                    ))}
+	                </Row>
+	                <Row>
+	                    <Col md={{span: 12, offset: 4}}>
+	                        <h1>Andre Arrangementer</h1>
+	                    </Col>
+	                </Row>
+	                <Row>
+	                    {this.getOtherEvents().map(event =>
+	                        <EventInfo
 
+	                            link={event.eventId}
+	                            imageUrl={event.imageUrl}
+	                            title={event.eventName}
+	                            address={event.address}
+	                            age_limit={event.ageLimit}
+	                            start_date={event.startTime}
+	                            end_date={event.endTime}
+	                            uploaded={event.createdAt}
+								myEvent={false}
 
-                <Row>
-                    <Col md={{span: 12, offset: 4}}>
-                        <h1>Mine Arrangementer</h1>
-                    </Col>
-                </Row>
-
-
-                <Row>
-                    {this.myEvents.map(event => (
-                        <EventInfo
-
-                            link={event.eventId}
-                            imageUrl={event.imageUrl}
-                            title={event.eventName}
-                            address={event.address}
-                            age_limit={event.ageLimit}
-                            start_date={event.startTime}
-                            end_date={event.endTime}
-                            uploaded={event.createdAt}
-							myEvent = {true}
-
-                        />
-                    ))}
-                </Row>
-
-
-                <Row>
-                    <Col md={{span: 12, offset: 4}}>
-                        <h1>Andre Arrangementer</h1>
-                    </Col>
-                </Row>
-                <Row>
-                    {this.getOtherEvents().map(event =>
-
-
-
-                        <EventInfo
-
-                            link={event.eventId}
-                            imageUrl={event.imageUrl}
-                            title={event.eventName}
-                            address={event.address}
-                            age_limit={event.ageLimit}
-                            start_date={event.startTime}
-                            end_date={event.endTime}
-                            uploaded={event.createdAt}
-							myEvent={false}
-
-                        />
-                    )}
-                </Row>
-
-
-            </Container>
-
-
+	                        />
+	                    )}
+	                </Row>
+	            </Container>
+	        </div>
         );
-
     }
 
     mounted() {
@@ -104,9 +90,6 @@ export class HomePage extends Component {
 			.catch((error) => console.log(error));
 
 		this.getAllEvents()
-
-
-
     }
 
     //gets all the events in the database and gives the array allEvents this value
@@ -125,8 +108,4 @@ export class HomePage extends Component {
 		return otherEvents;
 
 	}
-
-
-
-
 }
