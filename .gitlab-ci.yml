@@ -1,0 +1,13 @@
+variables:
+  MYSQL_DATABASE: School
+  MYSQL_USER: root
+  MYSQL_ROOT_PASSWORD: ''
+  MYSQL_ALLOW_EMPTY_PASSWORD: 1
+
+test:
+  image: node:latest
+  services:
+    - mysql:5 # The JS mysql-library does not yet support the newest mysql protocol
+  script:
+    - cd functions && npm install && npm test
+    #- cd ../client && npm install && npm test && flow check src

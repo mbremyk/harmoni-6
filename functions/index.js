@@ -13,9 +13,7 @@ let fs = require("fs");
 const express = require("express");
 const app = express();
 
-const {
-    fileParser
-} = require('express-multipart-file-parser');
+const {fileParser} = require('express-multipart-file-parser');
 
 app.use(fileParser({
     rawBodyOptions: {
@@ -65,15 +63,21 @@ function tokenIsBlacklisted(token) {
     return jwtBlacklist.includes(token);
 }
 
+let interval = 60 * 1000;
+
 /**
  * Goes through the blacklist every hour and removes timed out tokens
  */
 setInterval(() => {
+    console.log("Removing expired tokens");
+    console.log("Token count: " + jwtBlacklist.length);
     jwtBlacklist = jwtBlacklist.filter(token => {
-        token.isValid();
-    })
-}, 60 * 60 * 1000);
-
+        jwt.verify(token, privateKey, (err, decoded) => {
+            return Date.now() > decoded.exp * 1000;
+        });
+    });
+    console.log("Tokens after purge: " + jwtBlacklist.length);
+}, interval);
 
 /**
  * Creates a token based on the specified user information
@@ -230,7 +234,7 @@ app.post("/users", (req, res) => {
 /**
  *
  */
-app.post("/event", (req, res) => {
+app.post("/events", (req, res) =>{
     console.log("POST-request received from client");
     return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
 });
@@ -409,7 +413,7 @@ app.post("/login", (req, res) => {
     console.log("POST-request received from client");
 
     return db.getSaltByEmail(req.body.email)
-            .then(salt => {
+        .then(salt => {
             if (salt.length !== 1) {
                 res.sendStatus(401);
                 return;
@@ -431,8 +435,8 @@ app.post("/login", (req, res) => {
         });
 });
 
-app.post("/contract/:eventId/:artistId", (req, res) => {
-	console.log("Calling setContract");
+app.post("/contracts/:eventId/:artistId", (req, res) => {
+    console.log("Calling setContract");
     const {
         fieldname,
         originalname,
@@ -444,22 +448,22 @@ app.post("/contract/:eventId/:artistId", (req, res) => {
     console.log(req.files[0].originalname);
     console.log(req.files[0]);
 
-	fs.writeFile(`${__dirname}/uploads/`+file.originalname, file.buffer, (err) => {
-		if (err){
-			res.send(err);
-		}else{
-			console.log('The file has been saved!');
-			res.send("done");
-		}
-	});
-	//Todo set access here
+    fs.writeFile(`${__dirname}/uploads/` + file.originalname, file.buffer, (err) => {
+        if (err) {
+            res.send(err);
+        } else {
+            console.log('The file has been saved!');
+            res.send("done");
+        }
+    });
+    //Todo set access here
     /*db.setContract(req.body, req.params.eventId, req.params.artistId)
 		.then(() => res.send("Change made"));*/
 });
 
 
 app.get("/contract/:eventId/:artistId", (req, res) => {
-	console.log("downloading file");
+    console.log("downloading file");
 
     //Todo check access here
     /*db.getContract(req.params.eventId, req.params.artistId)
@@ -468,24 +472,10 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
             }
         );*/
 
-	const file = `${__dirname}/uploads/nativelog.txt`;
-	res.download(file); // Set disposition and send it.
+    const file = `${__dirname}/uploads/nativelog.txt`;
+    res.download(file); // Set disposition and send it.
 });
 
-app.use("/auth", (req, res, next) => {
-    console.log("Authorization request received from client");
-    let token = req.headers["x-access-token"];
-    jwt.verify(token, publicKey, (err, decoded) => {
-        if (err || decoded.username !== req.body.username) {
-            console.log("Token not OK");
-            res.status(401);
-            res.json({error: "Not authorized"});
-        } else {
-            console.log("Token OK");
-            next();
-        }
-    });
-});
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:
@@ -522,7 +512,9 @@ app.use("/auth", (req, res, next) => {
  */
 app.get("/auth/users/:userId", (req, res) => {
     console.log("GET-request received from client");
-    return db.getUserByEmail(req.body.email).then(user => user ? res.status(201).send(user) : res.status(400))
+    return db.getUserById(req.params.userId)
+        .then(user => res.send(user))
+        .catch(error => console.error(error));
 });
 
 /**
@@ -531,11 +523,10 @@ app.get("/auth/users/:userId", (req, res) => {
  *          x-access-token: string
  *      }
  */
-app.get("/auth/events/user/:userId", (req, res) => {
+app.get("/auth/events/users/:userId", (req, res) => {
     console.log("GET-request received from client");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
-    console.log(decoded);
     if (decoded.userId == req.params.userId) {
         return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
@@ -577,6 +568,8 @@ app.post("/auth/logout", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
+
+    res.sendStatus(201);
 });
 
 /**
@@ -590,7 +583,9 @@ app.post("/auth/logout", (req, res) => {
  */
 app.put("/auth/users/:userId", (req, res) => {
     console.log("PUT-request received from client");
-    return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
+
+    return db.updateUser(req.body)
+        .then(res.sendStatus(200));
 });
 
 console.log("Server initalized");
