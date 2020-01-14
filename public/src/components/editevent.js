@@ -51,14 +51,17 @@ export class EditEvent extends Component{
         this.eventAddress = this.handleEventAddressChange.bind(this);
         this.eventDescription = this.handleEventDescriptionChange.bind(this);
         this.ageLimit = this.handleAgeLimitChange.bind(this);
-        this.rider = this.handleRiderChange.bind(this);
-        this.contract = this.handleContractChange.bind(this);
-        this.artistsAdd = this.handleArtistsAdd.bind(this);
-        this.artists = this.handleArtists.bind(this);
         this.fDate = this.handleFDate.bind(this);
         this.fTime = this.handleFTime.bind(this);
         this.tDate = this.handleTDate.bind(this);
         this.tTime = this.handleTTime.bind(this);
+        this.rider = this.handleRiderChange.bind(this);
+        this.contract = this.handleContractChange.bind(this);
+        this.artistsAdd = this.handleArtistsAdd.bind(this);
+        this.artists = this.handleArtists.bind(this);
+        this.imageUrl = this.handleImageUrlChange.bind(this);
+        this.image = this.handleImageUpload.bind(this);
+        this.personnelAdd = this.handlePersonnelAdd.bind(this);
 
         this.state = {
             eventId: 0,
@@ -73,8 +76,11 @@ export class EditEvent extends Component{
             tTime: require('moment')().format('HH:mm'),
             rider: '',
             contract: '',
+            image: '',
+            imageUrl: '',
             artistsAdd: [],
             artists: [],
+            personnelAdd: [],
         };
     }
 
@@ -103,12 +109,24 @@ export class EditEvent extends Component{
         this.setState({contract: event.target.value})
     }
 
+    handleImageUpload(event){
+        this.setState({image: event.target.value})
+    }
+
+    handleImageUrlChange(event){
+        this.setState({imageUrl: event.target.value})
+    }
+
     handleArtistsAdd(event){
         service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
     }
 
     handleArtists(event){
         this.setState({artists: [...this.state.artists, ...event]})
+    }
+
+    handlePersonnelAdd(event){
+        service.getUser(event).then((user) => this.setState({personnelAdd: [...this.state.personnelAdd, user]}));
     }
 
     handleFDate(event) {
@@ -128,7 +146,13 @@ export class EditEvent extends Component{
     }
 
     handleSubmit() {
-        this.submit()
+        let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
+        let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
+
+        let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
+            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "");
+
+        service.updateEvent(ev)
     }
 
     render() {
@@ -176,7 +200,7 @@ export class EditEvent extends Component{
 
 
                         <Form.Group as={Col} sm={"3"}>
-                            <Form.Label>Dato</Form.Label>
+                            <Form.Label>Fra dato</Form.Label>
                             <Form.Control
                                 value={this.state.fDate}
                                 onChange={this.handleFDate}
@@ -186,7 +210,7 @@ export class EditEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"3"}>
-                            <Form.Label>TIME</Form.Label>
+                            <Form.Label>Fra klokkeslett</Form.Label>
                             <Form.Control
                                 value={this.state.fTime}
                                 onChange={this.handleFTime}
@@ -197,7 +221,7 @@ export class EditEvent extends Component{
 
 
                         <Form.Group as={Col} sm={"3"}>
-                            <Form.Label>Dato</Form.Label>
+                            <Form.Label>Til dato</Form.Label>
                             <Form.Control
                                 value={this.state.tDate}
                                 onChange={this.handleTDate}
@@ -207,7 +231,7 @@ export class EditEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"3"}>
-                            <Form.Label>TIME</Form.Label>
+                            <Form.Label>Til klokkeslett</Form.Label>
                             <Form.Control
                                 value={this.state.tTime}
                                 onChange={this.handleTTime}
@@ -228,7 +252,7 @@ export class EditEvent extends Component{
                                     Velg artist
                                 </Dropdown.Toggle>
 
-                                <Dropdown.Menu as={this.CustomMenu}>
+                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}}  as={this.CustomMenu}>
                                     {this.state.artists.map(artist => (
                                         <Dropdown.Item eventKey={artist.userId}>
                                             {artist.username}
@@ -254,6 +278,90 @@ export class EditEvent extends Component{
                         </Form.Group>
 
 
+                        <Form.Group as={Col} sm={"2"}>
+
+                            <Form.Label>Personell</Form.Label>
+
+                            <Dropdown onSelect={this.handlePersonnelAdd}>
+
+                                <Dropdown.Toggle variant={"success"} id="dropdown">
+                                    Velg personell
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
+                                    {this.state.artists.map(artist => (
+                                        <Dropdown.Item eventKey={artist.userId}>
+                                            {artist.username}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+
+                            </Dropdown>
+
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"10"}>
+
+                            <ListGroup title={"Valgt personell"}>
+                                {this.state.personnelAdd.map(personnel => (
+                                    <React.Fragment key={personnel.userId}>
+
+                                        <ListGroupItem>
+                                            {personnel.username}
+                                            <Form.Control
+                                                placeholder="Rollen til personen"
+                                                value={personnel.role}
+                                                onChange={(event) => personnel.role = event.target.value}
+                                            />
+                                        </ListGroupItem>
+                                    </React.Fragment>
+                                ))}
+                            </ListGroup>
+                            {this.state.personnelAdd.map(p => console.log(p))}
+                        </Form.Group>
+
+
+                        <Form.Group as={Col} sm={"6"}>
+                            <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                            <InputGroup className="mb-5">
+                                <FormControl
+                                    type="file"
+                                    value={this.state.image}
+                                    onChange={this.handleImageUpload}
+                                />
+                            </InputGroup>
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"6"}>
+                            <Form.Label>Eller legg inn en bilde-url</Form.Label>
+                            <Form.Control
+                                placeholder="Bilde-url"
+                                value={this.state.imageUrl}
+                                onChange={this.handleImageUrlChange}
+                            />
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"6"}>
+                            <Form.Label>Last opp rider</Form.Label>
+                            <InputGroup className="mb-5">
+                                <FormControl
+                                    type="file"
+                                    value={this.state.rider}
+                                    onChange={this.handleRiderChange}
+                                />
+                            </InputGroup>
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"6"}>
+                            <Form.Label>Last opp kontrakt</Form.Label>
+                            <InputGroup className="mb-5">
+                                <FormControl
+                                    type="file"
+                                    value={this.state.contract}
+                                    onChange={this.handleRiderChange}
+                                />
+                            </InputGroup>
+                        </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
 
@@ -280,28 +388,6 @@ export class EditEvent extends Component{
                             </ButtonToolbar>
                         </Form.Group>
 
-                        <Form.Group as={Col} sm={"6"}>
-                            <Form.Label>Last opp rider</Form.Label>
-                            <InputGroup className="mb-5">
-                                <FormControl
-                                    type="file"
-                                    value={this.state.rider}
-                                    onChange={this.handleRiderChange}
-                                />
-                            </InputGroup>
-                        </Form.Group>
-
-                        <Form.Group as={Col} sm={"6"}>
-                            <Form.Label>Last opp kontrakt</Form.Label>
-                            <InputGroup className="mb-5">
-                                <FormControl
-                                    type="file"
-                                    value={this.state.contract}
-                                    onChange={this.handleRiderChange}
-                                />
-                            </InputGroup>
-                        </Form.Group>
-
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
                             <Button type="button" onClick={this.handleSubmit}>Endre arragament</Button>
                         </Form.Group>
@@ -318,10 +404,8 @@ export class EditEvent extends Component{
 
             let fromDateTime = event.startTime.split(" ");
             let toDateTime = event.endTime.split(" ");
-
             let fromDate = fromDateTime[0];
             let toDate = toDateTime[0];
-
             let fromTime = fromDateTime[1];
             let toTime = toDateTime[1];
 
@@ -350,16 +434,5 @@ export class EditEvent extends Component{
             this.state.ageLimit--;
             this.setState({ageLimit: this.state.ageLimit})
         }
-    }
-
-    submit() {
-
-        let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
-        let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
-
-        let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "");
-
-        service.updateEvent(ev)
     }
 }
