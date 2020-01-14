@@ -124,9 +124,19 @@ class Dao {
             });
     }
 
-    /*
-    TODO: EVENTS
-     */
+	getUserByEmailOrUsername(email, username){
+		let where = {[op.or]: [{email: email},{username: username}]};
+		return model.UserModel.findAll({where: where})
+			.then(users => users)
+			.error(error => {
+				console.error(error);
+				return {};
+			});
+	}
+
+	/*
+	TODO: EVENTS
+	 */
 
     /**
      * creates a new Event in the Database, returns the ID the event was assigned

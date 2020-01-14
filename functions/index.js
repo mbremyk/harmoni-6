@@ -213,7 +213,7 @@ app.post("/user", (req, res) => {
     console.log('POST-request - /user');
     return db.getUserByEmailOrUsername(req.body.email, req.body.username)
         .then(user => {
-            if (user) {
+            if (user.length !== 0) {
                 res.sendStatus(409);
             } else {
                 return hashPassword.hashPassword(req.body.password).then(credentials => {
@@ -350,6 +350,7 @@ app.use("/auth", (req, res, next) => {
         }
     });
 });
+
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:
@@ -483,11 +484,16 @@ app.get("/auth/events/user/:userId", (req, res) => {
 
 app.get("/validate/username/:username", (req, res) => {
     console.log("GET-request - /validate/username/:username");
+    return db.getUserByEmailOrUsername('', req.params.username).then(result => {
+        console.log(result);
+        res.send(result.length === 1)})
 });
 
 app.get("/validate/email/:email", (req, res) => {
-    console.log("GET-request - /validate/username/:email");
-    return db.getUserByEmail(req.params.email).then(result => res.send(result.length === 1));
+    console.log("GET-request - /validate/email/:email");
+    return db.getUserByEmail(req.params.email).then(result => {
+        console.log(result);
+        res.send(result !== null)})
 });
 
 console.log("Server initalized");

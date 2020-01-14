@@ -49,13 +49,14 @@ export class CreateUserForm extends Component{
 		user.password = this.state.password1;
 
 		// check username availability
-		service.validateUsername(user.username).then(res => {
-			console.log(res);
-			if(false){ alert('Brukernavn er i bruk :('); } else {
+		service.validateUsername(user.username).then(taken1 => {
+			console.log('Check username, taken: ' + taken1);
+			if(taken1){ alert('Brukernavn er i bruk :('); } else {
 
 				// check email availability
-				service.validateEmail(user.email).then(ok2 => {
-					if(!ok2) { alert('Epost er i bruk'); } else {
+				service.validateEmail(user.email).then(taken2 => {
+					console.log('Check email, taken: ' + taken2);
+					if(taken2) { alert('Epost er i bruk'); } else {
 
 						service.createUser(user)
 							.then(res => console.log('Submit user status: ' + res))

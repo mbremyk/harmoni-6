@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-//const properties = require('./properties.js');
+const properties = require('./properties.js');
 const isCI = require('is-ci');
 const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
@@ -15,7 +15,7 @@ function init() {
         return sequelize;
     } else {
         let test = (process.env.NODE_ENV === 'test');
-        let pr = test ? new properties.TestProperties() : new properties.SebProperties();
+        let pr = test ? new properties.TestProperties() : new properties.Properties();
         console.log(pr.databaseUser);
         let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
             host: pr.databaseURL,
@@ -25,7 +25,7 @@ function init() {
                 min: 0,
                 idle: 10000
             },
-            //logging: true
+            logging: false
         });
         return sequelize;
     }
