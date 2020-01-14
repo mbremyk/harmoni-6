@@ -10,7 +10,7 @@ import "@fortawesome/fontawesome-free"
 import {CreateUserForm} from '../src/components/createuser';
 import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
-import {HarmoniNavbar} from "./components/harmoniNavbar.js";
+import {navbar} from "./components/navbar.js";
 import {myPage} from "./components/mypage.js";
 import {AddEvent} from './components/createevent.js';
 import {HomePage} from "./components/homepage";
@@ -30,14 +30,13 @@ const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
 const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
-        <BrowserRouter>
-            <div>
-                <HarmoniNavbar/>
-                {/*<Route path="/" component={harmoniNavbar}/>*/}
-                <Route exact path="/" component={LandingPage}/>
-                <Route exact path="/ny-bruker" component={CreateUserForm}/>
-                <Route exact path="/arrangement/:id" component={EventPage}/>
-                <Route exact path="/logg-inn" component={LoginForm}/>
+    <BrowserRouter>
+    <div>
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+        <Route exact path="/arrangement/:id" component={EventPage}/>
+        <Route exact path="/logg-inn" component={LoginForm}/>
 
                 <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
                 <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
