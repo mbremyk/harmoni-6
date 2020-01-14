@@ -70,7 +70,7 @@ class Services {
         return axios.get(url + '/users').then(response => response.data);
     }
     updateUser(user) {
-        return axios.put(url + '/auth/user/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
     getUser(id) {
         return axios.get(url + '/users/' + id).then(response => response.data);
