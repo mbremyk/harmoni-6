@@ -62,6 +62,7 @@ export class EditEvent extends Component{
 
         this.state = {
             eventId: 0,
+            organizerId: 0,
             eventName: '',
             eventAddress: '',
             eventDescription: '',
@@ -325,6 +326,7 @@ export class EditEvent extends Component{
             let toTime = toDateTime[1];
 
             this.setState({eventId: event.eventId});
+            this.setState({organizerId: event.organizerId});
             this.setState({eventName: event.eventName});
             this.setState({eventAddress: event.address});
             this.setState({eventDescription: event.description});
@@ -355,9 +357,8 @@ export class EditEvent extends Component{
         let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
-        let ev = new Event(this.state.eventId, 1, this.state.eventName, this.state.eventAddress,
+        let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
             this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "");
-        new Event(1,)
 
         service.updateEvent(ev)
     }
