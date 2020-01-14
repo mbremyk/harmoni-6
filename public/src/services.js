@@ -125,7 +125,7 @@ class Services {
 
 	createPersonnel(personnel, eventId)
 	{
-		return axios.post(url + '/event/' + eventId + '/personell', personnel).then(response => response.data);
+		return axios.post(url + '/events/' + eventId + '/personnel', personnel).then(response => response.data);
 	}
 
 	getPersonnel(id)
