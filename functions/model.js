@@ -72,7 +72,7 @@ let FileModel = sequelize.define('file', {
     path: Sequelize.STRING
 });
 
-let FileAccessModel = sequelize.define('fileAccess', {
+/*let FileAccessModel = sequelize.define('fileAccess', {
     fileId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -89,7 +89,7 @@ let FileAccessModel = sequelize.define('fileAccess', {
             key: 'userId'
         }
     }
-});
+});*/
 
 /*class Event {
     eventId;
