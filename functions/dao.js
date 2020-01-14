@@ -267,6 +267,7 @@ class Dao {
         return model.EventModel.findOne({where: {eventId: eventId}})
             .catch(error => {
                 console.error(error);
+                return {};
             });
     }
 

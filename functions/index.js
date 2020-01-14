@@ -52,6 +52,7 @@ setInterval(() => {
     })
 }, 60 * 60 * 1000);
 
+
 /**
  * Creates a token based on the specified user information
  *
@@ -66,7 +67,6 @@ function getToken(user) {
 
 /**
  * ENDPOINTS:
- * get /test
  * get /users
  * get /users/:userId
  * get /events
@@ -79,6 +79,20 @@ function getToken(user) {
  * post /gig
  * post /login
  *
+ * put /auth/event/:eventId
+ *
+ *          PERSONNEL
+ * post /events/:eventId/personnel
+ * put /events/:eventId/personnel
+ * get /events/:eventId/personnel
+ * delete /events/:eventId/personnel
+ *
+ *          TICKETS
+ * post /events/:eventId/tickets
+ * put /events/:eventId/tickets
+ * get /events/:eventId/tickets
+ * delete /events/:eventId/tickets
+ *
  * use /auth
  *
  * get /auth/users/:userId
@@ -88,16 +102,9 @@ function getToken(user) {
  * post /auth/logout
  *
  * put /auth/user/:userId
- * put /auth/event/:eventId
+
  */
 
-/**
- * Test endpoint. Use at own risk
- */
-app.get("/test", (req, res) => {
-    console.log(req);
-    res.send("test functional");
-});
 
 /**
  *
@@ -208,6 +215,148 @@ app.post("/event", (req, res) => {
 
 
 /**
+ * Add i ticket type to an event
+ * body:
+ * {
+ *    eventId: number
+ *    type: string
+ *    price: number
+ *    amount: number
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.post("/events/:eventId/tickets", (req, res) => {
+    return db.addTicket(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+});
+
+/**
+ *
+ * Changes the information of a Ticket
+ * body:
+ * {
+ *    eventId: number
+ *    type: string
+ *    price: number
+ *    amount: number
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.put('/event/:eventId/tickets', (req, res) => {
+    db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+});
+
+
+/**
+ *  Get an array of tickets connected to an event
+ *
+ *  ticket:{
+ *      eventId: number
+ *      type: string
+ *      price: number
+ *      amount: number
+ *  }
+ */
+app.get("/event/:eventId/tickets", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    db.getTickets(eventId).then(tickets => (tickets !== null) ? res.status(201).send(tickets) : res.sendStatus(400));
+});
+
+
+/**
+ * Deletes a ticket type from the event
+ * body:
+ * {
+ *    eventId: number
+ *    type: string
+ *    price: number
+ *    amount: number
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.delete('/event/:eventId/tickets', (req, res) => {
+    db.removeTicket(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+});
+
+
+/**
+ * Add personnel to an event
+ * body:
+ * {
+ *    personnelId: number
+ *    eventId:  number
+ *    role:  string
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.post("/events/:eventId/personnel", (req, res) => {
+    return db.addPersonnel(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+});
+
+
+/**
+ * Changes the information of personnel
+ * body:
+ * {
+ *    personnelId: number
+ *    eventId:  number
+ *    role:  string
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.put('/event/:eventId/personnel', (req, res) => {
+    db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+});
+
+/**
+ *  Get an array of personnel connected to an event
+ *
+ *  personnel:{
+ *      personnelId: number
+ *      eventId: number
+ *      role: string
+ *  }
+ */
+app.get("/event/:eventId/personnel", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(400));
+});
+
+
+/**
+ * Deletes personnel from the event
+ * body:
+ * {
+ *    personnelId: number
+ *    eventId:  number
+ *    role:  string
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.delete('/event/:eventId/tickets', (req, res) => {
+    db.removePersonnel(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+});
+
+
+/**
+ * Changes the information of an Event
+ * body:
+ * {
+ *     event: Event
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.put('/auth/event/:eventId', (req, res) => {
+    db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+});
+
+/**
  * Changes the information of an Event
  * body:
  * {
@@ -224,7 +373,10 @@ app.put('/auth/event/:eventId', (req, res) => {
  * Creates a Gig
  * body:
  * {
- *     gig: Gig
+ *    artistId: number
+ *    eventId: number
+ *    rider?: number
+ *    contract?: number
  * }
  *
  * @return {json} {jwt: token}

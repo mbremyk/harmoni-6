@@ -174,12 +174,12 @@ describe('Events', () => {
         });
     });
 
-    it('delete Event', done => {
-        db.deleteEvent(2).then(response => {
-            expect(response).toBeTruthy();
-            done();
-        });
-    });
+    // it('delete Event', done => {
+    //     db.deleteEvent(2).then(response => {
+    //         expect(response).toBeTruthy();
+    //         done();
+    //     });
+    // });
 
 
     it('correct data in events', done => {
