@@ -3,7 +3,8 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeAll(() => Models.syncTestData().then(() => function(){}));
+beforeAll(() => Models.syncTestData().then(() => function () {
+}));
 
 
 /*
@@ -122,6 +123,7 @@ describe('Users', () => {
 /*
                     EVENTS
  */
+
 
 describe('Events', () => {
 
@@ -305,10 +307,10 @@ describe('Gigs', () => {
     });
 
     it('correct data in gig', done => {
-        db.getGig(4).then(gig => {
-            expect(gig.artistId).toBe(8);
-            done();
+        db.getGigs(4).then(gigs => {
+          expect(gigs.length).toBe(1);
         });
+        done();
     });
 });
 
