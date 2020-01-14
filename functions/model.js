@@ -114,17 +114,15 @@ let EventModel = sequelize.define('event', {
     address: Sequelize.STRING,
     ageLimit: Sequelize.INTEGER,
     startTime: {
-        type: Sequelize.DATE,
-        get() {
-            return moment(this.getDataValue('startTime')).format('DD/MM/YYYY HH:mm');
+        type:Sequelize.DATE,
+        get(){
+            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    endTime: {
-        type: Sequelize.DATE,
-        get() {
-            return moment(this.getDataValue('endTime')).format('DD/MM/YYYY HH:mm');
-        }
-    },
+    endTime: {type:Sequelize.DATE,
+        get(){
+            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
+        }},
     imageUrl: Sequelize.STRING,
     image: Sequelize.BLOB,
     description: Sequelize.TEXT,
