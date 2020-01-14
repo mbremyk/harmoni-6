@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Router, Route} from 'react-router-dom';
+import {Router, Route, BrowserRouter} from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import "@fortawesome/fontawesome-free"
 
@@ -13,16 +13,17 @@ import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
 import {EditEvent} from "./components/editevent";
 import {UploadWidget, DownloadWidget} from "./widgets";
-import {history} from "./components/history"
 
 import {authService} from "./AuthService";
 import {PrivateRoute} from "./components/PrivateRoute";
+import {createBrowserHistory} from "history";
+const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
 
 const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
-    <Router history={history}>
+    <BrowserRouter history={history}>
         <div>
 	        <Route exact path="/" component={LandingPage}/>
 	        <Route exact path="/ny-bruker" component={CreateUserForm}/>
@@ -37,6 +38,6 @@ if (root)
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
         </div>
-    </Router>,
+    </BrowserRouter>,
     root
 );

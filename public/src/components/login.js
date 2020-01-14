@@ -5,7 +5,6 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {authService} from "../AuthService";
-import {history} from "./history"
 
 export class LoginForm extends Component {
     constructor(props) {
@@ -27,7 +26,7 @@ export class LoginForm extends Component {
     handleLogin() {
         if(!this.state.email || !this.state.password) { return; }
         authService.login(this.state.email, this.state.password).then(res => {
-            this.props.history.push('/hjem') })
+            window.location = '/hjem' })
     }
 
     render(){

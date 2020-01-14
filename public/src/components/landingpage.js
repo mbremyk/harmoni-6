@@ -1,9 +1,6 @@
 import {Component} from "react-simplified";
 import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
-import {EventInfo} from '../widgets.js';
 import {SortedEventView, SortingOptions} from './sortedeventview';
-
-import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
 
