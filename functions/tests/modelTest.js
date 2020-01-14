@@ -123,6 +123,8 @@ describe('Users', () => {
                     EVENTS
  */
 
+
+
 describe('Events', () => {
 
     it('create event', done => {
@@ -305,7 +307,7 @@ describe('Gigs', () => {
     });
 
     it('correct data in gig', done => {
-        db.getGig(4).then(gig => {
+        db.getGigs(4).then(gig => {
             expect(gig.artistId).toBe(8);
             done();
         });
