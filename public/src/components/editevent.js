@@ -313,6 +313,14 @@ export class EditEvent extends Component{
             let fromTime = fromDateTime[1];
             let toTime = toDateTime[1];
 
+
+            console.log(fromDateTime)
+            console.log(toDateTime)
+            console.log(fromDate)
+            console.log(toDate)
+            console.log(fromTime)
+            console.log(toTime)
+
             this.setState({eventId: event.eventId});
             this.setState({eventName: event.eventName});
             this.setState({eventAddress: event.address});
