@@ -16,12 +16,13 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     loginOk(email, password) {
-        return model.UserModel.findAll({where: {[op.and]: [{email: email}, {password: password}]}}).then(response => {
-            return response.length === 1;
-        }).catch(error => {
-            console.error(error);
-            return false;
-        });
+        return model.UserModel.findAll(
+            {where: {[op.and]: [{email: email}, {password: password}]}})
+            .then(response => response.length === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
     }
 
     /**
@@ -38,8 +39,8 @@ class Dao {
                 password: user.password,
                 salt: user.salt,
                 email: user.email
-            }
-        ).then(response => response.userId >= 1)
+            })
+            .then(response => response.userId >= 1)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -73,7 +74,11 @@ class Dao {
      * @returns {Promise<User[]>}
      */
     getAllUsers() {
-        return model.UserModel.findAll();
+        return model.UserModel.findAll()
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
     }
 
     /**
@@ -84,10 +89,9 @@ class Dao {
      */
     getUserByEmail(email) {
         return model.UserModel.findOne({where: {[op.and]: [{email: email}]}})
-            .then(user => user)
             .catch(error => {
                 console.error(error);
-                return null;
+                return {};
             });
     }
 
@@ -99,9 +103,6 @@ class Dao {
      */
     getSaltByEmail(email) {
         return model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
-            .then(salt => {
-                return salt;
-            })
             .catch(error => {
                 console.error(error);
                 return {};
@@ -112,16 +113,22 @@ class Dao {
      * Return the user by their ID
      *
      * @param userId
-     * @returns {Promise<User>}
+     * @returns {Promise<{}>}
      */
     getUserById(userId) {
         return model.UserModel.findOne({where: {userId: userId}})
-            .then(user => {
-                if (user) {
-                    return user;
-                }
+            .then(user => user ? user : {})
+            .catch(error => {
+                console.error(error);
                 return {};
-            }).catch(error => {
+            });
+    }
+
+    getUserByEmailOrUsername(email, username){
+        let where = {[op.or]: [{email: email},{username: username}]};
+        return model.UserModel.findAll({where: where})
+            .then(users => users)
+            .error(error => {
                 console.error(error);
                 return {};
             });
@@ -149,8 +156,8 @@ class Dao {
                 startTime: event.startTime,
                 endTime: event.endTime,
                 description: event.description
-            }
-        ).then(created => ({insertId: (created.eventId)}))
+            })
+            .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
                 console.error(error);
                 return null;
@@ -175,8 +182,8 @@ class Dao {
                 endTime: event.endTime,
                 description: event.description
             },
-            {where: {eventId: event.eventId}}
-        ).then(response => response[0] === 1 /*affected rows === 1*/)
+            {where: {eventId: event.eventId}})
+            .then(response => response[0] === 1 /*affected rows === 1*/)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -204,13 +211,15 @@ class Dao {
      * @returns {Promise<Event[]>}
      */
     getEventsMatching(searchText) {
-        return model.EventModel.findAll({
-            where: {[op.or]: [{eventName: {[op.like]: `%${searchText}%`}}, {description: {[op.like]: `%${searchText}%`}}]},
-            order: [['startTime', 'ASC']]
-        }).catch(error => {
-            console.error(error);
-            return [];
-        });
+        return model.EventModel.findAll(
+            {
+                where: {[op.or]: [{eventName: {[op.like]: `%${searchText}%`}}, {description: {[op.like]: `%${searchText}%`}}]},
+                order: [['startTime', 'ASC']]
+            })
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
     }
 
     /**
@@ -252,12 +261,14 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     addGig(gig) {
-        return model.GigModel.create({
-            artistId: gig.artistId,
-            eventId: gig.eventId,
-            rider: gig.rider,
-            contract: gig.contract,
-        }).then(response => response.id !== null)
+        return model.GigModel.create(
+            {
+                artistId: gig.artistId,
+                eventId: gig.eventId,
+                rider: gig.rider,
+                contract: gig.contract,
+            })
+            .then(response => response.id !== null)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -294,8 +305,42 @@ class Dao {
                 personnelId: personnel.personnelId,
                 eventId: personnel.eventId,
                 role: personnel.role
-            }
-        ).then(response => response.id !== null)
+            })
+            .then(response => response.id !== null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    /**
+     * Updates the role of personnel, cannot change event or person as these are the primary key
+     *
+     * @param personnel
+     * @returns {Promise<boolean>}
+     */
+    updatePersonnel(personnel) {
+        return model.PersonnelModel.update(
+            {
+                role: personnel.role
+            },
+            {where: {eventId: personnel.eventId, personnelId: personnel.personnelId}})
+            .then(response => response[0] === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    /**
+     * Removes Personnel from an event
+     *
+     * @param personnel
+     */
+    removePersonnel(personnel) {
+        return model.PersonnelModel.destroy(
+            {where: {eventId: personnel.eventId, personnelId: personnel.personnelId}})
+            .then(() => true)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -322,19 +367,54 @@ class Dao {
      */
 
     /**
-     * creates a new Gig in the Database, artistId and eventId
-     * in the gig object has to be unique, returns false if something goes wrong
+     * creates a new Ticket in the Database, returns false if something goes wrong
      *
      * @param ticket
      * @returns {Promise<boolean>}
      */
     addTicket(ticket) {
-        return model.TicketModel.create({
-            eventId: ticket.eventId,
-            type: ticket.type,
-            price: ticket.price,
-            amount: ticket.amount
-        }).then(response => response.id !== null)
+        return model.TicketModel.create(
+            {
+                eventId: ticket.eventId,
+                type: ticket.type,
+                price: ticket.price,
+                amount: ticket.amount
+            })
+            .then(response => response.id !== null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    /**
+     * Updates a new Ticket in the Database, returns false if something goes wrong
+     *
+     * @param ticket
+     * @returns {Promise<boolean>}
+     */
+    updateTicket(ticket) {
+        return model.TicketModel.update(
+            {
+                price: ticket.price,
+                amount: ticket.amount
+            },
+            {where: {eventId: ticket.eventId, type: ticket.type}})
+            .then(response => response[0] === 1 /*affected rows === 1*/)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    /**
+     * Removes and entry from the Tickets in the Database
+     *
+     * @param ticket
+     */
+    removeTicket(ticket) {
+        return model.TicketModel.destroy({where: {eventId: ticket.eventId, type: ticket.type}})
+            .then(() => true)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -355,6 +435,33 @@ class Dao {
                 return []
             });
     }
+
+	setContract(contract, gig, artist ){
+		return model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+			.then(gig => {
+				console.log(contract);
+				let b = new Blob([contract]);
+				gig.update({contract: null });
+			}
+		);
+		console.log(contract);
+
+		/*model.GigModel.update(
+			{contract: contract},
+			{ where: { gigId: gig, artistId: artist}}
+		);
+		model.update();*/
+
+	}
+
+	getContract(gig, artist){
+		return model.GigModel.findAll({where:{eventId: gig, artistId: artist } })
+			.then(gig => {
+					console.log(gig[0].contract);
+					return gig[0].contract;
+			}
+		);
+	}
 
     /*
     TODO: FILE STUFF
