@@ -8,7 +8,6 @@ const hashPassword = require("./userhandling");
 let cors = require("cors");
 let fs = require("fs");
 
-
 //Express
 const express = require("express");
 const app = express();
@@ -164,7 +163,7 @@ app.get("/users/:userId", (req, res) => {
  * }
  */
 app.get("/events", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /events");
     return db.getAllEvents().then(events => {
         if (events !== null) {
             res.status(201).send(events);
@@ -190,6 +189,7 @@ app.get("/events", (req, res) => {
  * }
  */
 app.get("/events/search/:searchText", (req, res) => {
+    console.log('GET-request - /events/search/:searchText');
     let searchText = decodeURIComponent(req.params.searchText);
     return db.getEventsMatching(searchText).then(events => {
         if (events !== null) {
@@ -230,9 +230,10 @@ app.get("/tickets/:eventId", (req, res) => {
  * }
  */
 app.post("/users", (req, res) => {
+    console.log('POST-request - /user');
     return db.getUserByEmailOrUsername(req.body.email, req.body.username)
         .then(user => {
-            if (user) {
+            if (user.length !== 0) {
                 res.sendStatus(409);
             } else {
                 return hashPassword.hashPassword(req.body.password).then(credentials => {
@@ -267,14 +268,14 @@ app.post("/events", (req, res) => {
  *
  */
 app.post("/gigs", (req, res) => {
-    console.log("POST-request received from client");
-    db.createGig(req.body).then(response => {
-        if (response) {
-            res.status(201).send(response)
-        } else {
-            res.status(400);
-        }
-    });
+	console.log("POST-request - /gigs");
+	db.createGig(req.body).then(response => {
+		if (response) {
+			res.status(201).send(response)
+		} else {
+			res.status(400);
+		}
+	});
 });
 
 /**
@@ -288,7 +289,7 @@ app.post("/gigs", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/login", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /login");
 
     return db.getSaltByEmail(req.body.email)
         .then(salt => {
@@ -389,7 +390,7 @@ app.use("/auth", (req, res, next) => {
  * }
  */
 app.get("/auth/users/:userId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /user/:userId");
     return db.getUserById(req.params.userId)
         .then(user => res.send(user))
         .catch(error => console.error(error));
@@ -402,7 +403,7 @@ app.get("/auth/users/:userId", (req, res) => {
  *      }
  */
 app.get("/auth/events/users/:userId", (req, res) => {
-    console.log("GET-request received from client");
+    console.log("GET-request - /tickets/:eventId");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
     if (decoded.userId == req.params.userId) {
@@ -424,7 +425,7 @@ app.get("/auth/events/users/:userId", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/auth/refresh", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /auth/refresh");
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
@@ -442,7 +443,7 @@ app.post("/auth/refresh", (req, res) => {
  * }
  */
 app.post("/auth/logout", (req, res) => {
-    console.log("POST-request received from client");
+    console.log("POST-request - /logout");
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
@@ -460,10 +461,44 @@ app.post("/auth/logout", (req, res) => {
  * }
  */
 app.put("/auth/users/:userId", (req, res) => {
-    console.log("PUT-request received from client");
+    console.log("PUT-request - auth/user/:userId");
 
     return db.updateUser(req.body)
         .then(res.sendStatus(200));
+});
+
+/**
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ */
+app.get("/auth/events/user/:userId", (req, res) => {
+    console.log("GET-request - /events/user/:userId");
+    let token = req.headers['x-access-token'];
+    let decoded = jwt.decode(token);
+    console.log(decoded);
+    if (decoded.userId == req.params.userId) {
+        return db.getEventsByOrganizerId(decoded.userId)
+            .then(events => res.send(events))
+            .catch(error => console.error(error));
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+app.get("/validate/username/:username", (req, res) => {
+    console.log("GET-request - /validate/username/:username");
+    return db.getUserByEmailOrUsername('', req.params.username).then(result => {
+        console.log(result);
+        res.send(result.length === 1)})
+});
+
+app.get("/validate/email/:email", (req, res) => {
+    console.log("GET-request - /validate/email/:email");
+    return db.getUserByEmail(req.params.email).then(result => {
+        console.log(result);
+        res.send(result !== null)})
 });
 
 console.log("Server initalized");
