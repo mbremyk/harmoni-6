@@ -6,6 +6,7 @@ import {createHashHistory, createBrowserHistory} from 'history';
 import {service} from "./services.js";
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free"
+
 import {CreateUserForm} from '../src/components/createuser';
 import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
