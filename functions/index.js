@@ -353,20 +353,6 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
     res.download(file); // Set disposition and send it.
 });
 
-app.use("/auth", (req, res, next) => {
-    console.log("Authorization request received from client");
-    let token = req.headers["x-access-token"];
-    jwt.verify(token, publicKey, (err, decoded) => {
-        if (err || decoded.username !== req.body.username) {
-            console.log("Token not OK");
-            res.status(401);
-            res.json({error: "Not authorized"});
-        } else {
-            console.log("Token OK");
-            next();
-        }
-    });
-});
 /**
  * Checks if x-access-token is active and not blacklisted and if the payload of the token matches the email of the user
  * header:
@@ -419,7 +405,6 @@ app.get("/auth/events/users/:userId", (req, res) => {
     console.log("GET-request received from client");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
-    console.log(decoded);
     if (decoded.userId == req.params.userId) {
         return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
