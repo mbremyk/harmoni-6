@@ -20,6 +20,9 @@ function init() {
         let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
             host: pr.databaseURL,
             dialect: pr.dialect,
+            dialectOptions: {
+                dateStrings: true,
+            },
             pool: {
                 max: 10,
                 min: 0,
@@ -30,7 +33,6 @@ function init() {
         return sequelize;
     }
 }
-
 
 let sequelize = init();
 
@@ -132,7 +134,7 @@ let EventModel = sequelize.define('event', {
     contract;
 }*/
 
-let GigModel = sequelize.define('gigs', {
+let GigModel = sequelize.define('gig', {
     artistId: {
         type: Sequelize.INTEGER, primaryKey: true, references: {
             model: UserModel,
