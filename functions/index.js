@@ -350,6 +350,22 @@ app.get("/event/:eventId/personnel", (req, res) => {
 
 
 /**
+ *  Get an array of Gig connected to an event
+ *
+ *  gig:{
+ *      eventId: int
+ *      artistId: int
+ *      contract: int
+ *      rider: int
+ *  }
+ */
+app.get("/event/:eventId/gig", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+});
+
+
+/**
  * Deletes personnel from the event
  * body:
  * {

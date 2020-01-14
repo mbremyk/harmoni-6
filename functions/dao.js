@@ -303,8 +303,8 @@ class Dao {
      * @param eventId
      * @returns {Promise<Gig>}
      */
-    getGig(eventId) {
-        return model.GigModel.findOne({where: {eventId: eventId}})
+    getGigs(eventId) {
+        return model.GigModel.findAll({where: {eventId: eventId}})
             .catch(error => {
                 console.error(error);
                 return {};
