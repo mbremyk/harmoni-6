@@ -27,8 +27,6 @@ export class SortedEventView extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.events !== prevProps.events) {
-
-            console.log("Props updated");
             this.handleEvents(this.props.events);
         }
     }
@@ -51,8 +49,6 @@ export class SortedEventView extends Component {
     }
 
     handleEvents = (events) => {
-        console.log("handle events:");
-        console.log(events);
         this.setState({events: events, eventsBackup: events})
     };
 
@@ -155,8 +151,6 @@ export class SortedEventView extends Component {
 
     mounted() {
         if (this.props.events) {
-            console.log("sorted mounted:");
-            console.log(this.props.events);
             this.handleEvents(this.props.events);
         } else {
             service

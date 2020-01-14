@@ -30,8 +30,6 @@ export class HomePage extends Component {
      */
 
 	render() {
-		console.log("hp render:");
-		console.log(this.getOtherEvents());
 			return (
 
 
@@ -48,21 +46,6 @@ export class HomePage extends Component {
 					<Row>
 						<SortedEventView myEvent={true} events={this.myEvents}/>
 
-						{/*{this.myEvents.map(event => (
-							<EventInfo
-
-								link={event.eventId}
-								imageUrl={event.imageUrl}
-								title={event.eventName}
-								address={event.address}
-								age_limit={event.ageLimit}
-								start_date={event.startTime}
-								end_date={event.endTime}
-								uploaded={event.createdAt}
-								myEvent = {true}
-
-							/>
-						))}*/}
 					</Row>
 
 

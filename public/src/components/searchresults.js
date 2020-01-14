@@ -5,26 +5,22 @@ import {SortedEventView} from "./sortedeventview";
 
 export class SearchResults extends Component {
     state = {
-        events: false
+        events: []
     };
 
     render() {
-        if (this.state.events) {
-            console.log("render: " + this.state.events);
-            return <SortedEventView events={this.state.events}/>
+        if (!(Array.isArray(this.state.events) && this.state.events.length) ) {
+            return <h1>Ingen resultater funnet</h1>;
         } else {
-            return null
+            return <SortedEventView events={this.state.events}/>
         }
     }
 
     mounted() {
-        console.log('Search input: ' + this.props.match.params.input);
         service
             .searchForEvents(this.props.match.params.input)
             .then(events => {
                 this.setState({events: events});
-                console.log("search mounted");
-                console.log(events)
             })
             .catch((error) => console.log(error));
     }
