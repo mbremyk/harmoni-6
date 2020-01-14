@@ -16,7 +16,7 @@ const jwt = require("jsonwebtoken");
 export class HomePage extends Component
 {
 	myEvents = [];
-	otherEvents = [];
+	allEvents = [];
 
 
 	/*
@@ -60,6 +60,7 @@ export class HomePage extends Component
 							start_date={event.startTime}
 							end_date={event.endTime}
 							uploaded={event.createdAt}
+							myEvent = {true}
 
 						/>
 					))}
@@ -72,7 +73,10 @@ export class HomePage extends Component
 					</Col>
 				</Row>
 				<Row>
-					{this.otherEvents.map(event => (
+					{this.getOtherEvents().map(event =>
+
+
+
 						<EventInfo
 
 							link={event.eventId}
@@ -83,9 +87,10 @@ export class HomePage extends Component
 							start_date={event.startTime}
 							end_date={event.endTime}
 							uploaded={event.createdAt}
+							myEvent={false}
 
 						/>
-					))}
+					)}
 				</Row>
 
 
@@ -98,24 +103,42 @@ export class HomePage extends Component
 
 	mounted()
 	{
+		let token = jwt.decode(authService.getToken());
 
 		service
-			.getEventsByOrganizer(jwt.decode(authService.getToken()))
+			.getEventsByOrganizer(token.userId)
 			.then(myEvents => (this.myEvents = myEvents))
 			.catch((error) => console.log(error));
-		this.getOtherevents()
+
+		this.getAllEvents()
+
+
 
 
 
 	}
 
-	getOtherevents()
+
+
+	//gets all the events in the database and gives the array allEvents this value
+	getAllEvents()
 	{
 		service
 			.getEvents()
-			.then(otherEvents => (this.otherEvents = otherEvents))
+			.then(otherEvents => (this.allEvents = otherEvents))
 			.catch((error) => console.log(error));
 	}
+
+	//checks if the event is organized by the logged in user, if not it goes in this array
+	getOtherEvents()
+	{
+		let token = jwt.decode(authService.getToken());
+		let otherEvents = this.allEvents.filter(e => e.organizerId !== token.userId)
+		return otherEvents;
+
+	}
+
+
 
 
 
