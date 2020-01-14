@@ -82,71 +82,72 @@ export class SortedEventView extends Component {
     }
 
     render() {
-        if(this.state.events !== []){
-        return (
-            <Container>
-                <Card>
+        if (this.state.events !== []) {
+            return (
+                <Container>
+                    <Card>
+                        <Row>
+                            <Col>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                        Sorter arrangementer
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris
+                                            TODO</Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+
+                            </Col>
+                            <Col>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                        Filtere
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
+                                            (6 år) </Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis
+                                            Arrangementer
+                                            TODO </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </Col>
+                            <Col>
+                                <Button onClick={() => this.handleOrder("asc")} variant={"light"}>Økende ↑</Button>
+                            </Col>
+                            <Col>
+                                <Button onClick={() => this.handleOrder("desc")} variant={"light"}>Synkende ↓</Button>
+                            </Col>
+                            <Col>
+                                <Button variant={"danger"} onClick={this.handleReset}>Nullstill</Button>
+                            </Col>
+                        </Row>
+                    </Card>
                     <Row>
-                        <Col>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="light" id="dropdown-basic">
-                                    Sorter arrangementer
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris
-                                        TODO</Dropdown.Item>
-                                    <Dropdown.Item
-                                        onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
-                                    <Dropdown.Item
-                                        onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
-                                    <Dropdown.Item
-                                        onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
 
-                        </Col>
-                        <Col>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="light" id="dropdown-basic">
-                                    Filtere
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
-                                        (6 år) </Dropdown.Item>
-                                    <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis Arrangementer
-                                        TODO </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </Col>
-                        <Col>
-                            <Button onClick={() => this.handleOrder("asc")} variant={"light"}>Økende ↑</Button>
-                        </Col>
-                        <Col>
-                            <Button onClick={() => this.handleOrder("desc")} variant={"light"}>Synkende ↓</Button>
-                        </Col>
-                        <Col>
-                            <Button variant={"danger"} onClick={this.handleReset}>Nullstill</Button>
-                        </Col>
+                        {this.state.events.map(event => (
+                            <EventInfo
+                                link={event.eventId}
+                                imageUrl={event.imageUrl}
+                                title={event.eventName}
+                                address={event.address}
+                                age_limit={event.ageLimit}
+                                start_date={event.startTime}
+                                end_date={event.endTime}
+                                uploaded={event.createdAt}
+                            />
+                        ))}
+
                     </Row>
-                </Card>
-                <Row>
-
-                    {this.state.events.map(event => (
-                        <EventInfo
-                            link={event.eventId}
-                            imageUrl={event.imageUrl}
-                            title={event.eventName}
-                            address={event.address}
-                            age_limit={event.ageLimit}
-                            start_date={event.startTime}
-                            end_date={event.endTime}
-                            uploaded={event.createdAt}
-                        />
-                    ))}
-
-                </Row>
-            </Container>
-        )
+                </Container>
+            )
         }
     };
 
@@ -156,8 +157,7 @@ export class SortedEventView extends Component {
             console.log("sorted mounted:");
             console.log(this.props.events);
             this.handleEvents(this.props.events);
-        }
-        else{
+        } else {
             service
                 .getEvents()
                 .then(events => (this.handleEvents(events)))

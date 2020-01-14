@@ -1,29 +1,20 @@
 import {Component} from "react-simplified";
-import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
-import {EventInfo} from '../widgets.js';
-import {createHashHistory} from 'history';
 import * as React from 'react';
-import {Event, service, Ticket} from '../services';
-import {authService} from '../AuthService'
+import {service} from '../services';
 import {SortedEventView} from "./sortedeventview";
-import {navbar} from "./navbar";
 
-
-
-const jwt = require("jsonwebtoken");
-
-
-export class SearchResults extends  Component{
+export class SearchResults extends Component {
     state = {
         events: false
     };
 
     render() {
-        if(this.state.events){
-        console.log("render: " +  this.state.events);
-        return <SortedEventView events={this.state.events}/>
+        if (this.state.events) {
+            console.log("render: " + this.state.events);
+            return <SortedEventView events={this.state.events}/>
+        } else {
+            return null
         }
-        else{ return null}
     }
 
     mounted() {
