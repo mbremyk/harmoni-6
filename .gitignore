@@ -440,3 +440,6 @@ build
 /build
 public/build/service-worker.js
 public/build/service-worker.js
+
+*/properties.js
+properties.js
