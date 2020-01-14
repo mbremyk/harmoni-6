@@ -1,4 +1,4 @@
-import {service, Event, Gig} from "../services";
+import {service, Event, Gig, Personnel} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -22,6 +22,8 @@ const jwt = require("jsonwebtoken");
 //TODO: Legge til bilde
 
 export class AddEvent extends Component{
+
+
 
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
@@ -65,6 +67,7 @@ export class AddEvent extends Component{
         this.artists = this.handleArtists.bind(this);
         this.imageUrl = this.handleImageUrlChange.bind(this);
         this.image = this.handleImageUpload.bind(this);
+        this.personnelAdd = this.handlePersonnelAdd.bind(this);
 
         this.state = {
             organizerId: '',
@@ -81,7 +84,8 @@ export class AddEvent extends Component{
             image: '',
             imageUrl: '',
             artistsAdd: [],
-            artists: []
+            artists: [],
+            personnelAdd: [],
         };
     }
 
@@ -123,6 +127,10 @@ export class AddEvent extends Component{
 
     handleArtists(event){
         this.setState({artists: [...this.state.artists, ...event]})
+    }
+
+    handlePersonnelAdd(event){
+        service.getUser(event).then((user) => this.setState({personnelAdd: [...this.state.personnelAdd, user]}));
     }
 
     handleSubmit() {
@@ -240,9 +248,52 @@ export class AddEvent extends Component{
                                         <ListGroupItem>
                                             {artist.username}
                                         </ListGroupItem>
-                                    </React.Fragment>))}
+                                    </React.Fragment>
+                                        ))}
                             </ListGroup>
 
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"2"}>
+
+                            <Form.Label>Personell</Form.Label>
+
+                            <Dropdown onSelect={this.handlePersonnelAdd}>
+
+                                <Dropdown.Toggle variant={"success"} id="dropdown">
+                                    Velg personell
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu as={this.CustomMenu}>
+                                    {this.state.artists.map(artist => (
+                                        <Dropdown.Item eventKey={artist.userId}>
+                                            {artist.username}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+
+                            </Dropdown>
+
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"10"}>
+
+                            <ListGroup title={"Valgt personell"}>
+                                {this.state.personnelAdd.map(personnel => (
+                                    <React.Fragment key={personnel.userId}>
+
+                                        <ListGroupItem>
+                                            {personnel.username}
+                                            <Form.Control
+                                                placeholder="Rollen til personen"
+                                                value={personnel.role}
+                                                onChange={(event) => personnel.role = event.target.value}
+                                            />
+                                        </ListGroupItem>
+                                    </React.Fragment>
+                                ))}
+                            </ListGroup>
+                            {this.state.personnelAdd.map(p => console.log(p))}
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>

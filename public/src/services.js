@@ -56,6 +56,13 @@ export class Ticket
     amount;
 }
 
+export class Personnel
+{
+	personnelId;
+	eventId;
+	role;
+}
+
 class Services
 {
 	login(email, password)
@@ -96,6 +103,16 @@ class Services
 	createGig(gig)
 	{
 		return axios.post(url + '/gigs', gig).then(response => response.data);
+	}
+
+	createPersonnel(personnel, id)
+	{
+		return axios.post(url + '/event' + id + '/personell', personnel).then(response => response.data);
+	}
+
+	getPersonnel(id)
+	{
+		return axios.get(url + '/personnel').then(response => response.data);
 	}
 
 	getTicketToEvent(eventId)
