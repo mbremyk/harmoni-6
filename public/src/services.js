@@ -28,6 +28,21 @@ export class Event {
     image;
     description;
 
+	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
+		this.eventId = eventId;
+		this.organizerId = organizerId;
+		this.eventName = eventName;
+		this.address = address;
+		this.description = description;
+		this.ageLimit = ageLimit;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.imageUrl = imageURL;
+		this.image = image;
+	}
+
+
+
 }
 
 export class Gig {
@@ -107,6 +122,10 @@ class Services {
         return axios.post(url + '/gigs', gig).then(response => response.data);
     }
 
+	updateEvent(event) {
+		return axios.put(url + "/auth/events/" + event.eventId, event).then(response => response.insertId);
+	}
+
     getTicketToEvent(eventId) {
         return axios.get(url + '/tickets/' + eventId).then(response => response.data);
     }
@@ -124,7 +143,7 @@ class Services {
     }
 
 	getEventByEventId(eventId) {
-		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
 	}
 
 	validateUsername(username) {
