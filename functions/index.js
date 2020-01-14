@@ -294,7 +294,7 @@ app.post("/events", (req, res) => {
  */
 app.post("/gigs", (req, res) => {
 	console.log("POST-request - /gigs");
-	db.createGig(req.body).then(response => {
+	db.addGig(req.body).then(response => {
 		if (response) {
 			res.status(201).send(response)
 		} else {
