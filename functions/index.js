@@ -62,7 +62,7 @@ function tokenIsBlacklisted(token) {
     return jwtBlacklist.includes(token);
 }
 
-let interval = 60 * 1000;
+let interval = 60 * 60 * 1000;
 
 /**
  * Goes through the blacklist every hour and removes timed out tokens
@@ -105,7 +105,7 @@ function getToken(user) {
  * post /gig
  * post /login
  *
- * put /auth/event/:eventId
+ * put /auth/events/:eventId
  *
  *          PERSONNEL
  * post /events/:eventId/personnel
@@ -163,7 +163,6 @@ app.get("/users/:userId", (req, res) => {
  *     description: Text
  * }
  */
-
 app.get("/events", (req, res) => {
     console.log("GET-request - /events");
     return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
@@ -398,7 +397,6 @@ app.delete('/events/:eventId/tickets', (req, res) => {
     return db.removePersonnel(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
-
 /**
  * Changes the information of an Event
  * body:
@@ -586,7 +584,7 @@ app.post("/auth/refresh", (req, res) => {
 
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
-    db.getUserByEmail(req.body.email).then(user => {
+    return db.getUserByEmail(req.body.email).then(user => {
         let token = getToken(user[0].dataValues);
         res.json({jwt: token});
     });
@@ -605,7 +603,7 @@ app.post("/auth/logout", (req, res) => {
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
 
-    res.sendStatus(201);
+    return res.sendStatus(201);
 });
 
 /**
