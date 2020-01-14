@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const isCI = require('is-ci');
-const properties = require(isCI ? './testProperties.js' : './properties.js');
+const properties = (isCI ? null : require('./properties.js'));
 const test = (process.env.NODE_ENV === 'test');
 const moment = require('moment');
 moment.locale('nb');
@@ -8,35 +8,24 @@ moment.locale('nb');
 function init() {
     if (isCI) {
         console.log("CI");
-        let sequelize = new Sequelize('School', 'root', '', {
-            host: 'mysql',
-            dialect: 'mysql'
-        });
-        return sequelize;
+        return new Sequelize('School', 'root', '', {host: 'mysql', dialect: 'mysql'});
     } else {
         let pr = test ? new properties.TestProperties() : new properties.Properties();
-        console.log(pr.databaseUser);
-        let sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-            host: pr.databaseURL,
-            dialect: pr.dialect,
-            dialectOptions: {
-                dateStrings: true,
-            },
-            pool: {
-                max: 10,
-                min: 0,
-                idle: 10000
-            },
-            logging: false
-        });
-        return sequelize;
+        console.log('Connected to db: ' + pr.databaseUser);
+        return new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword,
+            {
+                host: pr.databaseURL,
+                dialect: pr.dialect,
+                dialectOptions: {dateStrings: true,},
+                pool: {max: 10, min: 0, idle: 10000},
+                logging: false
+            });
     }
 }
 
 let sequelize = init();
 
-sequelize
-    .authenticate()
+sequelize.authenticate()
     .then(() => {
         console.log('Connection has been established successfully.');
     })
@@ -61,6 +50,13 @@ let UserModel = sequelize.define('user', {
 }, {
     timestamps: true
 });
+
+
+/*class File {
+    fileId;
+    path;
+}
+ */
 
 let FileModel = sequelize.define('file', {
     fileId: {
@@ -188,6 +184,7 @@ let TicketModel = sequelize.define('ticket', {
 /*class Personnel {
     personnelId;
     eventId;
+    role;
 }*/
 
 let PersonnelModel = sequelize.define('personnel', {

@@ -155,7 +155,8 @@ class Dao {
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
-                description: event.description
+                description: event.description,
+                imageUrl: event.imageUrl
             })
             .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
