@@ -1,4 +1,4 @@
-import {service, Event, Gig} from "../services";
+import {service, Event, Gig, Personnel} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -14,14 +14,16 @@ import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import DatePicker from "react-date-picker";
 import TimePicker from "react-time-picker";
+import {authService} from "../AuthService";
+const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
-//TODO: Hente ut organizerId fra bruker
 //TODO: Legge til annet personell
 //TODO: Legge til bilde
 
-
 export class AddEvent extends Component{
+
+
 
     CustomMenu = React.forwardRef(
         ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
@@ -63,8 +65,12 @@ export class AddEvent extends Component{
         this.contract = this.handleContractChange.bind(this);
         this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
+        this.imageUrl = this.handleImageUrlChange.bind(this);
+        this.image = this.handleImageUpload.bind(this);
+        this.personnelAdd = this.handlePersonnelAdd.bind(this);
 
         this.state = {
+            organizerId: '',
             eventName: '',
             eventAddress: '',
             eventDescription: '',
@@ -75,14 +81,17 @@ export class AddEvent extends Component{
             tTime: '00:00:00',
             rider: '',
             contract: '',
+            image: '',
+            imageUrl: '',
             artistsAdd: [],
             artists: [],
+            personnelAdd: [],
         };
     }
 
     handleEventNameChange(event){
         this.setState({eventName: event.target.value});
-    }
+    };
 
     handleEventAddressChange(event){
         this.setState({eventAddress: event.target.value});
@@ -104,12 +113,24 @@ export class AddEvent extends Component{
         this.setState({contract: event.target.value})
     }
 
-    handleArtistsAdd(event){
+    handleImageUpload(event){
+        this.setState({image: event.target.value})
+    }
+
+    handleImageUrlChange(event){
+        this.setState({imageUrl: event.target.value})
+    }
+
+    handleArtistsAdd(event) {
         service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
     }
 
     handleArtists(event){
         this.setState({artists: [...this.state.artists, ...event]})
+    }
+
+    handlePersonnelAdd(event){
+        service.getUser(event).then((user) => this.setState({personnelAdd: [...this.state.personnelAdd, user]}));
     }
 
     handleSubmit() {
@@ -125,7 +146,7 @@ export class AddEvent extends Component{
             alert('Fra-tidspunkt må være større enn til-tidspunkt!');
             return;
         }
-        this.submit()
+        this.submit();
     }
 
     mergeDateTime(fdate, ftime){
@@ -136,7 +157,7 @@ export class AddEvent extends Component{
 
         let ev = new Event();
         ev.address = this.state.eventAddress;
-        ev.organizerId = 1;
+        ev.organizerId = this.state.organizerId;
         ev.ageLimit = this.state.ageLimit;
         ev.description = this.state.eventDescription;
         ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
@@ -144,11 +165,20 @@ export class AddEvent extends Component{
         ev.eventName = this.state.eventName;
         ev.rider = this.state.rider;
         ev.contract = this.state.contract;
+        ev.imageUrl = this.state.imageUrl;
 
         service.createEvent(ev)
             .then(updated =>
-            {this.state.artistsAdd.map(artist =>
-                (service.createGig(new Gig(artist.userId, updated.insertId, this.state.rider, this.state.contract))))})
+
+            {
+                this.state.artistsAdd.map(a =>
+                    (service.createGig(new Gig(a.userId, updated.insertId, null, null))));
+                this.state.personnelAdd.map( personnel =>
+                    service.createPersonnel(new Personnel(updated.insertId, personnel.userId, personnel.role), updated.insertId));
+                console.log(updated.insertId);
+            }
+
+            ).then(() => this.props.history.push("/opprett-arrangement"))
         .catch(err => alert('En feil oppsto!' + err.message))
     }
 
@@ -205,7 +235,7 @@ export class AddEvent extends Component{
                                     Velg artist
                                 </Dropdown.Toggle>
 
-                                <Dropdown.Menu as={this.CustomMenu}>
+                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}}  as={this.CustomMenu}>
                                     {this.state.artists.map(artist => (
                                         <Dropdown.Item eventKey={artist.userId}>
                                             {artist.username}
@@ -225,9 +255,52 @@ export class AddEvent extends Component{
                                         <ListGroupItem>
                                             {artist.username}
                                         </ListGroupItem>
-                                    </React.Fragment>))}
+                                    </React.Fragment>
+                                        ))}
                             </ListGroup>
 
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"2"}>
+
+                            <Form.Label>Personell</Form.Label>
+
+                            <Dropdown onSelect={this.handlePersonnelAdd}>
+
+                                <Dropdown.Toggle variant={"success"} id="dropdown">
+                                    Velg personell
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
+                                    {this.state.artists.map(artist => (
+                                        <Dropdown.Item eventKey={artist.userId}>
+                                            {artist.username}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+
+                            </Dropdown>
+
+                        </Form.Group>
+
+                        <Form.Group as={Col} sm={"10"}>
+
+                            <ListGroup title={"Valgt personell"}>
+                                {this.state.personnelAdd.map(personnel => (
+                                    <React.Fragment key={personnel.userId}>
+
+                                        <ListGroupItem>
+                                            {personnel.username}
+                                            <Form.Control
+                                                placeholder="Rollen til personen"
+                                                value={personnel.role}
+                                                onChange={(event) => personnel.role = event.target.value}
+                                            />
+                                        </ListGroupItem>
+                                    </React.Fragment>
+                                ))}
+                            </ListGroup>
+                            {this.state.personnelAdd.map(p => console.log(p))}
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
@@ -282,28 +355,23 @@ export class AddEvent extends Component{
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
+                            <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                            <InputGroup className="mb-5">
+                                <FormControl
+                                    type="file"
+                                    value={this.state.image}
+                                    onChange={this.handleImageUpload}
+                                />
+                            </InputGroup>
+                        </Form.Group>
 
-                            <Form.Label>Aldersgrense</Form.Label>
-                            <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
-                                <ButtonGroup className="mr-2" aria-label="button-group">
-                                    <Button onClick={this.decrementAge}>-</Button>
-                                    <Button onClick={this.IncrementAge}>+</Button>
-                                </ButtonGroup>
-
-                                <InputGroup>
-                                    <FormControl
-                                        type="input"
-                                        value={this.state.ageLimit}
-                                        onChange={this.handleAgeLimitChange}
-                                        aria-label="btn-age"
-                                        aria-describedby="btnGroupAddon"
-                                    />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
-                                    </InputGroup.Append>
-                                </InputGroup>
-
-                            </ButtonToolbar>
+                        <Form.Group as={Col} sm={"12"}>
+                            <Form.Label>Eller legg inn en bilde-url</Form.Label>
+                            <Form.Control
+                                placeholder="Bilde-url"
+                                value={this.state.imageUrl}
+                                onChange={this.handleImageUrlChange}
+                            />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
@@ -328,8 +396,33 @@ export class AddEvent extends Component{
                             </InputGroup>
                         </Form.Group>
 
+                        <Form.Group as={Col} sm={"6"}>
+
+                            <Form.Label>Aldersgrense</Form.Label>
+                            <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
+                                <ButtonGroup className="mr-2" aria-label="button-group">
+                                    <Button onClick={this.decrementAge}>-</Button>
+                                    <Button onClick={this.IncrementAge}>+</Button>
+                                </ButtonGroup>
+
+                                <InputGroup>
+                                    <FormControl
+                                        type="input"
+                                        value={this.state.ageLimit}
+                                        onChange={this.handleAgeLimitChange}
+                                        aria-label="btn-age"
+                                        aria-describedby="btnGroupAddon"
+                                    />
+                                    <InputGroup.Append>
+                                        <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
+                                    </InputGroup.Append>
+                                </InputGroup>
+
+                            </ButtonToolbar>
+                        </Form.Group>
+
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                                <Button type="submit" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                                <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
                         </Form.Group>
 
                     </Form.Row>
@@ -340,7 +433,12 @@ export class AddEvent extends Component{
 
 
     mounted() {
+        let token = authService.getToken();
+        let decoded = jwt.decode(token);
+        let uId = decoded.userId;
+        this.setState({organizerId: uId});
         service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
+        //service.createGig(new Gig(2, 23, null, null));
     }
 
     changeDate(dateName, dateValue){
