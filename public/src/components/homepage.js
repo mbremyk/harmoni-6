@@ -9,63 +9,56 @@ import {SortedEventView} from "./sortedeventview";
 const jwt = require("jsonwebtoken");
 
 
+export class HomePage extends Component {
+    myEvents = [];
+    allEvents = [];
 
 
+    /*
+     <Container>
+     <Row>
+     <Col>
+
+     <Form.Control placeholder="Søk etter arragement"/>
 
 
+     </Col>
+     </Row>
 
-export class HomePage extends Component
-{
-	myEvents = [];
-	allEvents = [];
+     </Container>
+     */
 
-
-	/*
-	 <Container>
-	 <Row>
-	 <Col>
-
-	 <Form.Control placeholder="Søk etter arragement"/>
+    render() {
+        return (
 
 
-	 </Col>
-	 </Row>
-
-	 </Container>
-	 */
-
-	render()
-	{
-		return (
+            <Container>
 
 
-			<Container>
+                <Row>
+                    <Col md={{span: 12, offset: 4}}>
+                        <h1>Mine Arrangementer</h1>
+                    </Col>
+                </Row>
 
 
-				<Row>
-					<Col md={{span: 12, offset: 4}}>
-						<h1>Mine Arrangementer</h1>
-					</Col>
-				</Row>
+                <Row>
+                    {this.myEvents.map(event => (
+                        <EventInfo
 
-
-				<Row>
-					{this.myEvents.map(event => (
-						<EventInfo
-
-							link={event.eventId}
-							imageUrl={event.imageUrl}
-							title={event.eventName}
-							address={event.address}
-							age_limit={event.ageLimit}
-							start_date={event.startTime}
-							end_date={event.endTime}
-							uploaded={event.createdAt}
+                            link={event.eventId}
+                            imageUrl={event.imageUrl}
+                            title={event.eventName}
+                            address={event.address}
+                            age_limit={event.ageLimit}
+                            start_date={event.startTime}
+                            end_date={event.endTime}
+                            uploaded={event.createdAt}
 							myEvent = {true}
 
-						/>
-					))}
-				</Row>
+                        />
+                    ))}
+                </Row>
 
 
 				<Row>
@@ -77,12 +70,11 @@ export class HomePage extends Component
 			</Container>
 
 
-		);
+        );
 
-	}
+    }
 
-	mounted()
-	{
+    mounted() {
 		let token = jwt.decode(authService.getToken());
 
 		service
@@ -94,20 +86,15 @@ export class HomePage extends Component
 
 
 
+    }
 
-
-	}
-
-
-
-	//gets all the events in the database and gives the array allEvents this value
-	getAllEvents()
-	{
-		service
-			.getEvents()
-			.then(otherEvents => (this.allEvents = otherEvents))
-			.catch((error) => console.log(error));
-	}
+    //gets all the events in the database and gives the array allEvents this value
+	getAllEvents() {
+        service
+            .getEvents()
+            .then(otherEvents => (this.allEvents = otherEvents))
+            .catch((error) => console.log(error));
+    }
 
 	//checks if the event is organized by the logged in user, if not it goes in this array
 	getOtherEvents()
@@ -117,7 +104,6 @@ export class HomePage extends Component
 		return otherEvents;
 
 	}
-
 
 
 
