@@ -125,7 +125,7 @@ class Services {
         return axios.post(url + '/gigs', gig).then(response => response.data);
     }
 	updateEvent(event) {
-		return axios.put(url + "/auth/events", event).then(response => response.insertId);
+		return axios.put(url + "/auth/events/" + event.eventId, event).then(response => response.insertId);
 	}
 
     getTicketToEvent(eventId) {
@@ -133,7 +133,7 @@ class Services {
     }
 
     searchForEvents(input) {
-        return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+        return axios.get(url + '/events/search/' + encodeURIComponent(input)).then(response => response.data);
     }
 
     getEventsByOrganizer(userId) {
