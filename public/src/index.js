@@ -21,6 +21,7 @@ import {UploadWidget, DownloadWidget} from "./widgets";
 
 import {authService} from "./AuthService";
 import {PrivateRoute} from "./components/PrivateRoute";
+import {SearchResults} from "./components/searchresults";
 
 //const history = createHashHistory();
 const history = createBrowserHistory();
@@ -37,6 +38,9 @@ if (root)
         <Route exact path="/ny-bruker" component={CreateUserForm}/>
         <Route exact path="/arrangement/:id" component={EventPage}/>
         <Route exact path="/logg-inn" component={LoginForm}/>
+        <Route exact path="/sok/:input" component={SearchResults}/>
+
+
 
                 <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
                 <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>

@@ -10,11 +10,12 @@ const jwt = require("jsonwebtoken");
 
 
 export class HomePage extends Component {
-    myEvents = [];
-    allEvents = [];
+	myEvents = [];
+	allEvents = [];
+	otherEvents = false;
 
 
-    /*
+	/*
      <Container>
      <Row>
      <Col>
@@ -28,53 +29,75 @@ export class HomePage extends Component {
      </Container>
      */
 
-    render() {
-        return (
+	render() {
+		console.log("hp render:");
+		console.log(this.getOtherEvents());
+			return (
 
 
-            <Container>
+				<Container>
 
 
-                <Row>
-                    <Col md={{span: 12, offset: 4}}>
-                        <h1>Mine Arrangementer</h1>
-                    </Col>
-                </Row>
+					<Row>
+						<Col md={{span: 12, offset: 4}}>
+							<h1>Mine Arrangementer</h1>
+						</Col>
+					</Row>
 
 
-                <Row>
-                    {this.myEvents.map(event => (
-                        <EventInfo
+					<Row>
+						{this.myEvents.map(event => (
+							<EventInfo
 
-                            link={event.eventId}
-                            imageUrl={event.imageUrl}
-                            title={event.eventName}
-                            address={event.address}
-                            age_limit={event.ageLimit}
-                            start_date={event.startTime}
-                            end_date={event.endTime}
-                            uploaded={event.createdAt}
-							myEvent = {true}
+								link={event.eventId}
+								imageUrl={event.imageUrl}
+								title={event.eventName}
+								address={event.address}
+								age_limit={event.ageLimit}
+								start_date={event.startTime}
+								end_date={event.endTime}
+								uploaded={event.createdAt}
+								myEvent = {true}
 
-                        />
-                    ))}
-                </Row>
-
-
-				<Row>
-					<Col md={{span: 12, offset: 4}}>
-						<h1>Andre Arrangementer</h1>
-					</Col>
-				</Row>
-				<SortedEventView otherEvents={this.getOtherEvents()}/>
-			</Container>
+							/>
+						))}
+					</Row>
 
 
-        );
+					<Row>
+						<Col md={{span: 12, offset: 4}}>
+							<h1>Andre Arrangementer</h1>
+						</Col>
+					</Row>
+					{/*<Row>
+						{this.getOtherEvents().map(event => (
+							<EventInfo
 
-    }
+								link={event.eventId}
+								imageUrl={event.imageUrl}
+								title={event.eventName}
+								address={event.address}
+								age_limit={event.ageLimit}
+								start_date={event.startTime}
+								end_date={event.endTime}
+								uploaded={event.createdAt}
+								myEvent = {false}
 
-    mounted() {
+							/>
+						))}
+					</Row>*/}
+					<SortedEventView events={this.getOtherEvents()}/>
+
+
+				</Container>
+
+
+			);
+
+	}
+
+
+	mounted() {
 		let token = jwt.decode(authService.getToken());
 
 		service
@@ -82,25 +105,27 @@ export class HomePage extends Component {
 			.then(myEvents => (this.myEvents = myEvents))
 			.catch((error) => console.log(error));
 
-		this.getAllEvents()
+		this.getAllEvents();
 
 
 
-    }
 
-    //gets all the events in the database and gives the array allEvents this value
+	}
+
+	//gets all the events in the database and gives the array allEvents this value
 	getAllEvents() {
-        service
-            .getEvents()
-            .then(otherEvents => (this.allEvents = otherEvents))
-            .catch((error) => console.log(error));
-    }
+		service
+			.getEvents()
+			.then(otherEvents => (this.allEvents = otherEvents))
+			.catch((error) => console.log(error));
+
+	}
 
 	//checks if the event is organized by the logged in user, if not it goes in this array
 	getOtherEvents()
 	{
 		let token = jwt.decode(authService.getToken());
-		let otherEvents = this.allEvents.filter(e => e.organizerId !== token.userId)
+		let otherEvents = this.allEvents.filter(e => e.organizerId !== token.userId);
 		return otherEvents;
 
 	}

@@ -8,8 +8,16 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 
 export class navbar extends Component {
+    state = {
+        input: ''
+    };
+
+    handleInputChange(event) {
+        this.setState({input: event.target.value});
+    }
+
     render() {
-         if (this.props.location.pathname != "/") {
+        if (this.props.location.pathname != "/") {
             return (
                 <div>
                     <Navbar bg="light">
@@ -27,24 +35,34 @@ export class navbar extends Component {
                                 <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
                             </Nav>
                             <Form inline>
-                                <FormControl type="text" placeholder="Søk" className="mr-sm-2" onKeyPress={event => {
-                                    if (event.key === "Enter") {
-                                        this.search();
-                                    }
-                                }}/>
-                                <Button variant="outline-success" onClick={this.search}>Søk</Button>
+                                <FormControl type="text"
+                                             placeholder="Søk"
+                                             className="mr-sm-2"
+                                             value={this.state.input}
+                                             onChange={this.handleInputChange}
+                                             onKeyPress={event => {
+                                                 if (event.key === "Enter") {
+                                                     this.search();
+                                                 }
+                                             }}/>
+                                <Button variant="outline-success"
+                                        onClick={this.search}>Søk</Button>
                             </Form>
                         </Navbar.Collapse>
                     </Navbar>
                 </div>
             );
         } else {
-            return(
+            return (
                 <div></div>
             )
         }
     }
-    search() {
-        alert("Search clicked");
+
+    search = () => {
+        //alert("Search clicked, input: " + this.state.input);
+        //window.location = ("/sok/" + this.state.input)
+        this.props.history.push('/sok/' + this.state.input )
+
     }
 }

@@ -8,22 +8,30 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 
-export class SortedEventView extends Component{
+export class SortedEventView extends Component {
     state = {
-        events : [],
+        events: [],
         eventsBackup: [],
         order: "asc",
         sortingOption: "createdAt"
     };
 
-    sortEvents = (sortingOption, order) =>{
+    sortEvents = (sortingOption, order) => {
         this.setState({events: this.state.events.sort(this.compareValues(sortingOption, order))});
     };
 
-    handleSortingOption = (option) =>{
+    handleSortingOption = (option) => {
         this.setState({sortingOption: option});
         this.sortEvents(option, this.state.order);
     };
+
+    componentDidUpdate(prevProps) {
+        if (this.props.events !== prevProps.events) {
+            //this.fetchData(this.props.userID);
+            console.log("Props updated");
+            this.handleEvents(this.props.events);
+        }
+    }
 
     handleFilterOption(filter) {
         switch (filter) {
@@ -43,7 +51,9 @@ export class SortedEventView extends Component{
     }
 
     handleEvents = (events) => {
-        this.setState({events : events, eventsBackup : events})
+        console.log("handle events:");
+        console.log(events);
+        this.setState({events: events, eventsBackup: events})
     };
 
     compareValues(key, order = 'asc') {
@@ -72,7 +82,8 @@ export class SortedEventView extends Component{
     }
 
     render() {
-        return(
+        if(this.state.events !== []){
+        return (
             <Container>
                 <Card>
                     <Row>
@@ -82,10 +93,14 @@ export class SortedEventView extends Component{
                                     Sorter arrangementer
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris TODO</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
-                                    <Dropdown.Item onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris
+                                        TODO</Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
 
@@ -96,8 +111,10 @@ export class SortedEventView extends Component{
                                     Filtere
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig (6 år) </Dropdown.Item>
-                                    <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis Arrangementer TODO </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
+                                        (6 år) </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis Arrangementer
+                                        TODO </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Col>
@@ -130,18 +147,23 @@ export class SortedEventView extends Component{
                 </Row>
             </Container>
         )
+        }
     };
 
 
-    mounted()
-    {
-        if(this.props.otherEvents){
-            this.handleEvents(this.props.otherEvents);
+    mounted() {
+        if (this.props.events) {
+            console.log("sorted mounted:");
+            console.log(this.props.events);
+            this.handleEvents(this.props.events);
         }
-        service
-            .getEvents()
-            .then(events => (this.handleEvents(events)))
-            .catch((error) => console.log(error));
+        else{
+            service
+                .getEvents()
+                .then(events => (this.handleEvents(events)))
+                .catch((error) => console.log(error));
+        }
+
     }
 
 

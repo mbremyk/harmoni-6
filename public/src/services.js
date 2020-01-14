@@ -112,7 +112,7 @@ class Services {
     }
 
     searchForEvents(input) {
-        return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+        return axios.get(url + '/events/search/' + input ).then(response => response.data);
     }
 
     getEventsByOrganizer(userId) {
