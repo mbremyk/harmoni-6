@@ -67,6 +67,20 @@ export class Ticket {
     amount;
 }
 
+export class Personnel
+{
+	personnelId;
+	eventId;
+	role;
+
+	constructor(personnelId, eventId, role){
+		this.personnelId = personnelId;
+		this.eventId = eventId;
+		this.role = role;
+	}
+
+}
+
 class Services {
     login(email, password) {
         return axios.post(url + '/login', {email: email, password: password}).then(response => response.data);
@@ -101,9 +115,23 @@ class Services {
     }
 
     createEvent(event) {
-        return axios.post(url + '/events', event).then(response => response.insertId);
+        return axios.post(url + '/auth/events', event).then(response => response.data);
     }
 
+	createGig(gig)
+	{
+		return axios.post(url + '/gigs', gig).then(response => response.data);
+	}
+
+	createPersonnel(personnel, eventId)
+	{
+		return axios.post(url + '/events/' + eventId + '/personnel', personnel).then(response => response.data);
+	}
+
+	getPersonnel(id)
+	{
+		return axios.get(url + '/personnel').then(response => response.data);
+	}
     uploadContract(formData, event, artist) {
         return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
     }

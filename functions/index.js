@@ -169,6 +169,17 @@ app.get("/events", (req, res) => {
     return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
 
+app.post("/auth/events", (req, res) =>{
+    console.log("POST-request - /events");   return db.createEvent(req.body).then(response => {
+       if (response.insertId !== undefined) {
+           res.status(201).send(response)
+       }
+       else {
+           res.status(400);
+       }
+   })
+});
+
 /**
  * Get all events where eventName or description contains searchText
  * {
@@ -415,7 +426,7 @@ app.put('/auth/events/:eventId', (req, res) => {
  */
 app.post("/gigs", (req, res) => {
 	console.log("POST-request - /gigs");
-	return db.createGig(req.body).then(response => {
+	return db.addGig(req.body).then(response => {
 		if (response) {
 			res.status(201).send(response)
 		} else {
