@@ -4,94 +4,152 @@ import {EventInfo} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
+import {authService} from "../AuthService";
+
+const jwt = require("jsonwebtoken");
 
 
+export class EventPage extends Component {
+    e = new Event();
+    personell = [];
+    isPersonell = false;
+
+    render() {
+        if (!this.e)
+        {
+            return null
+        } else if (this.e) {
+            return (
 
 
+                <Container>
 
-export class EventPage extends Component
-{
-	e = new Event();
-	personell = [];
+                    <Image src={this.e.imageUrl} height="auto" width="100%"/>
 
-	render()
+                    <Row>
+                        <Col>
+                            <h1>{this.e.eventName}</h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={4}>
+                            <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
+                        </Col>
 
-	{
-		if (!this.e) return null;
-		return (
-
-
-
-			<Container>
-
-				<Image src={this.e.imageUrl} height="auto" width="100%"/>
-
-				<Row>
-					<Col>
-						<h1>{this.e.eventName}</h1>
-					</Col>
-				</Row>
-				<Row>
-					<Col md={4}>
-						<h4>fra {this.e.startTime} til {this.e.endTime}</h4>
-					</Col>
-
-					<Col md={{offset: 6}}>
-						<h4>Aldersgrense {this.e.ageLimit}</h4>
-					</Col>
+                        <Col md={{offset: 6}}>
+                            <h4>Aldersgrense {this.e.ageLimit}</h4>
+                        </Col>
 
 
-				</Row>
+                    </Row>
 
-				<Row>
-					<Col>
-						<h2>{this.e.address}</h2>
-					</Col>
-				</Row>
-				<Row>
-					<Col>
-						<h4>Artist 1 og Artist 2</h4>
-					</Col>
-				</Row>
+                    <Row>
+                        <Col>
+                            <h2>{this.e.address}</h2>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <h4>Artist 1 og Artist 2</h4>
+                        </Col>
+                    </Row>
 
-				<Row>
-					<Col>
-						<p>{this.e.description}</p>
-					</Col>
-				</Row>
-
-
-			</Container>
+                    <Row>
+                        <Col>
+                            <p>{this.e.description}</p>
+                        </Col>
+                    </Row>
 
 
-		);
-	}
+                </Container>
 
 
-	mounted()
-	{
+            );
+        } else if (this.checkForId()) {
+            return (
 
-		service
-			.getEventByEventId(this.props.match.params.id)
-			.then(e => (this.e = e))
-			.catch((error) => console.log(error));
+                <Container>
+
+                    <Image src={this.e.imageUrl} height="auto" width="100%"/>
+
+                    <Row>
+                        <Col>
+                            <h1>{this.e.eventName}</h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={4}>
+                            <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
+                        </Col>
+
+                        <Col md={{offset: 6}}>
+                            <h4>Aldersgrense {this.e.ageLimit}</h4>
+                        </Col>
 
 
-	}
+                    </Row>
 
-	getPersonellForEvent()
-	{
-		service
-			.getPersonellForEvent(this.props.match.params.id)
-			.then(personell => (this.personell = personell))
-			.catch((error) => console.log(error));
+                    <Row>
+                        <Col>
+                            <h2>{this.e.address}</h2>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <h4>Ass</h4>
+                        </Col>
+                    </Row>
 
-	}
+                    <Row>
+                        <Col>
+                            <p>{this.e.description}</p>
+                        </Col>
+                    </Row>
 
-	getArtistsForEvent()
-	{
-		//TODO
-	}   
+
+                </Container>
+
+
+            );
+
+        }
+    }
+
+
+    mounted() {
+
+        service
+            .getEventByEventId(this.props.match.params.id)
+            .then(e => (this.e = e))
+            .catch((error) => console.log(error));
+
+
+    }
+
+    getPersonellForEvent() {
+        service
+            .getPersonellForEvent(this.props.match.params.id)
+            .then(personell => (this.personell = personell))
+            .catch((error) => console.log(error));
+
+    }
+
+    getArtistsForEvent() {
+        //TODO
+    }
+
+    checkForId() {
+        let token = jwt.decode(authService.getToken())
+        this.personell.map(person => {
+                if (person.personellId == token.userId) {
+                    return true;
+                }
+                return false;
+            }
+        )
+
+
+    }
 
 }
 

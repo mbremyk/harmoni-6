@@ -234,7 +234,7 @@ app.post("/users", (req, res) => {
 /**
  *
  */
-app.post("/events", (req, res) =>{
+app.post("/events", (req, res) => {
     console.log("POST-request received from client");
     return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
 });
