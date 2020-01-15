@@ -385,15 +385,17 @@ export class EventPage extends Component {
         service
             .getEventByEventId(this.props.match.params.id)
             .then(e => {
-                this.e = e
+                this.e = e;
                 let token = jwt.decode(authService.getToken());
                 if (this.e.organizerId == token.userId) {
                     this.isOrganizer = true;
-                    console.log(this.isOrganizer);
                 }
+                console.log('isOrganizer: ' + this.isOrganizer);
             })
             .catch((error) => console.log(error));
+        console.log('getting personnel');
         this.getPersonnelForEvent();
+        console.log('getting artists');
         this.getArtistsForEvent();
 
 
@@ -409,12 +411,9 @@ export class EventPage extends Component {
                 this.personnel.map(person => {
                     if (person.personnelId == token.userId) {
                         this.isPersonnel = true;
-                        console.log("Er jeg personnel? " + this.isPersonnel)
-
                     }
                 });
-
-
+                console.log("Er jeg personnel? " + this.isPersonnel)
             })
             .catch((error) => console.log(error));
 
@@ -429,10 +428,9 @@ export class EventPage extends Component {
                 this.artists.map(person => {
                     if (person.artistId == token.userId) {
                         this.isArtist = true;
-                        console.log("Er jeg artist? " + this.isArtist)
                     }
                 });
-
+                console.log("Er jeg artist? " + this.isArtist);
 
             })
             .catch((error) => console.log(error));
