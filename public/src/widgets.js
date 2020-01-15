@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import {service} from "./services";
 
 export class EventInfo extends Component {
+    event;
     imageUrl;
     title;
     address;
@@ -18,10 +19,16 @@ export class EventInfo extends Component {
     link;
     myEvent;
 
+
     /*<div className="font-weight-bold">
      Pris fra
      </div>
      {this.props.price}*/
+
+    getCancelled() {
+        if (this.props.event.cancelled) return "Kansellert!";
+        else return "";
+    }
 
     render() {
         if (this.props.myEvent) {
@@ -35,9 +42,12 @@ export class EventInfo extends Component {
 
                         <div className="eventinfo">
                             <a href={"/arrangement/" + this.props.link}>
-                                <Card.Img variant="top"
-                                          src={this.props.imageUrl}
-                                          alt={this.title}/>
+                                <Card className="text-danger">
+                                    <Card.Img src={this.props.imageUrl} alt={this.title} />
+                                    <Card.ImgOverlay>
+                                        <Card.Title><h1>{this.getCancelled()}</h1></Card.Title>
+                                    </Card.ImgOverlay>
+                                </Card>
                             </a>
                         </div>
                         <Card.Body>
@@ -104,10 +114,18 @@ export class EventInfo extends Component {
                 <Col md={12} lg={4}>
 
 
+
+
                     <Card>
-                        <Card.Img variant="top"
+                        {/*<Card.Img variant="top"
                                   src={this.props.imageUrl}
-                                  alt={this.title}/>
+                                  alt={this.title}/>*/}
+                        <Card className="text-danger">
+                            <Card.Img src={this.props.imageUrl} alt={this.title} />
+                            <Card.ImgOverlay>
+                                <Card.Title><h1>{this.getCancelled()}</h1></Card.Title>
+                            </Card.ImgOverlay>
+                        </Card>
                         <Card.Body>
 
 

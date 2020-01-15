@@ -27,19 +27,21 @@ export class Event {
     imageUrl;
     image;
     description;
+    cancelled;
 
-    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
-        this.eventId = eventId;
-        this.organizerId = organizerId;
-        this.eventName = eventName;
-        this.address = address;
-        this.description = description;
-        this.ageLimit = ageLimit;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.imageUrl = imageURL;
-        this.image = image;
-    }
+	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image, cancelled) {
+		this.eventId = eventId;
+		this.organizerId = organizerId;
+		this.eventName = eventName;
+		this.address = address;
+		this.description = description;
+		this.ageLimit = ageLimit;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.imageUrl = imageURL;
+		this.image = image;
+		this.cancelled = cancelled;
+	}
 }
 
 export class Gig {
@@ -88,10 +90,6 @@ class Services {
 
     logout() {
         return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
-    }
-
-    updatePassword(user) {
-        return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     refreshToken() {
