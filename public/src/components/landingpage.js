@@ -32,7 +32,7 @@ export class LandingPage extends Component {
 						</Row>
 						<Row style={{padding: "3em"}}>
 							<Col className="text-center">
-								<h2>Logg på for å se dine arrangementer</h2>
+								<h2>Logg inn for å se dine arrangementer</h2>
 							</Col>
 						</Row>
 					</Container>

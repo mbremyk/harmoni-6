@@ -39,8 +39,7 @@ export class EventPage extends Component {
                             <Col>
                                 <a href="" download>
                                     <Button variant="primary" aria-label="Left Align" title="Last Ned">
-                                        <span className="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-                                        Kontrakt
+                                        Last Ned Kontrakt
                                     </Button>
                                 </a>
                             </Col>
@@ -174,8 +173,7 @@ export class EventPage extends Component {
                             <Col>
                                 <a href="" download>
                                     <Button variant="primary" aria-label="Left Align" title="Last Ned">
-                                        <span className="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-                                        Kontrakt
+                                        Last Ned Kontrakt
                                     </Button>
                                 </a>
                             </Col>
