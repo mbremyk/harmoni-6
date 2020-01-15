@@ -40,8 +40,6 @@ export class Event {
         this.imageUrl = imageURL;
         this.image = image;
     }
-
-
 }
 
 export class Gig {
