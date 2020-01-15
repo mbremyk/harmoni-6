@@ -90,6 +90,10 @@ class Services {
         return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
     }
 
+    updatePassword(user) {
+        return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
     refreshToken() {
         return axios.post(url + '/auth/refresh', {}, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
