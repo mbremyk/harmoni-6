@@ -123,13 +123,13 @@ let EventModel = sequelize.define('event', {
     startTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('startTime')).format('DD-MM-YYYY HH:mm');
+            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
         }
     },
     endTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('endTime')).format('DD-MM-YYYY HH:mm');
+            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
     imageUrl: Sequelize.STRING,
@@ -230,6 +230,9 @@ GigModel.belongsTo(UserModel, {foreignKey: 'artistId'});
 
 EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
 GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
+PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});

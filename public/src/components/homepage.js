@@ -6,6 +6,8 @@ import * as React from 'react';
 import {Event, service, Ticket} from '../services';
 import {authService} from '../AuthService'
 import {SortedEventView} from "./sortedeventview";
+import {HarmoniNavbar} from "./navbar";
+
 const jwt = require("jsonwebtoken");
 
 
@@ -13,48 +15,29 @@ export class HomePage extends Component {
     myEvents = [];
     allEvents = [];
 
-
-    /*
-     <Container>
-     <Row>
-     <Col>
-
-     <Form.Control placeholder="Søk etter arragement"/>
-
-
-     </Col>
-     </Row>
-
-     </Container>
-     */
-
     render() {
         return (
+	        <div>
+		        <HarmoniNavbar/>
+	            <Container>
+	                <Row>
+	                    <Col md={{span: 12, offset: 4}}>
+	                        <h1>Mine Arrangementer</h1>
+	                    </Col>
+	                </Row>
+	                <Row>
+	                    {this.myEvents.map(event => (
+	                        <EventInfo
 
-
-            <Container>
-
-
-                <Row>
-                    <Col md={{span: 12, offset: 4}}>
-                        <h1>Mine Arrangementer</h1>
-                    </Col>
-                </Row>
-
-
-                <Row>
-                    {this.myEvents.map(event => (
-                        <EventInfo
-
-                            link={event.eventId}
-                            imageUrl={event.imageUrl}
-                            title={event.eventName}
-                            address={event.address}
-                            age_limit={event.ageLimit}
-                            start_date={event.startTime}
-                            end_date={event.endTime}
-                            uploaded={event.createdAt}
-							myEvent = {true}
+	                            link={event.eventId}
+	                            imageUrl={event.imageUrl}
+	                            title={event.eventName}
+	                            address={event.address}
+	                            age_limit={event.ageLimit}
+	                            start_date={event.startTime}
+	                            end_date={event.endTime}
+	                            uploaded={event.createdAt}
+								myEvent = {true}
 
                         />
                     ))}
@@ -66,12 +49,11 @@ export class HomePage extends Component {
 						<h1>Andre Arrangementer</h1>
 					</Col>
 				</Row>
-				<SortedEventView otherEvents={this.getOtherEvents()}/>
-			</Container>
-
+					<SortedEventView otherEvents={this.getOtherEvents()}/>
+				</Container>
+	        </div>
 
         );
-
     }
 
     mounted() {
@@ -83,9 +65,6 @@ export class HomePage extends Component {
 			.catch((error) => console.log(error));
 
 		this.getAllEvents()
-
-
-
     }
 
     //gets all the events in the database and gives the array allEvents this value
@@ -104,8 +83,4 @@ export class HomePage extends Component {
 		return otherEvents;
 
 	}
-
-
-
-
 }
