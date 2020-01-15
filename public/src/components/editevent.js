@@ -82,8 +82,18 @@ export class EditEvent extends Component{
             artistsAdd: [],
             artists: [],
             personnelAdd: [],
+            cancelled: 0
         };
     }
+
+    handleEventCancel = () =>{
+        if (window.confirm("Ønsker du å avlyse arrangementet?") === true) {
+            this.setState({cancelled: true});
+            console.log("Cancelled")
+        } else {
+            console.log("No change")
+        }
+    };
 
     handleEventNameChange(event) {
         this.setState({eventName: event.target.value});
@@ -151,7 +161,7 @@ export class EditEvent extends Component{
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
         let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "");
+            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "", this.state.cancelled);
 
         service.updateEvent(ev)
     }
@@ -391,6 +401,9 @@ export class EditEvent extends Component{
                             </ButtonToolbar>
                         </Form.Group>
 
+                            <Form.Group as={Col}  md={{span: 3, offset: 5}}>
+                                <Button variant={"danger"} type="button" onClick={this.handleEventCancel}>Avlys arrangement</Button>
+                            </Form.Group>
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
                             <Button type="button" onClick={this.handleSubmit}>Endre arragament</Button>
                         </Form.Group>
@@ -423,6 +436,7 @@ export class EditEvent extends Component{
             this.setState({tDate: toDate});
             this.setState({fTime: fromTime});
             this.setState({tTime: toTime});
+            this.setState({cancelled: event.cancelled});
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));

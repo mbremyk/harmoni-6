@@ -226,6 +226,7 @@ class Dao {
                 image: event.image,
                 imageUrl: event.imageUrl,
                 description: event.description,
+                cancelled: event.cancelled,
             },
             {where: {eventId: event.eventId}})
             .then(response => response[0] === 1 /*affected rows === 1*/)
