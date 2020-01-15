@@ -7,8 +7,8 @@ export class Footer extends Component{
 
 	render() {
 		return (
-			<div className="-fill">
-				<div className="bg-secondary text-center align-bottom" style={{height: "100px"}}>
+			<div className="Footer">
+				<div className="bg-secondary text-center align-bottom">
 					<CardColumns>
 
 						<p className="text-white font-italic">Harmoni</p>

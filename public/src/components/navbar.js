@@ -11,7 +11,7 @@ export class HarmoniNavbar extends Component {
         return (
             <div>
                 <Navbar bg="light">
-                    <Navbar.Brand href="/">
+                    <Navbar.Brand href="/hjem">
                         Harmoni
                     </Navbar.Brand>
                 </Navbar>
