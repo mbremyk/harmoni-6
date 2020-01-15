@@ -141,45 +141,42 @@ export class AddEvent extends Component{
             return;
         }else if(
             this.state.tDate < this.state.fDate ||
-            this.state.tTime < this.state.fTime
+            (this.state.fDate === this.state.tDate &&
+                this.state.tTime < this.state.fTime)
         ){
-            alert('Fra-tidspunkt må være større enn til-tidspunkt!');
+            alert('Fra-tidspunkt må være mindre enn til-tidspunkt!');
             return;
+        }else{
+            let ev = new Event();
+            ev.address = this.state.eventAddress;
+            ev.organizerId = this.state.organizerId;
+            ev.ageLimit = this.state.ageLimit;
+            ev.description = this.state.eventDescription;
+            ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
+            ev.endTime = this.mergeDateTime(this.state.tDate, this.state.tTime);
+            ev.eventName = this.state.eventName;
+            ev.rider = this.state.rider;
+            ev.contract = this.state.contract;
+            ev.imageUrl = this.state.imageUrl;
+
+            service.createEvent(ev)
+                .then(updated =>
+
+                    {
+                        this.state.artistsAdd.map(a =>
+                            service.createGig(new Gig(a.userId, updated.insertId, null, null)));
+                        this.state.personnelAdd.map( p =>
+                            service.createPersonnel(new Personnel(p.userId, updated.insertId, p.role), updated.insertId));
+                    }
+
+                ).then(() => this.props.history.push("/opprett-arrangement"))
+                .catch(err => alert('En feil oppsto!' + err.message))
         }
-        this.submit();
+
     }
 
     mergeDateTime(fdate, ftime){
         return fdate.toISOString().split("T")[0] + " " + ftime;
-    }
-
-    submit() {
-
-        let ev = new Event();
-        ev.address = this.state.eventAddress;
-        ev.organizerId = this.state.organizerId;
-        ev.ageLimit = this.state.ageLimit;
-        ev.description = this.state.eventDescription;
-        ev.startTime = this.mergeDateTime(this.state.fDate, this.state.fTime);
-        ev.endTime = this.mergeDateTime(this.state.tDate, this.state.tTime);
-        ev.eventName = this.state.eventName;
-        ev.rider = this.state.rider;
-        ev.contract = this.state.contract;
-        ev.imageUrl = this.state.imageUrl;
-
-        service.createEvent(ev)
-            .then(updated =>
-
-            {
-                this.state.artistsAdd.map(a =>
-                    (service.createGig(new Gig(a.userId, updated.insertId, null, null))));
-                this.state.personnelAdd.map( personnel =>
-                    service.createPersonnel(new Personnel(personnel.userId, updated.insertId, personnel.role), updated.insertId));
-                console.log(updated.insertId);
-            }
-
-            ).then(() => this.props.history.push("/opprett-arrangement"))
-        .catch(err => alert('En feil oppsto!' + err.message))
     }
 
     render(){
