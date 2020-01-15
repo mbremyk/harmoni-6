@@ -234,13 +234,13 @@ GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
 PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
-FileModel.hasOne(GigModel, {foreignKey: 'contract'});
+FileModel.hasOne(GigModel, {foreignKey: 'fileId'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'rider'});
 GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
 
-UserModel.hasMany(PersonnelModel, {foreignKey: 'personnelId'});
+UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
 PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
 EventModel.hasMany(PersonnelModel, {foreignKey: 'eventId'});
@@ -273,4 +273,18 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
 });
 //syncTestData();
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, FileModel, syncModels, syncTestData};
+let dropTables = () => {
+    return GigModel.drop().then(() => {
+        FileModel.drop().then(() => {
+            TicketModel.drop().then(() => {
+                PersonnelModel.drop().then(() => {
+                    EventModel.drop().then(() => {
+                        UserModel.drop();
+                    });
+                });
+            });
+        });
+    });
+};
+
+module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, FileModel, syncModels, syncTestData, dropTables};

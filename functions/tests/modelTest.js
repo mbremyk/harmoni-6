@@ -3,8 +3,9 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeAll(() => Models.syncTestData().then(() => function () {
-}));
+beforeEach(done => Models.syncTestData().then(() => done()));
+
+afterEach(done => Models.dropTables().then(() => done()))
 
 
 /*
@@ -208,6 +209,14 @@ describe('Events', () => {
             expect(response).toBeFalsy();
             done();
         });
+    });
+
+    it('cancels event', done => {
+        db.cancelEvent(1)
+            .then(res => {
+                expect(res).toBeTruthy();
+                done();
+            });
     });
 
     // it('delete Event', done => {
