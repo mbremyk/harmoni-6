@@ -7,11 +7,19 @@ import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
 
 export class HarmoniNavbar extends Component {
+    state = {
+        input: ''
+    };
+
+    handleInputChange(event) {
+        this.setState({input: event.target.value});
+    }
+
     render() {
         return (
             <div>
                 <Navbar bg="light">
-                    <Navbar.Brand href="/">
+                    <Navbar.Brand href="/hjem">
                         Harmoni
                     </Navbar.Brand>
                 </Navbar>
@@ -25,11 +33,17 @@ export class HarmoniNavbar extends Component {
                             <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
                         </Nav>
                         <Form inline>
-                            <FormControl type="text" placeholder="Søk" className="mr-sm-2" onKeyPress={event => {
-                                if (event.key === "Enter") {
-                                    this.search();
-                                }
-                            }}/>
+                            <FormControl type="text"
+                                         placeholder="Søk"
+                                         className="mr-sm-2"
+                                         value={this.state.input}
+                                         onChange={this.handleInputChange}
+                                         onKeyPress={(event) => {
+                                             if (event.key === "Enter") {
+                                                 alert("Search clicked, input: " + this.state.input + "\n Kun knappen fungerer TODO");
+                                                 this.search()
+                                             }
+                                         }}/>
                             <Button variant="outline-success" onClick={this.search}>Søk</Button>
                         </Form>
                     </Navbar.Collapse>
@@ -37,7 +51,13 @@ export class HarmoniNavbar extends Component {
             </div>
         );
     }
+
     search() {
-        alert("Search clicked");
+        //let url = "/sok/" + this.state.input;
+        //alert("Search clicked, input: " + this.state.input + "\n Bruk knappen! Fuck js...");
+        window.location = ("/sok/" + this.state.input);
+        //window.location.replace("https://www.w3schools.com");
+        //this.props.history.push("/sok/" + this.state.input);
+        return false;
     }
 }

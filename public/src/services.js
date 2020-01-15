@@ -28,18 +28,18 @@ export class Event {
     image;
     description;
 
-	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
-		this.eventId = eventId;
-		this.organizerId = organizerId;
-		this.eventName = eventName;
-		this.address = address;
-		this.description = description;
-		this.ageLimit = ageLimit;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.imageUrl = imageURL;
-		this.image = image;
-	}
+    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
+        this.eventId = eventId;
+        this.organizerId = organizerId;
+        this.eventName = eventName;
+        this.address = address;
+        this.description = description;
+        this.ageLimit = ageLimit;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.imageUrl = imageURL;
+        this.image = image;
+    }
 }
 
 export class Gig {
@@ -90,6 +90,10 @@ class Services {
         return axios.post(url + '/auth/logout', {}, {headers: {'x-access-token': authService.getToken()}})
     }
 
+    updatePassword(user) {
+        return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
     refreshToken() {
         return axios.post(url + '/auth/refresh', {}, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
@@ -118,7 +122,11 @@ class Services {
     }
 
     updateUser(user) {
-        return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.put(url + '/auth/users/' + user.userId, user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
+    deleteUser(userId) {
+        return axios.delete(url + '/auth/users/' + userId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     getUsers() {
@@ -209,6 +217,9 @@ class Services {
         return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
     }
 
+    getGigForEvent(eventId) {
+        return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
+    }
 
     /*downloadContract(event, artist)
     {

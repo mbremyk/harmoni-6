@@ -1,3 +1,7 @@
+html
+{
+    font-size: 100%;
+}
 .landingpage {
     height: 100vh;
     min-height: 500px;
@@ -8,15 +12,12 @@
     color: white;
 }
 
-.error {
-    position: relative;
-    animation: shake .1s linear;
-    animation-iteration-count: 3;
+.HarmoniLogo {
+    font-family: 'Lemonada', cursive;
 }
 
-@keyframes shake {
-    0% { left: -5px; }
-    100% { right: -5px; }
+#root {
+    height: 100%;
 }
 
 /*Styling for eventinfo*/
