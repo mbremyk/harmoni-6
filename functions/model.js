@@ -46,7 +46,7 @@ let UserModel = sequelize.define('user', {
     username: {type: Sequelize.STRING, unique: true, allowNull: false},
     password: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
-    email: Sequelize.STRING
+    email: {type: Sequelize.STRING, unique: true, allowNull: false}
 }, {
     timestamps: true,
     paranoid: true
@@ -132,10 +132,10 @@ let EventModel = sequelize.define('event', {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    imageUrl: Sequelize.STRING,
+    imageUrl: Sequelize.TEXT,
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
-    cancelled: Sequelize.BOOLEAN
+    cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
 }, {paranoid: true});
 
 /*class Gig {
@@ -222,23 +222,33 @@ let PersonnelModel = sequelize.define('personnel', {
     paranoid: true
 });
 
+
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
 EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
 
 UserModel.hasMany(GigModel, {foreignKey: 'artistId'});
 GigModel.belongsTo(UserModel, {foreignKey: 'artistId'});
 
+UserModel.hasMany(PersonnelModel, {foreignKey: 'personnelId'});
+PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
+
+
 EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
 GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 
-UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
-PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
+EventModel.hasMany(PersonnelModel, {foreignKey: 'eventId'});
+PersonnelModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+EventModel.hasMany(TicketModel, {foreignKey: 'eventId'});
+TicketModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
 
 FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'rider'});
 GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
+
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
@@ -248,18 +258,50 @@ creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
 let syncTestData = () => sequelize.sync({force: true}).then(() => {
-    return (
-        UserModel.bulkCreate(testData.users).then(() => {
-            EventModel.bulkCreate(testData.events).then(() => {
-                PersonnelModel.bulkCreate(testData.personnel).then(() => {
-                    TicketModel.bulkCreate(testData.tickets).then(() => {
-                        GigModel.bulkCreate(testData.gigs);
-                    });
+    return UserModel.bulkCreate(testData.users).then(() => {
+        return EventModel.bulkCreate(testData.events).then(() => {
+            return PersonnelModel.bulkCreate(testData.personnel).then(() => {
+                return TicketModel.bulkCreate(testData.tickets).then(() => {
+                    return FileModel.bulkCreate(testData.files).then(() => {
+                        return GigModel.bulkCreate(testData.gigs).then(() => true);
+                    })
                 });
             });
-        })
-    ).catch(error => console.log(error));
+        });
+    })
+        .catch(error => {
+            console.error(error);
+            return false;
+        });
 });
 //syncTestData();
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, FileModel, syncModels, syncTestData};
+let dropTables = () => {
+    return GigModel.drop().then(() => {
+        return FileModel.drop().then(() => {
+            return TicketModel.drop().then(() => {
+                return PersonnelModel.drop().then(() => {
+                    return EventModel.drop().then(() => {
+                        return UserModel.drop().then(() => true);
+                    });
+                });
+            });
+        });
+    })
+        .catch(error => {
+            console.error(error);
+            return false;
+        });
+};
+
+module.exports = {
+    UserModel,
+    EventModel,
+    GigModel,
+    PersonnelModel,
+    TicketModel,
+    FileModel,
+    syncModels,
+    syncTestData,
+    dropTables
+};

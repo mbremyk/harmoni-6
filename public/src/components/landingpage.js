@@ -18,16 +18,21 @@ export class LandingPage extends Component {
 			<div>
 				<div className="landingpage">
 					<Container>
-						<Row>
-							<Col md={{span: 3, offset: 5}}>
-								<h1>Harmoni</h1>
+						<Row style={{padding: "5em"}}>
+							<Col>
+								<h1 className="HarmoniLogo display-3 text-center">Harmoni</h1>
 							</Col>
 						</Row>
-						<Row>
-							<Col md={{span: 3, offset: 5}}>
+						<Row style={{padding: "3em"}}>
+							<Col className="text-center">
 								<Button variant="primary"
 								        size="lg"
 								        onClick={() => this.logIn()} href="logg-inn">Logg inn</Button>
+							</Col>
+						</Row>
+						<Row style={{padding: "3em"}}>
+							<Col className="text-center">
+								<h2>Logg inn for å se dine arrangementer</h2>
 							</Col>
 						</Row>
 					</Container>

@@ -11,7 +11,7 @@ export class SearchResults extends Component {
     };
 
     render() {
-        if (!(Array.isArray(this.state.events) && this.state.events.length)) {
+        if (!(Array.isArray(this.state.events) && this.state.events.length)){
             return (
                 <Fragment>
                     <HarmoniNavbar/>
@@ -19,13 +19,13 @@ export class SearchResults extends Component {
                 </Fragment>
             )
         } else {
-            return (
-                <Fragment>
-                    <HarmoniNavbar/>
-                    <SortedEventView events={this.state.events}/>
-                </Fragment>
-            )
-        }
+                return (
+                    <Fragment>
+                        <HarmoniNavbar/>
+                        <SortedEventView events={this.state.events}/>
+                    </Fragment>
+                )
+            }
     }
 
     mounted() {

@@ -168,17 +168,19 @@ export class AddEvent extends Component{
             this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
             this.state.image);
 
+        let iId = undefined;
+
         service.createEvent(e)
             .then(updated =>
-
                     {
+                        iId = updated.insertId;
                         this.state.artistsAdd.map(a =>
                             service.createGig(new Gig(a.userId, updated.insertId, null, null)));
                         this.state.personnelAdd.map( p =>
                             service.createPersonnel(new Personnel(p.userId, updated.insertId, p.role)));
                     }
 
-            ).then(() => this.props.history.push("/opprett-arrangement"))
+            ).then(() => this.props.history.push("/arrangement/" + iId))
             .catch(err => alert(err.message))
     }
 
