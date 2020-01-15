@@ -325,6 +325,15 @@ app.put("/auth/users/:userId", (req, res) => {
 
 /**
  *
+ *
+ */
+app.delete("/auth/users/:userId", (req, res) => {
+    return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
+});
+
+
+/**
+ *
  */
 app.get("/users", (req, res) => {
     console.log("GET-request - /users");
@@ -622,16 +631,16 @@ app.get("/events/:eventId/tickets", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/gigs", (req, res) => {
-	console.log("POST-request - /gigs");
+    console.log("POST-request - /gigs");
     let contractFile = req.body.contract;
     let riderFile = req.body.rider;
     //console.log(riderFile.name);
     //console.log(contractFile.name);
     //console.log(Object.keys(req.body));
 
-	return db.addGig(req.body).then(response => {
+    return db.addGig(req.body).then(response => {
 
-		/*if (response) {
+        /*if (response) {
             res.status(201).send(response)
         } else {
             res.status(400);
@@ -645,7 +654,7 @@ app.post("/events/:eventId/gigs", (req, res) => {
                         });
                 });
         }
-	});
+    });
 });
 
 /**
@@ -678,21 +687,21 @@ app.post("/contracts/:eventId/:artistId", (req, res) => {
     console.log(req.files[0]);
 
     console.log(file.buffer instanceof Buffer);
-   /* let base64String = file.buffer.toString('base64');
+    /* let base64String = file.buffer.toString('base64');
 
-    let buf = new Buffer(base64String, "base64");
+     let buf = new Buffer(base64String, "base64");
 
-	/*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
-		if (err){
-			res.send(err);
-		}else{
-			console.log('The file has been saved!');
-			res.send("done");
-		}
-	});*/
-	//Todo set access here
+     /*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
+         if (err){
+             res.send(err);
+         }else{
+             console.log('The file has been saved!');
+             res.send("done");
+         }
+     });*/
+    //Todo set access here
     db.setContract(file, req.params.eventId, req.params.artistId)
-		.then(() => res.send("Change made"));
+        .then(() => res.send("Change made"));
 });
 
 
@@ -703,20 +712,20 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
     db.getContract(req.params.eventId, req.params.artistId)
         .then(result => {
 
-            let base64String = result.data;
-            let name = result.name;
-            let buf = new Buffer(base64String, "base64");
+                let base64String = result.data;
+                let name = result.name;
+                let buf = new Buffer(base64String, "base64");
 
-            res.send({name: name, data: base64String });
-            /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
-                if (err){
-                    res.send(err);
-                }else{
-                    console.log('The file has been saved!');
-                    const file = `${__dirname}/uploads/`+name;
-                    res.download(file); // Set disposition and send it.
-                }
-            });*/
+                res.send({name: name, data: base64String});
+                /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
+                    if (err){
+                        res.send(err);
+                    }else{
+                        console.log('The file has been saved!');
+                        const file = `${__dirname}/uploads/`+name;
+                        res.download(file); // Set disposition and send it.
+                    }
+                });*/
             }
         );
 });
@@ -732,7 +741,7 @@ app.get("/rider/:eventId/:artistId", (req, res) => {
                 let name = result.name;
                 let buf = new Buffer(base64String, "base64");
 
-                res.send({name: name, data: base64String });
+                res.send({name: name, data: base64String});
                 /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
                     if (err){
                         res.send(err);
