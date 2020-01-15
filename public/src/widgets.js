@@ -16,6 +16,7 @@ export class EventInfo extends Component {
     end_date;
     uploaded;
     link;
+    myEvent;
 
     /*<div className="font-weight-bold">
      Pris fra
