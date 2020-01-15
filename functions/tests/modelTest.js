@@ -1,5 +1,6 @@
 const Models = require('../model.js');
 const dao = require('../dao.js');
+
 let db = new dao();
 
 
@@ -71,12 +72,12 @@ describe('Users', () => {
         });
     });
 
-    // it('delete user', done => {
-    //     db.deleteUser(1).then(response => {
-    //         expect(response).toBeTruthy();
-    //         done();
-    //     });
-    // });
+    it('delete user', done => {
+        db.deleteUser(5).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
 
     it('correct data in users', done => {
         db.getAllUsers().then(users => {

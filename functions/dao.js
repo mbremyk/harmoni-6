@@ -60,8 +60,8 @@ class Dao {
                 username: user.username,
                 email: user.email
             },
-            {where: {userId: user.userId}}
-        ).then(response => response[0] === 1 /*affected rows === 1*/)
+            {where: {userId: user.userId}})
+            .then(response => response[0] === 1 /*affected rows === 1*/)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -77,17 +77,24 @@ class Dao {
      * @param userId
      * @returns {Promise<boolean>}
      */
-    // deleteUser(userId) { //TODO
-    //     return model.GigModel.update({artistId: 1}, {where: {artistId: userId}})
-    //         .then(() => model.PersonnelModel.update({personnelId: 1}, {where: {personnelId: userId}}))
-    //         .then(() => model.EventModel.update({organizerId: 1}, {where: {organizerId: userId}}))
-    //         .then(() => model.PersonnelModel.destroy({where: {userId: userId}}))
-    //         .then(() => true)
-    //         .catch(error => {
-    //             console.error(error);
-    //             return false;
-    //         });
-    // }
+    deleteUser(userId) {
+        return (model.UserModel.update(
+            {
+                username: 'this user no longer exists',
+                email: '',
+                password: null,
+                salt: null,
+
+            },
+            {where: {userId: userId}}))
+            .then(() => {
+                return model.UserModel.destroy({where: {userId: userId}})
+            })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
 
     /**
      * finds all registered user
