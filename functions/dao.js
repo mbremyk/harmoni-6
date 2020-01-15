@@ -364,13 +364,16 @@ class Dao {
      * retrieves the gig assosciated with an event
      *
      * @param eventId
-     * @returns {Promise<Gig>}
+     * @returns {Promise<Gig[]>}
      */
     getGigs(eventId) {
-        return model.GigModel.findAll({where: {eventId: eventId}})
+        return model.GigModel.findAll({
+            include: [{model: model.UserModel, attributes: ['username', 'email']}],
+            where: {eventId: eventId}
+        })
             .catch(error => {
                 console.error(error);
-                return {};
+                return [];
             });
     }
 
