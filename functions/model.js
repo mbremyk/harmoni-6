@@ -132,10 +132,10 @@ let EventModel = sequelize.define('event', {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    imageUrl: Sequelize.STRING,
+    imageUrl: Sequelize.TEXT,
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
-    cancelled: Sequelize.BOOLEAN
+    cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
 }, {paranoid: true});
 
 /*class Gig {
