@@ -27,8 +27,9 @@ export class Event {
     imageUrl;
     image;
     description;
+    cancelled;
 
-	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
+	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image, cancelled) {
 		this.eventId = eventId;
 		this.organizerId = organizerId;
 		this.eventName = eventName;
@@ -39,6 +40,7 @@ export class Event {
 		this.endTime = endTime;
 		this.imageUrl = imageURL;
 		this.image = image;
+		this.cancelled = cancelled;
 	}
 }
 
