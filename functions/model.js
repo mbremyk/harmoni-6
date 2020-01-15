@@ -231,7 +231,7 @@ GigModel.belongsTo(UserModel, {foreignKey: 'artistId'});
 EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
 GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 
-UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
+UserModel.hasMany(PersonnelModel, {foreignKey: 'personnelId'});
 PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'contract'});
