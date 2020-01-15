@@ -36,6 +36,7 @@ export default function EditEvent () {
     const [artistsAdd, setArtistsAdd] = useState([]);
     const [artists, setArtists] = useState([]);
     const [personnelAdd, setPersonnelAdd] = useState([]);
+    const [tests, setTests] = useState([]);
 
 
     function handleSubmit() {
@@ -52,6 +53,12 @@ export default function EditEvent () {
         console.log("test")
         console.log(id);
         console.log(match.params.id);
+
+        console.log(tests)
+        console.log(tests[0])
+        setTests(tests.push(1))
+        console.log(tests)
+        console.log(tests[0])
 
         service.getEventByEventId(id).then(event => {
 
@@ -73,7 +80,7 @@ export default function EditEvent () {
             setTDate(toDate);
             setTTime(toTime);
 
-            service.getUsers().then(event => setArtists(...event.target.value)).catch((err) => console.log(err.message));
+            service.getUsers().then(event => setArtists(event)).catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
     },[]);
 
@@ -163,7 +170,13 @@ export default function EditEvent () {
                     <Form.Group as={Col} sm={"2"}>
 
                         <Form.Label>Artist</Form.Label>
-                        <Dropdown onSelect={event => service.getUser(event).then((user) =>setArtistsAdd(user))}>
+                        <Dropdown onSelect={event => {
+                            service.getUser(event).then((user) => {
+                                console.log(artistsAdd)
+                                setArtistsAdd(user)
+                                console.log(artistsAdd)
+                            })
+                        }}>
 
                             <Dropdown.Toggle variant={"success"} id="dropdown">
                                 Velg artist
