@@ -48,7 +48,8 @@ let UserModel = sequelize.define('user', {
     salt: Sequelize.STRING.BINARY,
     email: Sequelize.STRING
 }, {
-    timestamps: true
+    timestamps: true,
+    paranoid: true
 });
 
 
@@ -65,7 +66,7 @@ let FileModel = sequelize.define('file', {
         autoIncrement: true
     },
     name: {
-        type:  Sequelize.STRING
+        type: Sequelize.STRING
     },
     contentType: {
         type: Sequelize.STRING
@@ -74,7 +75,7 @@ let FileModel = sequelize.define('file', {
         type: Sequelize.TEXT
     }
 
-});
+}, {paranoid: true});
 
 /*
 let FileAccessModel = sequelize.define('fileAccess', {
@@ -134,7 +135,8 @@ let EventModel = sequelize.define('event', {
     imageUrl: Sequelize.STRING,
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
-});
+    cancelled: Sequelize.BOOLEAN
+}, {paranoid: true});
 
 /*class Gig {
     artistId;
@@ -170,7 +172,7 @@ let GigModel = sequelize.define('gig', {
             key: 'fileId'
         }
     }
-});
+}, {paranoid: true});
 
 /*class Ticket {
     eventId;
@@ -189,7 +191,7 @@ let TicketModel = sequelize.define('ticket', {
     type: {type: Sequelize.STRING, primaryKey: true},
     price: Sequelize.INTEGER,
     amount: Sequelize.INTEGER
-});
+}, {paranoid: true});
 
 /*class Personnel {
     personnelId;
@@ -215,7 +217,10 @@ let PersonnelModel = sequelize.define('personnel', {
         }
     },
     role: Sequelize.STRING
-}, {tableName: 'personnel'});
+}, {
+    tableName: 'personnel',
+    paranoid: true
+});
 
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
 EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
@@ -239,7 +244,7 @@ let syncModels = () => sequelize.sync({force: false}).then().catch(error => cons
 creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
-let syncTestData = () => sequelize.sync({force: false}).then(() => {
+let syncTestData = () => sequelize.sync({force: true}).then(() => {
     return (
         UserModel.bulkCreate(testData.users).then(() => {
             EventModel.bulkCreate(testData.events).then(() => {

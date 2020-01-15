@@ -613,9 +613,9 @@ app.post("/events/:eventId/gigs", (req, res) => {
 	console.log("POST-request - /gigs");
     let contractFile = req.body.contract;
     let riderFile = req.body.rider;
-    console.log(riderFile.name);
-    console.log(contractFile.name);
-    console.log(Object.keys(req.body));
+    //console.log(riderFile.name);
+    //console.log(contractFile.name);
+    //console.log(Object.keys(req.body));
 
 	db.createGig(req.body).then(response => {
 

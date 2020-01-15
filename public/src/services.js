@@ -136,11 +136,11 @@ class Services {
         EVENTS
     */
     createEvent(event) {
-        return axios.post(url + '/auth/events', event).then(response => response.data);
+        return axios.post(url + '/auth/events', event, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     updateEvent(event) {
-        return axios.put(url + "/auth/events/" + event.eventId, event).then(response => response.data);
+        return axios.put(url + "/auth/events/" + event.eventId, event, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     getEvents() {
