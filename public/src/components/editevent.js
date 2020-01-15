@@ -366,9 +366,6 @@ export class EditEvent extends Component{
                                 </InputGroup>
                             </Form.Group>
 
-                            <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                                <Button type="button" onClick={this.handleSubmit}>Endre arragament</Button>
-                            </Form.Group>
                         <Form.Group as={Col} sm={"6"}>
 
                             <Form.Label>Aldersgrense</Form.Label>
