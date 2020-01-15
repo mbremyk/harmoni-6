@@ -71,6 +71,13 @@ describe('Users', () => {
         });
     });
 
+    // it('delete user', done => {
+    //     db.deleteUser(1).then(response => {
+    //         expect(response).toBeTruthy();
+    //         done();
+    //     });
+    // });
+
     it('correct data in users', done => {
         db.getAllUsers().then(users => {
             expect(users.length).toBeGreaterThanOrEqual(9);
