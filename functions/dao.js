@@ -124,8 +124,8 @@ class Dao {
             });
     }
 
-    getUserByEmailOrUsername(email, username){
-        let where = {[op.or]: [{email: email},{username: username}]};
+    getUserByEmailOrUsername(email, username) {
+        let where = {[op.or]: [{email: email}, {username: username}]};
         return model.UserModel.findAll({where: where})
             .then(users => users)
             .error(error => {
@@ -298,8 +298,8 @@ class Dao {
             {
                 artistId: gig.artistId,
                 eventId: gig.eventId,
-                rider: null,
-                contract: null,
+                rider: gig.rider,
+                contract: gig.contract,
             })
             .then(response => response.id !== null)
             .catch(error => {
@@ -381,13 +381,17 @@ class Dao {
     }
 
     /**
-     * retrieves the gig assosciated with an event
+     * retrieves the personnel assosciated with an event
      *
      * @param eventId
      * @returns {Promise<Personnel[]>}
      */
     getPersonnel(eventId) {
-        return model.PersonnelModel.findAll({where: {eventId: eventId}})
+        return model.PersonnelModel.findAll(
+            {
+                include: [{model: model.UserModel, attributes: ['username', 'email']}],
+                where: {eventId: eventId}
+            })
             .catch(error => {
                 console.error(error);
                 return [];
@@ -487,13 +491,13 @@ class Dao {
                     );
             });
 
-		/*model.GigModel.update(
-			{contract: contract},
-			{ where: { gigId: gig, artistId: artist}}
-		);
-		model.update();*/
+        /*model.GigModel.update(
+            {contract: contract},
+            { where: { gigId: gig, artistId: artist}}
+        );
+        model.update();*/
 
-	}
+    }
 
     setRider(rider, gig, artist ){
         let base64String = rider.data.toString('base64');
