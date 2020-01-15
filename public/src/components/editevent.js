@@ -12,7 +12,6 @@ import FormControl from "react-bootstrap/FormControl";
 import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
-import {Event, service} from "../services";
 import {HarmoniNavbar} from "./navbar";
 
 export class EditEvent extends Component{
