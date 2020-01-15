@@ -15,6 +15,9 @@ import {UploadWidget, DownloadWidget} from "./widgets";
 
 import {authService} from "./AuthService";
 import {PrivateRoute} from "./components/PrivateRoute";
+import {SearchResults} from "./components/searchresults";
+
+//const history = createHashHistory();
 import {createBrowserHistory} from "history";
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
@@ -28,6 +31,7 @@ if (root)
 	        <Route exact path="/ny-bruker" component={CreateUserForm}/>
 	        <Route exact path="/arrangement/:id" component={EventPage}/>
 	        <Route exact path="/logg-inn" component={LoginForm}/>
+            <Route exact path="/sok/:input" component={SearchResults}/>
 
             <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
             <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
@@ -40,3 +44,34 @@ if (root)
     </BrowserRouter>,
     root
 );
+
+/*
+
+router with router guard.
+
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+        <Route exact path="/arrangement/:id" component={EventPage}/>
+        <Route exact path="/logg-inn" component={LoginForm}/>
+
+        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
+
+router without router guard
+
+        <Route path="/" component={navbar}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm} />
+        <Route exact path="/min-side" component={myPage}/>
+        <Route exact path="/logg-inn" component={LoginForm} />
+        <Route exact path="/logg-ut" component={Logout}/>
+        <Route exact path="/hjem" component={HomePage} />
+        <Route exact path="/arrangement/:id" component={EventPage} />
+        <Route exact path="/opprett-arrangement" component={AddEvent} />
+        <Route exact path="/endre-arrangement" component={EditEvent} />
+
+ */
