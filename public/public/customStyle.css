@@ -8,6 +8,10 @@
     color: white;
 }
 
+.HarmoniLogo {
+    font-family: 'Lemonada', cursive;
+}
+
 #root {
     height: 100%;
 }

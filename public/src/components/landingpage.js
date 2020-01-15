@@ -20,7 +20,7 @@ export class LandingPage extends Component {
 					<Container>
 						<Row>
 							<Col md={{span: 3, offset: 5}}>
-								<h1>Harmoni</h1>
+								<b className="HarmoniLogo display-1">Harmoni</b>
 							</Col>
 						</Row>
 						<Row>
