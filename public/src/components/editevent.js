@@ -430,6 +430,12 @@ export class EditEvent extends Component{
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
+            service.getGigForEvent(this.props.match.params.id)
+                .then(g => {
+                    console.log(g);
+                    g.map(u => this.handleArtistsAdd(u.artistId));
+                })
+                .catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
     }
 
