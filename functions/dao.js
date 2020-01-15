@@ -60,8 +60,36 @@ class Dao {
                 username: user.username,
                 email: user.email
             },
-            {where: {userId: user.userId}}
-        ).then(response => response[0] === 1 /*affected rows === 1*/)
+            {where: {userId: user.userId}})
+            .then(response => response[0] === 1 /*affected rows === 1*/)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+
+    /**
+     *  Deletes a user from the database, in order to not delete events etc. the user
+     *  has been involved in, the user will be replaced by an anonomyous user before
+     *  deleteing the user itself.
+     *
+     * @param userId
+     * @returns {Promise<boolean>}
+     */
+    deleteUser(userId) {
+        return (model.UserModel.update(
+            {
+                username: 'this user no longer exists',
+                email: '',
+                password: null,
+                salt: null,
+
+            },
+            {where: {userId: userId}}))
+            .then(() => {
+                return model.UserModel.destroy({where: {userId: userId}})
+            })
             .catch(error => {
                 console.error(error);
                 return false;
@@ -221,6 +249,13 @@ class Dao {
             });
     }
 
+    /**
+     * deletes an event from the database, to do this, all associated data (gigs, tickets and personnel) will also
+     * get deleted
+     *
+     * @param eventId
+     * @returns {Promise<boolean>}
+     */
     deleteEvent(eventId) {
 
         return model.GigModel.destroy({where: {eventId: eventId}})

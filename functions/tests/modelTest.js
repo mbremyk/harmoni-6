@@ -1,5 +1,6 @@
 const Models = require('../model.js');
 const dao = require('../dao.js');
+
 let db = new dao();
 
 
@@ -72,6 +73,13 @@ describe('Users', () => {
         };
         db.updateUser(user).then(response => {
             expect(response).toBeFalsy();
+            done();
+        });
+    });
+
+    it('delete user', done => {
+        db.deleteUser(5).then(response => {
+            expect(response).toBeTruthy();
             done();
         });
     });
