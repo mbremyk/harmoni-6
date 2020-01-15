@@ -46,7 +46,7 @@ let UserModel = sequelize.define('user', {
     username: {type: Sequelize.STRING, unique: true, allowNull: false},
     password: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
-    email: Sequelize.STRING
+    email: {type: Sequelize.STRING, unique: true, allowNull: false}
 }, {
     timestamps: true,
     paranoid: true
@@ -234,11 +234,20 @@ GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
 PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
-FileModel.hasOne(GigModel, {foreignKey: 'contract'});
+FileModel.hasOne(GigModel, {foreignKey: 'fileId'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'rider'});
 GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
+
+UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
+PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
+
+EventModel.hasMany(PersonnelModel, {foreignKey: 'eventId'});
+PersonnelModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+EventModel.hasMany(TicketModel, {foreignKey: 'ticketId'});
+TicketModel.belongsTo(EventModel, {foreignKey: 'ticketId'});
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
@@ -248,18 +257,50 @@ creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
 let syncTestData = () => sequelize.sync({force: true}).then(() => {
-    return (
-        UserModel.bulkCreate(testData.users).then(() => {
-            EventModel.bulkCreate(testData.events).then(() => {
-                PersonnelModel.bulkCreate(testData.personnel).then(() => {
-                    TicketModel.bulkCreate(testData.tickets).then(() => {
-                        GigModel.bulkCreate(testData.gigs);
-                    });
+    return UserModel.bulkCreate(testData.users).then(() => {
+        return EventModel.bulkCreate(testData.events).then(() => {
+            return PersonnelModel.bulkCreate(testData.personnel).then(() => {
+                return TicketModel.bulkCreate(testData.tickets).then(() => {
+                    return FileModel.bulkCreate(testData.files).then(() => {
+                        return GigModel.bulkCreate(testData.gigs).then(() => true);
+                    })
                 });
             });
-        })
-    ).catch(error => console.log(error));
+        });
+    })
+        .catch(error => {
+            console.error(error);
+            return false;
+        });
 });
 //syncTestData();
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, FileModel, syncModels, syncTestData};
+let dropTables = () => {
+    return GigModel.drop().then(() => {
+        return FileModel.drop().then(() => {
+            return TicketModel.drop().then(() => {
+                return PersonnelModel.drop().then(() => {
+                    return EventModel.drop().then(() => {
+                        return UserModel.drop().then(() => true);
+                    });
+                });
+            });
+        });
+    })
+        .catch(error => {
+            console.error(error);
+            return false;
+        });
+};
+
+module.exports = {
+    UserModel,
+    EventModel,
+    GigModel,
+    PersonnelModel,
+    TicketModel,
+    FileModel,
+    syncModels,
+    syncTestData,
+    dropTables
+};

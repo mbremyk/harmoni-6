@@ -3,7 +3,12 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeAll(() => Models.syncTestData().then(() => function () {
+beforeEach(done => Models.syncTestData().then(res => {
+    done();
+}));
+
+afterEach(done => Models.dropTables().then(res => {
+    done();
 }));
 
 
@@ -99,6 +104,15 @@ describe('Users', () => {
         });
     });
 
+    it('finds salt by email', done => {
+        db.getSaltByEmail('steffen@mail.com')
+            .then(salt => {
+                expect(salt[0].dataValues)
+                    .toEqual({salt: 'salt'});
+                done();
+            });
+    });
+
     it('find user by ID', done => {
         db.getUserById(1).then(user => {
             expect({
@@ -117,6 +131,31 @@ describe('Users', () => {
             );
             done();
         });
+    });
+
+    it('finds user by email or username', done => {
+        db.getUserByEmailOrUsername('steffen@mail.com', 'Marius T')
+            .then(users => {
+                expect([{
+                    userId: users[0].dataValues.userId,
+                    username: users[0].dataValues.username,
+                    email: users[0].dataValues.email
+                }, {
+                    userId: users[1].dataValues.userId,
+                    username: users[1].dataValues.username,
+                    email: users[1].dataValues.email
+                }])
+                    .toEqual([{
+                        userId: 1,
+                        username: 'Steffen T',
+                        email: 'steffen@mail.com'
+                    }, {
+                        userId: 2,
+                        username: 'Marius T',
+                        email: 'marius@mail.com'
+                    }]);
+                done();
+            });
     });
 });
 
@@ -176,12 +215,20 @@ describe('Events', () => {
         });
     });
 
-    // it('delete Event', done => {
-    //     db.deleteEvent(2).then(response => {
-    //         expect(response).toBeTruthy();
-    //         done();
-    //     });
-    // });
+    it('cancels event', done => {
+        db.cancelEvent(1)
+            .then(res => {
+                expect(res).toBeTruthy();
+                done();
+            });
+    });
+
+    it('delete Event', done => {
+        db.deleteEvent(2).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
 
 
     it('correct data in events', done => {

@@ -197,7 +197,7 @@ class Dao {
     cancelEvent(eventId) {
         return model.EventModel.update(
             {
-                //TODO
+                cancelled: true
             },
             {where: {eventId: eventId}})
             .then(response => response[0] === 1 /*affected rows === 1*/)
@@ -209,17 +209,20 @@ class Dao {
 
     deleteEvent(eventId) {
 
-        return (
-            (model.GigModel.destroy({where: {eventId: eventId}}).then(() => {
-                model.TicketModel.destroy({where: {eventId: eventId}}).then(() => {
-                    model.PersonnelModel.destroy({where: {eventId: eventId}}).then(() => {
-                        model.EventModel.destroy({where: {eventId: eventId}}).then(() => true)
+        return model.GigModel.destroy({where: {eventId: eventId}})
+            .then(() => {
+                return model.TicketModel.destroy({where: {eventId: eventId}})
+                    .then(() => {
+                        return model.PersonnelModel.destroy({where: {eventId: eventId}})
+                            .then(() => {
+                                return model.EventModel.destroy({where: {eventId: eventId}})
+                                    .then(res => res)
+                            })
                     })
-                })
-            })).catch(error => {
+            }).catch(error => {
                 console.error(error);
                 return false;
-            }))
+            })
     }
 
     /**
@@ -473,17 +476,17 @@ class Dao {
             });
     }
 
-	setContract(contract, gig, artist ){
+    setContract(contract, gig, artist) {
         console.log(Object.keys(contract));
         let base64String = contract.data.toString('base64');
         let contentType = contract.contentType;
 
-        return model.FileModel.create({name: contract.name, data: base64String, contentType: contentType })
+        return model.FileModel.create({name: contract.name, data: base64String, contentType: contentType})
             .then(fileInstance => {
                 console.log(fileInstance);
                 console.log(gig);
                 console.log(artist);
-                model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+                model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
                     .then(gig => {
                             console.log(contract);
                             gig.update({contract: fileInstance.fileId});
@@ -499,16 +502,16 @@ class Dao {
 
     }
 
-    setRider(rider, gig, artist ){
+    setRider(rider, gig, artist) {
         let base64String = rider.data.toString('base64');
         let contentType = rider.contentType1;
 
-        return model.FileModel.create({name: rider.name, data: base64String, contentType: contentType })
+        return model.FileModel.create({name: rider.name, data: base64String, contentType: contentType})
             .then(fileInstance => {
                 console.log(fileInstance);
                 console.log(gig);
                 console.log(artist);
-                model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+                model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
                     .then(gig => {
                             //console.log(contract);
                             gig.update({rider: fileInstance.fileId});
@@ -519,18 +522,17 @@ class Dao {
     }
 
 
+    getContract(gig, artist) {
+        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
+            .then(gig => {
+                    console.log(gig);
+                    return model.FileModel.findByPk(gig[0].contract);
+                }
+            );
+    }
 
-	getContract(gig, artist){
-       return model.GigModel.findAll({where:{eventId: gig, artistId: artist }})
-			.then(gig => {
-			    console.log(gig);
-			    return model.FileModel.findByPk(gig[0].contract);
-			}
-		);
-	}
-
-    getRider(gig, artist){
-        return model.GigModel.findAll({where:{eventId: gig, artistId: artist }})
+    getRider(gig, artist) {
+        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
             .then(gig => {
                     console.log(gig);
                     return model.FileModel.findByPk(gig[0].rider);
@@ -542,6 +544,7 @@ class Dao {
                            FILE STUFF
      */
 }
+
 //model.syncTestData();
 module.exports = Dao;
 
