@@ -1,5 +1,6 @@
 import {service, Event, Gig, Personnel} from "../services";
 import {Component} from "react-simplified";
+import {HarmoniNavbar} from "./navbar";
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -91,7 +92,7 @@ export class AddEvent extends Component{
 
     handleEventNameChange(event){
         this.setState({eventName: event.target.value});
-    };
+    }
 
     handleEventAddressChange(event){
         this.setState({eventAddress: event.target.value});
@@ -180,9 +181,11 @@ export class AddEvent extends Component{
         if(!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
 
         return(
-            <Container>
-                <Form>
-                    <Form.Row>
+            <div>
+	            <HarmoniNavbar/>
+                <Container>
+                    <Form>
+                        <Form.Row>
 
                         <Form.Group as={Col} sm={"12"}>
                             <h1 className="font-weight-bold text-center">Opprett arrangement</h1>
@@ -259,43 +262,43 @@ export class AddEvent extends Component{
                             />
                         </Form.Group>
 
-                        <Form.Group as={Col} sm={"2"}>
+                            <Form.Group as={Col} sm={"2"}>
 
-                            <Form.Label>Artist</Form.Label>
+                                <Form.Label>Artist</Form.Label>
 
-                            <Dropdown onSelect={this.handleArtistsAdd}>
+                                <Dropdown onSelect={this.handleArtistsAdd}>
 
-                                <Dropdown.Toggle variant={"success"} id="dropdown">
-                                    Velg artist
-                                </Dropdown.Toggle>
+                                    <Dropdown.Toggle variant={"success"} id="dropdown">
+                                        Velg artist
+                                    </Dropdown.Toggle>
 
-                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}}  as={this.CustomMenu}>
-                                    {this.state.artists.map(artist => (
-                                        <Dropdown.Item eventKey={artist.userId}>
-                                            {artist.username}
-                                        </Dropdown.Item>
-                                        ))}
-                                </Dropdown.Menu>
+                                    <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}}  as={this.CustomMenu}>
+                                        {this.state.artists.map(artist => (
+                                            <Dropdown.Item eventKey={artist.userId}>
+                                                {artist.username}
+                                            </Dropdown.Item>
+                                            ))}
+                                    </Dropdown.Menu>
 
-                            </Dropdown>
+                                </Dropdown>
 
-                        </Form.Group>
+                            </Form.Group>
 
-                        <Form.Group as={Col} sm={"10"}>
+                            <Form.Group as={Col} sm={"10"}>
 
-                            <ListGroup title={"Valgte artister"}>
-                                {this.state.artistsAdd.map(artist => (
-                                    <React.Fragment key={artist.userId}>
-                                        <ListGroupItem>
-                                            {artist.username}
-                                        </ListGroupItem>
-                                    </React.Fragment>
-                                        ))}
+                                <ListGroup title={"Valgte artister"}>
+                                    {this.state.artistsAdd.map(artist => (
+                                        <React.Fragment key={artist.userId}>
+                                            <ListGroupItem>
+                                                {artist.username}
+                                            </ListGroupItem>
+                                        </React.Fragment>
+                                ))}
                             </ListGroup>
 
-                        </Form.Group>
+                            </Form.Group>
 
-                        <Form.Group as={Col} sm={"2"}>
+                            <Form.Group as={Col} sm={"2"}>
 
                             <Form.Label>Personell</Form.Label>
 
@@ -355,29 +358,29 @@ export class AddEvent extends Component{
                                 value={this.state.imageUrl}
                                 onChange={this.handleImageUrlChange}
                             />
-                        </Form.Group>
+                            </Form.Group>
 
-                        <Form.Group as={Col} sm={"6"}>
-                            <Form.Label>Last opp rider</Form.Label>
-                            <InputGroup className="mb-5">
-                                <FormControl
-                                    type="file"
-                                    value={this.state.rider}
-                                    onChange={this.handleRiderChange}
-                                />
-                            </InputGroup>
-                        </Form.Group>
+                            <Form.Group as={Col} sm={"6"}>
+                                <Form.Label>Last opp rider</Form.Label>
+                                <InputGroup className="mb-5">
+                                    <FormControl
+                                        type="file"
+                                        value={this.state.rider}
+                                        onChange={this.handleRiderChange}
+                                    />
+                                </InputGroup>
+                            </Form.Group>
 
-                        <Form.Group as={Col} sm={"6"}>
-                            <Form.Label>Last opp kontrakt</Form.Label>
-                            <InputGroup className="mb-5">
-                                <FormControl
-                                    type="file"
-                                    value={this.state.contract}
-                                    onChange={this.handleRiderChange}
-                                />
-                            </InputGroup>
-                        </Form.Group>
+                            <Form.Group as={Col} sm={"6"}>
+                                <Form.Label>Last opp kontrakt</Form.Label>
+                                <InputGroup className="mb-5">
+                                    <FormControl
+                                        type="file"
+                                        value={this.state.contract}
+                                        onChange={this.handleRiderChange}
+                                    />
+                                </InputGroup>
+                            </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
 
@@ -404,13 +407,14 @@ export class AddEvent extends Component{
                             </ButtonToolbar>
                         </Form.Group>
 
-                        <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                                <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
-                        </Form.Group>
+                            <Form.Group as={Col}  md={{span: 3, offset: 5}}>
+                                    <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                            </Form.Group>
 
-                    </Form.Row>
-                </Form>
-            </Container>
+                        </Form.Row>
+                    </Form>
+                </Container>
+            </div>
         );
     }
 
