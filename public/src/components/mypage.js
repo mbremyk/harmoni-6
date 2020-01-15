@@ -93,56 +93,69 @@ export class myPage extends Component {
             alert("Passordene er ulike.");
             return;
         }
-        if (this.state.password1 == "") {
-            // check username availability
-            if (user.username != this.state.oldUsername && user.email == this.state.oldEmail) {
-                service.validateUsername(user.username).then(taken1 => {
-                    console.log('Check username, taken: ' + taken1);
-                    if (taken1) {
-                        alert('Brukernavn er i bruk :(');
-                    } else {
-                        service.updateUser(user)
-                            .then(res => console.log("User updated: " + res))
-                            .then(this.state.OldUsername = user.username)
-                            .then(window.location.reload())
-                            .catch(err => alert("En feil har oppståt: t" + err.message));
-                    }
-                });
-            }
-            if (user.username == this.state.oldUsername && user.email != this.state.oldEmail) {
-                service.validateEmail(user.email).then(taken2 => {
-                    console.log('Check email, taken: ' + taken2);
-                    if(taken2) { alert('Epost er i bruk'); } else {
-                        service.updateUser(user)
-                            .then(res => console.log("User updated: " + res))
-                            .then(this.state.OldEmail = user.email)
-                            .then(window.location.reload())
-                            .catch(err => alert("En feil har oppståt: t" + err.message));
-                    }
-                });
-            }
-            if (user.username != this.state.oldUsername && user.email != this.state.oldEmail) {
-                service.validateUsername(user.username).then(taken1 => {
-                    console.log('Check username, taken: ' + taken1);
-                    if(taken1){ alert('Brukernavn er i bruk :('); } else {
-
-                        // check email availability
-                        service.validateEmail(user.email).then(taken2 => {
-                            console.log('Check email, taken: ' + taken2);
-                            if(taken2) { alert('Epost er i bruk'); } else {
-                                service.updateUser(user)
-                                    .then(res => console.log("User updated: " + res))
-                                    .then(this.state.OldEmail = user.email)
-                                    .then(this.state.OldUsername = user.username)
-                                    .then(window.location.reload())
-                                    .catch(err => alert("En feil har oppståt: t" + err.message));
-                            }
-                        })
-                    }
-                });
-            }
+        //Update password
+        if (this.state.password1 != "" && this.state.password1 === this.state.password2) {
+            user.password = this.state.password1;
+            service.updatePassword(user)
+                .then(res => console.log("Password updated" + res))
+                .then(alert("Passord oppdatert."))
+                .then(this.state.password1 = "")
+                .then(this.state.password2 = "")
+                .catch(err => alert("En feil har oppstått: " + err.message));
         }
-        alert('Bruker oppdatert.');
+        //Update username
+        if (user.username != this.state.oldUsername && user.email == this.state.oldEmail) {
+            service.validateUsername(user.username).then(taken1 => {
+                console.log('Check username, taken: ' + taken1);
+                if (taken1) {
+                    alert('Brukernavn er i bruk :(');
+                } else {
+                    service.updateUser(user)
+                        .then(res => console.log("User updated: " + res + " Password: " + user.password + " test"))
+                        .then(alert('Brukernavn oppdatert.'))
+                        .then(window.location.reload())
+                        .catch(err => alert("En feil har oppståt: t" + err.message));
+                }
+            });
+            //Update email
+        } else if (user.username == this.state.oldUsername && user.email != this.state.oldEmail) {
+            service.validateEmail(user.email).then(taken2 => {
+                console.log('Check email, taken: ' + taken2);
+                if (taken2) {
+                    alert('Epost er i bruk');
+                } else {
+                    service.updateUser(user)
+                        .then(res => console.log("User updated: " + res))
+                        .then(alert('E-post oppdatert.'))
+                        .then(window.location.reload())
+                        .catch(err => alert("En feil har oppståt: t" + err.message));
+                }
+            });
+            //update username and email
+        } else if (user.username != this.state.oldUsername && user.email != this.state.oldEmail) {
+            service.validateUsername(user.username).then(taken1 => {
+                console.log('Check username, taken: ' + taken1);
+                if (taken1) {
+                    alert('Brukernavn er i bruk :(');
+                } else {
+                    // check email availability
+                    service.validateEmail(user.email).then(taken2 => {
+                        console.log('Check email, taken: ' + taken2);
+                        if (taken2) {
+                            alert('Epost er i bruk');
+                        } else {
+                            service.updateUser(user)
+                                .then(res => console.log("User updated: " + res))
+                                .then(alert('Brukernavn og e-post oppdatert.'))
+                                .then(window.location.reload())
+                                .catch(err => alert("En feil har oppståt: t" + err.message));
+                        }
+                    })
+                }
+            });
+        } else {
+            window.location.reload();
+        }
     }
 
     handleUsernameChange(event) {

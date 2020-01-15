@@ -60,11 +60,53 @@ class Dao {
                 username: user.username,
                 email: user.email
             },
-            {where: {userId: user.userId}}
-        ).then(response => response[0] === 1 /*affected rows === 1*/)
+            {where: {userId: user.userId}})
+            .then(response => response[0] === 1 /*affected rows === 1*/)
             .catch(error => {
                 console.error(error);
                 return false;
+            });
+    }
+
+
+    /**
+     *  Deletes a user from the database, in order to not delete events etc. the user
+     *  has been involved in, the user will be replaced by an anonomyous user before
+     *  deleteing the user itself.
+     *
+     * @param userId
+     * @returns {Promise<boolean>}
+     */
+    deleteUser(userId) {
+        return (model.UserModel.update(
+            {
+                username: 'this user no longer exists',
+                email: '',
+                password: null,
+                salt: null,
+
+            },
+            {where: {userId: userId}}))
+            .then(() => {
+                return model.UserModel.destroy({where: {userId: userId}})
+            })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    updatePassword(user) {
+        return model.UserModel.update(
+            {
+                password: user.password,
+                salt: user.salt
+            },
+            {where: {userId: user.userId}}
+            ).then(response => response[0] === 1)
+            .catch(error => {
+               console.error(error);
+               return false;
             });
     }
 
@@ -197,7 +239,7 @@ class Dao {
     cancelEvent(eventId) {
         return model.EventModel.update(
             {
-                //TODO
+                cancelled: true
             },
             {where: {eventId: eventId}})
             .then(response => response[0] === 1 /*affected rows === 1*/)
@@ -207,19 +249,29 @@ class Dao {
             });
     }
 
+    /**
+     * deletes an event from the database, to do this, all associated data (gigs, tickets and personnel) will also
+     * get deleted
+     *
+     * @param eventId
+     * @returns {Promise<boolean>}
+     */
     deleteEvent(eventId) {
 
-        return (
-            (model.GigModel.destroy({where: {eventId: eventId}}).then(() => {
-                model.TicketModel.destroy({where: {eventId: eventId}}).then(() => {
-                    model.PersonnelModel.destroy({where: {eventId: eventId}}).then(() => {
-                        model.EventModel.destroy({where: {eventId: eventId}}).then(() => true)
+        return model.GigModel.destroy({where: {eventId: eventId}})
+            .then(() => {
+                return model.TicketModel.destroy({where: {eventId: eventId}})
+                    .then(() => {
+                        return model.PersonnelModel.destroy({where: {eventId: eventId}})
+                            .then(() => {
+                                return model.EventModel.destroy({where: {eventId: eventId}})
+                                    .then(res => res)
+                            })
                     })
-                })
-            })).catch(error => {
+            }).catch(error => {
                 console.error(error);
                 return false;
-            }))
+            })
     }
 
     /**
@@ -473,17 +525,17 @@ class Dao {
             });
     }
 
-	setContract(contract, gig, artist ){
+    setContract(contract, gig, artist) {
         console.log(Object.keys(contract));
         let base64String = contract.data.toString('base64');
         let contentType = contract.contentType;
 
-        return model.FileModel.create({name: contract.name, data: base64String, contentType: contentType })
+        return model.FileModel.create({name: contract.name, data: base64String, contentType: contentType})
             .then(fileInstance => {
                 console.log(fileInstance);
                 console.log(gig);
                 console.log(artist);
-                model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+                model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
                     .then(gig => {
                             console.log(contract);
                             gig.update({contract: fileInstance.fileId});
@@ -499,16 +551,16 @@ class Dao {
 
     }
 
-    setRider(rider, gig, artist ){
+    setRider(rider, gig, artist) {
         let base64String = rider.data.toString('base64');
         let contentType = rider.contentType1;
 
-        return model.FileModel.create({name: rider.name, data: base64String, contentType: contentType })
+        return model.FileModel.create({name: rider.name, data: base64String, contentType: contentType})
             .then(fileInstance => {
                 console.log(fileInstance);
                 console.log(gig);
                 console.log(artist);
-                model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+                model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
                     .then(gig => {
                             //console.log(contract);
                             gig.update({rider: fileInstance.fileId});
@@ -519,18 +571,17 @@ class Dao {
     }
 
 
+    getContract(gig, artist) {
+        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
+            .then(gig => {
+                    console.log(gig);
+                    return model.FileModel.findByPk(gig[0].contract);
+                }
+            );
+    }
 
-	getContract(gig, artist){
-       return model.GigModel.findAll({where:{eventId: gig, artistId: artist }})
-			.then(gig => {
-			    console.log(gig);
-			    return model.FileModel.findByPk(gig[0].contract);
-			}
-		);
-	}
-
-    getRider(gig, artist){
-        return model.GigModel.findAll({where:{eventId: gig, artistId: artist }})
+    getRider(gig, artist) {
+        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
             .then(gig => {
                     console.log(gig);
                     return model.FileModel.findByPk(gig[0].rider);
@@ -542,6 +593,7 @@ class Dao {
                            FILE STUFF
      */
 }
+
 //model.syncTestData();
 module.exports = Dao;
 

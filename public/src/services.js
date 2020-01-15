@@ -120,7 +120,11 @@ class Services {
     }
 
     updateUser(user) {
-        return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.put(url + '/auth/users/' + user.userId, user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
+    deleteUser(userId) {
+        return axios.delete(url + '/auth/users/' + userId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     getUsers() {
