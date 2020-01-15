@@ -8,6 +8,11 @@
     color: white;
 }
 
+#root {
+    height: 100%;
+}
+
+/*Styling for shake animation*/
 .error {
     position: relative;
     animation: shake .1s linear;
