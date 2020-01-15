@@ -14,6 +14,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {authService} from "../AuthService";
+import Row from "react-bootstrap/Row";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
@@ -68,6 +69,7 @@ export class AddEvent extends Component{
         this.imageUrl = this.handleImageUrlChange.bind(this);
         this.image = this.handleImageUpload.bind(this);
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
+        this.personnelRole = this.handlePersonnelRole.bind(this);
 
         this.state = {
             organizerId: '',
@@ -86,6 +88,7 @@ export class AddEvent extends Component{
             artistsAdd: [],
             artists: [],
             personnelAdd: [],
+            personnelRole: '',
         };
     }
 
@@ -147,6 +150,11 @@ export class AddEvent extends Component{
 
     handleTTime(event) {
         this.setState({tTime: event.target.value})
+    }
+
+    handlePersonnelRole(event, personell) {
+        personell.role = event.target.value
+        this.setState({personnelRole: event.target.value})
     }
 
     handleSubmit() {
@@ -287,8 +295,20 @@ export class AddEvent extends Component{
                                 <ListGroup title={"Valgte artister"}>
                                     {this.state.artistsAdd.map(artist => (
                                         <React.Fragment key={artist.userId}>
-                                            <ListGroupItem>
-                                                {artist.username}
+                                                <ListGroupItem>
+                                                    <Row>
+                                                        <Col>
+                                                            {artist.username}
+                                                        </Col>
+
+                                                        <Col>
+                                                            <Button type="button" variant={"danger"} onClick={() => {
+                                                                this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist),1)
+                                                                this.setState({artistsAdd: this.state.artistsAdd});
+                                                                }
+                                                            }>Fjern</Button>
+                                                        </Col>
+                                                    </Row>
                                             </ListGroupItem>
                                         </React.Fragment>
                                 ))}
@@ -325,12 +345,27 @@ export class AddEvent extends Component{
                                     <React.Fragment key={personnel.userId}>
 
                                         <ListGroupItem>
-                                            {personnel.username}
-                                            <Form.Control
-                                                placeholder="Rollen til personen"
-                                                value={personnel.role}
-                                                onChange={(event) => personnel.role = event.target.value}
-                                            />
+                                            <Row>
+                                                <Col>
+                                                    {personnel.username}
+                                                </Col>
+
+                                                <Col>
+                                                    <Form.Control
+                                                        placeholder="Rollen til personen"
+                                                        value={personnel.role}
+                                                        onChange={event => this.handlePersonnelRole(event, personnel)}
+                                                    />
+                                                </Col>
+
+                                                <Col>
+                                                    <Button type="button" variant={"danger"} onClick={() => {
+                                                        this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel),1)
+                                                        this.setState({personnelAdd: this.state.personnelAdd});
+                                                    }
+                                                    }>Fjern</Button>
+                                                </Col>
+                                            </Row>
                                         </ListGroupItem>
                                     </React.Fragment>
                                 ))}
