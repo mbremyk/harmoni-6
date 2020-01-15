@@ -28,18 +28,18 @@ export class Event {
     image;
     description;
 
-    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
-        this.eventId = eventId;
-        this.organizerId = organizerId;
-        this.eventName = eventName;
-        this.address = address;
-        this.description = description;
-        this.ageLimit = ageLimit;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.imageUrl = imageURL;
-        this.image = image;
-    }
+	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
+		this.eventId = eventId;
+		this.organizerId = organizerId;
+		this.eventName = eventName;
+		this.address = address;
+		this.description = description;
+		this.ageLimit = ageLimit;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.imageUrl = imageURL;
+		this.image = image;
+	}
 }
 
 export class Gig {

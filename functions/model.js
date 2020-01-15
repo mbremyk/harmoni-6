@@ -123,13 +123,13 @@ let EventModel = sequelize.define('event', {
     startTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('startTime')).format('DD-MM-YYYY HH:mm');
+            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
         }
     },
     endTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('endTime')).format('DD-MM-YYYY HH:mm');
+            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
     imageUrl: Sequelize.STRING,
