@@ -3,11 +3,12 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeAll(() => Models.syncTestData().then(() => function(){}));
+beforeAll(() => Models.syncTestData().then(() => function () {
+}));
 
 
 /*
-TODO: USERS
+                            USERS
  */
 
 describe('Login', () => {
@@ -120,8 +121,9 @@ describe('Users', () => {
 });
 
 /*
-TODO: EVENTS
+                    EVENTS
  */
+
 
 describe('Events', () => {
 
@@ -173,6 +175,14 @@ describe('Events', () => {
             done();
         });
     });
+
+    // it('delete Event', done => {
+    //     db.deleteEvent(2).then(response => {
+    //         expect(response).toBeTruthy();
+    //         done();
+    //     });
+    // });
+
 
     it('correct data in events', done => {
         db.getAllEvents().then(events => {
@@ -229,7 +239,7 @@ describe('Events - search', () => {
 });
 
 /*
-TODO: PERSONNEL
+                    PERSONNEL
  */
 
 describe('Personnel', () => {
@@ -279,7 +289,7 @@ describe('Personnel', () => {
 
 
 /*
-TODO: GIGS
+                    GIGS
  */
 
 describe('Gigs', () => {
@@ -297,16 +307,16 @@ describe('Gigs', () => {
     });
 
     it('correct data in gig', done => {
-        db.getGig(4).then(gig => {
-            expect(gig.artistId).toBe(8);
-            done();
+        db.getGigs(4).then(gigs => {
+          expect(gigs.length).toBe(1);
         });
+        done();
     });
 });
 
 
 /*
-TODO: TICKETS
+                TICKETS
  */
 
 describe('Tickets', () => {

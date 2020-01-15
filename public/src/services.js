@@ -28,6 +28,21 @@ export class Event {
     image;
     description;
 
+	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageURL, image) {
+		this.eventId = eventId;
+		this.organizerId = organizerId;
+		this.eventName = eventName;
+		this.address = address;
+		this.description = description;
+		this.ageLimit = ageLimit;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.imageUrl = imageURL;
+		this.image = image;
+	}
+
+
+
 }
 
 export class Gig {
@@ -50,6 +65,20 @@ export class Ticket {
     type;
     price;
     amount;
+}
+
+export class Personnel
+{
+	personnelId;
+	eventId;
+	role;
+
+	constructor(personnelId, eventId, role){
+		this.personnelId = personnelId;
+		this.eventId = eventId;
+		this.role = role;
+	}
+
 }
 
 class Services {
@@ -86,8 +115,23 @@ class Services {
     }
 
     createEvent(event) {
-        return axios.post(url + '/events', event).then(response => response.insertId);
+        return axios.post(url + '/auth/events', event).then(response => response.data);
     }
+
+	createGig(gig)
+	{
+		return axios.post(url + '/gigs', gig).then(response => response.data);
+	}
+
+	createPersonnel(personnel, eventId)
+	{
+		return axios.post(url + '/events/' + eventId + '/personnel', personnel).then(response => response.data);
+	}
+
+	getPersonnel(id)
+	{
+		return axios.get(url + '/personnel').then(response => response.data);
+	}
 
     uploadContract(formData, event, artist) {
         return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
@@ -110,12 +154,16 @@ class Services {
         return axios.post(url + '/gigs', gig).then(response => response.data);
     }
 
+	updateEvent(event) {
+		return axios.put(url + "/auth/events/" + event.eventId, event).then(response => response.insertId);
+	}
+
     getTicketToEvent(eventId) {
         return axios.get(url + '/tickets/' + eventId).then(response => response.data);
     }
 
     searchForEvents(input) {
-        return axios.get(url + '/events/search/:' + encodeURIComponent(input)).then(response => response.data);
+        return axios.get(url + '/events/search/' + encodeURIComponent(input)).then(response => response.data);
     }
 
     getEventsByOrganizer(userId) {
@@ -127,7 +175,7 @@ class Services {
     }
 
 	getEventByEventId(eventId) {
-		return axios.get(url + '/events/eventdetails/' + eventId).then(response => response.data);
+		return axios.get(url + '/events/eventDetails/' + eventId).then(response => response.data);
 	}
 
 	validateUsername(username) {

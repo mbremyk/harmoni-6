@@ -2,7 +2,6 @@ import * as React from 'react';
 import {Router, Route, BrowserRouter} from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import "@fortawesome/fontawesome-free"
-
 import {CreateUserForm} from '../src/components/createuser';
 import {LandingPage} from "./components/landingpage";
 import {LoginForm} from "./components/login";
@@ -34,7 +33,7 @@ if (root)
             <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
             <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
             <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
-            <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement" component={EditEvent}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
         </div>
