@@ -61,9 +61,19 @@ let UserModel = sequelize.define('user', {
 let FileModel = sequelize.define('file', {
     fileId: {
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
-    path: Sequelize.STRING
+    name: {
+        type:  Sequelize.STRING
+    },
+    contentType: {
+        type: Sequelize.STRING
+    },
+    data: {
+        type: Sequelize.TEXT
+    }
+
 });
 
 /*
@@ -112,17 +122,17 @@ let EventModel = sequelize.define('event', {
     startTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
+            return moment(this.getDataValue('startTime')).format('DD-MM-YYYY HH:mm');
         }
     },
     endTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
+            return moment(this.getDataValue('endTime')).format('DD-MM-YYYY HH:mm');
         }
     },
     imageUrl: Sequelize.STRING,
-    image: Sequelize.BLOB,
+    image: Sequelize.TEXT,
     description: Sequelize.TEXT,
 });
 
@@ -229,7 +239,7 @@ let syncModels = () => sequelize.sync({force: false}).then().catch(error => cons
 creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
-let syncTestData = () => sequelize.sync({force: true}).then(() => {
+let syncTestData = () => sequelize.sync({force: false}).then(() => {
     return (
         UserModel.bulkCreate(testData.users).then(() => {
             EventModel.bulkCreate(testData.events).then(() => {
@@ -242,5 +252,6 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
         })
     ).catch(error => console.log(error));
 });
+//syncTestData();
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels, syncTestData};
+module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, FileModel, syncModels, syncTestData};

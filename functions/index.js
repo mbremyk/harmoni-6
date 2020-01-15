@@ -248,121 +248,45 @@ app.post("/users", (req, res) => {
  *
  */
 app.post("/events", (req, res) => {
-    console.log("POST-request - /events");
-    return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
-});
+    console.log("POST-request received from client");
+    //console.log(JSON.parse(req.body));
 
+    /*const {
+        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        buffer,
+    } = req.files[0];
 
-/**
- * Add i ticket type to an event
- * body:
- * {
- *    eventId: number
- *    type: string
- *    price: number
- *    amount: number
- * }
- *
- * @return {json} {jwt: token}
- */
-app.post("/events/:eventId/tickets", (req, res) => {
-    return db.addTicket(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
-});
+    const {
+        fieldname1,
+        originalname1,
+        encoding1,
+        mimetype1,
+        buffer1,
+    } = req.files[0];*/
 
-/**
- *
- * Changes the information of a Ticket
- * body:
- * {
- *    eventId: number
- *    type: string
- *    price: number
- *    amount: number
- * }
- *
- * @return {json} {jwt: token}
- */
-app.put('/events/:eventId/tickets', (req, res) => {
-    return db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
-});
+    /*let contractFile = req.body.contract;
+    let riderFile = req.body.rider;
+    console.log(riderFile.name);
+    console.log(contractFile.name);*/
 
-
-/**
- *  Get an array of tickets connected to an event
- *
- *  ticket:{
- *      eventId: number
- *      type: string
- *      price: number
- *      amount: number
- *  }
- */
-app.get("/events/:eventId/tickets", (req, res) => {
-    let eventId = decodeURIComponent(req.params.eventId);
-    return db.getTickets(eventId).then(tickets => (tickets !== null) ? res.status(201).send(tickets) : res.sendStatus(400));
-});
-
-
-/**
- * Deletes a ticket type from the event
- * body:
- * {
- *    eventId: number
- *    type: string
- *    price: number
- *    amount: number
- * }
- *
- * @return {json} {jwt: token}
- */
-app.delete('/events/:eventId/tickets', (req, res) => {
-    return db.removeTicket(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
-});
-
-
-/**
- * Add personnel to an event
- * body:
- * {
- *    personnelId: number
- *    eventId:  number
- *    role:  string
- * }
- *
- * @return {json} {jwt: token}
- */
-app.post("/events/:eventId/personnel", (req, res) => {
-    return db.addPersonnel(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
-});
-
-
-/**
- * Changes the information of personnel
- * body:
- * {
- *    personnelId: number
- *    eventId:  number
- *    role:  string
- * }
- *
- * @return {json} {jwt: token}
- */
-app.put('/events/:eventId/personnel', (req, res) => {
-    return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
-});
-
-/**
- *  Get an array of personnel connected to an event
- *
- *  personnel:{
- *      personnelId: number
- *      eventId: number
- *      role: string
- *  }
- */
-app.get("/events/:eventId/personnel", (req, res) => {
-    let eventId = decodeURIComponent(req.params.eventId);
-    return db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(400));
+    return db.createEvent(req.body).then(response => {
+        if (response.insertId !== undefined) {
+            console.log(response);
+        /*db.setContract(contractFile, response.eventId, response.artistId)
+            .then(() => {
+                db.setRider(riderFile, response.eventId, response.artistId)
+                    .then(() => {*/
+                        res.status(201).send(response);
+                   /* });
+            });*/
+        }
+        else {
+            res.status(400);
+        }
+    })
 });
 
 
@@ -424,12 +348,28 @@ app.put('/auth/events/:eventId', (req, res) => {
  */
 app.post("/gigs", (req, res) => {
 	console.log("POST-request - /gigs");
-	return db.addGig(req.body).then(response => {
-		if (response) {
+    let contractFile = req.body.contract;
+    let riderFile = req.body.rider;
+    console.log(riderFile.name);
+    console.log(contractFile.name);
+    console.log(Object.keys(req.body));
+
+	db.createGig(req.body).then(response => {
+
+		/*if (response) {
 			res.status(201).send(response)
 		} else {
 			res.status(400);
-		}
+		}*/
+        if (response.insertId !== undefined) {
+            db.setContract(contractFile, response.eventId, response.artistId)
+                .then(() => {
+                    db.setRider(riderFile, response.eventId, response.artistId)
+                        .then(() => {
+                            res.status(201).send(response)
+                        });
+                });
+        }
 	});
 });
 
@@ -482,17 +422,22 @@ app.post("/contracts/:eventId/:artistId", (req, res) => {
     console.log(req.files[0].originalname);
     console.log(req.files[0]);
 
-    fs.writeFile(`${__dirname}/uploads/` + file.originalname, file.buffer, (err) => {
-        if (err) {
-            res.send(err);
-        } else {
-            console.log('The file has been saved!');
-            res.send("done");
-        }
-    });
-    //Todo set access here
-    /*db.setContract(req.body, req.params.eventId, req.params.artistId)
-		.then(() => res.send("Change made"));*/
+    console.log(file.buffer instanceof Buffer);
+   /* let base64String = file.buffer.toString('base64');
+
+    let buf = new Buffer(base64String, "base64");
+
+	/*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
+		if (err){
+			res.send(err);
+		}else{
+			console.log('The file has been saved!');
+			res.send("done");
+		}
+	});*/
+	//Todo set access here
+    db.setContract(file, req.params.eventId, req.params.artistId)
+		.then(() => res.send("Change made"));
 });
 
 
@@ -500,14 +445,50 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
     console.log("downloading file");
 
     //Todo check access here
-    /*db.getContract(req.params.eventId, req.params.artistId)
+    db.getContract(req.params.eventId, req.params.artistId)
         .then(result => {
-            res.send(JSON.stringify(result));
-            }
-        );*/
 
-    const file = `${__dirname}/uploads/nativelog.txt`;
-    res.download(file); // Set disposition and send it.
+            let base64String = result.data;
+            let name = result.name;
+            let buf = new Buffer(base64String, "base64");
+
+            res.send({name: name, data: base64String });
+            /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
+                if (err){
+                    res.send(err);
+                }else{
+                    console.log('The file has been saved!');
+                    const file = `${__dirname}/uploads/`+name;
+                    res.download(file); // Set disposition and send it.
+                }
+            });*/
+            }
+        );
+});
+
+app.get("/rider/:eventId/:artistId", (req, res) => {
+    console.log("downloading file");
+
+    //Todo check access here
+    db.getContract(req.params.eventId, req.params.artistId)
+        .then(result => {
+
+                let base64String = result.data;
+                let name = result.name;
+                let buf = new Buffer(base64String, "base64");
+
+                res.send({name: name, data: base64String });
+                /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
+                    if (err){
+                        res.send(err);
+                    }else{
+                        console.log('The file has been saved!');
+                        const file = `${__dirname}/uploads/`+name;
+                        res.download(file); // Set disposition and send it.
+                    }
+                });*/
+            }
+        );
 });
 
 /**
