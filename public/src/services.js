@@ -170,11 +170,11 @@ class Services {
     }
 
     getPersonellForEvent(eventId) {
+        console.log('henter ut axios for personell')
         return axios.get(url + '/events/' + eventId + '/personnel').then(response => response.data);
     }
-
     getGigForEvent(eventId) {
-        //return axios.get(url + '')
+        //return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
     }
 
     validateUsername(username) {
