@@ -5,6 +5,7 @@ import {service} from '../services';
 import {authService} from '../AuthService'
 import {SortedEventView} from "./sortedeventview";
 import {HarmoniNavbar} from "./navbar";
+import NavLink from "react-bootstrap/NavLink";
 
 const jwt = require("jsonwebtoken");
 
@@ -17,6 +18,7 @@ export class HomePage extends Component {
     render() {
         return (
             <div>
+                <HarmoniNavbar/>
                 <Row>
                     <Col md={{span: 12, offset: 4}}>
                         <h1>Mine Arrangementer</h1>
