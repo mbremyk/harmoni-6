@@ -132,10 +132,10 @@ let EventModel = sequelize.define('event', {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    imageUrl: Sequelize.STRING,
+    imageUrl: Sequelize.TEXT,
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
-    cancelled: Sequelize.BOOLEAN
+    cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
 }, {paranoid: true});
 
 /*class Gig {
@@ -231,17 +231,14 @@ GigModel.belongsTo(UserModel, {foreignKey: 'artistId'});
 EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
 GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 
-UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
+UserModel.hasMany(PersonnelModel, {foreignKey: 'personnelId'});
 PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
-FileModel.hasOne(GigModel, {foreignKey: 'fileId'});
+FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'rider'});
 GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
-
-UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
-PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
 EventModel.hasMany(PersonnelModel, {foreignKey: 'eventId'});
 PersonnelModel.belongsTo(EventModel, {foreignKey: 'eventId'});
