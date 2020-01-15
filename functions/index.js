@@ -199,7 +199,7 @@ app.post("/login", (req, res) => {
                         res.json({error: "Not authorized"})
                     }
                 });
-            })
+            });
         });
 });
 

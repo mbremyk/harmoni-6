@@ -46,7 +46,7 @@ let UserModel = sequelize.define('user', {
     username: {type: Sequelize.STRING, unique: true, allowNull: false},
     password: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
-    email: Sequelize.STRING
+    email: {type: Sequelize.STRING, unique: true, allowNull: false}
 }, {
     timestamps: true,
     paranoid: true
@@ -123,13 +123,13 @@ let EventModel = sequelize.define('event', {
     startTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('startTime')).format('DD-MM-YYYY HH:mm');
+            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
         }
     },
     endTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('endTime')).format('DD-MM-YYYY HH:mm');
+            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
     imageUrl: Sequelize.STRING,
@@ -237,6 +237,15 @@ GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 FileModel.hasOne(GigModel, {foreignKey: 'rider'});
 GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
 
+UserModel.hasMany(PersonnelModel, {foreignKey: 'personnelId'});
+PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
+
+EventModel.hasMany(PersonnelModel, {foreignKey: 'eventId'});
+PersonnelModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+EventModel.hasMany(TicketModel, {foreignKey: 'ticketId'});
+TicketModel.belongsTo(EventModel, {foreignKey: 'ticketId'});
+
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
 
@@ -250,7 +259,9 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
             EventModel.bulkCreate(testData.events).then(() => {
                 PersonnelModel.bulkCreate(testData.personnel).then(() => {
                     TicketModel.bulkCreate(testData.tickets).then(() => {
-                        GigModel.bulkCreate(testData.gigs);
+                        FileModel.bulkCreate(testData.files).then(() => {
+                            GigModel.bulkCreate(testData.gigs);
+                        })
                     });
                 });
             });

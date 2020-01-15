@@ -176,6 +176,19 @@ let events = [
 ];
 
 
+let files = [
+    {
+        name: 'Fil 1',
+        contentType: 'text',
+        data: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci commodi deleniti earum eligendi enim, laborum magni minus molestiae nisi nobis officiis omnis quis reiciendis sint ut vel voluptate voluptates voluptatum. Aliquamaperiam architectoaspernatur atbeatae consequaturdicta eaet impeditlabore,maiores modimolestiae natusnostrum officia,quidem quodsaepe suscipitvelit vero ? Doloremque eiusmaiores nostrumsuscipit voluptates ?Aliquam consectetur corporis deleniti distinctio eaque earum error et harum incidunt ipsa laudantium molestiae nam, officiis optio praesentium provident qui quo quos sequi, similique sit velit, veniam veritatis vero voluptatibus.Aliquid laborum odio totam? Ab accusantium ad atque beatae consequuntur ea facere itaque labore, officiis perferendis quibusdam rem sed sunt tempore ullam! Assumenda consectetur facere quod quos repellendus ut voluptas?Accusantium asperiores autem cumque doloremque error excepturi explicabo hic illo ipsam iusto magni, maiores maxime molestiae natus officia porro quasi quia quibusdam quod rerum similique sunt ut voluptate. Autem, sequi."
+    },
+    {
+        name: 'Fil 2',
+        contentType: 'text',
+        data: "Lorem var en dårlig idé"
+    }
+];
+
 /*
 TODO: GIGS
  */
@@ -183,8 +196,8 @@ let gigs = [
     {
         artistId: '5', //Magnus
         eventId: '2', //Ungdomskonert
-        rider: null,
-        contract: null
+        rider: 1,
+        contract: 2
     },
     {
         artistId: '6', //Jan
@@ -297,4 +310,4 @@ let tickets = [
     }
 ];
 
-module.exports = {users, events, gigs, personnel, tickets};
+module.exports = {users, events, gigs, personnel, tickets, files};
