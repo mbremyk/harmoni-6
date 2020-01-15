@@ -211,11 +211,11 @@ class Dao {
 
         return model.GigModel.destroy({where: {eventId: eventId}})
             .then(() => {
-                model.TicketModel.destroy({where: {eventId: eventId}})
+                return model.TicketModel.destroy({where: {eventId: eventId}})
                     .then(() => {
-                        model.PersonnelModel.destroy({where: {eventId: eventId}})
+                        return model.PersonnelModel.destroy({where: {eventId: eventId}})
                             .then(() => {
-                                model.EventModel.destroy({where: {eventId: eventId}})
+                                return model.EventModel.destroy({where: {eventId: eventId}})
                                     .then(res => res)
                             })
                     })

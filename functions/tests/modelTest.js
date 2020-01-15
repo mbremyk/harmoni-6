@@ -3,9 +3,13 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeEach(done => Models.syncTestData().then(() => done()));
+beforeEach(done => Models.syncTestData().then(res => {
+    done();
+}));
 
-afterEach(done => Models.dropTables().then(() => done()))
+afterEach(done => Models.dropTables().then(res => {
+    done();
+}));
 
 
 /*
@@ -219,12 +223,12 @@ describe('Events', () => {
             });
     });
 
-    // it('delete Event', done => {
-    //     db.deleteEvent(2).then(response => {
-    //         expect(response).toBeTruthy();
-    //         done();
-    //     });
-    // });
+    it('delete Event', done => {
+        db.deleteEvent(2).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
 
 
     it('correct data in events', done => {
