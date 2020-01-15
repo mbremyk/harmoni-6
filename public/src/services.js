@@ -215,6 +215,10 @@ class Services {
         return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
     }
 
+    getGigForEvent(eventId) {
+        return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
+    }
+
     /*downloadContract(event, artist)
     {
         //This approach to downloading the files does not work
