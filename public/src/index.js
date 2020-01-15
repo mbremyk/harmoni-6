@@ -12,10 +12,12 @@ import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
 import {EditEvent} from "./components/editevent";
 import {UploadWidget, DownloadWidget} from "./widgets";
+import {Footer} from "./components/footer";
 
 import {authService} from "./AuthService";
 import {PrivateRoute} from "./components/PrivateRoute";
 import {createBrowserHistory} from "history";
+
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
 
@@ -36,6 +38,8 @@ if (root)
             <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
+
+	        <Route path="/" component={Footer}/>
         </div>
     </BrowserRouter>,
     root
