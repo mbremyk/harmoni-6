@@ -407,7 +407,7 @@ app.get("/events", (req, res) => {
 app.get("/events/search/:searchText", (req, res) => {
     console.log('GET-request - /events/search/:searchText');
     let searchText = decodeURIComponent(req.params.searchText);
-    db.getEventsMatching(searchText).then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
+    return db.getEventsMatching(searchText).then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
 
 
@@ -617,7 +617,7 @@ app.post("/events/:eventId/gigs", (req, res) => {
     //console.log(contractFile.name);
     //console.log(Object.keys(req.body));
 
-	db.addGig(req.body).then(response => {
+	return db.addGig(req.body).then(response => {
 
 		/*if (response) {
             res.status(201).send(response)

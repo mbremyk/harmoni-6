@@ -17,7 +17,6 @@ import {authService} from "../AuthService";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
-//TODO: Legge til annet personell
 //TODO: Legge til bilde
 
 export class AddEvent extends Component{
@@ -164,13 +163,12 @@ export class AddEvent extends Component{
         service.createEvent(e)
             .then(updated =>
 
-            {
-                this.state.artistsAdd.map(a =>
-                    (service.createGig(new Gig(a.userId, updated.insertId, null, null))));
-                this.state.personnelAdd.map( personnel =>
-                    service.createPersonnel(new Personnel(personnel.userId, updated.insertId, personnel.role)));
-                console.log(updated.insertId);
-            }
+                    {
+                        this.state.artistsAdd.map(a =>
+                            service.createGig(new Gig(a.userId, updated.insertId, null, null)));
+                        this.state.personnelAdd.map( p =>
+                            service.createPersonnel(new Personnel(p.userId, updated.insertId, p.role)));
+                    }
 
             ).then(() => this.props.history.push("/opprett-arrangement"))
             .catch(err => alert(err.message))
@@ -337,7 +335,6 @@ export class AddEvent extends Component{
                                     </React.Fragment>
                                 ))}
                             </ListGroup>
-                            {this.state.personnelAdd.map(p => console.log(p))}
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
