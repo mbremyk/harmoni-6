@@ -252,7 +252,7 @@ export class AddEvent extends Component{
                                             {artist.username}
                                         </ListGroupItem>
                                     </React.Fragment>
-                                        ))}
+                                ))}
                             </ListGroup>
 
                         </Form.Group>
@@ -433,7 +433,6 @@ export class AddEvent extends Component{
         let uId = decoded.userId;
         this.setState({organizerId: uId});
         service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
-        //service.createGig(new Gig(2, 23, null, null));
     }
 
     changeDate(dateName, dateValue){
