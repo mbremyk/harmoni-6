@@ -124,8 +124,8 @@ class Dao {
             });
     }
 
-    getUserByEmailOrUsername(email, username){
-        let where = {[op.or]: [{email: email},{username: username}]};
+    getUserByEmailOrUsername(email, username) {
+        let where = {[op.or]: [{email: email}, {username: username}]};
         return model.UserModel.findAll({where: where})
             .then(users => users)
             .error(error => {
@@ -381,13 +381,17 @@ class Dao {
     }
 
     /**
-     * retrieves the gig assosciated with an event
+     * retrieves the personnel assosciated with an event
      *
      * @param eventId
      * @returns {Promise<Personnel[]>}
      */
     getPersonnel(eventId) {
-        return model.PersonnelModel.findAll({where: {eventId: eventId}})
+        return model.PersonnelModel.findAll(
+            {
+                include: [{model: model.UserModel, attributes: ['username', 'email']}],
+                where: {eventId: eventId}
+            })
             .catch(error => {
                 console.error(error);
                 return [];
@@ -469,32 +473,32 @@ class Dao {
             });
     }
 
-	setContract(contract, gig, artist ){
-		return model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
-			.then(gig => {
-				console.log(contract);
-				let b = new Blob([contract]);
-				gig.update({contract: null });
-			}
-		);
-		console.log(contract);
+    setContract(contract, gig, artist) {
+        return model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
+            .then(gig => {
+                    console.log(contract);
+                    let b = new Blob([contract]);
+                    gig.update({contract: null});
+                }
+            );
+        console.log(contract);
 
-		/*model.GigModel.update(
-			{contract: contract},
-			{ where: { gigId: gig, artistId: artist}}
-		);
-		model.update();*/
+        /*model.GigModel.update(
+            {contract: contract},
+            { where: { gigId: gig, artistId: artist}}
+        );
+        model.update();*/
 
-	}
+    }
 
-	getContract(gig, artist){
-		return model.GigModel.findAll({where:{eventId: gig, artistId: artist } })
-			.then(gig => {
-					console.log(gig[0].contract);
-					return gig[0].contract;
-			}
-		);
-	}
+    getContract(gig, artist) {
+        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
+            .then(gig => {
+                    console.log(gig[0].contract);
+                    return gig[0].contract;
+                }
+            );
+    }
 
     /*
                            FILE STUFF
