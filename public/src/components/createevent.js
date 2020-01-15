@@ -165,7 +165,7 @@ export class AddEvent extends Component{
                         this.state.artistsAdd.map(a =>
                             service.createGig(new Gig(a.userId, updated.insertId, null, null)));
                         this.state.personnelAdd.map( p =>
-                            service.createPersonnel(new Personnel(p.userId, updated.insertId, p.role), updated.insertId));
+                            service.createPersonnel(new Personnel(p.userId, updated.insertId, p.role)));
                     }
 
                 ).then(() => this.props.history.push("/opprett-arrangement"))
