@@ -106,6 +106,11 @@ class Services {
     updateUser(user) {
         return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
+
+    updatePassword(user) {
+        return axios.put(url + '/auth/users/:userId', user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
     getUser(id) {
         return axios.get(url + '/users/' + id).then(response => response.data);
     }

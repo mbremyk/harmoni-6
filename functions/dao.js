@@ -68,6 +68,20 @@ class Dao {
             });
     }
 
+    updatePassword(user) {
+        return model.UserModel.update(
+            {
+                password: user.password,
+                salt: user.salt
+            },
+            {where: {userId: user.userId}}
+            ).then(response => response[0] === 1)
+            .catch(error => {
+               console.error(error);
+               return false;
+            });
+    }
+
     /**
      * finds all registered user
      *
