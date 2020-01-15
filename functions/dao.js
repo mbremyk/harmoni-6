@@ -473,15 +473,23 @@ class Dao {
             });
     }
 
-    setContract(contract, gig, artist) {
-        return model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
-            .then(gig => {
-                    console.log(contract);
-                    let b = new Blob([contract]);
-                    gig.update({contract: null});
-                }
-            );
-        console.log(contract);
+	setContract(contract, gig, artist ){
+        console.log(Object.keys(contract));
+        let base64String = contract.data.toString('base64');
+        let contentType = contract.contentType;
+
+        return model.FileModel.create({name: contract.name, data: base64String, contentType: contentType })
+            .then(fileInstance => {
+                console.log(fileInstance);
+                console.log(gig);
+                console.log(artist);
+                model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+                    .then(gig => {
+                            console.log(contract);
+                            gig.update({contract: fileInstance.fileId});
+                        }
+                    );
+            });
 
         /*model.GigModel.update(
             {contract: contract},
@@ -491,11 +499,41 @@ class Dao {
 
     }
 
-    getContract(gig, artist) {
-        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
+    setRider(rider, gig, artist ){
+        let base64String = rider.data.toString('base64');
+        let contentType = rider.contentType1;
+
+        return model.FileModel.create({name: rider.name, data: base64String, contentType: contentType })
+            .then(fileInstance => {
+                console.log(fileInstance);
+                console.log(gig);
+                console.log(artist);
+                model.GigModel.findOne({where:{eventId: gig, artistId: artist } })
+                    .then(gig => {
+                            //console.log(contract);
+                            gig.update({rider: fileInstance.fileId});
+                        }
+                    );
+            });
+
+    }
+
+
+
+	getContract(gig, artist){
+       return model.GigModel.findAll({where:{eventId: gig, artistId: artist }})
+			.then(gig => {
+			    console.log(gig);
+			    return model.FileModel.findByPk(gig[0].contract);
+			}
+		);
+	}
+
+    getRider(gig, artist){
+        return model.GigModel.findAll({where:{eventId: gig, artistId: artist }})
             .then(gig => {
-                    console.log(gig[0].contract);
-                    return gig[0].contract;
+                    console.log(gig);
+                    return model.FileModel.findByPk(gig[0].rider);
                 }
             );
     }
@@ -504,7 +542,7 @@ class Dao {
                            FILE STUFF
      */
 }
-
+//model.syncTestData();
 module.exports = Dao;
 
 

@@ -48,7 +48,8 @@ let UserModel = sequelize.define('user', {
     salt: Sequelize.STRING.BINARY,
     email: Sequelize.STRING
 }, {
-    timestamps: true
+    timestamps: true,
+    paranoid: true
 });
 
 
@@ -61,10 +62,20 @@ let UserModel = sequelize.define('user', {
 let FileModel = sequelize.define('file', {
     fileId: {
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
-    path: Sequelize.STRING
-});
+    name: {
+        type: Sequelize.STRING
+    },
+    contentType: {
+        type: Sequelize.STRING
+    },
+    data: {
+        type: Sequelize.TEXT
+    }
+
+}, {paranoid: true});
 
 /*
 let FileAccessModel = sequelize.define('fileAccess', {
@@ -112,19 +123,20 @@ let EventModel = sequelize.define('event', {
     startTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
+            return moment(this.getDataValue('startTime')).format('DD-MM-YYYY HH:mm');
         }
     },
     endTime: {
         type: Sequelize.DATE,
         get() {
-            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
+            return moment(this.getDataValue('endTime')).format('DD-MM-YYYY HH:mm');
         }
     },
     imageUrl: Sequelize.STRING,
-    image: Sequelize.BLOB,
+    image: Sequelize.TEXT,
     description: Sequelize.TEXT,
-});
+    cancelled: Sequelize.BOOLEAN
+}, {paranoid: true});
 
 /*class Gig {
     artistId;
@@ -160,7 +172,7 @@ let GigModel = sequelize.define('gig', {
             key: 'fileId'
         }
     }
-});
+}, {paranoid: true});
 
 /*class Ticket {
     eventId;
@@ -179,7 +191,7 @@ let TicketModel = sequelize.define('ticket', {
     type: {type: Sequelize.STRING, primaryKey: true},
     price: Sequelize.INTEGER,
     amount: Sequelize.INTEGER
-});
+}, {paranoid: true});
 
 /*class Personnel {
     personnelId;
@@ -205,7 +217,10 @@ let PersonnelModel = sequelize.define('personnel', {
         }
     },
     role: Sequelize.STRING
-}, {tableName: 'personnel'});
+}, {
+    tableName: 'personnel',
+    paranoid: true
+});
 
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
 EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
@@ -245,5 +260,6 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
         })
     ).catch(error => console.log(error));
 });
+//syncTestData();
 
-module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, syncModels, syncTestData};
+module.exports = {UserModel, EventModel, GigModel, PersonnelModel, TicketModel, FileModel, syncModels, syncTestData};

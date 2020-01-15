@@ -319,7 +319,6 @@ app.get("/users", (req, res) => {
     return db.getAllUsers().then(users => users ? res.status(201).send(users) : res.sendStatus(400));
 });
 
-
 /**
  * Get one user by id
  */
@@ -545,7 +544,6 @@ app.post("/events/:eventId/tickets", (req, res) => {
 
 
 /**
- *
  * Changes the information of a Ticket
  * body:
  * {
@@ -560,7 +558,6 @@ app.post("/events/:eventId/tickets", (req, res) => {
 app.put('/events/:eventId/tickets', (req, res) => {
     return db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
-
 
 /**
  * Deletes a ticket type from the event
@@ -613,16 +610,31 @@ app.get("/events/:eventId/tickets", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/gigs", (req, res) => {
-    console.log("POST-request - /gigs");
-    return db.addGig(req.body).then(response => {
-        if (response) {
+	console.log("POST-request - /gigs");
+    let contractFile = req.body.contract;
+    let riderFile = req.body.rider;
+    //console.log(riderFile.name);
+    //console.log(contractFile.name);
+    //console.log(Object.keys(req.body));
+
+	db.addGig(req.body).then(response => {
+
+		/*if (response) {
             res.status(201).send(response)
         } else {
             res.status(400);
+        }*/
+        if (response.insertId !== undefined) {
+            db.setContract(contractFile, response.eventId, response.artistId)
+                .then(() => {
+                    db.setRider(riderFile, response.eventId, response.artistId)
+                        .then(() => {
+                            res.status(201).send(response)
+                        });
+                });
         }
-    });
+	});
 });
-
 
 /**
  *  Get an array of Gig connected to an event
@@ -653,17 +665,22 @@ app.post("/contracts/:eventId/:artistId", (req, res) => {
     console.log(req.files[0].originalname);
     console.log(req.files[0]);
 
-    fs.writeFile(`${__dirname}/uploads/` + file.originalname, file.buffer, (err) => {
-        if (err) {
-            res.send(err);
-        } else {
-            console.log('The file has been saved!');
-            res.send("done");
-        }
-    });
-    //Todo set access here
-    /*db.setContract(req.body, req.params.eventId, req.params.artistId)
-		.then(() => res.send("Change made"));*/
+    console.log(file.buffer instanceof Buffer);
+   /* let base64String = file.buffer.toString('base64');
+
+    let buf = new Buffer(base64String, "base64");
+
+	/*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
+		if (err){
+			res.send(err);
+		}else{
+			console.log('The file has been saved!');
+			res.send("done");
+		}
+	});*/
+	//Todo set access here
+    db.setContract(file, req.params.eventId, req.params.artistId)
+		.then(() => res.send("Change made"));
 });
 
 
@@ -671,14 +688,50 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
     console.log("downloading file");
 
     //Todo check access here
-    /*db.getContract(req.params.eventId, req.params.artistId)
+    db.getContract(req.params.eventId, req.params.artistId)
         .then(result => {
-            res.send(JSON.stringify(result));
-            }
-        );*/
 
-    const file = `${__dirname}/uploads/nativelog.txt`;
-    res.download(file); // Set disposition and send it.
+            let base64String = result.data;
+            let name = result.name;
+            let buf = new Buffer(base64String, "base64");
+
+            res.send({name: name, data: base64String });
+            /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
+                if (err){
+                    res.send(err);
+                }else{
+                    console.log('The file has been saved!');
+                    const file = `${__dirname}/uploads/`+name;
+                    res.download(file); // Set disposition and send it.
+                }
+            });*/
+            }
+        );
+});
+
+app.get("/rider/:eventId/:artistId", (req, res) => {
+    console.log("downloading file");
+
+    //Todo check access here
+    db.getContract(req.params.eventId, req.params.artistId)
+        .then(result => {
+
+                let base64String = result.data;
+                let name = result.name;
+                let buf = new Buffer(base64String, "base64");
+
+                res.send({name: name, data: base64String });
+                /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
+                    if (err){
+                        res.send(err);
+                    }else{
+                        console.log('The file has been saved!');
+                        const file = `${__dirname}/uploads/`+name;
+                        res.download(file); // Set disposition and send it.
+                    }
+                });*/
+            }
+        );
 });
 
 
