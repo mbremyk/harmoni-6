@@ -136,6 +136,10 @@ export class EditEvent extends Component{
         this.setState({artists: [...this.state.artists, ...event]})
     }
 
+    handlePersonnel(event){
+        this.setState({personnelAdd: [...this.state.personnelAdd, ...event]})
+    }
+
     handlePersonnelAdd(event){
         service.getUser(event).then((user) => this.setState({personnelAdd: [...this.state.personnelAdd, user]}));
     }
@@ -156,6 +160,7 @@ export class EditEvent extends Component{
         this.setState({tTime: event.target.value})
     }
 
+
     handleSubmit() {
         let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
@@ -163,7 +168,7 @@ export class EditEvent extends Component{
         let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
             this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "", this.state.cancelled);
 
-        service.updateEvent(ev)
+        service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
     }
 
     render() {
@@ -284,6 +289,7 @@ export class EditEvent extends Component{
                                         <React.Fragment key={artist.userId}>
                                             <ListGroupItem>
                                                 {artist.username}
+                                                {console.log(artist.username)}
                                             </ListGroupItem>
                                         </React.Fragment>))}
                                 </ListGroup>
@@ -432,6 +438,7 @@ export class EditEvent extends Component{
             this.setState({eventAddress: event.address});
             this.setState({eventDescription: event.description});
             this.setState({ageLimit: event.ageLimit});
+            this.setState({imageUrl: event.imageUrl});
             this.setState({fDate: fromDate});
             this.setState({tDate: toDate});
             this.setState({fTime: fromTime});
@@ -439,6 +446,7 @@ export class EditEvent extends Component{
             this.setState({cancelled: event.cancelled});
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
+            service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
     }
 
