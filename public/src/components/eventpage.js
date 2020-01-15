@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken");
 export class EventPage extends Component {
     e = new Event();
     personnel = [];
+    artists = [];
     isPersonnel = false;
     isOrganizer = false;
     isArtist = false;
@@ -21,55 +22,8 @@ export class EventPage extends Component {
         if (!this.e) {
             return null
         } else if (this.e) {
-            if (!this.isPersonnel && !this.isOrganizer) {
-                return (
 
-
-                    <Container>
-
-                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
-
-                        <Row>
-                            <Col>
-                                <h1>{this.e.eventName}</h1>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col md={4}>
-                                <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
-                            </Col>
-
-                            <Col md={{offset: 6}}>
-                                <h4>Aldersgrense {this.e.ageLimit}</h4>
-                            </Col>
-
-
-                        </Row>
-
-                        <Row>
-                            <Col>
-                                <h2>{this.e.address}</h2>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <h4>Artist 1 og Artist 2</h4>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col>
-                                <p>{this.e.description}</p>
-                            </Col>
-                        </Row>
-
-
-                    </Container>
-
-
-                );
-
-            } else if (this.isPersonnel == true) {
+            if (this.isOrganizer) {
                 return (
 
                     <Container>
@@ -82,27 +36,39 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={4}>
-                                <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
+                            <Col>
+                                <a href="" download>
+                                    <Button variant="primary" aria-label="Left Align" title="Last Ned">
+                                        <span className="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                        Kontrakt
+                                    </Button>
+                                </a>
                             </Col>
-
-                            <Col md={{offset: 6}}>
-                                <h4>Aldersgrense {this.e.ageLimit}</h4>
-                            </Col>
-
-
                         </Row>
 
                         <Row>
+
                             <Col>
-                                <h2>{this.e.address}</h2>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
                             </Col>
-                        </Row>
-                        <Row>
+
                             <Col>
-                                <h4>Ass</h4>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
                             </Col>
+                            <Col>
+                                <h6>Adresse: {this.e.address}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
+                            </Col>
+
+
                         </Row>
+
 
                         <Row>
                             <Col>
@@ -110,31 +76,81 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Table responsive>
-                                <thead>
-                                <tr>
-
-                                    <th>Ansvarsområdet</th>
-                                    <th>Epost</th>
-
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                {this.personnel.map(person => (
+                            <Col>
+                                <h2>Personnel</h2>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Table responsive>
+                                    <thead>
                                     <tr>
-                                        <td>{person.role}</td>
-                                        <td>{this.user.email}</td>
 
+                                        <th>Ansvarsområdet</th>
+                                        <th>Epost</th>
 
                                     </tr>
+                                    </thead>
+                                    <tbody>
 
-                                ))}
+                                    {this.personnel.map(person => (
+                                        <tr>
+                                            <td>{person.role}</td>
+                                            <td>{person.user.email}</td>
 
-                                </tbody>
+
+                                        </tr>
+
+                                    ))}
+
+                                    </tbody>
 
 
-                            </Table>
+                                </Table>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <h2>Artister</h2>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Table responsive>
+                                    <thead>
+                                    <tr>
+
+                                        <th>Navn</th>
+                                        <th>Epost</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {this.artists.map(person => (
+                                        <tr>
+                                            <td>{person.user.username}</td>
+                                            <td>{person.user.email}</td>
+
+
+                                        </tr>
+
+                                    ))}
+
+                                    </tbody>
+
+
+                                </Table>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
+                                    Arragement</Button>
+                            </Col>
+                            <Col>
+                                <Button variant="danger">Avlys Arrangement</Button>
+                            </Col>
                         </Row>
 
 
@@ -142,9 +158,7 @@ export class EventPage extends Component {
 
 
                 );
-
-
-            } else if (this.isOrganizer == true) {
+            } else if ((this.isArtist && this.isPersonnel || this.isArtist)) {
                 return (
 
                     <Container>
@@ -167,26 +181,36 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={4}>
-                                <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
+
+                            <Col>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
                             </Col>
 
-                            <Col md={{offset: 6}}>
-                                <h4>Aldersgrense {this.e.ageLimit}</h4>
+                            <Col>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Adresse: {this.e.address}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
                             </Col>
 
 
                         </Row>
 
+
                         <Row>
                             <Col>
-                                <h2>Adresse: {this.e.address}</h2>
+                                <h4>{this.e.address}</h4>
                             </Col>
                         </Row>
                         <Row>
-                            <Col>
-                                <h4>arrangør yo</h4>
-                            </Col>
+
                         </Row>
 
                         <Row>
@@ -195,12 +219,6 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col>
-                                <h2>Personnel</h2>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
                             <Table responsive>
                                 <thead>
                                 <tr>
@@ -215,7 +233,7 @@ export class EventPage extends Component {
                                 {this.personnel.map(person => (
                                     <tr>
                                         <td>{person.role}</td>
-                                        <td>{this.user.email}</td>
+                                        <td>{person.user.email}</td>
 
 
                                     </tr>
@@ -226,25 +244,13 @@ export class EventPage extends Component {
 
 
                             </Table>
-                            </Col>
                         </Row>
-                        <Row>
-                            <Col>
-                                <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre Arragement</Button>
-                            </Col>
-                            <Col>
-                                <Button variant="danger">Avlys Arrangement</Button>
-                            </Col>
-                        </Row>
-
-
 
                     </Container>
 
 
                 );
-
-            } else if (this.isArtist == true) {
+            } else if (this.isPersonnel) {
                 return (
 
                     <Container>
@@ -257,27 +263,102 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={4}>
-                                <h4>fra {this.e.startTime} til {this.e.endTime}</h4>
+
+                            <Col>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
                             </Col>
 
-                            <Col md={{offset: 6}}>
-                                <h4>Aldersgrense {this.e.ageLimit}</h4>
+                            <Col>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Adresse: {this.e.address}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
                             </Col>
 
 
                         </Row>
 
-
                         <Row>
                             <Col>
-                                <h2>{this.e.address}</h2>
+                                <p>{this.e.description}</p>
                             </Col>
                         </Row>
                         <Row>
+                            <Table responsive>
+                                <thead>
+                                <tr>
+
+                                    <th>Ansvarsområdet</th>
+                                    <th>Epost</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {this.personnel.map(person => (
+                                    <tr>
+                                        <td>{person.role}</td>
+                                        <td>{person.user.email}</td>
+
+
+                                    </tr>
+
+                                ))}
+
+                                </tbody>
+
+
+                            </Table>
+                        </Row>
+
+
+                    </Container>
+
+
+                );
+
+
+            } else if (!this.isPersonnel && !this.isOrganizer) {
+                return (
+
+
+                    <Container>
+
+                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
+
+                        <Row>
                             <Col>
-                                <h4>arrangør yo</h4>
+                                <h1>{this.e.eventName}</h1>
                             </Col>
+                        </Row>
+                        <Row>
+
+                            <Col>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
+                            </Col>
+
+                            <Col>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Adresse: {this.e.address}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
+                            </Col>
+
+
                         </Row>
 
                         <Row>
@@ -286,15 +367,15 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
 
+
                     </Container>
-
-
-
 
 
                 );
 
+
             }
+
         }
     }
 
@@ -313,6 +394,7 @@ export class EventPage extends Component {
             })
             .catch((error) => console.log(error));
         this.getPersonnelForEvent();
+        this.getArtistsForEvent();
 
 
     }
@@ -320,14 +402,15 @@ export class EventPage extends Component {
     //works
     getPersonnelForEvent() {
         service
-            .getPersonellForEvent(this.props.match.params.id)
+            .getPersonnel(this.props.match.params.id)
             .then(personnel => {
                 this.personnel = personnel;
                 let token = jwt.decode(authService.getToken());
                 this.personnel.map(person => {
                     if (person.personnelId == token.userId) {
                         this.isPersonnel = true;
-                        console.log(this.isPersonnel);
+                        console.log("Er jeg personnel? " + this.isPersonnel)
+
                     }
                 });
 
@@ -338,23 +421,22 @@ export class EventPage extends Component {
     }
 
     getArtistsForEvent() {
-        //TODO
-    }
-
-    getUser(id) {
-        service.getUser(id)
-            .then(e => {
-                this.user = e;
-
+        service
+            .getGigForEvent(this.props.match.params.id)
+            .then(artists => {
+                this.artists = artists;
+                let token = jwt.decode(authService.getToken());
+                this.artists.map(person => {
+                    if (person.artistId == token.userId) {
+                        this.isArtist = true;
+                        console.log("Er jeg artist? " + this.isArtist)
+                    }
+                });
 
 
             })
             .catch((error) => console.log(error));
-
     }
-
-
-
 
 }
 

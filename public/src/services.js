@@ -210,7 +210,7 @@ class Services {
     }
 
     getGigForEvent(eventId) {
-        //return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
+        return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
     }
 
     /*downloadContract(event, artist)
