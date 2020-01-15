@@ -199,7 +199,7 @@ app.post("/login", (req, res) => {
                         res.json({error: "Not authorized"})
                     }
                 });
-            })
+            });
         });
 });
 
@@ -302,12 +302,24 @@ app.post("/users", (req, res) => {
  * {
  *     username: string
  *     email: string
- *     newEmail: string
+ *     password: string
+ *
  * }
  */
 app.put("/auth/users/:userId", (req, res) => {
     console.log("PUT-request - auth/user/:userId");
-    return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
+    if (req.body.password != null) {
+        hashPassword.hashPassword(req.body.password).then(credentials => {
+            return db.updatePassword({
+                userId: req.body.userId,
+                password: credentials[0],
+                salt: credentials[1]
+            })
+                .then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
+        })
+    } else {
+        return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
+    }
 });
 
 
