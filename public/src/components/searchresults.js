@@ -2,6 +2,8 @@ import {Component} from "react-simplified";
 import * as React from 'react';
 import {service} from '../services';
 import {SortedEventView} from "./sortedeventview";
+import {HarmoniNavbar} from "./navbar";
+import {Fragment} from "react";
 
 export class SearchResults extends Component {
     state = {
@@ -9,10 +11,20 @@ export class SearchResults extends Component {
     };
 
     render() {
-        if (!(Array.isArray(this.state.events) && this.state.events.length) ) {
-            return <h1>Ingen resultater funnet</h1>;
+        if (!(Array.isArray(this.state.events) && this.state.events.length)) {
+            return (
+                <Fragment>
+                    <HarmoniNavbar/>
+                    <h1>Ingen resultater funnet</h1>
+                </Fragment>
+            )
         } else {
-            return <SortedEventView events={this.state.events}/>
+            return (
+                <Fragment>
+                    <HarmoniNavbar/>
+                    <SortedEventView events={this.state.events}/>
+                </Fragment>
+            )
         }
     }
 

@@ -38,9 +38,10 @@ export class HarmoniNavbar extends Component {
                                          className="mr-sm-2"
                                          value={this.state.input}
                                          onChange={this.handleInputChange}
-                                         onKeyPress={event => {
+                                         onKeyPress={(event) => {
                                              if (event.key === "Enter") {
-                                                 this.search();
+                                                 alert("Search clicked, input: " + this.state.input + "\n Kun knappen fungerer TODO");
+                                                 this.search()
                                              }
                                          }}/>
                             <Button variant="outline-success" onClick={this.search}>Søk</Button>
@@ -51,10 +52,12 @@ export class HarmoniNavbar extends Component {
         );
     }
 
-    search = () => {
-        //alert("Search clicked, input: " + this.state.input);
-        //window.location = ("/sok/" + this.state.input)
-        this.props.history.push('/sok/' + this.state.input )
-
+    search() {
+        //let url = "/sok/" + this.state.input;
+        //alert("Search clicked, input: " + this.state.input + "\n Bruk knappen! Fuck js...");
+        window.location = ("/sok/" + this.state.input);
+        //window.location.replace("https://www.w3schools.com");
+        //this.props.history.push("/sok/" + this.state.input);
+        return false;
     }
 }
