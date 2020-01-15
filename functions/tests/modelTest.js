@@ -46,7 +46,7 @@ describe('Users', () => {
 
     it('update user success', done => {
         let user = {
-            userId: '7',
+            userId: '6',
             username: 'UPDATED',
             password: 'UPDATED',
             email: 'NEW@mail.com'
@@ -257,8 +257,8 @@ describe('Personnel', () => {
 
     it('update personnel', done => {
         let personnel = {
-            eventId: 4,
-            personnelId: 8,
+            eventId: 2,
+            personnelId: 4,
             role: 'UPDATED'
         };
         db.updatePersonnel(personnel).then(response => {
@@ -282,6 +282,31 @@ describe('Personnel', () => {
     it('correct data in personnel', done => {
         db.getPersonnel(4).then(personnel => {
             expect(personnel.length).toBe(2);
+            expect(personnel.map(personnel =>
+                personnel.toJSON()).map(personnel => (
+                {
+                    personnelId: personnel.personnelId,
+                    eventId: personnel.eventId,
+                    role: personnel.role,
+                    email: personnel.user.email,
+                    username: personnel.user.username,
+                }
+            ))).toEqual([
+                {
+                    personnelId: 7, //Sivert
+                    eventId: 4, //Kygokonsert
+                    role: 'Lys',
+                    email: 'sivert@mail.com',
+                    username: 'Sivert U',
+                },
+                {
+                    personnelId: 8, //Michael
+                    eventId: 4, //Kygokonsert
+                    role: 'Sikkerhet',
+                    email: 'michael@mail.com',
+                    username: 'Michael S.L',
+                },
+            ]);
             done();
         });
     });
@@ -308,7 +333,7 @@ describe('Gigs', () => {
 
     it('correct data in gig', done => {
         db.getGigs(4).then(gigs => {
-          expect(gigs.length).toBe(1);
+            expect(gigs.length).toBe(1);
         });
         done();
     });

@@ -5,8 +5,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {service, User} from "../services";
 import {authService} from "../AuthService";
+import {HarmoniNavbar} from "./navbar";
 import * as jwt from "jsonwebtoken";
-
 
 /*
 * My page container for "/min-side". Ability to change name, email and password for a logged in user.
@@ -24,38 +24,40 @@ export class myPage extends Component {
             oldEmail: ''
         }
     }
-
     render() {
         return (
-            <Container>
-                <Form>
-                    <h1>Min side</h1>
-                    <Form.Group>
-                        <Form.Label>Brukernavn</Form.Label>
-                        <Form.Control autocomplete="username" value={this.state.username}
+            <div>
+                <HarmoniNavbar/>
+                <Container>
+                    <Form>
+                        <h1>Min side</h1>
+                        <Form.Group>
+                            <Form.Label>Brukernavn</Form.Label>
+                            <Form.Control autocomplete="username" value={this.state.username}
                                       onChange={this.handleUsernameChange}>
-                        </Form.Control>
-                    </Form.Group>
-                    <Form.Group controlId="formBasicEmail">
-                        <Form.Label>E-post</Form.Label>
-                        <Form.Control autocomplete="email" value={this.state.email} onChange={this.handleEmailChange}>
-                        </Form.Control>
-                    </Form.Group>
-                    <Form.Group controlId="formNewPassword">
-                        <Form.Label>Nytt passord</Form.Label>
-                        <Form.Control autocomplete="new-password" type="password" placeholder="Nytt passord"
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group controlId="formBasicEmail">
+                            <Form.Label>E-post</Form.Label>
+                            <Form.Control autocomplete="email" value={this.state.email} onChange={this.handleEmailChange}>
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group controlId="formNewPassword">
+                            <Form.Label>Nytt passord</Form.Label>
+                            <Form.Control autocomplete="new-password" type="password" placeholder="Nytt passord"
                                       value={this.state.password1} onChange={this.handleNewPassword1Change}/>
-                    </Form.Group>
-                    <Form.Group controlId="formRepNewPassword">
-                        <Form.Label>Gjenta nytt passord</Form.Label>
-                        <Form.Control autocomplete="new-password" type="password" placeholder="Gjenta nytt passord"
+                        </Form.Group>
+                        <Form.Group controlId="formRepNewPassword">
+                            <Form.Label>Gjenta nytt passord</Form.Label>
+                            <Form.Control autocomplete="new-password" type="password" placeholder="Gjenta nytt passord"
                                       value={this.state.password2} onChange={this.handleNewPassword2Change}/>
-                    </Form.Group>
-                    <Button variant="primary" type="button" onClick={this.save}>
-                        Lagre
-                    </Button>
-                </Form>
-            </Container>
+                        </Form.Group>
+                        <Button variant="primary" type="button" onClick={this.save}>
+                            Lagre
+                        </Button>
+                    </Form>
+                </Container>
+            </div>
         );
     }
 

@@ -74,10 +74,10 @@ TODO: EVENTS
 let events = [
     {
         //eventId: 1
-        organizerId: '9', //Sabine
+        organizerId: 9, //Sabine
         eventName: 'Fredagsquiz',
         address: 'Ikke en faktisk addresse 1',
-        ageLimit: '0',
+        ageLimit: 0,
         startTime: null,
         endTime: null,
         imageUrl: 'https://images.readwrite.com/wp-content/uploads/2019/08/Why-You-Love-Online-Quizzes-825x500.jpg',
@@ -93,10 +93,10 @@ let events = [
     },
     {
         //eventId: 2
-        organizerId: '4', //Jakob
+        organizerId: 4, //Jakob
         eventName: 'Ungdomskonsert',
         address: 'Sukkerhuset',
-        ageLimit: '15',
+        ageLimit: 15,
         startTime: null,
         endTime: null,
         imageUrl: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80',
@@ -110,10 +110,10 @@ let events = [
     },
     {
         //eventId: 3
-        organizerId: '7', //Sivert
+        organizerId: 7, //Sivert
         eventName: 'D.D.E',
         address: 'Festningen',
-        ageLimit: '18',
+        ageLimit: 18,
         startTime: null,
         endTime: null,
         imageUrl: 'https://www.bakgaarden.no/wp-content/uploads/2019/08/DDE-1-crop%C2%A9LineBerre-1030x686.jpg',
@@ -122,10 +122,10 @@ let events = [
     },
     {
         //eventId: 4
-        organizerId: '2', //Marius
+        organizerId: 2, //Marius
         eventName: 'Kygokonsert på torget',
         address: 'Trondheim torg',
-        ageLimit: '0',
+        ageLimit: 0,
         startTime: null,
         endTime: null,
         imageUrl: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80',
@@ -154,10 +154,10 @@ let events = [
     },
     {
         //eventId: 5
-        organizerId: '2', //Marius
+        organizerId: 2, //Marius
         eventName: 'Mandagsfylla',
         address: 'Sukkerhuset',
-        ageLimit: '21',
+        ageLimit: 21,
         startTime: null,
         endTime: null,
         imageUrl: 'https://vulkanoslo.no/wp-content/uploads/2019/04/barvulkan_3.jpg',
@@ -181,20 +181,20 @@ TODO: GIGS
  */
 let gigs = [
     {
-        artistId: '5', //Magnus
-        eventId: '2', //Ungdomskonert
+        artistId: 5, //Magnus
+        eventId: 2, //Ungdomskonert
         rider: null,
         contract: null
     },
     {
-        artistId: '6', //Jan
-        eventId: '3', //D.D.E
+        artistId: 6, //Jan
+        eventId: 3, //D.D.E
         rider: null,
         contract: null
     },
     {
-        artistId: '8', //Michael
-        eventId: '4', //Kygokonsert
+        artistId: 8, //Michael
+        eventId: 4, //Kygokonsert
         rider: null,
         contract: null
     }
@@ -206,38 +206,38 @@ TODO: PERSONNEL
  */
 let personnel = [
     {
-        personnelId: '3', //Sebastian
-        eventId: '1', //Fredagsquiz
+        personnelId: 3, //Sebastian
+        eventId: 1, //Fredagsquiz
         role: 'Quizmaster'
     },
     {
-        personnelId: '4', //Jakob
-        eventId: '2', //Ungdomskonert
+        personnelId: 4, //Jakob
+        eventId: 2, //Ungdomskonert
         role: 'Crowd control'
     },
     {
-        personnelId: '6', //Jan
-        eventId: '2', //Ungdomskonert
+        personnelId: 6, //Jan
+        eventId: 2, //Ungdomskonert
         role: 'Diskolys'
     },
     {
-        personnelId: '2', //Marius
-        eventId: '3', //D.D.E
+        personnelId: 2, //Marius
+        eventId: 3, //D.D.E
         role: 'Hypeman'
     },
     {
-        personnelId: '7', //Sivert
-        eventId: '4', //Kygokonsert
+        personnelId: 7, //Sivert
+        eventId: 4, //Kygokonsert
         role: 'Lys'
     },
     {
-        personnelId: '8', //Michael
-        eventId: '4', //Kygokonsert
+        personnelId: 8, //Michael
+        eventId: 4, //Kygokonsert
         role: 'Sikkerhet'
     },
     {
-        personnelId: '3', //Sebastian
-        eventId: '5', //Mandagsfylla
+        personnelId: 3, //Sebastian
+        eventId: 5, //Mandagsfylla
         role: 'Bartender'
     }
 ];
@@ -248,51 +248,51 @@ TODO: TICKETS
  */
 let tickets = [
     {
-        eventId: '1', //Fredagsquiz
+        eventId: 1, //Fredagsquiz
         type: 'Inngang',
-        price: '50',
-        amount: '40'
+        price: 50,
+        amount: 40
     },
     {
-        eventId: '2', //Ungdomskonert
+        eventId: 2, //Ungdomskonert
         type: 'Barn under 15år',
-        price: '99',
-        amount: '50'
+        price: 99,
+        amount: 50
     },
     {
-        eventId: '2', //Ungdomskonsert
+        eventId: 2, //Ungdomskonsert
         type: 'Voksen',
-        price: '199',
-        amount: '30'
+        price: 199,
+        amount: 30
     },
     {
-        eventId: '3', //D.D.E
+        eventId: 3, //D.D.E
         type: 'Gratis',
-        price: '0',
-        amount: '1000'
+        price: 0,
+        amount: 1000
     },
     {
-        eventId: '4', //Kygokonsert
+        eventId: 4, //Kygokonsert
         type: 'Golden Circle',
-        price: '1999',
-        amount: '29'
+        price: 1999,
+        amount: 29
     },
     {
-        eventId: '4', //Kygokonsert
+        eventId: 4, //Kygokonsert
         type: 'Early Bird',
-        price: '199',
-        amount: '100'
+        price: 199,
+        amount: 100
     },
     {
-        eventId: '4', //Kygokonsert
+        eventId: 4, //Kygokonsert
         type: 'Vanlig',
-        price: '399',
-        amount: '300'
+        price: 399,
+        amount: 300
     },
     {
-        eventId: '5', //Mandagsfylla
+        eventId: 5, //Mandagsfylla
         type: 'Pris per øl',
-        price: '69',
+        price: 69,
         amount: null
     }
 ];
