@@ -20,8 +20,8 @@ export class HomePage extends Component {
             <div>
                 <HarmoniNavbar/>
                 <Row>
-                    <Col md={{span: 12, offset: 4}}>
-                        <h1>Mine Arrangementer</h1>
+                    <Col>
+                        <h1 className="text-center">Mine Arrangementer</h1>
                     </Col>
                 </Row>
                 <Row>
@@ -29,8 +29,8 @@ export class HomePage extends Component {
 
                 </Row>
                 <Row>
-                    <Col md={{span: 12, offset: 4}}>
-                        <h1>Andre Arrangementer</h1>
+                    <Col>
+                        <h1 className="text-center">Andre Arrangementer</h1>
                     </Col>
                 </Row>
                 <SortedEventView events={this.getOtherEvents()}/>
