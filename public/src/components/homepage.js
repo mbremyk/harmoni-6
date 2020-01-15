@@ -4,8 +4,10 @@ import * as React from 'react';
 import {service} from '../services';
 import {authService} from '../AuthService'
 import {SortedEventView} from "./sortedeventview";
+import {HarmoniNavbar} from "./navbar";
 
 const jwt = require("jsonwebtoken");
+
 
 export class HomePage extends Component {
     myEvents = [];
@@ -32,6 +34,7 @@ export class HomePage extends Component {
                 <SortedEventView events={this.getOtherEvents()}/>
             </div>
         );
+
     }
 
     mounted() {

@@ -5,9 +5,8 @@ import Nav from "react-bootstrap/Nav";
 import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
 
-export class navbar extends Component {
+export class HarmoniNavbar extends Component {
     state = {
         input: ''
     };
@@ -17,46 +16,39 @@ export class navbar extends Component {
     }
 
     render() {
-        if (this.props.location.pathname != "/") {
-            return (
-                <div>
-                    <Navbar bg="light">
-                        <Navbar.Brand href="/">
-                            Harmoni
-                        </Navbar.Brand>
-                    </Navbar>
-                    <Navbar bg="light" expand="lg">
-                        <Navbar.Toggle aria-controls="basic-harmoniNavbar-nav"/>
-                        <Navbar.Collapse id="basic-navbar-nav">
-                            <Nav className="mr-auto">
-                                <Nav.Link href="/hjem">Hjem</Nav.Link>
-                                <Nav.Link href="/opprett-arrangement">Opprett arrangement</Nav.Link>
-                                <Nav.Link href="/min-side">Min side</Nav.Link>
-                                <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
-                            </Nav>
-                            <Form inline>
-                                <FormControl type="text"
-                                             placeholder="Søk"
-                                             className="mr-sm-2"
-                                             value={this.state.input}
-                                             onChange={this.handleInputChange}
-                                             onKeyPress={event => {
-                                                 if (event.key === "Enter") {
-                                                     this.search();
-                                                 }
-                                             }}/>
-                                <Button variant="outline-success"
-                                        onClick={this.search}>Søk</Button>
-                            </Form>
-                        </Navbar.Collapse>
-                    </Navbar>
-                </div>
-            );
-        } else {
-            return (
-                <div></div>
-            )
-        }
+        return (
+            <div>
+                <Navbar bg="light">
+                    <Navbar.Brand href="/">
+                        Harmoni
+                    </Navbar.Brand>
+                </Navbar>
+                <Navbar bg="light" expand="lg">
+                    <Navbar.Toggle aria-controls="basic-harmoniNavbar-nav"/>
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="mr-auto">
+                            <Nav.Link href="/hjem">Hjem</Nav.Link>
+                            <Nav.Link href="/opprett-arrangement">Opprett arrangement</Nav.Link>
+                            <Nav.Link href="/min-side">Min side</Nav.Link>
+                            <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
+                        </Nav>
+                        <Form inline>
+                            <FormControl type="text"
+                                         placeholder="Søk"
+                                         className="mr-sm-2"
+                                         value={this.state.input}
+                                         onChange={this.handleInputChange}
+                                         onKeyPress={event => {
+                                             if (event.key === "Enter") {
+                                                 this.search();
+                                             }
+                                         }}/>
+                            <Button variant="outline-success" onClick={this.search}>Søk</Button>
+                        </Form>
+                    </Navbar.Collapse>
+                </Navbar>
+            </div>
+        );
     }
 
     search = () => {
