@@ -617,7 +617,7 @@ app.post("/events/:eventId/gigs", (req, res) => {
     //console.log(contractFile.name);
     //console.log(Object.keys(req.body));
 
-	db.createGig(req.body).then(response => {
+	db.addGig(req.body).then(response => {
 
 		/*if (response) {
             res.status(201).send(response)
