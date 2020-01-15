@@ -18,7 +18,6 @@ import {authService} from "../AuthService";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
-//TODO: Legge til annet personell
 //TODO: Legge til bilde
 
 export class AddEvent extends Component{
@@ -297,7 +296,6 @@ export class AddEvent extends Component{
                                     </React.Fragment>
                                 ))}
                             </ListGroup>
-                            {this.state.personnelAdd.map(p => console.log(p))}
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
