@@ -222,32 +222,33 @@ let PersonnelModel = sequelize.define('personnel', {
     paranoid: true
 });
 
+
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
 EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
 
 UserModel.hasMany(GigModel, {foreignKey: 'artistId'});
 GigModel.belongsTo(UserModel, {foreignKey: 'artistId'});
 
-EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
-GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
-
 UserModel.hasMany(PersonnelModel, {foreignKey: 'personnelId'});
 PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
 
-FileModel.hasOne(GigModel, {foreignKey: 'fileId'});
+
+EventModel.hasMany(GigModel, {foreignKey: 'eventId'});
+GigModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+EventModel.hasMany(PersonnelModel, {foreignKey: 'eventId'});
+PersonnelModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+EventModel.hasMany(TicketModel, {foreignKey: 'eventId'});
+TicketModel.belongsTo(EventModel, {foreignKey: 'eventId'});
+
+
+FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'rider'});
 GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
 
-UserModel.hasMany(PersonnelModel, {foreignKey: 'userId'});
-PersonnelModel.belongsTo(UserModel, {foreignKey: 'personnelId'});
-
-EventModel.hasMany(PersonnelModel, {foreignKey: 'eventId'});
-PersonnelModel.belongsTo(EventModel, {foreignKey: 'eventId'});
-
-EventModel.hasMany(TicketModel, {foreignKey: 'ticketId'});
-TicketModel.belongsTo(EventModel, {foreignKey: 'ticketId'});
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
