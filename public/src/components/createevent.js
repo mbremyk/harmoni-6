@@ -1,4 +1,4 @@
-import {service, Event, Gig, Personnel} from "../services";
+import {service, Event, Personnel, SimpleFile, BulkGig, BulkPersonnel} from "../services";
 import {Component} from "react-simplified";
 import {HarmoniNavbar} from "./navbar";
 import React from "react";
@@ -17,6 +17,7 @@ import {authService} from "../AuthService";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
+//TODO: Legge til annet personell
 //TODO: Legge til bilde
 
 export class AddEvent extends Component{
@@ -106,11 +107,11 @@ export class AddEvent extends Component{
     }
 
     handleRiderChange(event){
-        this.setState({rider: event.target.value})
+        this.setState({rider: event.target.files[0]});
     }
 
     handleContractChange(event){
-        this.setState({contract: event.target.value})
+        this.setState({contract: event.target.files[0]});
     }
 
     handleImageUpload(event){
@@ -155,26 +156,50 @@ export class AddEvent extends Component{
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
 
-
         let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
             this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
             this.state.image);
 
-        let iId = undefined;
+                console.log(this.state.contract);
+                console.log(this.state.rider);
+                console.log("converting to buffer");
+                this.toBase64(this.state.contract)
+                    .then(cData => {
+                        this.toBase64(this.state.rider)
+                            .then(rData => {
+                                let contract = new SimpleFile(cData, this.state.contract.name);
+                                let rider = new SimpleFile(rData, this.state.rider.name);
+                                console.log(contract);
 
-        service.createEvent(e)
-            .then(updated =>
-                    {
-                        iId = updated.insertId;
-                        this.state.artistsAdd.map(a =>
-                            service.createGig(new Gig(a.userId, updated.insertId, null, null)));
-                        this.state.personnelAdd.map( p =>
-                            service.createPersonnel(new Personnel(p.userId, updated.insertId, p.role)));
-                    }
+                                service.createEvent(e)
+                                    .then(updated => {
+                                        console.log(this.state.personnelAdd);
+                                            service.createGig(new BulkGig(updated.insertId, this.state.artistsAdd, contract, rider))
+                                                .then(() => service.createPersonnel(new BulkPersonnel(updated.insertId, this.state.personnelAdd)));
+                                            // service.createPersonnel(new BulkPersonel(updated.insertId, this.state.personnelAdd));
+                                            /*this.state.artistsAdd.map(a =>
+                                                (service.createGig(new Gig(a.userId, updated.insertId, contract, rider))));
+                                            this.state.personnelAdd.map( personnel =>
+                                                service.createPersonnel(new Personnel(personnel.userId, updated.insertId, personnel.role)));
+                                            console.log(updated.insertId);*/
+                                        }
+                                    ).then(() => this.props.history.push("/opprett-arrangement"))
+                                    .catch(err => alert(err.message));
+                                }
+                            )
+                    });
 
-            ).then(() => this.props.history.push("/arrangement/" + iId))
-            .catch(err => alert(err.message))
+
+
     }
+
+    toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+
 
     render(){
 
@@ -359,27 +384,17 @@ export class AddEvent extends Component{
                             />
                             </Form.Group>
 
-                            <Form.Group as={Col} sm={"6"}>
-                                <Form.Label>Last opp rider</Form.Label>
-                                <InputGroup className="mb-5">
-                                    <FormControl
-                                        type="file"
-                                        value={this.state.rider}
-                                        onChange={this.handleRiderChange}
-                                    />
-                                </InputGroup>
-                            </Form.Group>
+                        <Form.Group as={Col} sm={"6"}>
+                            <label>Last opp rider</label>
+                            <input type="file" className="form-control" encType="multipart/form-data" name="file"
+                                   onChange={this.handleRiderChange}/>
+                        </Form.Group>
 
-                            <Form.Group as={Col} sm={"6"}>
-                                <Form.Label>Last opp kontrakt</Form.Label>
-                                <InputGroup className="mb-5">
-                                    <FormControl
-                                        type="file"
-                                        value={this.state.contract}
-                                        onChange={this.handleRiderChange}
-                                    />
-                                </InputGroup>
-                            </Form.Group>
+                        <Form.Group as={Col} sm={"6"}>
+                            <label>Last opp kontrakt</label>
+                            <input type="file" className="form-control" encType="multipart/form-data" name="file"
+                                   onChange={this.handleContractChange}/>
+                        </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
 

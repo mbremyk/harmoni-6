@@ -44,18 +44,29 @@ export class Event {
 	}
 }
 
-export class Gig {
+export class SimpleFile {
+    name;
+    data;
 
-    artistId;
+    constructor(data, name) {
+        this.name = name;
+        this.data = data;
+    }
+
+}
+
+export class BulkGig {
+
     eventId;
     rider;
     contract;
+    artists;
 
-    constructor(artistId, eventId, rider, contract) {
-        this.artistId = artistId;
+    constructor( eventId, artists, rider, contract) {
         this.eventId = eventId;
         this.rider = rider;
         this.contract = contract;
+        this.artists = artists;
     }
 }
 
@@ -66,13 +77,24 @@ export class Ticket {
     amount;
 }
 
+export class BulkPersonnel {
+    personnel ;
+    eventId;
+
+    constructor(personnel, eventId) {
+        this.personnel = personnel;
+        this.eventId = eventId;
+    }
+
+}
+
 export class Personnel {
     personnelId;
     eventId;
     role;
 
-    constructor(personnelId, eventId, role) {
-        this.personnelId = personnelId;
+    constructor(personnel, eventId, role) {
+        this.personnelId = personnel;
         this.eventId = eventId;
         this.role = role;
     }
@@ -208,7 +230,7 @@ class Services {
         GIGS
     */
     createGig(gig) {
-        return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
+        return axios.post(url +'/gigs', gig).then(response => response.data);
     }
 
     uploadContract(formData, event, artist) {
@@ -219,11 +241,18 @@ class Services {
         return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
     }
 
-    /*downloadContract(event, artist)
+    downloadContract(event, artist)
     {
+        console.log("Downloading");
         //This approach to downloading the files does not work
-        //return axios.get(url+"/contract/"+event+"/"+artist).then(response => response);
-    }*/
+        return axios.get(url+"/contract/"+event+"/"+artist).then(response => response.data);
+    }
+    downloadRider(event, artist)
+    {
+        console.log("Downloading");
+        //This approach to downloading the files does not work
+        return axios.get(url+"/rider/"+event+"/"+artist).then(response => response.data);
+    }
 
 
 }

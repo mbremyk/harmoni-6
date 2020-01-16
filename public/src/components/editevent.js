@@ -13,6 +13,8 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {HarmoniNavbar} from "./navbar";
+//import {Event, service} from "../services";
+import Row from "react-bootstrap/Row";
 
 export class EditEvent extends Component{
 
@@ -416,7 +418,11 @@ export class EditEvent extends Component{
 
                         </Form.Row>
                     </Form>
-                </Container>
+                <Row>
+                    <button id={"contract"} onClick={this.downloadC}>Download the contract</button>
+                    <button id={"rider"} onClick={this.downloadR}>Download the rider</button>
+                </Row>
+            </Container>
             </div>
         );
     }
@@ -449,6 +455,47 @@ export class EditEvent extends Component{
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
     }
+
+
+    downloadC = (e) => {
+        //For the time being this only fetches the file with the 1-1 key.
+        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
+        let eventId = this.state.eventId;
+        let artistId = this.state.artists[0].userId;
+        console.log(this.state.artists[0].username);
+        if(e.target.id == "contract") {
+            service.downloadContract(eventId, artistId)
+                .then(response => {
+                    let fileName = response.name;
+                    const link = document.createElement('a');
+                    link.download = response.name;
+                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
+                    //console.log(ret);
+                    link.href = response.data;
+                    link.click();
+                })
+        }
+
+    };
+
+    downloadR = (e) => {
+        //For the time being this only fetches the file with the 1-1 key.
+        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
+        let eventId = this.state.eventId;
+        let artistId = this.state.artists[0].userId;
+        console.log(this.state.artists[0].username);
+            service.downloadRider(eventId, artistId)
+                .then(response => {
+                    let fileName = response.name;
+                    const link = document.createElement('a');
+                    link.download = response.name;
+                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
+                    //console.log(ret);
+                    link.href = response.data;
+                    link.click();
+                })
+
+    };
 
     IncrementAge(){
         this.state.ageLimit++;

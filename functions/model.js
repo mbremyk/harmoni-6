@@ -111,7 +111,8 @@ let FileAccessModel = sequelize.define('fileAccess', {
 let EventModel = sequelize.define('event', {
     eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     organizerId: {
-        type: Sequelize.INTEGER, references: {
+        type: Sequelize.INTEGER,
+        references: {
             model: UserModel,
             key: 'userId'
         },
