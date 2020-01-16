@@ -5,6 +5,7 @@ import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket, User} from '../services';
 import {authService} from "../AuthService";
+import {HarmoniNavbar} from "./navbar";
 
 const jwt = require("jsonwebtoken");
 
@@ -25,6 +26,8 @@ export class EventPage extends Component {
 
             if (this.isOrganizer) {
                 return (
+                    <div>
+                    <HarmoniNavbar/>
 
                     <Container>
 
@@ -154,11 +157,14 @@ export class EventPage extends Component {
 
 
                     </Container>
+                    </div>
 
 
                 );
             } else if ((this.isArtist && this.isPersonnel || this.isArtist)) {
                 return (
+                    <div>
+                        <HarmoniNavbar/>
 
                     <Container>
 
@@ -245,11 +251,14 @@ export class EventPage extends Component {
                         </Row>
 
                     </Container>
+                    </div>
 
 
                 );
             } else if (this.isPersonnel) {
                 return (
+                    <div>
+                    <HarmoniNavbar/>
 
                     <Container>
 
@@ -318,6 +327,7 @@ export class EventPage extends Component {
 
 
                     </Container>
+                    </div>
 
 
                 );
@@ -325,7 +335,6 @@ export class EventPage extends Component {
 
             } else if (!this.isPersonnel && !this.isOrganizer) {
                 return (
-
 
                     <Container>
 
@@ -374,10 +383,11 @@ export class EventPage extends Component {
 
             }
 
+
         }
     }
 
-
+    //checks if the person viewing the event is the organizer
     mounted() {
 
         service
@@ -399,7 +409,7 @@ export class EventPage extends Component {
 
     }
 
-    //works
+    //gets all the people working on that event and checks if the person viewing it is a part of the personnel
     getPersonnelForEvent() {
         service
             .getPersonnel(this.props.match.params.id)
@@ -417,6 +427,7 @@ export class EventPage extends Component {
 
     }
 
+    //gets all the artist working on that event and checks if the person viewing it is a an artist
     getArtistsForEvent() {
         service
             .getGigForEvent(this.props.match.params.id)
