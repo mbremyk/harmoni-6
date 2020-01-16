@@ -412,11 +412,11 @@ describe('Events - search', () => {
 describe('Personnel', () => {
     it('add personnel to event', done => {
         let personnel = {
-            eventId: 1,
-            personnelId: 1,
+            //eventId: 1,
+            userId: 1,
             role: 'JEG VIL JOBBE'
         };
-        db.addPersonnel(personnel).then(response => {
+        db.addPersonnel(personnel, 1).then(response => {
             expect(response).toBeTruthy();
             done();
         });
@@ -492,8 +492,8 @@ describe('Gigs', () => {
             contract: null,
             rider: null,
         };
-        db.addGig(gig).then(response => {
-            expect(response).toBeTruthy();
+        db.addGig(2, 1).then(response => {
+            expect(response.eventId).toBe(1);
             done();
         });
     });

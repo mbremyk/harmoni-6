@@ -24,7 +24,7 @@ app.use(fileParser({
         }
     },
 }));
-app.use(cors({origin: true}));
+//app.use(cors({origin: true}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -489,7 +489,15 @@ app.put('/auth/events/:eventId', (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/personnel", (req, res) => {
-    return db.addPersonnel(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+    console.log(Object.keys(req.body));
+    console.log(JSON.stringify(req.body));
+    let eventId = decodeURIComponent(req.params.eventId);
+    req.body.personnel.map(person => {
+        db.addPersonnel(person, eventId)
+            .then(() => console.log(person));
+    });
+    res.status(201);
+    //return db.addPersonnel(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
 });
 
 
@@ -630,30 +638,29 @@ app.get("/events/:eventId/tickets", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.post("/events/:eventId/gigs", (req, res) => {
-    console.log("POST-request - /gigs");
+app.post("/gigs", (req, res) => {
+	console.log("POST-request - /gigs");
+    console.log(req.body.artists);
     let contractFile = req.body.contract;
     let riderFile = req.body.rider;
-    //console.log(riderFile.name);
-    //console.log(contractFile.name);
-    //console.log(Object.keys(req.body));
+    console.log(riderFile.name);
+    console.log(contractFile.name);
 
-    return db.addGig(req.body).then(response => {
-
-        /*if (response) {
-            res.status(201).send(response)
-        } else {
-            res.status(400);
-        }*/
-        if (response.insertId !== undefined) {
-            db.setContract(contractFile, response.eventId, response.artistId)
+   // req.body.artists.shift();
+    req.body.artists.map( artist => {
+        console.log(artist.username);
+        db.addGig(artist.userId, req.body.eventId).then(response => {
+            console.log("Index"+response);
+            db.setContract(contractFile, response.eventId, artist.userId)
                 .then(() => {
-                    db.setRider(riderFile, response.eventId, response.artistId)
+                    console.log("Contract set");
+                    db.setRider(riderFile, response.eventId, artist.userId)
                         .then(() => {
+                            console.log("Rider set");
                             res.status(201).send(response)
                         });
                 });
-        }
+        });
     });
 });
 
@@ -687,21 +694,21 @@ app.post("/contracts/:eventId/:artistId", (req, res) => {
     console.log(req.files[0]);
 
     console.log(file.buffer instanceof Buffer);
-    /* let base64String = file.buffer.toString('base64');
+   /* let base64String = file.buffer.toString('base64');
 
-     let buf = new Buffer(base64String, "base64");
+    let buf = new Buffer(base64String, "base64");
 
-     /*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
-         if (err){
-             res.send(err);
-         }else{
-             console.log('The file has been saved!');
-             res.send("done");
-         }
-     });*/
-    //Todo set access here
+	/*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
+		if (err){
+			res.send(err);
+		}else{
+			console.log('The file has been saved!');
+			res.send("done");
+		}
+	});*/
+	//Todo set access here
     db.setContract(file, req.params.eventId, req.params.artistId)
-        .then(() => res.send("Change made"));
+		.then(() => res.send("Change made"));
 });
 
 
@@ -712,20 +719,20 @@ app.get("/contract/:eventId/:artistId", (req, res) => {
     db.getContract(req.params.eventId, req.params.artistId)
         .then(result => {
 
-                let base64String = result.data;
-                let name = result.name;
-                let buf = new Buffer(base64String, "base64");
+            let base64String = result.data;
+            let name = result.name;
+            //let buf = new Buffer(base64String, "base64");
 
-                res.send({name: name, data: base64String});
-                /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
-                    if (err){
-                        res.send(err);
-                    }else{
-                        console.log('The file has been saved!');
-                        const file = `${__dirname}/uploads/`+name;
-                        res.download(file); // Set disposition and send it.
-                    }
-                });*/
+            res.send({name: name, data: base64String });
+            /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
+                if (err){
+                    res.send(err);
+                }else{
+                    console.log('The file has been saved!');
+                    const file = `${__dirname}/uploads/`+name;
+                    res.download(file); // Set disposition and send it.
+                }
+            });*/
             }
         );
 });
@@ -734,14 +741,14 @@ app.get("/rider/:eventId/:artistId", (req, res) => {
     console.log("downloading file");
 
     //Todo check access here
-    db.getContract(req.params.eventId, req.params.artistId)
+    db.getRider(req.params.eventId, req.params.artistId)
         .then(result => {
 
                 let base64String = result.data;
                 let name = result.name;
                 let buf = new Buffer(base64String, "base64");
 
-                res.send({name: name, data: base64String});
+                res.send({name: name, data: base64String });
                 /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
                     if (err){
                         res.send(err);

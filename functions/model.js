@@ -23,7 +23,22 @@ function init() {
     }
 }
 
+function initCloud(){
+    let pr = new properties.CloudProperties();
+    const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
+        dialect: 'mysql',
+        host: '/cloudsql/kkdatabase',
+        timestamps: false,
+        dialectOptions: {
+            socketPath: '/cloudsql/kkdatabase'
+        },
+    });
+    return sequelize;
+}
+
 let sequelize = init();
+//let sequelize = initCloud();
+
 
 sequelize.authenticate()
     .then(() => {
@@ -111,7 +126,8 @@ let FileAccessModel = sequelize.define('fileAccess', {
 let EventModel = sequelize.define('event', {
     eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     organizerId: {
-        type: Sequelize.INTEGER, references: {
+        type: Sequelize.INTEGER,
+        references: {
             model: UserModel,
             key: 'userId'
         },
