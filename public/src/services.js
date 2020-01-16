@@ -190,6 +190,7 @@ class Services {
         PERSONNEL
     */
     createPersonnel(personnel) {
+        console.log(personnel);
         return axios.post(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
     }
 

@@ -391,11 +391,12 @@ class Dao {
      * @param personnel
      * @returns {Promise<boolean>}
      */
-    addPersonnel(personnel) {
+    addPersonnel(personnel, eventId) {
         return model.PersonnelModel.create(
             {
-                personnelId: personnel.personnelId,
-                eventId: personnel.eventId,
+                personnelId: personnel.userId,
+                //eventId: personnel.eventId,
+                eventId: eventId,
                 role: personnel.role
             })
             .then(response => response.id !== null)

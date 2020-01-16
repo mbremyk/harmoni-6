@@ -489,9 +489,11 @@ app.put('/auth/events/:eventId', (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/personnel", (req, res) => {
-    console.log(Object.keys(req.body.personnel));
+    console.log(Object.keys(req.body));
+    console.log(JSON.stringify(req.body));
+    let eventId = decodeURIComponent(req.params.eventId);
     req.body.personnel.map(person => {
-        db.addPersonnel(person)
+        db.addPersonnel(person, eventId)
             .then(() => console.log(person));
     });
     res.status(201);
