@@ -168,7 +168,8 @@ export class EditEvent extends Component{
         let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
             this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl, "", this.state.cancelled);
 
-        service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
+        service.updateEvent(ev).then((response) => {this.props.history.push("/arrangement/" + this.state.eventId); console.log(response)});
+
     }
 
     render() {
