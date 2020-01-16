@@ -184,7 +184,7 @@ export class EditEvent extends Component{
                         <Form.Row>
 
                             <Form.Group as={Col} sm={"12"}>
-                                <h1 className="font-weight-bold text-center">Opprett arrangement</h1>
+                                <h1 className="font-weight-bold text-center">Endre arrangement</h1>
                             </Form.Group>
 
                             <Form.Group as={Col} sm={"12"}>
@@ -412,7 +412,7 @@ export class EditEvent extends Component{
                                 <Button variant={"danger"} type="button" onClick={this.handleEventCancel}>Avlys arrangement</Button>
                             </Form.Group>
                         <Form.Group as={Col}  md={{span: 3, offset: 5}}>
-                            <Button type="button" onClick={this.handleSubmit}>Endre arragament</Button>
+                            <Button type="button" onClick={this.handleSubmit}>Endre arrangement</Button>
                         </Form.Group>
 
                         </Form.Row>
