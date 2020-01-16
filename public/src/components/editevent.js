@@ -168,7 +168,7 @@ export class EditEvent extends Component{
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
         let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "", this.state.cancelled);
+            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl, "", this.state.cancelled);
 
         service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
     }
@@ -328,7 +328,7 @@ export class EditEvent extends Component{
                                     <React.Fragment key={personnel.userId}>
 
                                         <ListGroupItem>
-                                            {personnel.username}
+                                            {personnel.user.username}
                                             <Form.Control
                                                 placeholder="Rollen til personen"
                                                 value={personnel.role}
@@ -453,6 +453,12 @@ export class EditEvent extends Component{
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
+            service.getGigForEvent(this.props.match.params.id)
+                .then(g => {
+                    console.log(g);
+                    g.map(u => this.handleArtistsAdd(u.artistId));
+                })
+                .catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
     }
 
