@@ -166,7 +166,7 @@ export class EditEvent extends Component{
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
         let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, "", "", this.state.cancelled);
+            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl, "", this.state.cancelled);
 
         service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
     }
@@ -326,7 +326,7 @@ export class EditEvent extends Component{
                                     <React.Fragment key={personnel.userId}>
 
                                         <ListGroupItem>
-                                            {personnel.username}
+                                            {personnel.user.username}
                                             <Form.Control
                                                 placeholder="Rollen til personen"
                                                 value={personnel.role}
