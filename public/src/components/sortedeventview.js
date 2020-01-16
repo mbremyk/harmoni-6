@@ -130,6 +130,7 @@ export class SortedEventView extends Component {
 
                         {this.state.events.map(event => (
                             <EventInfo
+                                event = {event}
                                 link={event.eventId}
                                 imageUrl={event.imageUrl}
                                 title={event.eventName}
