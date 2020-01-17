@@ -168,17 +168,19 @@ export class AddEvent extends Component {
 
         service.createEvent(e).then(updated => {
 
+            console.log(this.state.artistsAdd)
+
             this.state.artistsAdd.map(artist => {
                 this.toBase64(this.state.contract).then(cData => {
                     let contract = new SimpleFile(cData, this.state.contract.name);
-                    console.log(new Gig(updated.insertId, artist, contract))
-                    service.createGig(new Gig(updated.insertId, artist, contract))
+                    console.log(new Gig(updated.insertId, artist.userId, contract))
+                    service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
                 })
             })
 
             this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-            service.createPersonnel(this.state.personnelAdd).then(() => this.props.history.push("/opprett-arrangement/" + updated.insertId))
-        }).catch(err => alert(err.message))
+            service.createPersonnel(this.state.personnelAdd).then(() => this.props.history.push("/opprett-arrangement/" + updated.insertId)).catch(error => console.log(error))
+        }).catch(err => console.log(err.message))
     }
 
 
@@ -317,14 +319,6 @@ export class AddEvent extends Component {
                                                                    onChange={this.handleContractChange}/>
                                                         </Form.Group>
 
-                                                        <Form.Group as={Col} sm={"5"}>
-                                                            <label>Last opp et annet dokument</label>
-                                                            <input type="file" className="form-control"
-                                                                   encType="multipart/form-data" name="file"
-                                                                   onChange={this.handleDocumentChange}/>
-                                                        </Form.Group>
-
-
                                                         <Col sm={"2"}>
                                                             <label>Fjern artist</label>
                                                             <Button type="button" variant={"danger"} onClick={() => {
@@ -462,7 +456,7 @@ export class AddEvent extends Component {
         let decoded = jwt.decode(token);
         let uId = decoded.userId;
         this.setState({organizerId: uId});
-        service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
+        service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
     }
 
 

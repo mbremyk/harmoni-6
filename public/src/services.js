@@ -82,7 +82,7 @@ export class Gig {
     constructor(eventId, artistId, contract) {
         this.eventId = eventId;
         this.contract = contract;
-        this.artists = artistId;
+        this.artistId = artistId;
     }
 }
 
@@ -235,7 +235,7 @@ class Services {
         GIGS
     */
     createGig(gig) {
-        return axios.post(url + '/gigs', gig).then(response => response.data);
+        return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
     }
 
     uploadContract(formData, event, artist) {
