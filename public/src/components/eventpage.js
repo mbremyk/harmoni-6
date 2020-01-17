@@ -42,18 +42,13 @@ export class EventPage extends Component {
                                 <h6>Fra {this.currentEvent.startTime} Til {this.currentEvent.endTime}</h6>
                             </Col>
 
-                            <Col>
-                                <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
-                            </Col>
+                            {this.RenderAgeLimit()}
                             <Col>
                                 <h6>Adresse: {this.currentEvent.address}</h6>
                             </Col>
+                            {this.RenderArtist()}
                             <Col>
-                                <h6>Artister: {this.artists.map(artist => (
-
-                                    <h5>{artist.user.username}</h5>
-
-                                ))}</h6>
+                                <h6>Arrangert av: {this.user.username}</h6>
                             </Col>
                         </Row>
                         {this.DownloadContract()}
@@ -61,6 +56,12 @@ export class EventPage extends Component {
                             <Col>
                                 <p>{this.currentEvent.description}</p>
                             </Col>
+                        </Row>
+                        <Row>
+                            <Col><h5>Kontakt Arrangør</h5></Col>
+                        </Row>
+                        <Row>
+                            <Col><h6>Email: {this.user.email}</h6></Col>
                         </Row>
                         <Row>
                             <Col>
@@ -89,15 +90,15 @@ export class EventPage extends Component {
             .then(e => {
                 this.currentEvent = e;
                 let token = jwt.decode(authService.getToken());
-                if (this.currentEvent.organizerId == token.userId) {
+                this.getInfoAboutOrganizer(this.CurrentEvent.organizerId);
+                if (this.CurrentEvent.organizerId == token.userId) {
                     this.isOrganizer = true;
                 }
-                console.log('isOrganizer: ' + this.isOrganizer);
+
+
             })
             .catch((error) => console.log(error));
-        console.log('getting personnel');
         this.getPersonnelForEvent();
-        console.log('getting artists');
         this.getArtistsForEvent();
 
 
@@ -136,6 +137,13 @@ export class EventPage extends Component {
                 console.log("Er jeg artist? " + this.isArtist);
 
             })
+            .catch((error) => console.log(error));
+    }
+
+    getInfoAboutOrganizer(id) {
+        service
+            .getUser(id)
+            .then(user => this.user = user)
             .catch((error) => console.log(error));
     }
 
@@ -237,6 +245,34 @@ export class EventPage extends Component {
         if (authService.loggedIn()) {
             return <HarmoniNavbar/>
         }
+    }
+
+    RenderArtist() {
+        if (this.artists.length !== 0) {
+            return <Col>
+                <h6>Artister: {this.artists.map(artist => (
+
+                    <h5>{artist.user.username}</h5>
+
+                ))}</h6>
+            </Col>
+        }
+
+    }
+
+    RenderAgeLimit() {
+        if (this.CurrentEvent.ageLimit !== 0) {
+            return <Col>
+                <h6>Aldersgrense {this.CurrentEvent.ageLimit}</h6>
+            </Col>
+
+        } else {
+            return <Col>
+                <h6>Tillat for alle</h6>
+            </Col>
+        }
+
+
     }
 
     handleDelete = () => {

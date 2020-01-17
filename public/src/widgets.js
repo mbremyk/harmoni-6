@@ -29,6 +29,19 @@ export class EventInfo extends Component {
      </div>
      {this.props.price}*/
 
+    getAgeLimitInfo(age_limit){
+        if(age_limit !== 0)
+        {
+            return <div>
+                <b>Aldersgrense:</b> {age_limit}
+            </div>
+        }else{
+            return <div className="font-weight-bold">
+                Tillat For Alle
+            </div>
+        }
+    }
+
     getCardFooter(myEvent) {
         if (myEvent) {
             return <Row>
@@ -72,12 +85,7 @@ export class EventInfo extends Component {
                                     Adresse
                                 </div>
                                 {this.props.address}
-                                <div className="font-weight-bold">
-                                    Aldersgrense
-                                </div>
-                                <div className="font-italic">
-                                    {this.props.age_limit}
-                                </div>
+                                {this.getAgeLimitInfo(this.props.age_limit)}
                                 <div className="font-weight-bold">
                                     Fra
                                 </div>
