@@ -6,13 +6,16 @@ import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {authService} from "../AuthService";
 import {Card} from "react-bootstrap";
+import Alert from "react-bootstrap/Alert";
 
 export class LoginForm extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			email: '',
-			password: ''
+			password: '',
+            error: '',
+            errorType: 'success',
 		};
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -26,13 +29,19 @@ export class LoginForm extends Component {
 		this.setState({password: event.target.value});
 	}
 
+    setError(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout( () => this.setState({error: '', errorType: 'primary'}), 5000);
+    }
+
 	handleLogin() {
 		if (!this.state.email || !this.state.password) {
+		    this.setError('Alle felter må fylles.', 'danger');
 			return;
 		}
 		authService.login(this.state.email, this.state.password).then(res => {
 			window.location = '/hjem'
-		})
+		}).catch( () => this.setError('Innlogging feilet', 'danger'));
 	}
 
 	render() {
@@ -41,6 +50,11 @@ export class LoginForm extends Component {
 				<Card style={{padding: '10px', 'margin-top': '20%'}}>
                     <div style={{padding: '5%'}}>
                         <label className='h1'>Logg inn</label>
+
+                        {(this.state.error)?
+                            <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                            <div style={{height: '3em'}}/>}
+
                         <Form>
                             <Form.Group controlId="formBasicEmail">
                                 <Form.Label>Email</Form.Label>

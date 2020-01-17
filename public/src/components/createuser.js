@@ -105,7 +105,11 @@ export class CreateUserForm extends Component {
 				<Card style={{padding: '10px', marginTop: '20%'}}>
 					<div style={{padding: '5%'}}>
 						<label className='h1'>Lag ny bruker</label>
-						{(this.state.error)? <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> : <div style={{height: '3em'}}/>}
+
+						{(this.state.error)?
+							<Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+							<div style={{height: '3em'}}/>}
+
 						<Form>
 							<Form.Group controlId="formBasicUsername">
 								<Form.Label>Brukernavn</Form.Label>

@@ -135,7 +135,6 @@ class Services {
         return axios.get(url + '/users/' + userId).then(response => response.data);
     }
 
-
     /*
         EVENTS
     */

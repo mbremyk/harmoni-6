@@ -308,29 +308,18 @@ app.post("/users", (req, res) => {
  */
 app.put("/auth/users/:userId", (req, res) => {
     console.log("PUT-request - auth/user/:userId");
-    if (req.body.password != null) {
-        hashPassword.hashPassword(req.body.password).then(credentials => {
-            return db.updatePassword({
-                userId: req.body.userId,
-                password: credentials[0],
-                salt: credentials[1]
-            })
-                .then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
-        })
-    } else {
-        return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
-    }
-});
+    return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
 
+});
 
 /**
  *
  *
  */
 app.delete("/auth/users/:userId", (req, res) => {
+    console.log("GET-request - /auth/users/:userId");
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
-
 
 /**
  *
