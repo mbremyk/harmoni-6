@@ -445,7 +445,7 @@ export class EventPage extends Component {
             .catch((error) => console.log(error));
     }
 
-}
+
     getInfoAboutOrganizer(id) {
         service
             .getUser(id)
@@ -533,29 +533,6 @@ export class EventPage extends Component {
         }
     }
 
-
-
-            return <div>
-                <Row className="tableheader">
-                    <Col className="border-bottom border-top"><b>Personnel</b></Col>
-                    <Col className="border-bottom border-top"><b>Epost</b></Col>
-                </Row>
-
-                {this.personnel.map(person => (
-
-                    <Row>
-
-                        <Col className>{person.role}</Col>
-                        <Col className>{person.user.email}</Col>
-                    </Row>
-
-                ))}
-            </div>
-
-
-        }
-
-    }
 
     //the button will render if the user is an artist or an organizer
     DownloadContract() {

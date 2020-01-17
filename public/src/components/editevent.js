@@ -173,7 +173,7 @@ export class EditEvent extends Component{
         let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
-        if(this.state.image.type.includes("image")) {
+        if (this.state.image !== "") {
             this.toBase64(this.state.image)
                 .then(res => {
                     let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
