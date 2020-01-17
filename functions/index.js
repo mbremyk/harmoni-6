@@ -145,8 +145,9 @@ function getToken(user) {
  *                      GIGS
  * post     /events/:eventId/gigs           ?auth?
  * get      /events/:eventId/gigs           ?auth?
- * post     /events/:eventId/gigs/:artistId ?auth?  //rider
- * get      /events/:eventId/gigs/:artistId ?auth?  //rider
+ * get      /events/:eventId/gigs/:artistId     //contract
+ * post     /events/:eventId/gigs/:artistId/rider
+ * get      /events/:eventId/gigs/:artistId/rider
  *
  */
 
@@ -682,7 +683,7 @@ app.get("/events/:eventId/gigs", (req, res) => {
  *
  * @return {json} {jwt: token}
  */
-app.post("/events/:eventId/gigs/:artistId", (req, res) => {
+app.post("/events/:eventId/gigs/:artistId/rider", (req, res) => {
     db.addRiderItems(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
@@ -691,7 +692,7 @@ app.post("/events/:eventId/gigs/:artistId", (req, res) => {
  *
  *  @return {json} {jwt: token, RiderItem[]}
  */
-app.get("/events/:eventId/gigs/:artistId", (req, res) => {
+app.get("/events/:eventId/gigs/:artistId/rider", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
     return db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));

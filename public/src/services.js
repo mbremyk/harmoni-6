@@ -3,7 +3,7 @@ import axios from 'axios'
 var url = '';
 if (window.location.href.includes('localhost:5000')) {
     url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
-}else if (window.location.href.includes('localhost:3000')) {
+} else if (window.location.href.includes('localhost:3000')) {
     url = 'http://localhost:8080';
 } else {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
@@ -247,11 +247,11 @@ class Services {
     }
 
     addRiderItems(riderItems) {
-        return axios.get(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId).then(response => response.data)
+        return axios.get(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider').then(response => response.data)
     }
 
     getRiderItems(eventId, artistId) {
-        return axios.get(url + '/events/' + eventId + '/gigs/' + artistId).then(response => response.data)
+        return axios.get(url + '/events/' + eventId + '/gigs/' + artistId + '/rider').then(response => response.data)
     }
 }
 
