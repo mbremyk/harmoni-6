@@ -23,7 +23,7 @@ function init() {
     }
 }
 
-function initCloud(){
+function initCloud() {
     let pr = new properties.CloudProperties();
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
         dialect: 'mysql',
@@ -68,9 +68,61 @@ let UserModel = sequelize.define('user', {
 });
 
 
+/*class Event {
+    eventId;
+    organizerId;    //userId
+    eventName;
+    city;
+    address;
+    placeDescription;
+    ageLimit;
+    startTime;
+    endTime;
+    imageUrl;
+    image;
+    description;
+    cancelled;
+}*/
+
+let EventModel = sequelize.define('event', {
+    eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+    organizerId: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        },
+        allowNull: false
+    },
+    eventName: {type: Sequelize.STRING, allowNull: false},
+    city: Sequelize.STRING,
+    address: Sequelize.STRING,
+    placeDescription: Sequelize.STRING,
+    ageLimit: Sequelize.INTEGER,
+    startTime: {
+        type: Sequelize.DATE,
+        get() {
+            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
+        }
+    },
+    endTime: {
+        type: Sequelize.DATE,
+        get() {
+            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
+        }
+    },
+    imageUrl: Sequelize.TEXT,
+    image: Sequelize.TEXT,
+    description: Sequelize.TEXT,
+    cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
+}, {paranoid: true});
+
+
 /*class File {
     fileId;
-    path;
+    name;
+    contentType;
+    data;
 }
  */
 
@@ -92,67 +144,6 @@ let FileModel = sequelize.define('file', {
 
 }, {paranoid: true});
 
-/*
-let FileAccessModel = sequelize.define('fileAccess', {
-    fileId: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        references: {
-            model: FileModel,
-            key: 'fileId'
-        }
-    },
-    userId: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        references: {
-            model: UserModel,
-            key: 'userId'
-        }
-    }
-});
-*/
-
-/*class Event {
-    eventId;
-    organizerId;    //userId
-    eventName;
-    address;
-    ageLimit;
-    dateTime;
-    description;
-}*/
-
-let EventModel = sequelize.define('event', {
-    eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-    organizerId: {
-        type: Sequelize.INTEGER,
-        references: {
-            model: UserModel,
-            key: 'userId'
-        },
-        allowNull: false
-    },
-    eventName: {type: Sequelize.STRING, allowNull: false},
-    address: Sequelize.STRING,
-    ageLimit: Sequelize.INTEGER,
-    startTime: {
-        type: Sequelize.DATE,
-        get() {
-            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
-        }
-    },
-    endTime: {
-        type: Sequelize.DATE,
-        get() {
-            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
-        }
-    },
-    imageUrl: Sequelize.TEXT,
-    image: Sequelize.TEXT,
-    description: Sequelize.TEXT,
-    cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
-}, {paranoid: true});
 
 /*class Gig {
     artistId;
@@ -183,24 +174,42 @@ let GigModel = sequelize.define('gig', {
     }
 }, {paranoid: true});
 
-/*class Ticket {
-    eventId;
-    type;
-    price;
-    amount;
-}*/
 
-let TicketModel = sequelize.define('ticket', {
+/*
+class Rider{
+    artistId;
+    eventId;
+    riderItem;
+    confirmed: boolean
+}
+ */
+let RiderModel = sequelize.define('riderItem', {
+    artistId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        },
+    },
     eventId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
             model: EventModel,
             key: 'eventId'
-        }
+        },
     },
-    type: {type: Sequelize.STRING, primaryKey: true},
-    price: Sequelize.INTEGER,
-    amount: Sequelize.INTEGER
+    item: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    },
+    confirmed: {
+        type: Sequelize.BOOLEAN,
+        default: null
+    }
 }, {paranoid: true});
+
 
 /*class Personnel {
     personnelId;
@@ -230,6 +239,25 @@ let PersonnelModel = sequelize.define('personnel', {
     tableName: 'personnel',
     paranoid: true
 });
+
+/*class Ticket {
+    eventId;
+    type;
+    price;
+    amount;
+}*/
+
+let TicketModel = sequelize.define('ticket', {
+    eventId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: EventModel,
+            key: 'eventId'
+        }
+    },
+    type: {type: Sequelize.STRING, primaryKey: true},
+    price: Sequelize.INTEGER,
+    amount: Sequelize.INTEGER
+}, {paranoid: true});
 
 
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
@@ -269,19 +297,20 @@ const testData = require('./tests/TestData.js');
 let syncTestData = () => sequelize.sync({force: true}).then(() => {
     return UserModel.bulkCreate(testData.users).then(() => {
         return EventModel.bulkCreate(testData.events).then(() => {
-            return PersonnelModel.bulkCreate(testData.personnel).then(() => {
-                return TicketModel.bulkCreate(testData.tickets).then(() => {
-                    return FileModel.bulkCreate(testData.files).then(() => {
-                        return GigModel.bulkCreate(testData.gigs).then(() => true);
-                    })
+            return FileModel.bulkCreate(testData.files).then(() => {
+                return GigModel.bulkCreate(testData.gigs).then(() => {
+                    return RiderModel.bulkCreate(testData.riderItems).then(() => {
+                        return PersonnelModel.bulkCreate(testData.personnel).then(() => {
+                            return TicketModel.bulkCreate(testData.tickets).then(() => true)
+                        })
+                    });
                 });
             });
         });
-    })
-        .catch(error => {
-            console.error(error);
-            return false;
-        });
+    }).catch(error => {
+        console.error(error);
+        return false;
+    });
 });
 
 module.exports = {
@@ -289,6 +318,7 @@ module.exports = {
     EventModel,
     GigModel,
     PersonnelModel,
+    RiderModel,
     TicketModel,
     FileModel,
     syncModels,
