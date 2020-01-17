@@ -174,13 +174,6 @@ let GigModel = sequelize.define('gig', {
             key: 'eventId'
         }
     },
-    rider: {
-        type: Sequelize.INTEGER,
-        references: {
-            model: FileModel,
-            key: 'fileId'
-        }
-    },
     contract: {
         type: Sequelize.INTEGER,
         references: {
@@ -290,25 +283,6 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
             return false;
         });
 });
-//syncTestData();
-
-let dropTables = () => {
-    return GigModel.drop().then(() => {
-        return FileModel.drop().then(() => {
-            return TicketModel.drop().then(() => {
-                return PersonnelModel.drop().then(() => {
-                    return EventModel.drop().then(() => {
-                        return UserModel.drop().then(() => true);
-                    });
-                });
-            });
-        });
-    })
-        .catch(error => {
-            console.error(error);
-            return false;
-        });
-};
 
 module.exports = {
     UserModel,
@@ -318,6 +292,5 @@ module.exports = {
     TicketModel,
     FileModel,
     syncModels,
-    syncTestData,
-    dropTables
+    syncTestData
 };
