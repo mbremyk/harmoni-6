@@ -12,6 +12,18 @@ let fs = require("fs");
 const express = require("express");
 const app = express();
 
+if(!process.env.FIREBASE_CONFIG){
+    console.log("running local server");
+    app.listen(8080);
+}else{
+    console.log("running firebase server");
+    const main = express();
+    main.use('/api/v1', app);
+    /*main.use(bodyParser.json());
+    main.use(bodyParser.urlencoded({extended: true}));*/
+    exports.webApi = functions.https.onRequest(main);
+}
+
 const {fileParser} = require('express-multipart-file-parser');
 
 app.use(fileParser({
@@ -643,23 +655,25 @@ app.post("/gigs", (req, res) => {
     console.log(req.body.artists);
     let contractFile = req.body.contract;
     let riderFile = req.body.rider;
-    console.log(riderFile.name);
-    console.log(contractFile.name);
+    /*console.log(riderFile.name);
+    console.log(contractFile.name);*/
 
    // req.body.artists.shift();
     req.body.artists.map( artist => {
         console.log(artist.username);
         db.addGig(artist.userId, req.body.eventId).then(response => {
             console.log("Index"+response);
-            db.setContract(contractFile, response.eventId, artist.userId)
-                .then(() => {
-                    console.log("Contract set");
-                    db.setRider(riderFile, response.eventId, artist.userId)
-                        .then(() => {
-                            console.log("Rider set");
-                            res.status(201).send(response)
-                        });
-                });
+            if(contractFile == null || riderFile == null){
+                db.setContract(contractFile, response.eventId, artist.userId)
+                    .then(() => {
+                        console.log("Contract set");
+                        db.setRider(riderFile, response.eventId, artist.userId)
+                            .then(() => {
+                                console.log("Rider set");
+                                res.status(201).send(response)
+                            });
+                    });
+            }
         });
     });
 });

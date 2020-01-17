@@ -2,8 +2,10 @@ import axios from 'axios'
 import {authService} from './AuthService'
 
 var url = '';
-if (window.location.href.includes('localhost')) {
+if (window.location.href.includes('localhost:5000')) {
     url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
+}else if (window.location.href.includes('localhost:3000')) {
+    url = 'http://localhost:8080';
 } else {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
