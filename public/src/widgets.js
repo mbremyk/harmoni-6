@@ -234,15 +234,15 @@ export class UploadWidget extends Component {
     }
 
 	fileHandler = (e) => {
-		let eventId = 2;
-		let artistId = 5;
-		e.preventDefault();
-		let selectedFile =  e.target.files[0];
-		let data = new FormData();
-		data.append("file", selectedFile);
-		console.log(data);
-		service.uploadContract(data, eventId, artistId)
-			.then(res => console.log(res));
-	};
+        let eventId = 2;
+        let artistId = 5;
+        e.preventDefault();
+        let selectedFile = e.target.files[0];
+        let data = new FormData();
+        data.append("file", selectedFile);
+        console.log(data);
+        // service.uploadContract(data, eventId, artistId)
+        // 	.then(res => console.log(res));
+    };
 
 }
