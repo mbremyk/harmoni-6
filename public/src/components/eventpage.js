@@ -42,18 +42,13 @@ export class EventPage extends Component {
                                 <h6>Fra {this.currentEvent.startTime} Til {this.currentEvent.endTime}</h6>
                             </Col>
 
-                            <Col>
-                                <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
-                            </Col>
+                            {this.RenderAgeLimit()}
                             <Col>
                                 <h6>Adresse: {this.currentEvent.address}</h6>
                             </Col>
+                            {this.RenderArtist()}
                             <Col>
-                                <h6>Artister: {this.artists.map(artist => (
-
-                                    <h5>{artist.user.username}</h5>
-
-                                ))}</h6>
+                                <h6>Arrangert av: {this.user.username}</h6>
                             </Col>
                         </Row>
                         <Row>
@@ -62,12 +57,20 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         <Row>
+                            <Col><h5>Kontakt Arrangør</h5></Col>
+                        </Row>
+                        <Row>
+                            <Col><h6>Email: {this.user.email}</h6></Col>
+                        </Row>
+                        <Row>
                             <Col>
                                 {this.ShowArtist()}
                                 {this.ShowPersonnel()}
                             </Col>
                         </Row>
                         {this.EditButton()}
+
+
                     </Container>
                 </div>
 
@@ -86,15 +89,15 @@ export class EventPage extends Component {
             .then(e => {
                 this.currentEvent = e;
                 let token = jwt.decode(authService.getToken());
+                this.getInfoAboutOrganizer(this.currentEvent.organizerId);
                 if (this.currentEvent.organizerId == token.userId) {
                     this.isOrganizer = true;
                 }
-                console.log('isOrganizer: ' + this.isOrganizer);
+
+
             })
             .catch((error) => console.log(error));
-        console.log('getting personnel');
         this.getPersonnelForEvent();
-        console.log('getting artists');
         this.getArtistsForEvent();
 
 
@@ -136,6 +139,13 @@ export class EventPage extends Component {
             .catch((error) => console.log(error));
     }
 
+    getInfoAboutOrganizer(id) {
+        service
+            .getUser(id)
+            .then(user => this.user = user)
+            .catch((error) => console.log(error));
+    }
+
     //only the artist viewing the page will get this option beside their contact info
     RiderButton(id) {
         let token = jwt.decode(authService.getToken());
@@ -156,7 +166,7 @@ export class EventPage extends Component {
                         <Col className="border-bottom border-top"><b></b></Col>
                         <Col className="border-bottom border-top"><b></b></Col>
 
-                    </Row>
+                </Row>
 
 
                     {
@@ -228,7 +238,9 @@ export class EventPage extends Component {
                 </Row>
 
                 {this.personnel.map(person => (
+
                     <Row>
+
                         <Col className>{person.role}</Col>
                         <Col className>{person.user.email}</Col>
                     </Row>
@@ -240,7 +252,6 @@ export class EventPage extends Component {
         }
 
     }
-
 
     //the button will render if the user is an artist or an organizer
     DownloadContract() {
@@ -318,6 +329,33 @@ export class EventPage extends Component {
         }
     }
 
+    RenderArtist() {
+        if (this.artists.length !== 0) {
+            return <Col>
+                <h6>Artister: {this.artists.map(artist => (
+
+                    <h5>{artist.user.username}</h5>
+
+                ))}</h6>
+            </Col>
+        }
+
+    }
+
+    RenderAgeLimit() {
+        if (this.currentEvent.ageLimit !== 0) {
+            return <Col>
+                <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
+            </Col>
+
+        } else {
+            return <Col>
+                <h6>Tillat for alle</h6>
+            </Col>
+        }
+
+
+    }
 
     handleDelete = () => {
         if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
