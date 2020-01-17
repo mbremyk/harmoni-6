@@ -168,19 +168,26 @@ export class AddEvent extends Component {
 
         service.createEvent(e).then(updated => {
 
-            console.log(this.state.artistsAdd)
-
-            this.state.artistsAdd.map(artist => {
-                this.toBase64(this.state.contract).then(cData => {
-                    let contract = new SimpleFile(cData, this.state.contract.name);
-                    console.log(new Gig(updated.insertId, artist.userId, contract))
-                    service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
+            if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
+                this.state.artistsAdd.map(artist => {
+                    this.toBase64(this.state.contract).then(cData => {
+                        let contract = new SimpleFile(cData, this.state.contract.name);
+                        service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
+                    })
                 })
-            })
 
-            this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-            service.createPersonnel(this.state.personnelAdd).then(() => this.props.history.push("/opprett-arrangement/" + updated.insertId)).catch(error => console.log(error))
-        }).catch(err => console.log(err.message))
+            }
+
+            if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
+
+                this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
+                service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
+                    this.props.history.push("/arrangement/" + updated.insertId)
+                }).catch(error => console.log(error))
+            } else {
+                this.props.history.push("/arrangement/" + updated.insertId)
+            }
+        }).catch(err => console.log(err))
     }
 
 
@@ -319,6 +326,9 @@ export class AddEvent extends Component {
                                                                    onChange={this.handleContractChange}/>
                                                         </Form.Group>
 
+                                                        <Col>
+                                                        </Col>
+
                                                         <Col sm={"2"}>
                                                             <label>Fjern artist</label>
                                                             <Button type="button" variant={"danger"} onClick={() => {
@@ -365,30 +375,29 @@ export class AddEvent extends Component {
                                 <ListGroup title={"Valgt personell"}>
                                     {this.state.personnelAdd.map(personnel => (
                                         <React.Fragment key={personnel.userId}>
+                                            <ListGroupItem>
+                                                <Row>
+                                                    <Col>
+                                                        {personnel.username}
+                                                    </Col>
 
-                                        <ListGroupItem>
-                                            <Row>
-                                                <Col>
-                                                    {personnel.username}
-                                                </Col>
+                                                    <Col>
+                                                        <Form.Control
+                                                            placeholder="Rollen til personen"
+                                                            value={personnel.role}
+                                                            onChange={event => this.handlePersonnelRole(event, personnel)}
+                                                        />
+                                                    </Col>
 
-                                                <Col>
-                                                    <Form.Control
-                                                        placeholder="Rollen til personen"
-                                                        value={personnel.role}
-                                                        onChange={event => this.handlePersonnelRole(event, personnel)}
-                                                    />
-                                                </Col>
-
-                                                <Col>
-                                                    <Button type="button" variant={"danger"} onClick={() => {
-                                                        this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel),1)
-                                                        this.setState({personnelAdd: this.state.personnelAdd});
-                                                    }
-                                                    }>Fjern</Button>
-                                                </Col>
-                                            </Row>
-                                        </ListGroupItem>
+                                                    <Col>
+                                                        <Button type="button" variant={"danger"} onClick={() => {
+                                                            this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1)
+                                                            this.setState({personnelAdd: this.state.personnelAdd});
+                                                        }
+                                                        }>Fjern</Button>
+                                                    </Col>
+                                                </Row>
+                                            </ListGroupItem>
                                     </React.Fragment>
                                 ))}
                             </ListGroup>

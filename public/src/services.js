@@ -194,8 +194,8 @@ class Services {
     /*
         PERSONNEL
     */
-    createPersonnel(personnel) {
-        return axios.post(url + '/events/' + personnel[0].eventId + '/personnel', personnel).then(response => response.data);
+    createPersonnel(personnel, id) {
+        return axios.post(url + '/events/' + id + '/personnel', personnel).then(response => response.data);
     }
 
     updatePersonnel(personnel) {
@@ -246,19 +246,10 @@ class Services {
         return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
-    downloadContract(event, artist) {
+    downloadContract(eventId, artistId) {
         console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url + "/contract/" + event + "/" + artist).then(response => response.data);
+        return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
     }
-
-    downloadRider(event, artist) {
-        console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url + "/rider/" + event + "/" + artist).then(response => response.data);
-    }
-
-
 }
 
 export let service = new Services();

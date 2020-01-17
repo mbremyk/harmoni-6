@@ -487,7 +487,7 @@ app.put('/auth/events/:eventId', (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/personnel", (req, res) => {
-    db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201) : res.status(400));
+    return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.status(400));
 });
 
 
@@ -690,12 +690,15 @@ app.post("/events/:eventId/gigs/:artistId", (req, res) => {
 app.get("/events/:eventId/gigs/:artistId", (req, res) => {
     console.log("downloading file");
 
-    db.getRider(req.params.eventId, req.params.artistId)
+    db.getContract(req.params.eventId, req.params.artistId)
         .then(result => {
+
+            console.log(result)
 
             let base64String = result.data;
             let name = result.name;
-            let buf = new Buffer(base64String, "base64");
+
+            console.log(result.name)
 
             res.send({name: name, data: base64String});
                 /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {

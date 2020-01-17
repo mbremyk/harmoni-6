@@ -526,7 +526,6 @@ class Dao {
         return model.GigModel.findAll({
             include: [
                 {model: model.UserModel, attributes: ['username', 'email']},
-                {model: model.FileModel}
             ],
             where: {eventId: eventId}
         })
@@ -534,6 +533,21 @@ class Dao {
                 console.error(error);
                 return [];
             });
+    }
+
+    getContractId(eventId, artistId) {
+        return model.GigModel.findOne({
+            where: {eventId: eventId, artistId: artistId},
+            attributes: ["contract"]
+        }).catch(error => console.error(error));
+    }
+
+    getContract(eventId, artistId) {
+        return this.getContractId(eventId, artistId).then((gig) => {
+            return model.FileModel.findOne({
+                where: {fileId: gig.contract}
+            })
+        }).catch(error => console.error(error));
     }
 
 
