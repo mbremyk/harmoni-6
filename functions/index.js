@@ -663,7 +663,7 @@ app.post("/gigs", (req, res) => {
         console.log(artist.username);
         db.addGig(artist.userId, req.body.eventId).then(response => {
             console.log("Index"+response);
-            if(contractFile == null || riderFile == null){
+            if(contractFile != null || riderFile != null){
                 db.setContract(contractFile, response.eventId, artist.userId)
                     .then(() => {
                         console.log("Contract set");
