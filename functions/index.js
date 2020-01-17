@@ -36,7 +36,6 @@ app.use(fileParser({
         }
     },
 }));
-
 app.use(cors({origin: true}));
 
 app.use(bodyParser.json());
