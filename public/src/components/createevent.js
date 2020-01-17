@@ -1,7 +1,7 @@
 import {service, Event, Personnel, SimpleFile, BulkGig, BulkPersonnel} from "../services";
 import {Component} from "react-simplified";
 import {HarmoniNavbar} from "./navbar";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
@@ -15,156 +15,203 @@ import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {authService} from "../AuthService";
 import Row from "react-bootstrap/Row";
-import {useRouteMatch} from "react-router";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
 //TODO: Legge til annet personell
 //TODO: Legge til bilde
 
-export default function NewAndUpdateEvent() {
+export class AddEvent extends Component{
 
-    let match = useRouteMatch();
+    CustomMenu = React.forwardRef(
+        ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
+            const [value, setValue] = React.useState('');
 
-    const [eventId, setEventId] = useState(0);
-    const [organizerId, setOrganizerId] = useState(0);
-    const [eventName, setEventName] = useState("");
-    const [eventAddress, setEventAddress] = useState("");
-    const [eventDescription, setEventDescription] = useState("");
-    const [ageLimit, setAgeLimit] = useState(0);
-    const [fDate, setFDate] = useState(require('moment')().format('YYYY-MM-DD'));
-    const [tDate, setTDate] = useState(require('moment')().format('YYYY-MM-DD'));
-    const [fTime, setFTime] = useState(require('moment')().format('HH:mm'));
-    const [tTime, setTTime] = useState(require('moment')().format('HH:mm'));
-    const [rider, setRider] = useState("");
-    const [contract, setContract] = useState("");
-    const [image, setImage] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
-    const [artistsAdd, setArtistsAdd] = useState([]);
-    const [artists, setArtists] = useState([]);
-    const [personnelAdd, setPersonnelAdd] = useState([]);
-    const [personnelRole, setPersonnelRole] = useState("");
-    const [cancelled, setCancelled] = useState(0);
+            return (
+                <div
+                    ref={ref}
+                    style={style}
+                    className={className}
+                    aria-labelledby={labeledBy}
+                >
+                    <FormControl
+                        autoFocus
+                        className="mx-3 my-2 w-auto"
+                        placeholder="Type to filter..."
+                        onChange={e => setValue(e.target.value)}
+                        value={value}
+                    />
+                    <ul className="list-unstyled">
+                        {React.Children.toArray(children).filter(
+                            child =>
+                                !value || child.props.children.toLowerCase().startsWith(value),
+                        )}
+                    </ul>
+                </div>
+            );
+        },
+    );
 
-    useEffect(() => {
+    constructor(props) {
+        super(props);
 
-        console.log(match);
+        this.eventName = this.handleEventNameChange.bind(this);
+        this.eventAddress = this.handleEventAddressChange.bind(this);
+        this.eventDescription = this.handleEventDescriptionChange.bind(this);
+        this.ageLimit = this.handleAgeLimitChange.bind(this);
+        this.fDate = this.handleFDate.bind(this);
+        this.fTime = this.handleFTime.bind(this);
+        this.tDate = this.handleTDate.bind(this);
+        this.tTime = this.handleTTime.bind(this);
+        this.rider = this.handleRiderChange.bind(this);
+        this.contract = this.handleContractChange.bind(this);
+        this.artistsAdd = this.handleArtistsAdd.bind(this);
+        this.artists = this.handleArtists.bind(this);
+        this.imageUrl = this.handleImageUrlChange.bind(this);
+        this.image = this.handleImageUpload.bind(this);
+        this.personnelAdd = this.handlePersonnelAdd.bind(this);
+        this.personnelRole = this.handlePersonnelRole.bind(this);
 
-        if (match.path === "/opprett-arrangement") {
-            setupNew()
-        }
-
-        if (match.path === "/endre-arrangement/:id") {
-            setupUpdate()
-        }
-    }, []);
-
-    function setupUpdate() {
-        console.log("endrer arragngement")
-
-        service.getEventByEventId(match.params.id).then(event => {
-
-            let fromDateTime = event.startTime.split(" ");
-            let toDateTime = event.endTime.split(" ");
-            let fromDate = fromDateTime[0];
-            let toDate = toDateTime[0];
-            let fromTime = fromDateTime[1];
-            let toTime = toDateTime[1];
-
-            setEventId(event.eventId);
-            setOrganizerId(event.organizerId);
-            setEventName(event.eventName);
-            setEventAddress(event.address);
-            setEventDescription(event.description);
-            setAgeLimit(event.ageLimit);
-            setFDate(fromDate);
-            setFTime(fromTime);
-            setTDate(toDate);
-            setTTime(toTime);
-            setImageUrl(event.imageUrl);
-            setImage(event.image);
-            setCancelled(event.cancelled);
-
-            service.getUsers().then(users => setArtists(users)).catch((err) => console.log(err.message));
-            service.getPersonnel(match.params.id).then(personnel => setPersonnelAdd(personnel)).catch((err) => console.log(err.message));
-            service.getGigForEvent(match.params.id).then(g => {
-                g.map(u =>
-                    service.getUser(u.artistId).then((user) => setArtistsAdd(artistsAdd.concat(user)))
-                        .catch((err) => console.log(err.message)))
-            })
-        }).catch((error) => console.log(error.message));
+        this.state = {
+            organizerId: '',
+            eventName: '',
+            eventAddress: '',
+            eventDescription: '',
+            ageLimit: 0,
+            fDate: require('moment')().format('YYYY-MM-DD'),
+            tDate: require('moment')().format('YYYY-MM-DD'),
+            fTime: require('moment')().format('HH:mm'),
+            tTime: require('moment')().format('HH:mm'),
+            rider: '',
+            contract: '',
+            image: '',
+            imageUrl: '',
+            artistsAdd: [],
+            artists: [],
+            personnelAdd: [],
+            personnelRole: '',
+        };
     }
 
-    function setupNew() {
-
-        console.log("oppretter event");
-
-        let token = authService.getToken();
-        let decoded = jwt.decode(token);
-        let uId = decoded.userId;
-        setOrganizerId(uId)
-        service.getUsers().then(users => setArtists(users)).catch((err) => alert(err.message));
+    handleEventNameChange(event){
+        this.setState({eventName: event.target.value});
     }
 
-    function handleSubmit() {
-
-        if (match.path === "/endre-arrangement/:id") {
-            sumbitUpdate();
-        }
-
-        if (match.path === "/opprett-arrangement") {
-            sumbitNew();
-        }
+    handleEventAddressChange(event){
+        this.setState({eventAddress: event.target.value});
     }
 
-    function sumbitNew() {
+    handleEventDescriptionChange(event){
+        this.setState({eventDescription: event.target.value});
+    }
 
-        let fDateTime = fDate + " " + fTime + ":00";
-        let tDateTime = tDate + " " + tTime + ":00";
+    handleAgeLimitChange(event){
+        this.setState({ageLimit: event.target.value});
+    }
 
-        let e = new Event(0, organizerId, eventName, eventAddress, eventDescription, ageLimit,
-            fDateTime, tDateTime, imageUrl, image);
+    handleRiderChange(event){
+        this.setState({rider: event.target.files[0]});
+    }
 
-        toBase64(contract)
-            .then(cData => {
-                toBase64(rider)
-                    .then(rData => {
-                            let contract = new SimpleFile(cData, contract.name);
-                            let rider = new SimpleFile(rData, rider.name);
-                            console.log(contract);
+    handleContractChange(event){
+        this.setState({contract: event.target.files[0]});
+    }
 
-                            service.createEvent(e).then(updated => {
-                                    service.createGig(new BulkGig(updated.insertId, artistsAdd, contract, rider)).then(() =>
-                                        service.createPersonnel(new BulkPersonnel(personnelAdd, updated.insertId)
-                                            .then(() => window.location = "/opprett-arrangement/" + updated.insertId)));
+    handleImageUpload(event){
+        this.setState({image: event.target.value})
+    }
+
+    handleImageUrlChange(event){
+        this.setState({imageUrl: event.target.value})
+    }
+
+    handleArtistsAdd(event) {
+        service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
+    }
+
+    handleArtists(event){
+        this.setState({artists: [...this.state.artists, ...event]})
+    }
+
+    handlePersonnelAdd(event){
+        service.getUser(event).then((user) => this.setState({personnelAdd: [...this.state.personnelAdd, user]}));
+    }
+
+    handleFDate(event) {
+        this.setState({fDate: event.target.value})
+    }
+
+    handleFTime(event) {
+        this.setState({fTime: event.target.value})
+    }
+
+    handleTDate(event) {
+        this.setState({tDate: event.target.value})
+    }
+
+    handleTTime(event) {
+        this.setState({tTime: event.target.value})
+    }
+
+    handlePersonnelRole(event, personell) {
+        personell.role = event.target.value
+        this.setState({personnelRole: event.target.value})
+    }
+
+    handleSubmit() {
+
+        let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
+        let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
+
+
+        let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
+            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
+            this.state.image);
+
+                console.log(this.state.contract);
+                console.log(this.state.rider);
+                console.log("converting to buffer");
+                this.toBase64(this.state.contract)
+                    .then(cData => {
+                        this.toBase64(this.state.rider)
+                            .then(rData => {
+                                let contract = new SimpleFile(cData, this.state.contract.name);
+                                let rider = new SimpleFile(rData, this.state.rider.name);
+                                console.log(contract);
+
+                                service.createEvent(e)
+                                    .then(updated => {
+                                        //console.log(this.state.personnelAdd);
+                                            service.createGig(new BulkGig(updated.insertId, this.state.artistsAdd, contract, rider))
+                                                .then(() => service.createPersonnel(new BulkPersonnel(this.state.personnelAdd, updated.insertId )));
+                                            // service.createPersonnel(new BulkPersonel(updated.insertId, this.state.personnelAdd));
+                                            /*this.state.artistsAdd.map(a =>
+                                                (service.createGig(new Gig(a.userId, updated.insertId, contract, rider))));
+                                            this.state.personnelAdd.map( personnel =>
+                                                service.createPersonnel(new Personnel(personnel.userId, updated.insertId, personnel.role)));
+                                            console.log(updated.insertId);*/
+                                        }
+                                    ).then(() => this.props.history.push("/opprett-arrangement"))
+                                    .catch(err => alert(err.message));
                                 }
-                            ).catch(err => alert(err.message));
-                        }
-                    )
-            });
+                            )
+                    });
+
+
+
     }
 
-    function sumbitUpdate() {
+    toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 
-        let fDateTime = fDate + " " + fTime + ":00";
-        let tDateTime = tDate + " " + tTime + ":00";
 
-        let e = new Event(eventId, organizerId, eventName, eventAddress,
-            eventDescription, ageLimit, fDateTime, tDateTime, imageUrl, image, cancelled);
+    render(){
 
-        service.updateEvent(e).then(window.location = "/arrangement/" + eventId);
-    }
-
-    function toBase64(file) {
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
-
-    //if(!(Array.isArray(artists) && artists.length)) return null;
+        if(!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
 
         return(
             <div>
@@ -174,26 +221,24 @@ export default function NewAndUpdateEvent() {
                         <Form.Row>
 
                         <Form.Group as={Col} sm={"12"}>
-                            {(match.url === "/opprett-arrangement") ?
-                                <h1 className="font-weight-bold text-center">Opprett arrangement</h1> :
-                                <h1 className="font-weight-bold text-center">Endre arrangement</h1>}
+                            <h1 className="font-weight-bold text-center">Opprett arrangement</h1>
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"12"}>
                             <Form.Label>Arrangementsnavn</Form.Label>
                             <Form.Control
-                                placeholder="Navn på arrangement"
-                                value={eventName}
-                                onChange={event => setEventName(event.target.value)}
+                                placeholder="Navn på arrangement . . ."
+                                value={this.state.eventName}
+                                onChange={this.handleEventNameChange}
                             />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"12"}>
                             <Form.Label>Adresse</Form.Label>
                             <Form.Control
-                                placeholder="Adresse der arrangementet skal holdes"
-                                value={eventAddress}
-                                onChange={event => setEventAddress(event.target.value)}
+                                placeholder="Adresse der arrangementet skal holdes . . ."
+                                value={this.state.eventAddress}
+                                onChange={this.handleEventAddressChange}
 
                             />
                         </Form.Group>
@@ -201,19 +246,19 @@ export default function NewAndUpdateEvent() {
                         <Form.Group as={Col} sm={12}>
                             <Form.Label>Beskrivelse</Form.Label>
                             <Form.Control
-                                placeholder="Her kan du skrive en beskrivelse av arrangementet"
+                                placeholder="Her kan du skrive en kort beskrivelse av arrangementet (max. 500 ord) . . ."
                                 as="textarea"
                                 rows="8"
-                                value={eventDescription}
-                                onChange={event => setEventDescription(event.target.value)}
+                                value={this.state.eventDescription}
+                                onChange={this.handleEventDescriptionChange}
                             />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Fra dato</Form.Label>
                             <Form.Control
-                                value={fDate}
-                                onChange={event => setFDate(event.target.value)}
+                                value={this.state.fDate}
+                                onChange={this.handleFDate}
                                 type={"date"}
 
                             />
@@ -222,8 +267,8 @@ export default function NewAndUpdateEvent() {
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Fra klokkeslett</Form.Label>
                             <Form.Control
-                                value={fTime}
-                                onChange={event => setFTime(event.target.value)}
+                                value={this.state.fTime}
+                                onChange={this.handleFTime}
                                 type={"time"}
 
                             />
@@ -233,8 +278,8 @@ export default function NewAndUpdateEvent() {
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Til dato</Form.Label>
                             <Form.Control
-                                value={tDate}
-                                onChange={event => setTDate(event.target.value)}
+                                value={this.state.tDate}
+                                onChange={this.handleTDate}
                                 type={"date"}
 
                             />
@@ -243,8 +288,8 @@ export default function NewAndUpdateEvent() {
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Til klokkeslett</Form.Label>
                             <Form.Control
-                                value={tTime}
-                                onChange={event => setTTime(event.target.value)}
+                                value={this.state.tTime}
+                                onChange={this.handleTTime}
                                 type={"time"}
 
                             />
@@ -254,16 +299,14 @@ export default function NewAndUpdateEvent() {
 
                                 <Form.Label>Artist</Form.Label>
 
-                                <Dropdown onSelect={event => service.getUser(event).then((user) => {
-                                    setArtistsAdd(artistsAdd.concat(user))
-                                })}>
+                                <Dropdown onSelect={this.handleArtistsAdd}>
 
                                     <Dropdown.Toggle variant={"success"} id="dropdown">
                                         Velg artist
                                     </Dropdown.Toggle>
 
-                                    <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}} as={CustomMenu}>
-                                        {artists.map(artist => (
+                                    <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}}  as={this.CustomMenu}>
+                                        {this.state.artists.map(artist => (
                                             <Dropdown.Item eventKey={artist.userId}>
                                                 {artist.username}
                                             </Dropdown.Item>
@@ -277,7 +320,7 @@ export default function NewAndUpdateEvent() {
                             <Form.Group as={Col} sm={"10"}>
 
                                 <ListGroup title={"Valgte artister"}>
-                                    {artistsAdd.map(artist => (
+                                    {this.state.artistsAdd.map(artist => (
                                         <React.Fragment key={artist.userId}>
                                                 <ListGroupItem>
                                                     <Row>
@@ -287,10 +330,9 @@ export default function NewAndUpdateEvent() {
 
                                                         <Col>
                                                             <Button type="button" variant={"danger"} onClick={() => {
-                                                                let copy = [...artistsAdd];
-                                                                copy.splice(artistsAdd.indexOf(artist), 1);
-                                                                setArtistsAdd(copy);
-                                                            }
+                                                                this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist),1)
+                                                                this.setState({artistsAdd: this.state.artistsAdd});
+                                                                }
                                                             }>Fjern</Button>
                                                         </Col>
                                                     </Row>
@@ -305,15 +347,14 @@ export default function NewAndUpdateEvent() {
 
                             <Form.Label>Personell</Form.Label>
 
-                                <Dropdown onSelect={event => service.getUser(event).then((user) =>
-                                    setPersonnelAdd(personnelAdd.concat(user)))}>
+                            <Dropdown onSelect={this.handlePersonnelAdd}>
 
                                 <Dropdown.Toggle variant={"success"} id="dropdown">
                                     Velg personell
                                 </Dropdown.Toggle>
 
-                                    <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}} as={CustomMenu}>
-                                        {artists.map(artist => (
+                                <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
+                                    {this.state.artists.map(artist => (
                                         <Dropdown.Item eventKey={artist.userId}>
                                             {artist.username}
                                         </Dropdown.Item>
@@ -327,7 +368,7 @@ export default function NewAndUpdateEvent() {
                         <Form.Group as={Col} sm={"10"}>
 
                             <ListGroup title={"Valgt personell"}>
-                                {personnelAdd.map(personnel => (
+                                {this.state.personnelAdd.map(personnel => (
                                     <React.Fragment key={personnel.userId}>
 
                                         <ListGroupItem>
@@ -340,22 +381,16 @@ export default function NewAndUpdateEvent() {
                                                     <Form.Control
                                                         placeholder="Rollen til personen"
                                                         value={personnel.role}
-                                                        onChange={event => {
-                                                            setPersonnelRole(event);
-                                                            personnel.role = event.target.value
-                                                        }}
+                                                        onChange={event => this.handlePersonnelRole(event, personnel)}
                                                     />
                                                 </Col>
 
                                                 <Col>
                                                     <Button type="button" variant={"danger"} onClick={() => {
-                                                        let copy = [...personnelAdd];
-                                                        copy.splice(personnelAdd.indexOf(personnel), 1);
-                                                        setPersonnelAdd(copy)
+                                                        this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel),1)
+                                                        this.setState({personnelAdd: this.state.personnelAdd});
                                                     }
-                                                    }>
-                                                        Fjern
-                                                    </Button>
+                                                    }>Fjern</Button>
                                                 </Col>
                                             </Row>
                                         </ListGroupItem>
@@ -369,8 +404,8 @@ export default function NewAndUpdateEvent() {
                             <InputGroup className="mb-5">
                                 <FormControl
                                     type="file"
-                                    value={image}
-                                    onChange={event => setImage(event.target.value)}
+                                    value={this.state.image}
+                                    onChange={this.handleImageUpload}
                                 />
                             </InputGroup>
                         </Form.Group>
@@ -379,21 +414,21 @@ export default function NewAndUpdateEvent() {
                             <Form.Label>Eller legg inn en bilde-url</Form.Label>
                             <Form.Control
                                 placeholder="Bilde-url"
-                                value={imageUrl}
-                                onChange={event => setImageUrl(event.target.value)}
+                                value={this.state.imageUrl}
+                                onChange={this.handleImageUrlChange}
                             />
                             </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
                             <label>Last opp rider</label>
                             <input type="file" className="form-control" encType="multipart/form-data" name="file"
-                                   onChange={event => setRider(event.target.files[0])}/>
+                                   onChange={this.handleRiderChange}/>
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
                             <label>Last opp kontrakt</label>
                             <input type="file" className="form-control" encType="multipart/form-data" name="file"
-                                   onChange={event => setContract(event.target.files[0])}/>
+                                   onChange={this.handleContractChange}/>
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
@@ -401,15 +436,15 @@ export default function NewAndUpdateEvent() {
                             <Form.Label>Aldersgrense</Form.Label>
                             <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
                                 <ButtonGroup className="mr-2" aria-label="button-group">
-                                    <Button onClick={decrementAge}>-</Button>
-                                    <Button onClick={IncrementAge}>+</Button>
+                                    <Button onClick={this.decrementAge}>-</Button>
+                                    <Button onClick={this.IncrementAge}>+</Button>
                                 </ButtonGroup>
 
                                 <InputGroup>
                                     <FormControl
                                         type="input"
-                                        value={ageLimit}
-                                        onChange={event => setAgeLimit(event.target.value)}
+                                        value={this.state.ageLimit}
+                                        onChange={this.handleAgeLimitChange}
                                         aria-label="btn-age"
                                         aria-describedby="btnGroupAddon"
                                     />
@@ -421,107 +456,36 @@ export default function NewAndUpdateEvent() {
                             </ButtonToolbar>
                         </Form.Group>
 
-                            <Row>
+                            <Form.Group as={Col}  md={{span: 3, offset: 5}}>
+                                    <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                            </Form.Group>
 
-                                <Col>
-                                    <Button type="button" variant={"success"} onClick={handleSubmit}>Opprett
-                                        arrangementet</Button>
-                                </Col>
-
-                                <Col>
-                                    <Button variant={"danger"} type="button" onClick={() => {
-                                        if (window.confirm("Ønsker du å avlyse arrangementet?")) setCancelled(true)
-                                    }}>Avlys arrangement</Button>
-                                </Col>
-
-                                <Col>
-                                    <Button id={"contract"} onClick={downloadC}>Download the contract</Button>
-                                </Col>
-
-                                <Col>
-                                    <Button id={"rider"} onClick={downloadR}>Download the rider</Button>
-                                </Col>
-                            </Row>
                         </Form.Row>
                     </Form>
                 </Container>
             </div>
         );
-
-    function IncrementAge() {
-        setAgeLimit(ageLimit + 1)
     }
 
-    function decrementAge() {
-        if (ageLimit > 0) {
-            setAgeLimit(ageLimit - 1)
+
+    mounted() {
+        let token = authService.getToken();
+        let decoded = jwt.decode(token);
+        let uId = decoded.userId;
+        this.setState({organizerId: uId});
+        service.getUsers().then(this.handleArtists).catch((err) => alert(err.message));
+    }
+
+
+    IncrementAge(){
+        this.state.ageLimit++;
+        this.setState({ageLimit: this.state.ageLimit});
+    }
+
+    decrementAge(){
+        if (this.state.ageLimit > 0) {
+            this.state.ageLimit--;
+            this.setState({ageLimit: this.state.ageLimit})
         }
     }
-
-    function downloadC(e) {
-        //For the time being this only fetches the file with the 1-1 key.
-        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
-        let eventId = eventId;
-        let artistId = artists[0].userId;
-        console.log(artists[0].username);
-        if (e.target.id == "contract") {
-            service.downloadContract(eventId, artistId)
-                .then(response => {
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }
-    }
-
-    function downloadR(e) {
-        //For the time being this only fetches the file with the 1-1 key.
-        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
-        let eventId = eventId;
-        let artistId = artists[0].userId;
-        console.log(artists[0].username);
-        service.downloadRider(eventId, artistId)
-            .then(response => {
-                let fileName = response.name;
-                const link = document.createElement('a');
-                link.download = response.name;
-                //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                //console.log(ret);
-                link.href = response.data;
-                link.click();
-            })
-    }
-    }
-
-const CustomMenu = React.forwardRef(
-    ({children, style, className, 'aria-labelledby': labeledBy}, ref) => {
-        const [value, setValue] = React.useState('');
-
-        return (
-            <div
-                ref={ref}
-                style={style}
-                className={className}
-                aria-labelledby={labeledBy}
-            >
-                <FormControl
-                    autoFocus
-                    className="mx-3 my-2 w-auto"
-                    placeholder="Type to filter..."
-                    onChange={e => setValue(e.target.value)}
-                    value={value}
-                />
-                <ul className="list-unstyled">
-                    {React.Children.toArray(children).filter(
-                        child =>
-                            !value || child.props.children.toLowerCase().startsWith(value),
-                    )}
-                </ul>
-            </div>
-        );
-    },
-);
+}
