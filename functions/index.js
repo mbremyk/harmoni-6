@@ -484,8 +484,36 @@ app.put('/auth/events/:eventId', (req, res) => {
 });
 
 
-/*
-    PERSONNEL
+/**
+ * Delete an event
+ * body:
+ * {
+ *     event: Event
+ * }
+ */
+
+app.delete('/auth/events/:eventId', (req, res) => {
+    console.log("DELETE-request - /events/" + req.params.eventId);
+    return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+});
+
+/*app.delete('/jobs/:id', (req, res) => {
+    jobDao.deleteJob(req.params.id, (status, data) => {
+        res.status(status);
+        res.json(data);
+    });
+});*/
+
+
+
+/**
+ *  Get an array of personnel connected to an event
+ *
+ *  personnel:{
+ *      personnelId: number
+ *      eventId: number
+ *      role: string
+ *  }
  */
 
 
