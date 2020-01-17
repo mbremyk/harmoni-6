@@ -81,7 +81,7 @@ export class SortedEventView extends Component {
         if (this.state.events !== []) {
             return (
                 <Container>
-                    <Card>
+                    <Card bg={"light"}>
                         <Row>
                             <Col>
                                 <Dropdown>
@@ -122,7 +122,7 @@ export class SortedEventView extends Component {
                                 <Button onClick={() => this.handleOrder("desc")} variant={"light"}>Synkende ↓</Button>
                             </Col>
                             <Col>
-                                <Button variant={"danger"} onClick={this.handleReset}>Nullstill</Button>
+                                <Button variant={"light"} onClick={this.handleReset}>Nullstill</Button>
                             </Col>
                         </Row>
                     </Card>
