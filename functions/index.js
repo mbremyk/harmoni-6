@@ -133,8 +133,8 @@ function getToken(user) {
  *                      GIGS
  * post     /events/:eventId/gigs           ?auth?
  * get      /events/:eventId/gigs           ?auth?
- * post     /contracts/:eventId/:artistId   ?auth?  ?/events/:eventId/gigs/:artistId?
- * get      /contract/:eventId/:artistId    ?auth?  ?/events/:eventId/gigs/:artistId?
+ * post     /events/:eventId/gigs/:artistId ?auth?  //rider
+ * get      /events/:eventId/gigs/:artistId ?auth?  //rider
  *
  */
 
@@ -556,7 +556,7 @@ app.get("/events/:eventId/personnel", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/tickets", (req, res) => {
-    return db.addTicket(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
 });
 
 
@@ -645,70 +645,27 @@ app.get("/events/:eventId/gigs", (req, res) => {
 });
 
 /**
- * Adds a file to the database and connetcs the file to a specific Gig
+ * Adds rider items to the database
  * body:
  * {
- *    files: File[]
+ *      RiderItem[]
  * }
  *
  * @return {json} {jwt: token}
  */
-// TODO
 app.post("/events/:eventId/gigs/:artistId", (req, res) => {
-    let file = req.files[0];
-    console.log(req.files[0].originalname);
-    console.log(req.files[0]);
-
-    console.log(file.buffer instanceof Buffer);
-    /* let base64String = file.buffer.toString('base64');
-
-     let buf = new Buffer(base64String, "base64");
-
-     /*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
-         if (err){
-             res.send(err);
-         }else{
-             console.log('The file has been saved!');
-             res.send("done");
-         }
-     });*/
-    db.setContract(file, req.params.eventId, req.params.artistId)
-        .then(() => res.send("Change made"));
+    db.addRiderItems(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
-
 /**
- * Finds all files assosciated with a specific gig
- * body:
- * {
- *    files: File[]
- * }
+ *  Get an array of riderItems connected to gig with params matching the url
  *
- * @return {json} {jwt: token}
+ *  @return {json} {jwt: token, RiderItem[]}
  */
-//TODO
 app.get("/events/:eventId/gigs/:artistId", (req, res) => {
-    console.log("downloading file");
-
-    db.getRider(req.params.eventId, req.params.artistId)
-        .then(result => {
-
-            let base64String = result.data;
-            let name = result.name;
-            let buf = new Buffer(base64String, "base64");
-
-            res.send({name: name, data: base64String});
-                /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
-                    if (err){
-                        res.send(err);
-                    }else{
-                        console.log('The file has been saved!');
-                        const file = `${__dirname}/uploads/`+name;
-                        res.download(file); // Set disposition and send it.
-                    }
-                });*/
-            }
-        );
+    let eventId = decodeURIComponent(req.params.eventId);
+    let artistId = decodeURIComponent(req.params.artistId);
+    return db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
 });
 
 
