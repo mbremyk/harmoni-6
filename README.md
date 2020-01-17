@@ -23,6 +23,15 @@ cd functions
 npm install && firebase serve --only functions
 ```
 
+# run npm server alone
+From the top repository, hot reloads are built in here.
+This local server runs under the endpoint http://localhost:8080
+while the deployed endpoint runs under https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1/
+```sh
+cd functions
+npm install && npm run-script run-local
+```
+
 # run client and server
 From the top repository (npm install must have been run in both functions and public),
 here the react app has to be built first, disabling hot reloads.
