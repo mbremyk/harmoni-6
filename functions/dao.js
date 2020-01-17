@@ -542,6 +542,8 @@ class Dao {
         let base64String = buf.toString('base64');*/
         let contentType = contract.contentType;
 
+
+
         return model.FileModel.create({name: contract.name, data: contract.data, contentType: contentType })
             .then(fileInstance => {
                 console.log(fileInstance);
