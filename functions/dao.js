@@ -209,6 +209,7 @@ class Dao {
      * @returns {Promise<number>}
      */
     createEvent(event) {
+        console.log(event.imageUrl instanceof String);
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
@@ -225,6 +226,7 @@ class Dao {
                 console.error(error);
                 return null;
             });
+
     }
 
     /**
@@ -599,6 +601,7 @@ class Dao {
                     .then(gig => {
                             //console.log(contract);
                             gig.update({rider: fileInstance.fileId});
+                            return;
                         }
                     );
             });

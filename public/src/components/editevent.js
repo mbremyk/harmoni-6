@@ -123,7 +123,7 @@ export class EditEvent extends Component{
     }
 
     handleImageUpload(event){
-        this.setState({image: event.target.value})
+        this.setState({image: event.target.files[0]})
     }
 
     handleImageUrlChange(event){
@@ -167,10 +167,21 @@ export class EditEvent extends Component{
         let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
-        let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-            this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl, "", this.state.cancelled);
+        if(this.state.image.type.includes("image")) {
+            this.toBase64(this.state.image)
+                .then(res => {
+                    let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
+                        this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, res, "", this.state.cancelled);
+                        service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
+                });
+        }else{
+            let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
+                this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl, "", this.state.cancelled);
+                service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
+        }
 
-        service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
+
+        //service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
     }
 
     render() {
@@ -344,13 +355,8 @@ export class EditEvent extends Component{
 
                         <Form.Group as={Col} sm={"6"}>
                             <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
-                            <InputGroup className="mb-5">
-                                <FormControl
-                                    type="file"
-                                    value={this.state.image}
-                                    onChange={this.handleImageUpload}
-                                />
-                            </InputGroup>
+                            <input type="file" className="form-control" encType="multipart/form-data" name="file"
+                                   onChange={this.handleImageUpload}/>
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
@@ -361,9 +367,8 @@ export class EditEvent extends Component{
                                 onChange={this.handleImageUrlChange}
                             />
                         </Form.Group>
-
                             <Form.Group as={Col} sm={"6"}>
-                                <Form.Label>Last opp rider</Form.Label>
+                                <Form.Label>Last opp vedlegg</Form.Label>
                                 <InputGroup className="mb-5">
                                     <FormControl
                                         type="file"
@@ -383,7 +388,6 @@ export class EditEvent extends Component{
                                     />
                                 </InputGroup>
                             </Form.Group>
-
                         <Form.Group as={Col} sm={"6"}>
 
                             <Form.Label>Aldersgrense</Form.Label>
@@ -418,10 +422,10 @@ export class EditEvent extends Component{
 
                         </Form.Row>
                     </Form>
-                <Row>
-                    <button id={"contract"} onClick={this.downloadC}>Download the contract</button>
-                    <button id={"rider"} onClick={this.downloadR}>Download the rider</button>
-                </Row>
+                    <Row>
+                        <button id={"contract"} onClick={this.downloadC}>Download the contract</button>
+                        <button id={"rider"} onClick={this.downloadR}>Download the rider</button>
+                    </Row>
             </Container>
             </div>
         );
@@ -461,6 +465,13 @@ export class EditEvent extends Component{
                 .catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
     }
+
+    toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 
 
     downloadC = (e) => {

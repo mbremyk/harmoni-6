@@ -1,6 +1,6 @@
 import {Component} from "react-simplified";
 import {Container, Row, Col, Button, Form, Alert, Image, Table} from "react-bootstrap";
-import {EventInfo} from '../widgets.js';
+import {EventInfo, DownloadWidget} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket, User} from '../services';
@@ -51,7 +51,6 @@ export class EventPage extends Component {
                                 <h6>Arrangert av: {this.user.username}</h6>
                             </Col>
                         </Row>
-                        {this.DownloadContract()}
                         <Row>
                             <Col>
                                 <p>{this.currentEvent.description}</p>
@@ -158,28 +157,72 @@ export class EventPage extends Component {
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
         if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
-            return <div>
-                <Row>
+            if(this.isOrganizer){
+                return <div>
+                    <Row>
 
-                    <Col className="border-bottom border-top"><b>Artist</b></Col>
-                    <Col className="border-bottom border-top"><b>Epost</b></Col>
+                        <Col className="border-bottom border-top"><b>Artist</b></Col>
+                        <Col className="border-bottom border-top"><b>Epost</b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
 
                 </Row>
 
 
-                {this.artists.map(person => (
-                    <Row>
-                        <Col>{person.user.username}</Col>
-                        <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
+                    {
+                        this.artists.map(person => (
+                            <Row>
+                                <Col>{person.user.username}</Col>
+                                <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
+                                <Col><DownloadWidget type={"kontrakt"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
+                                <Col><DownloadWidget type={"rider"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
+                            </Row>
+                        ))}
 
+                </div>
+            }else{
+                return <div>
+                    <Row>
+
+                        <Col className="border-bottom border-top"><b>Artist</b></Col>
+                        <Col className="border-bottom border-top"><b>Epost</b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
 
                     </Row>
 
-                ))}
 
-            </div>
+                    {
+                        this.artists.map(person => (
+                            <Row>
+                                <Col>{person.user.username}</Col>
+                                <Col>{person.user.email}</Col>
+                                {this.validUser(person)}
+                                <Col>{this.RiderButton(person.artistId)}</Col>
+                            </Row>
+                        ))}
 
+                </div>
+            }
 
+        }
+    }
+
+    validUser(person){
+        let token = jwt.decode(authService.getToken());
+        console.log(token.userId+" vs "+person.artistId);
+        if(person.artistId == token.userId){
+            return(
+                <div>
+                    <Col>
+                        <DownloadWidget type={"kontrakt"} artist={person.artistId} event={this.currentEvent.eventId}/>
+                        <DownloadWidget type={"rider"} artist={person.artistId} event={this.currentEvent.eventId}/>
+                    </Col>
+                </div>
+            )
+        }else{
+            return <div>Not worthy</div>
         }
     }
 
@@ -224,6 +267,45 @@ export class EventPage extends Component {
             </Row>
         }
     }
+
+    /*DownloadContract() {
+        if (!this.artists) {
+            return null;
+        } else {
+            if (this.isOrganizer) {
+                return (
+                    <div>
+                        {this.artists.map(artist => (
+                            <Row>
+                                <Col>
+                                    <DownloadWidget event={this.currentEvent.eventId} type={"kontrakt"}
+                                                    artist={this.artist}/>
+                                </Col>
+                            </Row>
+                        ))};
+                        <Col>
+                            <DownloadWidget event={this.currentEvent.eventId} type={"annent"} artist={this.artist}/>
+                        </Col>
+                    </div>
+                )
+            } else if (this.isArtist) {
+                return (
+                    <div>
+                        <Row>
+                            <Col>
+                                <DownloadWidget event={this.currentEvent.eventId} type={"kontract"}
+                                                artist={this.user.userId}/>
+                            </Col>
+                            <Col>
+                                <DownloadWidget event={this.currentEvent.eventId} type={"rider"}
+                                                artist={this.user.userId}/>
+                            </Col>
+                        </Row>
+                    </div>
+                )
+            }
+        }
+    }*/
 
     //only organizers get to edit the event so this button will only render when the user is the organizer
     EditButton() {
