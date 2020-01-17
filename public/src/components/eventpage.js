@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 
 
 export class EventPage extends Component {
-    CurrentEvent = new Event();
+    currentEvent = new Event();
     personnel = [];
     artists = [];
     isPersonnel = false;
@@ -20,33 +20,33 @@ export class EventPage extends Component {
     user = new User();
 
     render() {
-        if (!this.CurrentEvent) {
+        if (!this.currentEvent) {
             return null
-        } else if (this.CurrentEvent) {
+        } else if (this.currentEvent) {
             return (
 
                 <div>
                     {this.RenderNavbar()}
                     <Container>
 
-                        <Image src={this.CurrentEvent.imageUrl} height="auto" width="100%"/>
+                        <Image src={this.currentEvent.imageUrl} height="auto" width="100%"/>
 
                         <Row>
                             <Col>
-                                <h1>{this.CurrentEvent.eventName}</h1>
+                                <h1>{this.currentEvent.eventName}</h1>
                             </Col>
                         </Row>
                         <Row>
 
                             <Col>
-                                <h6>Fra {this.CurrentEvent.startTime} Til {this.CurrentEvent.endTime}</h6>
+                                <h6>Fra {this.currentEvent.startTime} Til {this.currentEvent.endTime}</h6>
                             </Col>
 
                             <Col>
-                                <h6>Aldersgrense {this.CurrentEvent.ageLimit}</h6>
+                                <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
                             </Col>
                             <Col>
-                                <h6>Adresse: {this.CurrentEvent.address}</h6>
+                                <h6>Adresse: {this.currentEvent.address}</h6>
                             </Col>
                             <Col>
                                 <h6>Artister: {this.artists.map(artist => (
@@ -59,7 +59,7 @@ export class EventPage extends Component {
                         {this.DownloadContract()}
                         <Row>
                             <Col>
-                                <p>{this.CurrentEvent.description}</p>
+                                <p>{this.currentEvent.description}</p>
                             </Col>
                         </Row>
                         <Row>
@@ -87,9 +87,9 @@ export class EventPage extends Component {
         service
             .getEventByEventId(this.props.match.params.id)
             .then(e => {
-                this.CurrentEvent = e;
+                this.currentEvent = e;
                 let token = jwt.decode(authService.getToken());
-                if (this.CurrentEvent.organizerId == token.userId) {
+                if (this.currentEvent.organizerId == token.userId) {
                     this.isOrganizer = true;
                 }
                 console.log('isOrganizer: ' + this.isOrganizer);
@@ -225,6 +225,9 @@ export class EventPage extends Component {
                     <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
                         Arragement</Button>
                 </Col>
+                <Col>
+                    <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
+                </Col>
             </Row>
         }
     }
@@ -236,13 +239,11 @@ export class EventPage extends Component {
         }
     }
 
-
-}
     handleDelete = () => {
         if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-            service.deleteEvent(this.e).then(() => {this.props.history.push("/hjem/")});
+            service.deleteEvent(this.currentEvent).then(() => {this.props.history.push("/hjem/")});
             alert("Arrangementet er nå slettet")
         }
-    }
+    };
 
 }
