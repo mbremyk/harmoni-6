@@ -113,7 +113,7 @@ export class AddEvent extends Component {
     }
 
     handleImageUpload(event) {
-        this.setState({image: event.target.value})
+        this.setState({image: event.target.files[0]})
     }
 
     handleImageUrlChange(event) {
@@ -161,6 +161,49 @@ export class AddEvent extends Component {
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
 
+        console.log(this.state.image.type);
+        if(this.state.image.type.includes("image")){
+            this.toBase64(this.state.image)
+                .then(res =>{
+                    console.log("Image converted to base64")
+                    this.state.imageUrl = res;
+                    let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
+                        this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
+                        this.state.image);
+
+                    console.log(this.state.contract);
+                    console.log(this.state.rider);
+                    console.log("converting to buffer");
+                    this.toBase64(this.state.contract)
+                        .then(cData => {
+                            this.toBase64(this.state.rider)
+                                .then(rData => {
+                                        let contract = new SimpleFile(cData, this.state.contract.name);
+                                        let rider = new SimpleFile(rData, this.state.rider.name);
+                                        console.log(contract);
+
+                                        service.createEvent(e)
+                                            .then(updated => {
+                                                    //console.log(this.state.personnelAdd);
+                                                    service.createGig(new BulkGig(updated.insertId, this.state.artistsAdd, contract, rider))
+                                                        .then(() => service.createPersonnel(new BulkPersonnel(this.state.personnelAdd, updated.insertId )));
+                                                    // service.createPersonnel(new BulkPersonel(updated.insertId, this.state.personnelAdd));
+                                                    /*this.state.artistsAdd.map(a =>
+                                                        (service.createGig(new Gig(a.userId, updated.insertId, contract, rider))));
+                                                    this.state.personnelAdd.map( personnel =>
+                                                        service.createPersonnel(new Personnel(personnel.userId, updated.insertId, personnel.role)));
+                                                    console.log(updated.insertId);*/
+                                                }
+                                            ).then(() => this.props.history.push("/opprett-arrangement"))
+                                            .catch(err => alert(err.message));
+                                    }
+                                )
+                        });
+                });
+        }else{
+            let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
+                this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
+                this.state.image);
         let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
             this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
             this.state.image);
@@ -413,6 +456,11 @@ export class AddEvent extends Component {
                                     />
                                 </InputGroup>
                             </Form.Group>
+                        <Form.Group as={Col} sm={"6"}>
+                            <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                            <input type="file" className="form-control" encType="multipart/form-data" name="file"
+                                   onChange={this.handleImageUpload}/>
+                        </Form.Group>
 
                             <Form.Group as={Col} sm={"6"}>
                                 <Form.Label>Eller legg inn en bilde-url</Form.Label>

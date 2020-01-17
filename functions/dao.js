@@ -1,3 +1,4 @@
+const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
@@ -189,6 +190,7 @@ class Dao {
      * @returns {Promise<number>}
      */
     createEvent(event) {
+        console.log(event.imageUrl instanceof String);
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
