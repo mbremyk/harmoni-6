@@ -90,8 +90,8 @@ export class EventPage extends Component {
             .then(e => {
                 this.currentEvent = e;
                 let token = jwt.decode(authService.getToken());
-                this.getInfoAboutOrganizer(this.CurrentEvent.organizerId);
-                if (this.CurrentEvent.organizerId == token.userId) {
+                this.getInfoAboutOrganizer(this.currentEvent.organizerId);
+                if (this.currentEvent.organizerId == token.userId) {
                     this.isOrganizer = true;
                 }
 
@@ -261,9 +261,9 @@ export class EventPage extends Component {
     }
 
     RenderAgeLimit() {
-        if (this.CurrentEvent.ageLimit !== 0) {
+        if (this.currentEvent.ageLimit !== 0) {
             return <Col>
-                <h6>Aldersgrense {this.CurrentEvent.ageLimit}</h6>
+                <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
             </Col>
 
         } else {
