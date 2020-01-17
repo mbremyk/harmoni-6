@@ -1,6 +1,6 @@
 import {Component} from "react-simplified";
 import {Container, Row, Col, Button, Form, Alert, Image, Table} from "react-bootstrap";
-import {EventInfo} from '../widgets.js';
+import {EventInfo, DownloadWidget} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket, User} from '../services';
@@ -56,7 +56,6 @@ export class EventPage extends Component {
                                 ))}</h6>
                             </Col>
                         </Row>
-                        {this.DownloadContract()}
                         <Row>
                             <Col>
                                 <p>{this.currentEvent.description}</p>
@@ -69,8 +68,6 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         {this.EditButton()}
-
-
                     </Container>
                 </div>
 
@@ -155,6 +152,8 @@ export class EventPage extends Component {
 
                     <Col className="border-bottom border-top"><b>Artist</b></Col>
                     <Col className="border-bottom border-top"><b>Epost</b></Col>
+                    <Col className="border-bottom border-top"><b></b></Col>
+                    <Col className="border-bottom border-top"><b></b></Col>
 
                 </Row>
 
@@ -163,8 +162,8 @@ export class EventPage extends Component {
                     <Row>
                         <Col>{person.user.username}</Col>
                         <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
-
-
+                        <Col><DownloadWidget type={"kontrakt"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
+                        <Col><DownloadWidget type={"rider"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
                     </Row>
 
                 ))}
@@ -201,32 +200,6 @@ export class EventPage extends Component {
         }
 
     }
-    downloadC = (e) => {
-        //For the time being this only fetches the file with the 1-1 key.
-        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
-        console.log(this.e);
-        //console.log(this.artists);
-
-        let eventId = this.e.eventId;
-        let artistId = this.artists[0].userId;
-        //let artistId = 1;
-        //console.log(this.artists[0].username);
-        if(e.target.id == "contract") {
-            service.downloadContract(eventId, artistId)
-                .then(response => {
-                    console.log("INNI Promise");
-                    console.log("response: "+response);
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }
-
-    };
 
 
     //the button will render if the user is an artist or an organizer
@@ -243,6 +216,45 @@ export class EventPage extends Component {
             </Row>
         }
     }
+
+    /*DownloadContract() {
+        if (!this.artists) {
+            return null;
+        } else {
+            if (this.isOrganizer) {
+                return (
+                    <div>
+                        {this.artists.map(artist => (
+                            <Row>
+                                <Col>
+                                    <DownloadWidget event={this.currentEvent.eventId} type={"kontrakt"}
+                                                    artist={this.artist}/>
+                                </Col>
+                            </Row>
+                        ))};
+                        <Col>
+                            <DownloadWidget event={this.currentEvent.eventId} type={"annent"} artist={this.artist}/>
+                        </Col>
+                    </div>
+                )
+            } else if (this.isArtist) {
+                return (
+                    <div>
+                        <Row>
+                            <Col>
+                                <DownloadWidget event={this.currentEvent.eventId} type={"kontract"}
+                                                artist={this.user.userId}/>
+                            </Col>
+                            <Col>
+                                <DownloadWidget event={this.currentEvent.eventId} type={"rider"}
+                                                artist={this.user.userId}/>
+                            </Col>
+                        </Row>
+                    </div>
+                )
+            }
+        }
+    }*/
 
     //only organizers get to edit the event so this button will only render when the user is the organizer
     EditButton() {
