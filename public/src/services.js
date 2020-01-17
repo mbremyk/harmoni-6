@@ -171,6 +171,11 @@ class Services {
         return axios.put(url + "/auth/events/" + event.eventId, event, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
+    deleteEvent(event) {
+        //console.log(url + '/auth/events/' + event.eventId);
+        return axios.delete(url + '/auth/events/' + event.eventId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
     getEvents() {
         return axios.get(url + '/events').then(response => response.data);
     }

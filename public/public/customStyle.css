@@ -6,12 +6,10 @@
 
 }*/
 
-html{
-    min-height: 100%;
-}
 body{
     background-image: url(/pictures/geometricPattern.png);
     background-repeat: repeat;
+    min-height: 100%;
 }
 
 .landingpage {
