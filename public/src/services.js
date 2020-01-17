@@ -1,5 +1,4 @@
 import axios from 'axios'
-import {authService} from './AuthService'
 
 var url = '';
 if (window.location.href.includes('localhost')) {
@@ -20,7 +19,9 @@ export class Event {
     eventId;
     organizerId;
     eventName;
+    city;
     address;
+    placeDescription;
     ageLimit;
     startTime;
     endTime;
@@ -29,11 +30,13 @@ export class Event {
     description;
     cancelled;
 
-    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
+    constructor(eventId, organizerId, eventName, city, address, placeDescription, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.eventName = eventName;
+        this.city = city;
         this.address = address;
+        this.placeDescription = placeDescription;
         this.description = description;
         this.ageLimit = ageLimit;
         this.startTime = startTime;
@@ -65,6 +68,19 @@ export class Gig {
         this.eventId = eventId;
         this.contract = contract;
         this.artists = artistId;
+    }
+}
+
+export class RiderItem {
+    eventId;
+    artistId;
+    riderItem;
+    confirmed;
+
+    constructor(eventId, artistId, riderItem) {
+        this.eventId = eventId;
+        this.artistId = artistId;
+        this.riderItem = riderItem;
     }
 }
 
@@ -176,7 +192,7 @@ class Services {
     /*
         PERSONNEL
     */
-    createPersonnel(personnel) {
+    addPersonnel(personnel) {
         return axios.post(url + '/events/' + personnel[0].eventId + '/personnel', personnel).then(response => response.data);
     }
 
@@ -196,8 +212,8 @@ class Services {
     /*
         TICKETS
     */
-    createTicket(ticket) {
-        return axios.post(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
+    addTickets(tickets) {
+        return axios.post(url + '/events/' + tickets[0].eventId + '/ticket', tickets).then(response => response.data);
     }
 
     updateTicket(ticket) {
@@ -216,31 +232,21 @@ class Services {
     /*
         GIGS
     */
-    createGig(gig) {
+    addGig(gig) {
         return axios.post(url + '/gigs', gig).then(response => response.data);
-    }
-
-    uploadContract(formData, event, artist) {
-        return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
     }
 
     getGigForEvent(eventId) {
         return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
-    downloadContract(event, artist) {
-        console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url + "/contract/" + event + "/" + artist).then(response => response.data);
+    addRiderItems(riderItems) {
+        return axios.get(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId).then(response => response.data)
     }
 
-    downloadRider(event, artist) {
-        console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url + "/rider/" + event + "/" + artist).then(response => response.data);
+    getRiderItems(eventId, artistId) {
+        return axios.get(url + '/events/' + eventId + '/gigs/' + artistId).then(response => response.data)
     }
-
-
 }
 
 export let service = new Services();
