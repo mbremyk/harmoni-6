@@ -29,19 +29,19 @@ export class Event {
     description;
     cancelled;
 
-	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
-		this.eventId = eventId;
-		this.organizerId = organizerId;
-		this.eventName = eventName;
-		this.address = address;
-		this.description = description;
-		this.ageLimit = ageLimit;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.imageUrl = imageUrl;
-		this.image = image;
-		this.cancelled = cancelled;
-	}
+    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
+        this.eventId = eventId;
+        this.organizerId = organizerId;
+        this.eventName = eventName;
+        this.address = address;
+        this.description = description;
+        this.ageLimit = ageLimit;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.imageUrl = imageUrl;
+        this.image = image;
+        this.cancelled = cancelled;
+    }
 }
 
 export class SimpleFile {
@@ -55,18 +55,16 @@ export class SimpleFile {
 
 }
 
-export class BulkGig {
+export class Gig {
 
     eventId;
-    rider;
+    artistId;
     contract;
-    artists;
 
-    constructor( eventId, artists, rider, contract) {
+    constructor(eventId, artistId, contract) {
         this.eventId = eventId;
-        this.rider = rider;
         this.contract = contract;
-        this.artists = artists;
+        this.artists = artistId;
     }
 }
 
@@ -77,24 +75,13 @@ export class Ticket {
     amount;
 }
 
-export class BulkPersonnel {
-    personnel ;
-    eventId;
-
-    constructor(personnel, eventId) {
-        this.personnel = personnel;
-        this.eventId = eventId;
-    }
-
-}
-
 export class Personnel {
     personnelId;
     eventId;
     role;
 
-    constructor(personnel, eventId, role) {
-        this.personnelId = personnel;
+    constructor(userId, eventId, role) {
+        this.personnelId = userId;
         this.eventId = eventId;
         this.role = role;
     }
@@ -190,8 +177,7 @@ class Services {
         PERSONNEL
     */
     createPersonnel(personnel) {
-        console.log(personnel);
-        return axios.post(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
+        return axios.post(url + '/events/' + personnel[0].eventId + '/personnel', personnel).then(response => response.data);
     }
 
     updatePersonnel(personnel) {
@@ -231,7 +217,7 @@ class Services {
         GIGS
     */
     createGig(gig) {
-        return axios.post(url +'/gigs', gig).then(response => response.data);
+        return axios.post(url + '/gigs', gig).then(response => response.data);
     }
 
     uploadContract(formData, event, artist) {
@@ -239,20 +225,19 @@ class Services {
     }
 
     getGigForEvent(eventId) {
-        return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
+        return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
-    downloadContract(event, artist)
-    {
+    downloadContract(event, artist) {
         console.log("Downloading");
         //This approach to downloading the files does not work
-        return axios.get(url+"/contract/"+event+"/"+artist).then(response => response.data);
+        return axios.get(url + "/contract/" + event + "/" + artist).then(response => response.data);
     }
-    downloadRider(event, artist)
-    {
+
+    downloadRider(event, artist) {
         console.log("Downloading");
         //This approach to downloading the files does not work
-        return axios.get(url+"/rider/"+event+"/"+artist).then(response => response.data);
+        return axios.get(url + "/rider/" + event + "/" + artist).then(response => response.data);
     }
 
 
