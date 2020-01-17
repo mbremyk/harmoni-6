@@ -82,7 +82,7 @@ describe('Users', () => {
 
     it('correct data in users', done => {
         db.getAllUsers().then(users => {
-            expect(users.length).toBeGreaterThanOrEqual(9);
+            expect(users.length).toBe(9);
             done();
         });
     });
@@ -181,7 +181,7 @@ describe('Events', () => {
             description: 'if you can see this the event was created properly'
         };
         db.createEvent(event).then(response => {
-            expect(response.insertId).toEqual(6);
+            expect(response.insertId).toBe(6);
             done();
         });
     });
@@ -349,7 +349,7 @@ describe('Events', () => {
 
     it('correct data in events', done => {
         db.getAllEvents().then(events => {
-            expect(events.length).toBeGreaterThanOrEqual(5);
+            expect(events.length).toBe(5);
             done();
         });
     });
@@ -499,7 +499,7 @@ describe('Tickets', () => {
             amount: 69,
 
         };
-        db.addTicket(ticket).then(response => {
+        db.addTickets(ticket).then(response => {
             expect(response).toBeTruthy();
             done();
         });
@@ -533,7 +533,7 @@ describe('Tickets', () => {
 
     it('correct data in tickets', done => {
         db.getTickets(4).then(tickets => {
-            expect(tickets.length).toBeGreaterThanOrEqual(3);
+            expect(tickets.length).toBe(3);
             done();
         });
     });
@@ -581,12 +581,61 @@ describe('Gigs', () => {
         });
         done();
     });
+
+
+    it('add riderItem', done => {
+        let item = [{
+            eventId: 2,
+            artistId: 5,
+            item: "TEST"
+        }];
+        db.addRiderItems(item).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct riderItems', done => {
+        db.getRiderItems(2, 5).then(items => {
+            expect(items.length).toBe(4);
+            expect(items.map(item =>
+                item.toJSON()).map(item => (
+                {
+                    eventId: item.eventId,
+                    artistId: item.artistId,
+                    item: item.item
+                }
+            ))).toEqual([
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Varm Cola',
+                    confirmed: null
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Sigg',
+                    confirmed: true
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Nakkepute',
+                    confirmed: false
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Litt Sjokolade hadde vært fint',
+                    confirmed: true
+                }
+            ]);
+        });
+        done();
+    });
 });
 
-
-describe('Files', () => {
-
-});
 
 describe('Proving math', () => {
     it('1+1=2', done => {
