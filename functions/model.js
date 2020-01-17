@@ -132,7 +132,7 @@ let EventModel = sequelize.define('event', {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    imageUrl: Sequelize.TEXT,
+    imageUrl: {type : Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
     cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
