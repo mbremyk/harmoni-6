@@ -201,15 +201,12 @@ class Dao {
                 description: event.description,
                 imageUrl: event.imageUrl
             })
-            .then(created => {
-                console.log(created);
-                insertId: (created.eventId);
-                return created;
-            })
+            .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
                 console.error(error);
                 return null;
             });
+
     }
 
     /**
@@ -584,6 +581,7 @@ class Dao {
                     .then(gig => {
                             //console.log(contract);
                             gig.update({rider: fileInstance.fileId});
+                            return;
                         }
                     );
             });

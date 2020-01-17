@@ -418,7 +418,7 @@ export class AddEvent extends Component{
                             </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
-                            <label>Last opp rider</label>
+                            <label>Last opp vedlegg</label>
                             <input type="file" className="form-control" encType="multipart/form-data" name="file"
                                    onChange={this.handleRiderChange}/>
                         </Form.Group>

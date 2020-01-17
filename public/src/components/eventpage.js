@@ -41,7 +41,7 @@ export class EventPage extends Component {
                         <Row>
                             <Col>
                                 <a href="" download>
-                                    <Button variant="primary" aria-label="Left Align" title="Last Ned">
+                                    <Button variant="primary" onClick={this.downloadC} aria-label="Left Align" title="Last Ned">
                                         Last Ned Kontrakt
                                     </Button>
                                 </a>
@@ -178,8 +178,8 @@ export class EventPage extends Component {
                         <Row>
                             <Col>
                                 <a href="" download>
-                                    <Button variant="primary" aria-label="Left Align" title="Last Ned">
-                                        Last Ned Kontrakt
+                                    <Button id={"contract"} variant="primary" aria-label="Left Align" title="Last Ned">
+                                        Last Ned
                                     </Button>
                                 </a>
                             </Col>
@@ -444,6 +444,33 @@ export class EventPage extends Component {
             })
             .catch((error) => console.log(error));
     }
+
+    downloadC = (e) => {
+        //For the time being this only fetches the file with the 1-1 key.
+        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
+        console.log(this.e);
+        //console.log(this.artists);
+
+        let eventId = this.e.eventId;
+        let artistId = this.artists[0].userId;
+        //let artistId = 1;
+        //console.log(this.artists[0].username);
+        if(e.target.id == "contract") {
+            service.downloadContract(eventId, artistId)
+                .then(response => {
+                    console.log("INNI Promise");
+                    console.log("response: "+response);
+                    let fileName = response.name;
+                    const link = document.createElement('a');
+                    link.download = response.name;
+                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
+                    //console.log(ret);
+                    link.href = response.data;
+                    link.click();
+                })
+        }
+
+    };
 
 }
 
