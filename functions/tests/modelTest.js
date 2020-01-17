@@ -8,9 +8,9 @@ beforeEach(done => Models.syncTestData().then(res => {
     done();
 }));
 
-afterEach(done => Models.dropTables().then(res => {
-    done();
-}));
+// afterEach(done => Models.dropTables().then(res => {
+//     done();
+// }));
 
 
 /*

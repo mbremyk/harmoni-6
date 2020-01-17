@@ -23,7 +23,7 @@ function init() {
     }
 }
 
-function initCloud(){
+function initCloud() {
     let pr = new properties.CloudProperties();
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
         dialect: 'mysql',
@@ -54,7 +54,7 @@ sequelize.authenticate()
     password;
     salt;
     email;
-};*/
+}; */
 
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
@@ -238,6 +238,32 @@ let PersonnelModel = sequelize.define('personnel', {
     paranoid: true
 });
 
+let BugModel = sequelize.define('bug', {
+    bugId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+    email: Sequelize.STRING,
+    username: Sequelize.STRING,
+    subject: Sequelize.STRING,
+    bugText: {type: Sequelize.TEXT, allowNull: false}
+});
+
+let RiderModel = sequelize.define('rider', {
+    eventId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: EventModel,
+            key: 'eventId'
+        }
+    },
+    artistId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        }
+    }
+});
 
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
 EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
@@ -319,5 +345,6 @@ module.exports = {
     FileModel,
     syncModels,
     syncTestData,
-    dropTables
+    dropTables,
+    BugModel
 };
