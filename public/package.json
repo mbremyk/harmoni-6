@@ -34,8 +34,7 @@
     "history": "^4.10.1",
     "jwt-decode": "^2.2.0",
     "react-router-dom": "^5.1.2",
-    "react-router-guards": "^1.0.1",
-    "zxcvbn": "^4.4.2"
+    "react-router-guards": "^1.0.1"
   },
   "browserslist": {
     "production": [

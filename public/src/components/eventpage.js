@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 
 
 export class EventPage extends Component {
-    currentEvent = new Event();
+    e = new Event();
     personnel = [];
     artists = [];
     isPersonnel = false;
@@ -20,91 +20,396 @@ export class EventPage extends Component {
     user = new User();
 
     render() {
-        if (!this.currentEvent) {
+        if (!this.e) {
             return null
-        } else if (this.currentEvent) {
-            return (
+        } else if (this.e) {
 
-                <div>
-                    {this.RenderNavbar()}
+            if (this.isOrganizer) {
+                return (
+                    <div>
+                    <HarmoniNavbar/>
+
                     <Container>
 
-                        <Image src={this.currentEvent.imageUrl} height="auto" width="100%"/>
+                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
 
                         <Row>
                             <Col>
-                                <h1>{this.currentEvent.eventName}</h1>
+                                <h1>{this.e.eventName}</h1>
                             </Col>
                         </Row>
+                        <Row>
+                            <Col>
+                                <a href="" download>
+                                    <Button variant="primary" aria-label="Left Align" title="Last Ned">
+                                        Last Ned Kontrakt
+                                    </Button>
+                                </a>
+                            </Col>
+                        </Row>
+
                         <Row>
 
                             <Col>
-                                <h6>Fra {this.currentEvent.startTime} Til {this.currentEvent.endTime}</h6>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
                             </Col>
 
-                            {this.RenderAgeLimit()}
                             <Col>
-                                <h6>Adresse: {this.currentEvent.address}</h6>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
                             </Col>
-                            {this.RenderArtist()}
                             <Col>
-                                <h6>Arrangert av: {this.user.username}</h6>
+                                <h6>Adresse: {this.e.address}</h6>
                             </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
+                            </Col>
+
+
                         </Row>
-                        {this.DownloadContract()}
+
+
                         <Row>
                             <Col>
-                                <p>{this.currentEvent.description}</p>
+                                <p>{this.e.description}</p>
                             </Col>
-                        </Row>
-                        <Row>
-                            <Col><h5>Kontakt Arrangør</h5></Col>
-                        </Row>
-                        <Row>
-                            <Col><h6>Email: {this.user.email}</h6></Col>
                         </Row>
                         <Row>
                             <Col>
-                                {this.ShowArtist()}
-                                {this.ShowPersonnel()}
+                                <h2>Personnel</h2>
                             </Col>
                         </Row>
-                        {this.EditButton()}
+                        <Row>
+                            <Col>
+                                <Table responsive>
+                                    <thead>
+                                    <tr>
+
+                                        <th>Ansvarsområdet</th>
+                                        <th>Epost</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {this.personnel.map(person => (
+                                        <tr>
+                                            <td>{person.role}</td>
+                                            <td>{person.user.email}</td>
+
+
+                                        </tr>
+
+                                    ))}
+
+                                    </tbody>
+
+
+                                </Table>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <h2>Artister</h2>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Table responsive>
+                                    <thead>
+                                    <tr>
+
+                                        <th>Navn</th>
+                                        <th>Epost</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {this.artists.map(person => (
+                                        <tr>
+                                            <td>{person.user.username}</td>
+                                            <td>{person.user.email}</td>
+
+
+                                        </tr>
+
+                                    ))}
+
+                                    </tbody>
+
+
+                                </Table>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
+                                    Arragement</Button>
+                            </Col>
+                            <Col>
+                                <Button variant="danger">Avlys Arrangement</Button>
+                            </Col>
+                        </Row>
 
 
                     </Container>
-                </div>
+                    </div>
 
 
-            );
+                );
+            } else if ((this.isArtist && this.isPersonnel || this.isArtist)) {
+                return (
+                    <div>
+                        <HarmoniNavbar/>
+
+                    <Container>
+
+                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
+
+                        <Row>
+                            <Col>
+                                <h1>{this.e.eventName}</h1>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <a href="" download>
+                                    <Button variant="primary" aria-label="Left Align" title="Last Ned">
+                                        Last Ned Kontrakt
+                                    </Button>
+                                </a>
+                            </Col>
+                        </Row>
+                        <Row>
+
+                            <Col>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
+                            </Col>
+
+                            <Col>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Adresse: {this.e.address}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
+                            </Col>
+
+
+                        </Row>
+
+
+                        <Row>
+                            <Col>
+                                <h4>{this.e.address}</h4>
+                            </Col>
+                        </Row>
+                        <Row>
+
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <p>{this.e.description}</p>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Table responsive>
+                                <thead>
+                                <tr>
+
+                                    <th>Ansvarsområdet</th>
+                                    <th>Epost</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {this.personnel.map(person => (
+                                    <tr>
+                                        <td>{person.role}</td>
+                                        <td>{person.user.email}</td>
+
+
+                                    </tr>
+
+                                ))}
+
+                                </tbody>
+
+
+                            </Table>
+                        </Row>
+
+                    </Container>
+                    </div>
+
+
+                );
+            } else if (this.isPersonnel) {
+                return (
+                    <div>
+                    <HarmoniNavbar/>
+
+                    <Container>
+
+                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
+
+                        <Row>
+                            <Col>
+                                <h1>{this.e.eventName}</h1>
+                            </Col>
+                        </Row>
+                        <Row>
+
+                            <Col>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
+                            </Col>
+
+                            <Col>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Adresse: {this.e.address}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
+                            </Col>
+
+
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <p>{this.e.description}</p>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Table responsive>
+                                <thead>
+                                <tr>
+
+                                    <th>Ansvarsområdet</th>
+                                    <th>Epost</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {this.personnel.map(person => (
+                                    <tr>
+                                        <td>{person.role}</td>
+                                        <td>{person.user.email}</td>
+
+
+                                    </tr>
+
+                                ))}
+
+                                </tbody>
+
+
+                            </Table>
+                        </Row>
+
+
+                    </Container>
+                    </div>
+
+
+                );
+
+
+            } else if (!this.isPersonnel && !this.isOrganizer) {
+                return (
+
+                    <Container>
+
+                        <Image src={this.e.imageUrl} height="auto" width="100%"/>
+
+                        <Row>
+                            <Col>
+                                <h1>{this.e.eventName}</h1>
+                            </Col>
+                        </Row>
+                        <Row>
+
+                            <Col>
+                                <h6>Fra {this.e.startTime} Til {this.e.endTime}</h6>
+                            </Col>
+
+                            <Col>
+                                <h6>Aldersgrense {this.e.ageLimit}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Adresse: {this.e.address}</h6>
+                            </Col>
+                            <Col>
+                                <h6>Artister: {this.artists.map(artist => (
+
+                                    <h5>{artist.user.username}</h5>
+
+                                ))}</h6>
+                            </Col>
+
+
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <p>{this.e.description}</p>
+                            </Col>
+                        </Row>
+
+
+                    </Container>
+
+
+                );
+
+
+            }
 
 
         }
     }
 
-//checks if the person viewing the event is the organizer
+    //checks if the person viewing the event is the organizer
     mounted() {
 
         service
             .getEventByEventId(this.props.match.params.id)
             .then(e => {
-                this.currentEvent = e;
+                this.e = e;
                 let token = jwt.decode(authService.getToken());
-                this.getInfoAboutOrganizer(this.currentEvent.organizerId);
-                if (this.currentEvent.organizerId == token.userId) {
+                if (this.e.organizerId == token.userId) {
                     this.isOrganizer = true;
                 }
-
-
+                console.log('isOrganizer: ' + this.isOrganizer);
             })
             .catch((error) => console.log(error));
+        console.log('getting personnel');
         this.getPersonnelForEvent();
+        console.log('getting artists');
         this.getArtistsForEvent();
 
 
     }
 
-//gets all the people working on that event and checks if the person viewing it is a part of the personnel
+    //gets all the people working on that event and checks if the person viewing it is a part of the personnel
     getPersonnelForEvent() {
         service
             .getPersonnel(this.props.match.params.id)
@@ -122,7 +427,7 @@ export class EventPage extends Component {
 
     }
 
-//gets all the artist working on that event and checks if the person viewing it is a an artist
+    //gets all the artist working on that event and checks if the person viewing it is a an artist
     getArtistsForEvent() {
         service
             .getGigForEvent(this.props.match.params.id)
@@ -140,146 +445,5 @@ export class EventPage extends Component {
             .catch((error) => console.log(error));
     }
 
-    getInfoAboutOrganizer(id) {
-        service
-            .getUser(id)
-            .then(user => this.user = user)
-            .catch((error) => console.log(error));
-    }
-
-    //only the artist viewing the page will get this option beside their contact info
-    RiderButton(id) {
-        let token = jwt.decode(authService.getToken());
-        if (id == token.userId) {
-            return <Button variant="primary" size="sm" className="float-right">Legg til Rider</Button>;
-        }
-    }
-
-//returns a list over artist and their contact info if there is any artist on the event
-    ShowArtist() {
-        if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
-            return <div>
-                <Row>
-
-                    <Col className="border-bottom border-top"><b>Artist</b></Col>
-                    <Col className="border-bottom border-top"><b>Epost</b></Col>
-
-                </Row>
-
-
-                {this.artists.map(person => (
-                    <Row>
-                        <Col>{person.user.username}</Col>
-                        <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
-
-
-                    </Row>
-
-                ))}
-
-            </div>
-
-
-        }
-    }
-
-//returns a list over personnel and their contact info if there is any personnel on the event
-    ShowPersonnel() {
-        if ((this.personnel.length !== 0 && (this.isArtist || this.isPersonnel || this.isOrganizer))) {
-
-
-            return <div>
-                <Row className="tableheader">
-                    <Col className="border-bottom border-top"><b>Personnel</b></Col>
-                    <Col className="border-bottom border-top"><b>Epost</b></Col>
-                </Row>
-
-                {this.personnel.map(person => (
-
-                    <Row>
-
-                        <Col className>{person.role}</Col>
-                        <Col className>{person.user.email}</Col>
-                    </Row>
-
-                ))}
-            </div>
-
-
-        }
-
-    }
-
-    //the button will render if the user is an artist or an organizer
-    DownloadContract() {
-        if (this.isOrganizer || this.isArtist) {
-            return <Row>
-                <Col>
-                    <a href="" download>
-                        <Button variant="primary" aria-label="Left Align" title="Last Ned">
-                            Last Ned Kontrakt
-                        </Button>
-                    </a>
-                </Col>
-            </Row>
-        }
-    }
-
-    //only organizers get to edit the event so this button will only render when the user is the organizer
-    EditButton() {
-        if (this.isOrganizer) {
-            return <Row>
-                <Col>
-                    <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
-                        Arragement</Button>
-                </Col>
-                <Col>
-                    <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
-                </Col>
-            </Row>
-        }
-    }
-
-    //renders navbar if a user is logged in
-    RenderNavbar() {
-        if (authService.loggedIn()) {
-            return <HarmoniNavbar/>
-        }
-    }
-
-    RenderArtist() {
-        if (this.artists.length !== 0) {
-            return <Col>
-                <h6>Artister: {this.artists.map(artist => (
-
-                    <h5>{artist.user.username}</h5>
-
-                ))}</h6>
-            </Col>
-        }
-
-    }
-
-    RenderAgeLimit() {
-        if (this.currentEvent.ageLimit !== 0) {
-            return <Col>
-                <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
-            </Col>
-
-        } else {
-            return <Col>
-                <h6>Tillat for alle</h6>
-            </Col>
-        }
-
-
-    }
-
-    handleDelete = () => {
-        if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-            service.deleteEvent(this.currentEvent).then(() => {this.props.history.push("/hjem/")});
-            alert("Arrangementet er nå slettet")
-        }
-    };
-
 }
+

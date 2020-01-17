@@ -12,18 +12,6 @@ let fs = require("fs");
 const express = require("express");
 const app = express();
 
-if(!process.env.FIREBASE_CONFIG){
-    console.log("running local server");
-    app.listen(8080);
-}else{
-    console.log("running firebase server");
-    const main = express();
-    main.use('/api/v1', app);
-    /*main.use(bodyParser.json());
-    main.use(bodyParser.urlencoded({extended: true}));*/
-    exports.webApi = functions.https.onRequest(main);
-}
-
 const {fileParser} = require('express-multipart-file-parser');
 
 app.use(fileParser({
@@ -320,18 +308,29 @@ app.post("/users", (req, res) => {
  */
 app.put("/auth/users/:userId", (req, res) => {
     console.log("PUT-request - auth/user/:userId");
-    return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
-
+    if (req.body.password != null) {
+        hashPassword.hashPassword(req.body.password).then(credentials => {
+            return db.updatePassword({
+                userId: req.body.userId,
+                password: credentials[0],
+                salt: credentials[1]
+            })
+                .then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
+        })
+    } else {
+        return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
+    }
 });
+
 
 /**
  *
  *
  */
 app.delete("/auth/users/:userId", (req, res) => {
-    console.log("GET-request - /auth/users/:userId");
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
+
 
 /**
  *
@@ -473,36 +472,8 @@ app.put('/auth/events/:eventId', (req, res) => {
 });
 
 
-/**
- * Delete an event
- * body:
- * {
- *     event: Event
- * }
- */
-
-app.delete('/auth/events/:eventId', (req, res) => {
-    console.log("DELETE-request - /events/" + req.params.eventId);
-    return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
-});
-
-/*app.delete('/jobs/:id', (req, res) => {
-    jobDao.deleteJob(req.params.id, (status, data) => {
-        res.status(status);
-        res.json(data);
-    });
-});*/
-
-
-
-/**
- *  Get an array of personnel connected to an event
- *
- *  personnel:{
- *      personnelId: number
- *      eventId: number
- *      role: string
- *  }
+/*
+    PERSONNEL
  */
 
 

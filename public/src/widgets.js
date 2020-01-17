@@ -19,90 +19,158 @@ export class EventInfo extends Component {
     link;
     myEvent;
 
-    state = {
-        hoverCss: "shadow-sm"
-    };
-
 
     /*<div className="font-weight-bold">
      Pris fra
      </div>
      {this.props.price}*/
 
-    getAgeLimitInfo(age_limit){
-        if(age_limit !== 0)
-        {
-            return <div>
-                <b>Aldersgrense:</b> {age_limit}
-            </div>
-        }else{
-            return <div className="font-weight-bold">
-                Tillat For Alle
-            </div>
-        }
-    }
-
-    getCardFooter(myEvent) {
-        if (myEvent) {
-            return <Row>
-                <Col>
-                    <small className="text-muted"> Publisert {this.props.uploaded}</small>
-                </Col>
-                <Col>
-                    <Button href={"/endre-arrangement/" + this.props.link} variant="primary" size="sm">Rediger
-                        Arragement</Button>
-                </Col>
-            </Row>
-        } else return <small className="text-muted"> Publisert {this.props.uploaded}</small>
-    }
-
-    getCancelledTxt() {
+    getCancelled() {
         if (this.props.event.cancelled) return "Kansellert!";
         else return "";
     }
 
     render() {
-        return (
-            <Col md={12} lg={4} className={"mt-2 mb-2"} style={{cursor: "pointer"}}>
-                <Card onMouseEnter={() => this.setState({hoverCss: "shadow-lg"})}
-                      onMouseLeave={() => this.setState({hoverCss: "shadow-sm"})}
-                      className={this.state.hoverCss}
-                      onClick={() => window.location = "/arrangement/" + this.props.link}
-                >
-                    <Card className="text-danger border-0">
-                        <div style={{height: "13em", overflow: "hidden"}}>
-                            <Card.Img src={this.props.imageUrl} alt={this.title}/>
-                            <Card.ImgOverlay>
-                                <Card.Title><h1>{this.getCancelledTxt()}</h1></Card.Title>
-                            </Card.ImgOverlay>
-                        </div>
-                    </Card>
-                    <Card.Body>
+        if (this.props.myEvent) {
+            return (
+
+
+                <Col md={12} lg={4}>
+
+
+                    <Card>
+
                         <div className="eventinfo">
+                            <a href={"/arrangement/" + this.props.link}>
+                                <Card className="text-danger">
+                                    <Card.Img src={this.props.imageUrl} alt={this.title} />
+                                    <Card.ImgOverlay>
+                                        <Card.Title><h1>{this.getCancelled()}</h1></Card.Title>
+                                    </Card.ImgOverlay>
+                                </Card>
+                            </a>
+                        </div>
+                        <Card.Body>
+
+
+                            <div className="eventinfo">
+                                <a href={"/arrangement/" + this.props.link}>
+
+                                    <Card.Title>{this.props.title}</Card.Title>
+                                    <Card.Text>
+                                        <div className="font-weight-bold ">
+                                            Adresse
+                                        </div>
+                                        {this.props.address}
+
+                                        <div className="font-weight-bold">
+                                            Aldersgrense
+                                        </div>
+                                        <div className="font-italic">
+                                            {this.props.age_limit}
+                                        </div>
+                                        <div className="font-weight-bold">
+                                            Fra
+                                        </div>
+
+                                        {this.props.start_date}
+
+                                        <div className="font-weight-bold">
+                                            Til
+                                        </div>
+
+                                        {this.props.end_date}
+
+                                    </Card.Text>
+
+                                </a>
+                            </div>
+
+                        </Card.Body>
+                        <Card.Footer>
+                            <Row>
+                                <Col>
+                                    <small className="text-muted"> Publisert {this.props.uploaded}</small>
+                                </Col>
+                                <Col>
+                                    <Button href={"/endre-arrangement/" + this.props.link} variant="primary" size="sm">Rediger
+                                        Arragement</Button>
+                                </Col>
+                            </Row>
+
+                        </Card.Footer>
+                    </Card>
+
+
+                </Col>
+
+
+            );
+
+
+        } else {
+            return (
+
+                <Col md={12} lg={4}>
+
+
+
+
+                    <Card>
+                        {/*<Card.Img variant="top"
+                                  src={this.props.imageUrl}
+                                  alt={this.title}/>*/}
+                        <Card className="text-danger">
+                            <Card.Img src={this.props.imageUrl} alt={this.title} />
+                            <Card.ImgOverlay>
+                                <Card.Title><h1>{this.getCancelled()}</h1></Card.Title>
+                            </Card.ImgOverlay>
+                        </Card>
+                        <Card.Body>
+
+
                             <Card.Title>{this.props.title}</Card.Title>
                             <Card.Text>
                                 <div className="font-weight-bold ">
                                     Adresse
                                 </div>
                                 {this.props.address}
-                                {this.getAgeLimitInfo(this.props.age_limit)}
+
+                                <div className="font-weight-bold">
+                                    Aldersgrense
+                                </div>
+                                <div className="font-italic">
+                                    {this.props.age_limit}
+                                </div>
                                 <div className="font-weight-bold">
                                     Fra
                                 </div>
+
                                 {this.props.start_date}
+
                                 <div className="font-weight-bold">
                                     Til
                                 </div>
+
                                 {this.props.end_date}
+
                             </Card.Text>
-                        </div>
-                    </Card.Body>
-                    <Card.Footer>
-                        {this.getCardFooter(this.props.myEvent)}
-                    </Card.Footer>
-                </Card>
-            </Col>
-        );
+
+                            <a href={"/arrangement/" + this.props.link} className="stretched-link"></a>
+
+
+                        </Card.Body>
+                        <Card.Footer>
+                            <small className="text-muted"> Publisert {this.props.uploaded}</small>
+                        </Card.Footer>
+                    </Card>
+
+
+                </Col>
+            );
+        }
+
+
     }
 }
 

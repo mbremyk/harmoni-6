@@ -26,13 +26,12 @@ function init() {
 function initCloud(){
     let pr = new properties.CloudProperties();
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-        dialect: pr.dialect,
-        host: pr.databaseURL,
-       // port: pr.port,
+        dialect: 'mysql',
+        host: '/cloudsql/kkdatabase',
         timestamps: false,
-        /*dialectOptions: {
-            socketPath: '/cloudsql/caramel-vine-256015:europe-north1:kkdatabase'
-        },*/
+        dialectOptions: {
+            socketPath: '/cloudsql/kkdatabase'
+        },
     });
     return sequelize;
 }
@@ -149,7 +148,7 @@ let EventModel = sequelize.define('event', {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    imageUrl: {type : Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
+    imageUrl: Sequelize.TEXT,
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
     cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
@@ -267,7 +266,7 @@ let syncModels = () => sequelize.sync({force: false}).then().catch(error => cons
 creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
-let syncTestData = () => sequelize.sync({force: false}).then(() => {
+let syncTestData = () => sequelize.sync({force: true}).then(() => {
     return UserModel.bulkCreate(testData.users).then(() => {
         return EventModel.bulkCreate(testData.events).then(() => {
             return PersonnelModel.bulkCreate(testData.personnel).then(() => {

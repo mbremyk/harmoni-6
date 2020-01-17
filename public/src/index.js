@@ -28,21 +28,23 @@ const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
     <BrowserRouter history={history}>
-        <Route exact path="/" component={LandingPage}/>
-        <Route exact path="/ny-bruker" component={CreateUserForm}/>
-        <Route exact path="/arrangement/:id" component={EventPage}/>
-        <Route exact path="/logg-inn" component={LoginForm}/>
-        <Route exact path="/sok/:input" component={SearchResults}/>
+        <div>
+	        <Route exact path="/" component={LandingPage}/>
+	        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+	        <Route exact path="/arrangement/:id" component={EventPage}/>
+	        <Route exact path="/logg-inn" component={LoginForm}/>
+            <Route exact path="/sok/:input" component={SearchResults}/>
 
-        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
+	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
+	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
 
-        <Route path="/" component={Footer}/>
+	        <Route path="/" component={Footer}/>
+        </div>
     </BrowserRouter>,
     root
 );

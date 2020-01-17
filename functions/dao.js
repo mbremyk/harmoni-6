@@ -1,4 +1,3 @@
-const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
@@ -56,36 +55,17 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateUser(user) {
-
-        if(user.password !== ''){
-            return hashPassword.hashPassword(user.password).then(credentials => {
-                return model.UserModel.update(
-                    {
-                        password: credentials[0],
-                        salt: credentials[1],
-                        username: user.username,
-                        email: user.email
-                    },
-                    {where: {userId: user.userId}})
-                    .then(response => response[0] === 1 /*affected rows === 1*/)
-                    .catch(error => {
-                        console.error(error);
-                        return false;
-                    });
-            })
-        } else {
-            return model.UserModel.update(
-                {
-                    username: user.username,
-                    email: user.email
-                },
-                {where: {userId: user.userId}})
-                .then(response => response[0] === 1 /*affected rows === 1*/)
-                .catch(error => {
-                    console.error(error);
-                    return false;
-                });
-        }
+        return model.UserModel.update(
+            {
+                username: user.username,
+                email: user.email
+            },
+            {where: {userId: user.userId}})
+            .then(response => response[0] === 1 /*affected rows === 1*/)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
     }
 
 
