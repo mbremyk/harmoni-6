@@ -148,19 +148,34 @@ export class EditEvent extends Component{
 
     handleFDate(event) {
         this.setState({fDate: event.target.value})
+        if(event.target.value <= this.state.tDate) {
+            return alert("From-date must be less than or equal to to-date");
+        }
     }
 
     handleFTime(event) {
-        this.setState({fTime: event.target.value})
+        this.setState({fTime: event.target.value});
     }
 
     handleTDate(event) {
-        this.setState({tDate: event.target.value})
+        this.setState({tDate: event.target.value});
+        if (event.target.value >= this.state.fDate) {
+            return alert("To-date must be greater than or equal to from-date");
+        }
     }
 
+
     handleTTime(event) {
-        this.setState({tTime: event.target.value})
+        this.setState({tTime: event.target.value});
     }
+
+    handleWrongTime(event) {
+            /*if (this.state.fDate === this.state.tDate && event.target.value <= this.state.tTime) {
+                return alert("To-time must be greater than from-time on the same date");
+            }else if(this.state.fDate === this.state.tDate && event.target.value >= this.state.fTime){
+                return alert("From-time must be less than to-time on the same date");
+            }*/
+        }
 
 
     handleSubmit() {
@@ -235,6 +250,7 @@ export class EditEvent extends Component{
                             <Form.Control
                                 value={this.state.fTime}
                                 onChange={this.handleFTime}
+                                onBlur={this.handleWrongTime}
                                 type={"time"}
 
                             />
@@ -248,7 +264,8 @@ export class EditEvent extends Component{
                                 onChange={this.handleTDate}
                                 type={"date"}
 
-                            />
+                            >
+                            </Form.Control>
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"3"}>
@@ -256,6 +273,7 @@ export class EditEvent extends Component{
                             <Form.Control
                                 value={this.state.tTime}
                                 onChange={this.handleTTime}
+                                onBlur={this.handleWrongTime}
                                 type={"time"}
 
                             />
