@@ -361,9 +361,8 @@ export class EditEvent extends Component{
                                 onChange={this.handleImageUrlChange}
                             />
                         </Form.Group>
-
                             <Form.Group as={Col} sm={"6"}>
-                                <Form.Label>Last opp rider</Form.Label>
+                                <Form.Label>Last opp vedlegg</Form.Label>
                                 <InputGroup className="mb-5">
                                     <FormControl
                                         type="file"
@@ -383,7 +382,6 @@ export class EditEvent extends Component{
                                     />
                                 </InputGroup>
                             </Form.Group>
-
                         <Form.Group as={Col} sm={"6"}>
 
                             <Form.Label>Aldersgrense</Form.Label>
@@ -418,10 +416,10 @@ export class EditEvent extends Component{
 
                         </Form.Row>
                     </Form>
-                <Row>
-                    <button id={"contract"} onClick={this.downloadC}>Download the contract</button>
-                    <button id={"rider"} onClick={this.downloadR}>Download the rider</button>
-                </Row>
+                    <Row>
+                        <button id={"contract"} onClick={this.downloadC}>Download the contract</button>
+                        <button id={"rider"} onClick={this.downloadR}>Download the rider</button>
+                    </Row>
             </Container>
             </div>
         );

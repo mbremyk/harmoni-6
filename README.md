@@ -14,7 +14,7 @@ cd public
 npm install && npm start
 ```
 
-# run server alone
+# run firebase server alone
 From the top repository, hot reloads are built in here.
 The local server runs under the endpoint http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/
 while the deployed endpoint runs under https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1/

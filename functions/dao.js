@@ -189,6 +189,7 @@ class Dao {
      * @returns {Promise<number>}
      */
     createEvent(event) {
+        console.log(event.imageUrl instanceof String);
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
@@ -200,7 +201,11 @@ class Dao {
                 description: event.description,
                 imageUrl: event.imageUrl
             })
-            .then(created => ({insertId: (created.eventId)}))
+            .then(created => {
+                console.log(created);
+                insertId: (created.eventId);
+                return created;
+            })
             .catch(error => {
                 console.error(error);
                 return null;
