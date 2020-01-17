@@ -8,6 +8,24 @@ if (window.location.href.includes('localhost')) {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
 
+export class Artist {
+
+    userId;
+    username;
+    email;
+    contract;
+    document;
+
+    constructor(userId, username, email, contract, document) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.contract = contract;
+        this.document = document
+    }
+
+}
+
 export class User {
     userId;
     username;
@@ -55,16 +73,14 @@ export class SimpleFile {
 
 }
 
-export class BulkGig {
+export class Gig {
 
     eventId;
-    rider;
     contract;
     artists;
 
-    constructor( eventId, artists, rider, contract) {
+    constructor(eventId, artists, contract) {
         this.eventId = eventId;
-        this.rider = rider;
         this.contract = contract;
         this.artists = artists;
     }

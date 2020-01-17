@@ -1,4 +1,4 @@
-import {service, Event, Personnel, SimpleFile, BulkGig, BulkPersonnel} from "../services";
+import {service, Event, Personnel, SimpleFile, BulkGig, BulkPersonnel, Artist, Gig} from "../services";
 import {Component} from "react-simplified";
 import {HarmoniNavbar} from "./navbar";
 import React from "react";
@@ -15,6 +15,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {authService} from "../AuthService";
 import Row from "react-bootstrap/Row";
+import Card from "react-bootstrap/Card";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
@@ -63,7 +64,6 @@ export class AddEvent extends Component{
         this.fTime = this.handleFTime.bind(this);
         this.tDate = this.handleTDate.bind(this);
         this.tTime = this.handleTTime.bind(this);
-        this.rider = this.handleRiderChange.bind(this);
         this.contract = this.handleContractChange.bind(this);
         this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
@@ -82,7 +82,6 @@ export class AddEvent extends Component{
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
-            rider: '',
             contract: '',
             image: '',
             imageUrl: '',
@@ -109,10 +108,6 @@ export class AddEvent extends Component{
         this.setState({ageLimit: event.target.value});
     }
 
-    handleRiderChange(event){
-        this.setState({rider: event.target.files[0]});
-    }
-
     handleContractChange(event){
         this.setState({contract: event.target.files[0]});
     }
@@ -126,7 +121,10 @@ export class AddEvent extends Component{
     }
 
     handleArtistsAdd(event) {
-        service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
+        service.getUser(event).then((user) => this.setState({
+            artistsAdd: [...this.state.artistsAdd,
+                new Artist(user.userId, user.username, user.email, "", "")]
+        }));
     }
 
     handleArtists(event){
@@ -160,46 +158,30 @@ export class AddEvent extends Component{
 
     handleSubmit() {
 
-        let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
-        let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
+        let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
+        let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
 
 
         let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
             this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
             this.state.image);
 
-                console.log(this.state.contract);
-                console.log(this.state.rider);
-                console.log("converting to buffer");
-                this.toBase64(this.state.contract)
-                    .then(cData => {
-                        this.toBase64(this.state.rider)
-                            .then(rData => {
-                                let contract = new SimpleFile(cData, this.state.contract.name);
-                                let rider = new SimpleFile(rData, this.state.rider.name);
-                                console.log(contract);
 
-                                service.createEvent(e)
-                                    .then(updated => {
-                                        //console.log(this.state.personnelAdd);
-                                            service.createGig(new BulkGig(updated.insertId, this.state.artistsAdd, contract, rider))
-                                                .then(() => service.createPersonnel(new BulkPersonnel(this.state.personnelAdd, updated.insertId )));
-                                            // service.createPersonnel(new BulkPersonel(updated.insertId, this.state.personnelAdd));
-                                            /*this.state.artistsAdd.map(a =>
-                                                (service.createGig(new Gig(a.userId, updated.insertId, contract, rider))));
-                                            this.state.personnelAdd.map( personnel =>
-                                                service.createPersonnel(new Personnel(personnel.userId, updated.insertId, personnel.role)));
-                                            console.log(updated.insertId);*/
-                                        }
-                                    ).then(() => this.props.history.push("/opprett-arrangement"))
-                                    .catch(err => alert(err.message));
-                                }
-                            )
-                    });
+        service.createEvent(e).then(updated => {
 
+            this.state.artistsAdd.map(artist => {
+                this.toBase64(this.state.contract).then(cData => {
+                    let contract = new SimpleFile(cData, this.state.contract.name);
+                    console.log(new Gig(updated.insertId, artist, contract))
+                    service.createGig(new Gig(updated.insertId, artist, contract))
+                })
+            })
 
-
+            service.createPersonnel(new BulkPersonnel(this.state.personnelAdd, updated.insertId))
+                .then(() => this.props.history.push("/opprett-arrangement/" + updated.insertId))
+        }).catch(err => alert(err.message))
     }
+
 
     toBase64 = (file) => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -322,21 +304,39 @@ export class AddEvent extends Component{
                                 <ListGroup title={"Valgte artister"}>
                                     {this.state.artistsAdd.map(artist => (
                                         <React.Fragment key={artist.userId}>
+                                            <Card>
+                                                <Card.Title
+                                                    className="font-weight-bold text-center">{artist.username}</Card.Title>
                                                 <ListGroupItem>
                                                     <Row>
-                                                        <Col>
-                                                            {artist.username}
-                                                        </Col>
 
-                                                        <Col>
+                                                        <Form.Group as={Col} sm={"5"}>
+                                                            <label>Last opp kontrakt</label>
+                                                            <input type="file" className="form-control"
+                                                                   encType="multipart/form-data" name="file"
+                                                                   onChange={this.handleContractChange}/>
+                                                        </Form.Group>
+
+                                                        <Form.Group as={Col} sm={"5"}>
+                                                            <label>Last opp et annet dokument</label>
+                                                            <input type="file" className="form-control"
+                                                                   encType="multipart/form-data" name="file"
+                                                                   onChange={this.handleDocumentChange}/>
+                                                        </Form.Group>
+
+
+                                                        <Col sm={"2"}>
+                                                            <label>Fjern artist</label>
                                                             <Button type="button" variant={"danger"} onClick={() => {
                                                                 this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist),1)
                                                                 this.setState({artistsAdd: this.state.artistsAdd});
-                                                                }
+                                                            }
                                                             }>Fjern</Button>
                                                         </Col>
+
                                                     </Row>
-                                            </ListGroupItem>
+                                                </ListGroupItem>
+                                            </Card>
                                         </React.Fragment>
                                 ))}
                             </ListGroup>
@@ -418,18 +418,6 @@ export class AddEvent extends Component{
                                 onChange={this.handleImageUrlChange}
                             />
                             </Form.Group>
-
-                        <Form.Group as={Col} sm={"6"}>
-                            <label>Last opp rider</label>
-                            <input type="file" className="form-control" encType="multipart/form-data" name="file"
-                                   onChange={this.handleRiderChange}/>
-                        </Form.Group>
-
-                        <Form.Group as={Col} sm={"6"}>
-                            <label>Last opp kontrakt</label>
-                            <input type="file" className="form-control" encType="multipart/form-data" name="file"
-                                   onChange={this.handleContractChange}/>
-                        </Form.Group>
 
                         <Form.Group as={Col} sm={"6"}>
 
