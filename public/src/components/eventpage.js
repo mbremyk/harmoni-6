@@ -147,30 +147,72 @@ export class EventPage extends Component {
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
         if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
-            return <div>
-                <Row>
-
-                    <Col className="border-bottom border-top"><b>Artist</b></Col>
-                    <Col className="border-bottom border-top"><b>Epost</b></Col>
-                    <Col className="border-bottom border-top"><b></b></Col>
-                    <Col className="border-bottom border-top"><b></b></Col>
-
-                </Row>
-
-
-                {this.artists.map(person => (
+            if(this.isOrganizer){
+                return <div>
                     <Row>
-                        <Col>{person.user.username}</Col>
-                        <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
-                        <Col><DownloadWidget type={"kontrakt"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
-                        <Col><DownloadWidget type={"rider"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
+
+                        <Col className="border-bottom border-top"><b>Artist</b></Col>
+                        <Col className="border-bottom border-top"><b>Epost</b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+
                     </Row>
 
-                ))}
 
-            </div>
+                    {
+                        this.artists.map(person => (
+                            <Row>
+                                <Col>{person.user.username}</Col>
+                                <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
+                                <Col><DownloadWidget type={"kontrakt"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
+                                <Col><DownloadWidget type={"rider"} artist={person.artistId} event={this.currentEvent.eventId}/></Col>
+                            </Row>
+                        ))}
+
+                </div>
+            }else{
+                return <div>
+                    <Row>
+
+                        <Col className="border-bottom border-top"><b>Artist</b></Col>
+                        <Col className="border-bottom border-top"><b>Epost</b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+                        <Col className="border-bottom border-top"><b></b></Col>
+
+                    </Row>
 
 
+                    {
+                        this.artists.map(person => (
+                            <Row>
+                                <Col>{person.user.username}</Col>
+                                <Col>{person.user.email}</Col>
+                                {this.validUser(person)}
+                                <Col>{this.RiderButton(person.artistId)}</Col>
+                            </Row>
+                        ))}
+
+                </div>
+            }
+
+        }
+    }
+
+    validUser(person){
+        let token = jwt.decode(authService.getToken());
+        console.log(token.userId+" vs "+person.artistId);
+        if(person.artistId == token.userId){
+            return(
+                <div>
+                    <Col>
+                        <DownloadWidget type={"kontrakt"} artist={person.artistId} event={this.currentEvent.eventId}/>
+                        <DownloadWidget type={"rider"} artist={person.artistId} event={this.currentEvent.eventId}/>
+                    </Col>
+                </div>
+            )
+        }else{
+            return <div>Not worthy</div>
         }
     }
 
@@ -186,9 +228,7 @@ export class EventPage extends Component {
                 </Row>
 
                 {this.personnel.map(person => (
-
                     <Row>
-
                         <Col className>{person.role}</Col>
                         <Col className>{person.user.email}</Col>
                     </Row>
