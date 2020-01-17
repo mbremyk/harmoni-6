@@ -61,8 +61,12 @@ export class EventPage extends Component {
                                 <p>{this.CurrentEvent.description}</p>
                             </Col>
                         </Row>
-                        {this.ShowArtist()}
-                        {this.ShowPersonnel()}
+                        <Row>
+                            <Col>
+                                {this.ShowArtist()}
+                                {this.ShowPersonnel()}
+                            </Col>
+                        </Row>
                         {this.EditButton()}
 
 
@@ -134,47 +138,39 @@ export class EventPage extends Component {
             .catch((error) => console.log(error));
     }
 
+    //only the artist viewing the page will get this option beside their contact info
     RiderButton(id) {
         let token = jwt.decode(authService.getToken());
         if (id == token.userId) {
-            return <Button variant="primary">Legg til Rider</Button>;
+            return <Button variant="primary" size="sm" className="float-right">Legg til Rider</Button>;
         }
     }
 
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
         if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
-            return (<Row>
-                <Col>
-                    <Table responsive>
-                        <thead>
-                        <tr>
+            return <div>
+                <Row>
 
-                            <th>Artist</th>
-                            <th>Epost</th>
+                    <Col className="border-bottom border-top"><b>Artist</b></Col>
+                    <Col className="border-bottom border-top"><b>Epost</b></Col>
 
-                        </tr>
-                        </thead>
-                        <tbody>
-
-                        {this.artists.map(person => (
-                            <tr>
-                                <td>{person.user.username}</td>
-                                <td>{person.user.email} {this.RiderButton(person.artistId)} </td>
+                </Row>
 
 
+                {this.artists.map(person => (
+                    <Row>
+                        <Col>{person.user.username}</Col>
+                        <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
 
 
-                            </tr>
+                    </Row>
 
-                        ))}
+                ))}
 
-                        </tbody>
+            </div>
 
 
-                    </Table>
-                </Col>
-            </Row>);
         }
     }
 
@@ -183,41 +179,31 @@ export class EventPage extends Component {
         if ((this.personnel.length !== 0 && (this.isArtist || this.isPersonnel || this.isOrganizer))) {
 
 
-            return <Row>
-                <Col>
-                    <Table responsive>
-                        <thead>
-                        <tr>
+            return <div>
+                <Row className="tableheader">
+                    <Col className="border-bottom border-top"><b>Personnel</b></Col>
+                    <Col className="border-bottom border-top"><b>Epost</b></Col>
+                </Row>
 
-                            <th>Personnel</th>
-                            <th>Epost</th>
+                {this.personnel.map(person => (
 
-                        </tr>
-                        </thead>
-                        <tbody>
+                    <Row>
 
-                        {this.personnel.map(person => (
-                            <tr>
-                                <td>{person.role}</td>
-                                <td>{person.user.email}</td>
+                        <Col className>{person.role}</Col>
+                        <Col className>{person.user.email}</Col>
+                    </Row>
 
-
-                            </tr>
-
-                        ))}
-
-                        </tbody>
+                ))}
+            </div>
 
 
-                    </Table>
-                </Col>
-            </Row>
         }
 
     }
 
+    //the button will render if the user is an artist or an organizer
     DownloadContract() {
-        if (this.isOrganizer) {
+        if (this.isOrganizer || this.isArtist) {
             return <Row>
                 <Col>
                     <a href="" download>
@@ -230,6 +216,7 @@ export class EventPage extends Component {
         }
     }
 
+    //only organizers get to edit the event so this button will only render when the user is the organizer
     EditButton() {
         if (this.isOrganizer) {
             return <Row>
@@ -241,6 +228,7 @@ export class EventPage extends Component {
         }
     }
 
+    //renders navbar if a user is logged in
     RenderNavbar() {
         if (authService.loggedIn()) {
             return <HarmoniNavbar/>
