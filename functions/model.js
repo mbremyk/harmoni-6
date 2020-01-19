@@ -295,7 +295,7 @@ let syncModels = () => sequelize.sync({force: false}).then().catch(error => cons
 creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
-let syncTestData = () => sequelize.sync({force: false}).then(() => {
+let syncTestData = () => sequelize.sync({force: true}).then(() => {
     return UserModel.bulkCreate(testData.users).then(() => {
         return EventModel.bulkCreate(testData.events).then(() => {
             return FileModel.bulkCreate(testData.files).then(() => {
