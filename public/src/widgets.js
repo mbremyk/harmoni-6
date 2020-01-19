@@ -113,7 +113,7 @@ export class DownloadWidget extends Component  {
     type = "";
     render() {
         return (
-            <Button onClick={this.download} variant="link" aria-label="Left Align" title="Last Ned">
+            <Button onClick={this.download} variant="primary" title="Last Ned" size="sm">
                 last ned {this.type}
             </Button>
         )
