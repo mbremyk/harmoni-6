@@ -29,12 +29,11 @@ const root = document.getElementById('root');
 if (root)
     ReactDOM.render(
     <BrowserRouter history={history}>
-        <div>
-	        <Route exact path="/" component={LandingPage}/>
-	        <Route exact path="/ny-bruker" component={CreateUserForm}/>
-	        <Route exact path="/arrangement/:id" component={EventPage}/>
-	        <Route exact path="/logg-inn" component={LoginForm}/>
-            <Route exact path="/sok/:input" component={SearchResults}/>
+        <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/ny-bruker" component={CreateUserForm}/>
+        <Route exact path="/arrangement/:id" component={EventPage}/>
+        <Route exact path="/logg-inn" component={LoginForm}/>
+        <Route exact path="/sok/:input" component={SearchResults}/>
 
             <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
             <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
@@ -45,8 +44,7 @@ if (root)
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/arrangement/:id/legg-til-rider" component={RiderPage}/>
 
-	        <Route path="/" component={Footer}/>
-        </div>
+        <Route path="/" component={Footer}/>
     </BrowserRouter>,
     root
 );

@@ -1,3 +1,4 @@
+const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
@@ -55,17 +56,36 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateUser(user) {
-        return model.UserModel.update(
-            {
-                username: user.username,
-                email: user.email
-            },
-            {where: {userId: user.userId}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
-            .catch(error => {
-                console.error(error);
-                return false;
-            });
+
+        if(user.password !== ''){
+            return hashPassword.hashPassword(user.password).then(credentials => {
+                return model.UserModel.update(
+                    {
+                        password: credentials[0],
+                        salt: credentials[1],
+                        username: user.username,
+                        email: user.email
+                    },
+                    {where: {userId: user.userId}})
+                    .then(response => response[0] === 1 /*affected rows === 1*/)
+                    .catch(error => {
+                        console.error(error);
+                        return false;
+                    });
+            })
+        } else {
+            return model.UserModel.update(
+                {
+                    username: user.username,
+                    email: user.email
+                },
+                {where: {userId: user.userId}})
+                .then(response => response[0] === 1 /*affected rows === 1*/)
+                .catch(error => {
+                    console.error(error);
+                    return false;
+                });
+        }
     }
 
 
@@ -189,6 +209,7 @@ class Dao {
      * @returns {Promise<number>}
      */
     createEvent(event) {
+        console.log(event.imageUrl instanceof String);
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
@@ -205,6 +226,7 @@ class Dao {
                 console.error(error);
                 return null;
             });
+
     }
 
     /**
@@ -579,6 +601,7 @@ class Dao {
                     .then(gig => {
                             //console.log(contract);
                             gig.update({rider: fileInstance.fileId});
+                            return;
                         }
                     );
             });
