@@ -151,7 +151,7 @@ export class EventPage extends Component {
     RiderButton(id) {
         let token = jwt.decode(authService.getToken());
         if (id == token.userId) {
-            return <Button variant="primary" size="sm" className="float-right">Legg til Rider</Button>;
+            return <Button variant="primary" size="sm" className="float-right" href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>Legg til Rider</Button>;
         }
     }
 

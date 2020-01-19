@@ -20,6 +20,7 @@ import {SearchResults} from "./components/searchresults";
 
 //const history = createHashHistory();
 import {createBrowserHistory} from "history";
+import {RiderPage, Riderpage} from "./components/riderpage";
 
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
@@ -42,6 +43,7 @@ if (root)
             <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
 	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
+	        <PrivateRoute authed={authService.loggedIn()} exact path="/arrangement/:id/legg-til-rider" component={RiderPage}/>
 
 	        <Route path="/" component={Footer}/>
         </div>
