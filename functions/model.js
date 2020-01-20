@@ -288,9 +288,6 @@ TicketModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
-FileModel.hasOne(GigModel, {foreignKey: 'rider'});
-GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
-
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 

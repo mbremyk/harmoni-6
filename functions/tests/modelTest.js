@@ -178,7 +178,6 @@ describe('Events', () => {
             startTime: null,
             endTime: null,
             imageUrl: 'fake URL',
-            image: null,
             description: 'Create event test',
         };
         db.createEvent(event).then(response => {
@@ -391,12 +390,7 @@ describe('Personnel', () => {
     });
 
     it('remove personnel', done => {
-        let personnel = {
-            eventId: 5,
-            personnelId: 3,
-            role: 'DELETE'
-        };
-        db.removePersonnel(personnel).then(response => {
+        db.removePersonnel(5, 3).then(response => {
             expect(response).toBeTruthy();
             done();
         });
@@ -471,13 +465,7 @@ describe('Tickets', () => {
     });
 
     it('remove Ticket', done => {
-        let ticket = {
-            eventId: 1,
-            type: 'Inngang',
-            price: 50,
-            amount: 40,
-        };
-        db.removeTicket(ticket).then(response => {
+        db.removeTicket(1, 'Inngang').then(response => {
             expect(response).toBeTruthy();
             done();
         });
