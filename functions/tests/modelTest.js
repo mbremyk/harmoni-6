@@ -563,16 +563,12 @@ describe('Gigs', () => {
                     eventId: gig.eventId,
                     artistId: gig.artistId,
                     artistName: gig.user.username,
-                    contract: gig.file.name,
-                    contractData: gig.file.data
                 }
             ))).toEqual([
                 {
                     eventId: 2,
                     artistId: 5,
                     artistName: 'Michael S.L',
-                    contract: 'Fil 2',
-                    contractData: 'Lorem var en dårlig idé'
                 }
             ]);
         });
