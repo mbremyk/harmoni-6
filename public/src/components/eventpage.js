@@ -1,9 +1,8 @@
 import {Component} from "react-simplified";
-import {Container, Row, Col, Button, Form, Alert, Image, Table} from "react-bootstrap";
-import {EventInfo, DownloadWidget} from '../widgets.js';
-import {createHashHistory} from 'history';
+import {Button, Col, Container, Image, Row} from "react-bootstrap";
+import {DownloadWidget} from '../widgets.js';
 import * as React from 'react';
-import {Event, service, Ticket, User} from '../services';
+import {Event, service, User} from '../services';
 import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
 
@@ -40,7 +39,7 @@ export class EventPage extends Component {
 
                             <Col>
                                 <Row>
-                                    <h6>Fra: {this.currentEvent.startTime}<br/>Til: {this.currentEvent.endTime}</h6>
+                                    <h6>Fra: {this.currentEvent.startTime}<br/>Til : {this.currentEvent.endTime}</h6>
                                 </Row>
                             </Col>
 
@@ -166,20 +165,21 @@ export class EventPage extends Component {
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
         if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
+            let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <div>
                 <Row>
 
-                    <Col className="border-bottom border-top"><b>Artist</b></Col>
+                    <Col className="border-bottom border-top"><b>{'' + artist}</b></Col>
                     <Col className="border-bottom border-top"><b>Epost</b></Col>
-                    <Col className="border-bottom border-top"></Col>
+                    <Col className="border-bottom border-top"> </Col>
 
 
                 </Row>
                 {this.artists.map(person => (
                     <Row>
                         <Col>{person.user.username}</Col>
-                        <Col>{this.RenderButtons(person.artistId)}</Col>
                         <Col>{person.user.email} </Col>
+                        <Col>{this.RenderButtons(person.artistId)}</Col>
                     </Row>
                 ))}
             </div>
@@ -196,17 +196,17 @@ export class EventPage extends Component {
 
             return <div>
                 <Row className="tableheader">
-                    <Col className="border-bottom border-top"><b>Ansvarlig</b></Col>
+                    <Col className="border-bottom border-top"><b>Personell</b></Col>
+                    <Col className="border-bottom border-top"><b> </b></Col>
                     <Col className="border-bottom border-top"><b>Oppgave</b></Col>
-                    <Col className="border-bottom border-top"><b>Epost</b></Col>
                 </Row>
 
                 {this.personnel.map(person => (
 
                     <Row>
                         <Col className>{person.user.username}</Col>
-                        <Col className>{person.role}</Col>
                         <Col className>{person.user.email}</Col>
+                        <Col className>{person.role}</Col>
                     </Row>
 
                 ))}
@@ -238,8 +238,9 @@ export class EventPage extends Component {
 
     RenderArtist() {
         if (this.artists.length !== 0) {
+            let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <Col>
-                <h6>Artister: {this.artists.map(artist => (
+                <h6>{artist}: {this.artists.map(artist => (
 
                     <h5>{artist.user.username}</h5>
 
