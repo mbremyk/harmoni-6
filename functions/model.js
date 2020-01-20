@@ -18,7 +18,7 @@ function init() {
                 dialect: pr.dialect,
                 dialectOptions: {dateStrings: true,},
                 pool: {max: 10, min: 0, idle: 10000},
-                logging: true
+                logging: false
             });
     }
 }
@@ -99,7 +99,7 @@ let EventModel = sequelize.define('event', {
     eventName: {type: Sequelize.STRING, allowNull: false},
     city: Sequelize.STRING,
     address: Sequelize.STRING,
-    placeDescription: Sequelize.STRING,
+    placeDescription: Sequelize.TEXT,
     ageLimit: Sequelize.INTEGER,
     startTime: {
         type: Sequelize.DATE,
