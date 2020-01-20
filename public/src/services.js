@@ -194,7 +194,6 @@ class Services {
     }
 
     deleteEvent(event) {
-        //console.log(url + '/auth/events/' + event.eventId);
         return axios.delete(url + '/auth/events/' + event.eventId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
@@ -218,18 +217,35 @@ class Services {
     /*
         PERSONNEL
     */
+
+    /**
+     * @param personnel: Personnel[]
+     * @returns Promise<>: boolean
+     */
     addPersonnel(personnel) {
         return axios.post(url + '/events/' + personnel[0].eventId + '/personnel', personnel).then(response => response.data);
     }
 
+    /**
+     * @param personnel: Personnel
+     * @returns Promise<>: boolean
+     */
     updatePersonnel(personnel) {
         return axios.put(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
     }
 
+    /**
+     * @param personnel: Personnel
+     * @returns Promise<>: boolean
+     */
     deletePersonnel(personnel) {
         return axios.delete(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
     }
 
+    /**
+     * @param eventId: number
+     * @returns Promise<>: Personnel[]
+     */
     getPersonnel(eventId) {
         return axios.get(url + '/events/' + eventId + '/personnel').then(response => response.data);
     }
@@ -238,18 +254,34 @@ class Services {
     /*
         TICKETS
     */
+    /**
+     * @param tickets: Ticket[]
+     * @returns Promise<>: boolean
+     */
     addTickets(tickets) {
         return axios.post(url + '/events/' + tickets[0].eventId + '/ticket', tickets).then(response => response.data);
     }
 
+    /**
+     * @param ticket: Ticket
+     * @returns Promise<>: boolean
+     */
     updateTicket(ticket) {
         return axios.put(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
     }
 
+    /**
+     * @param ticket: Ticket
+     * @returns Promise<>: boolean
+     */
     deleteTicket(ticket) {
         return axios.delete(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
     }
 
+    /**
+     * @param eventId: number
+     * @returns Promise<>: Ticket[]
+     */
     getTicketToEvent(eventId) {
         return axios.get(url + '/events/' + eventId + '/ticket').then(response => response.data);
     }
@@ -258,26 +290,52 @@ class Services {
     /*
         GIGS
     */
+    /**
+     * @param gig: Gig with file
+     * @returns Promise<>: boolean
+     */
     addGig(gig) {
         return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
     }
 
+    /**
+     * @param eventId: number
+     * @returns Promise<>: Gig[]
+     */
     getGigForEvent(eventId) {
         return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
+    /**
+     * @param eventId: number
+     * @param artistId: number
+     * @returns Promise<>: Contract
+     */
     downloadContract(eventId, artistId) {
         return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
     }
 
+    /**
+     * @param riderItems: RiderItem[]
+     * @returns Promise<>: boolean
+     */
     addRiderItems(riderItems) {
         return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
     }
 
+    /**
+     * @param riderItems: RiderItem[]
+     * @returns Promise<>: boolean
+     */
     confirmRiderItems(riderItems) {
         return axios.put(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
     }
 
+    /**
+     * @param eventId: number
+     * @param artistId: number
+     * @returns Promise<>: boolean
+     */
     getRiderItems(eventId, artistId) {
         return axios.get(url + '/events/' + eventId + '/gigs/' + artistId + '/rider').then(response => response.data)
     }
