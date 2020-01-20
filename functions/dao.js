@@ -1,3 +1,4 @@
+const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
@@ -55,17 +56,36 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateUser(user) {
-        return model.UserModel.update(
-            {
-                username: user.username,
-                email: user.email
-            },
-            {where: {userId: user.userId}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
-            .catch(error => {
-                console.error(error);
-                return false;
-            });
+
+        if(user.password !== ''){
+            return hashPassword.hashPassword(user.password).then(credentials => {
+                return model.UserModel.update(
+                    {
+                        password: credentials[0],
+                        salt: credentials[1],
+                        username: user.username,
+                        email: user.email
+                    },
+                    {where: {userId: user.userId}})
+                    .then(response => response[0] === 1 /*affected rows === 1*/)
+                    .catch(error => {
+                        console.error(error);
+                        return false;
+                    });
+            })
+        } else {
+            return model.UserModel.update(
+                {
+                    username: user.username,
+                    email: user.email
+                },
+                {where: {userId: user.userId}})
+                .then(response => response[0] === 1 /*affected rows === 1*/)
+                .catch(error => {
+                    console.error(error);
+                    return false;
+                });
+        }
     }
 
 
@@ -90,6 +110,48 @@ class Dao {
             .then(() => {
                 return model.UserModel.destroy({where: {userId: userId}})
             })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    async forgotPassword(email) {
+        let newPass = Math.random().toString(36).substring(7);
+        let salt = await this.getSaltByEmail(email);
+        let credentials = await hashPassword.hashPassword(newPass, salt);
+
+        console.log('!!! nytt passord: \'' + newPass + '\'');
+
+        return model.UserModel.update(
+            {
+                tempPassword: credentials[0]
+            },
+            {where: {email: email}}
+            ).then(response => response[0] === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    onetimeLogin(email, password) {
+        return model.UserModel.findAll(
+            {where: {[op.and]: [{email: email}, {tempPassword: password}]}})
+            .then(response => response.length === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    deleteOneTimeLogin(email) {
+        return model.UserModel.update(
+            {
+                tempPassword: null
+            },
+            {where: {email: email}}
+        ).then(response => response[0] === 1)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -543,6 +605,8 @@ class Dao {
         const buf = new Buffer.from(contract.data);
         let base64String = buf.toString('base64');*/
         let contentType = contract.contentType;
+
+
 
         return model.FileModel.create({name: contract.name, data: contract.data, contentType: contentType})
             .then(fileInstance => {

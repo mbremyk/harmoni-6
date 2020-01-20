@@ -2,8 +2,10 @@ import axios from 'axios'
 import {authService} from './AuthService'
 
 var url = '';
-if (window.location.href.includes('localhost')) {
+if (window.location.href.includes('localhost:5000')) {
     url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
+}else if (window.location.href.includes('localhost:3000')) {
+    url = 'http://localhost:8080';
 } else {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
@@ -133,6 +135,10 @@ class Services {
         return axios.get(url + '/validate/email/' + email).then(response => response.data);
     }
 
+    forgotPass(email) {
+        return axios.put(url + '/forgotPass/' + email).then(response => response.data);
+    }
+
 
     /*
         USERS
@@ -157,7 +163,6 @@ class Services {
         return axios.get(url + '/users/' + userId).then(response => response.data);
     }
 
-
     /*
         EVENTS
     */
@@ -167,6 +172,11 @@ class Services {
 
     updateEvent(event) {
         return axios.put(url + "/auth/events/" + event.eventId, event, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
+    deleteEvent(event) {
+        //console.log(url + '/auth/events/' + event.eventId);
+        return axios.delete(url + '/auth/events/' + event.eventId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     getEvents() {

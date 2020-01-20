@@ -13,6 +13,18 @@ const mail = require("./mail.js");
 const express = require("express");
 const app = express();
 
+if(!process.env.FIREBASE_CONFIG){
+    console.log("running local server");
+    app.listen(8080);
+}else{
+    console.log("running firebase server");
+    const main = express();
+    main.use('/api/v1', app);
+    /*main.use(bodyParser.json());
+    main.use(bodyParser.urlencoded({extended: true}));*/
+    exports.webApi = functions.https.onRequest(main);
+}
+
 const {fileParser} = require('express-multipart-file-parser');
 
 app.use(fileParser({
@@ -102,7 +114,7 @@ function getToken(user) {
  * get      /validate/email/:email
  * post     /auth/logout
  * post     /auth/refresh
-
+ * put      /forgotPass/:email
  *
  *                      USERS
  * post     /users
@@ -182,8 +194,8 @@ app.use("/auth", (req, res, next) => {
  *
  * @return {json} {jwt: token}
  */
-app.post("/login", (req, res) => {
-    console.log("POST-request - /login");
+app.post("/login2", (req, res) => {
+        console.log("POST-request - /login");
 
     return db.getSaltByEmail(req.body.email)
         .then(salt => {
@@ -199,7 +211,8 @@ app.post("/login", (req, res) => {
                             let token = getToken(user.dataValues);
                             res.json({jwt: token});
                         })
-                    } else {
+                    }
+                    else {
                         res.status(401);
                         res.json({error: "Not authorized"})
                     }
@@ -208,6 +221,41 @@ app.post("/login", (req, res) => {
         });
 });
 
+app.post("/login", async (req, res) => {
+    console.log("POST-request - /login");
+
+    let salt = await db.getSaltByEmail(req.body.email);
+    let credentials = await hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt);
+
+    let ok1 = await db.loginOk(req.body.email, credentials[0]);
+    let ok2 = await db.onetimeLogin(req.body.email, credentials[0]);
+
+    console.log('login:' + ok1 + ' ' + ok2);
+
+    if(ok1) {
+
+        return db.getUserByEmail(req.body.email).then(user => {
+            console.log(user.dataValues);
+            let token = getToken(user.dataValues);
+            res.json({jwt: token});
+        });
+
+    } else if(ok2) {
+
+        let res = await db.deleteOneTimeLogin(req.body.email);
+        return db.getUserByEmail(req.body.email).then(user => {
+            console.log(user.dataValues);
+            let token = getToken(user.dataValues);
+            res.json({jwt: token});
+        });
+
+    } else {
+
+        res.status(401);
+        res.json({error: "Not authorized"})
+    }
+
+});
 
 app.get("/validate/username/:username", (req, res) => {
     console.log("GET-request - /validate/username/:username");
@@ -264,6 +312,15 @@ app.post("/auth/refresh", (req, res) => {
     });
 });
 
+app.put('/forgotPass/:email', (req, res) => {
+    console.log('PUT-request - /forgotPass/:email');
+
+    let email = req.params.email;
+    return db.forgotPassword(email)
+        .then(success => success ? res.status(201) : res.status(400))
+        .catch(error => console.error(error));
+});
+
 
 /*
     USERS
@@ -313,29 +370,18 @@ app.post("/users", (req, res) => {
  */
 app.put("/auth/users/:userId", (req, res) => {
     console.log("PUT-request - auth/user/:userId");
-    if (req.body.password != null) {
-        hashPassword.hashPassword(req.body.password).then(credentials => {
-            return db.updatePassword({
-                userId: req.body.userId,
-                password: credentials[0],
-                salt: credentials[1]
-            })
-                .then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
-        })
-    } else {
-        return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
-    }
-});
+    return db.updateUser(req.body).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400));
 
+});
 
 /**
  *
  *
  */
 app.delete("/auth/users/:userId", (req, res) => {
+    console.log("GET-request - /auth/users/:userId");
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
-
 
 /**
  *
@@ -477,8 +523,36 @@ app.put('/auth/events/:eventId', (req, res) => {
 });
 
 
-/*
-    PERSONNEL
+/**
+ * Delete an event
+ * body:
+ * {
+ *     event: Event
+ * }
+ */
+
+app.delete('/auth/events/:eventId', (req, res) => {
+    console.log("DELETE-request - /events/" + req.params.eventId);
+    return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+});
+
+/*app.delete('/jobs/:id', (req, res) => {
+    jobDao.deleteJob(req.params.id, (status, data) => {
+        res.status(status);
+        res.json(data);
+    });
+});*/
+
+
+
+/**
+ *  Get an array of personnel connected to an event
+ *
+ *  personnel:{
+ *      personnelId: number
+ *      eventId: number
+ *      role: string
+ *  }
  */
 
 
@@ -648,23 +722,25 @@ app.post("/gigs", (req, res) => {
     console.log(req.body.artists);
     let contractFile = req.body.contract;
     let riderFile = req.body.rider;
-    console.log(riderFile.name);
-    console.log(contractFile.name);
+    /*console.log(riderFile.name);
+    console.log(contractFile.name);*/
 
     // req.body.artists.shift();
     req.body.artists.map(artist => {
         console.log(artist.username);
         db.addGig(artist.userId, req.body.eventId).then(response => {
             console.log("Index" + response);
-            db.setContract(contractFile, response.eventId, artist.userId)
-                .then(() => {
-                    console.log("Contract set");
-                    db.setRider(riderFile, response.eventId, artist.userId)
-                        .then(() => {
-                            console.log("Rider set");
-                            res.status(201).send(response)
-                        });
-                });
+            if(contractFile != null || riderFile != null){
+                db.setContract(contractFile, response.eventId, artist.userId)
+                    .then(() => {
+                        console.log("Contract set");
+                        db.setRider(riderFile, response.eventId, artist.userId)
+                            .then(() => {
+                                console.log("Rider set");
+                                res.status(201).send(response)
+                            });
+                    });
+            }
         });
     });
 });
