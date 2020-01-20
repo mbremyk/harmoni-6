@@ -172,69 +172,47 @@ export class AddEvent extends Component {
 
     handleSubmit() {
 
-        let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
-        let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
-
         if (this.state.image !== "") {
             this.toBase64(this.state.image).then(res => {
                 this.state.imageUrl = res;
 
-                let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.city, this.state.eventAddress,
-                    this.state.placeDescription, this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
-                    this.state.image, this.state.cancelled);
-
-                service.createEvent(e).then(updated => {
-
-                    if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
-                        this.state.artistsAdd.map(artist => {
-                            this.toBase64(artist.contract).then(cData => {
-                                let contract = new SimpleFile(cData, artist.contract.name);
-                                service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
-                            })
-                        })
-                    }
-
-                    if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
-
-                        this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-                        service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
-                            this.props.history.push("/arrangement/" + updated.insertId)
-                        }).catch(error => console.log(error))
-                    } else {
-                        this.props.history.push("/arrangement/" + updated.insertId)
-                    }
-                }).catch(err => console.log(err))
+                this.runServices()
             });
         } else {
-
-            let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.city, this.state.eventAddress,
-                this.state.placeDescription, this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
-                this.state.image, this.state.cancelled);
-
-            console.log(e)
-
-            service.createEvent(e).then(updated => {
-
-                if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
-                    this.state.artistsAdd.map(artist => {
-                        this.toBase64(artist.contract).then(cData => {
-                            let contract = new SimpleFile(cData, artist.contract.name);
-                            service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
-                        })
-                    })
-                }
-
-                if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
-
-                    this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-                    service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
-                        this.props.history.push("/arrangement/" + updated.insertId)
-                    }).catch(error => console.log(error))
-                } else {
-                    this.props.history.push("/arrangement/" + updated.insertId)
-                }
-            }).catch(err => console.log(err))
+            this.runServices()
         }
+    }
+
+    runServices() {
+
+        let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
+        let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
+
+        let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.city, this.state.eventAddress,
+            this.state.placeDescription, this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
+            this.state.image, this.state.cancelled);
+
+        service.createEvent(e).then(updated => {
+
+            if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
+                this.state.artistsAdd.map(artist => {
+                    this.toBase64(artist.contract).then(cData => {
+                        let contract = new SimpleFile(cData, artist.contract.name);
+                        service.addGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
+                    })
+                })
+            }
+
+            if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
+
+                this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
+                service.addPersonnel(this.state.personnelAdd).then(() => {
+                    this.props.history.push("/arrangement/" + updated.insertId)
+                }).catch(error => console.log(error))
+            } else {
+                this.props.history.push("/arrangement/" + updated.insertId)
+            }
+        }).catch(err => console.log(err))
     }
 
     toBase64 = (file) => new Promise((resolve, reject) => {

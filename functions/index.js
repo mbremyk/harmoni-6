@@ -718,6 +718,17 @@ app.get("/events/:eventId/gigs", (req, res) => {
     return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
+/**
+ * Get a contract connected to an event and a artist
+ *
+ */
+
+app.get("/events/:eventId/gigs/:artistId", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    let artistId = decodeURIComponent(req.params.artistId);
+    db.getContract(eventId, artistId).then(contract => (contract !== null) ? res.status(201).send(contract) : res.sendStatus(400));
+});
+
 
 /**
  * Adds rider items to the database

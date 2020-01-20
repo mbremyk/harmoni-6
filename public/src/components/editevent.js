@@ -66,12 +66,16 @@ export class EditEvent extends Component{
         this.imageUrl = this.handleImageUrlChange.bind(this);
         this.image = this.handleImageUpload.bind(this);
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
+        this.city = this.handleCityChange.bind(this);
+        this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
 
         this.state = {
             eventId: 0,
             organizerId: 0,
             eventName: '',
             eventAddress: '',
+            city: '',
+            placeDescription: '',
             eventDescription: '',
             ageLimit: 0,
             fDate: require('moment')().format('YYYY-MM-DD'),
@@ -100,6 +104,18 @@ export class EditEvent extends Component{
 
     handleEventNameChange(event) {
         this.setState({eventName: event.target.value});
+    }
+
+    handleCityChange(event) {
+        this.setState({city: event.target.value});
+    }
+
+    handlePlaceDescriptionChange(event) {
+        this.setState({placeDescription: event.target.value});
+    }
+
+    handleEventAddressChange(event) {
+        this.setState({eventAddress: event.target.value});
     }
 
     handleEventAddressChange(event){
@@ -215,13 +231,35 @@ export class EditEvent extends Component{
                                     />
                                 </Form.Group>
 
-                                <Form.Group as={Col} sm={"12"}>
+                                <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>Adresse</Form.Label>
                                     <Form.Control
                                         placeholder="Adresse der arrangementet skal holdes"
                                         value={this.state.eventAddress}
                                         onChange={this.handleEventAddressChange}
 
+                                    />
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"6"}>
+                                    <Form.Label>By</Form.Label>
+                                    <Form.Control
+                                        placeholder="By der arrangementet skal holdes"
+                                        value={this.state.city}
+                                        onChange={this.handleCityChange}
+
+                                    />
+                                </Form.Group>
+
+
+                                <Form.Group as={Col} sm={12}>
+                                    <Form.Label>Plass beskrivelse</Form.Label>
+                                    <Form.Control
+                                        placeholder="For eksempel 3. etajse"
+                                        as="textarea"
+                                        rows="8"
+                                        value={this.state.placeDescription}
+                                        onChange={this.handlePlaceDescriptionChange}
                                     />
                                 </Form.Group>
 
@@ -321,7 +359,8 @@ export class EditEvent extends Component{
 
                                                             <Col sm={""}>
                                                                 <label>Last ned kontrakt</label>
-                                                                <Button id={"contract"} onClick={this.downloadC}>Last
+                                                                <Button id={"contract"}
+                                                                        onClick={event => this.downloadC(event, artist)}>Last
                                                                     ned</Button>
                                                             </Col>
 
@@ -373,7 +412,7 @@ export class EditEvent extends Component{
                                                 <ListGroupItem>
                                                     <Row>
                                                         <Col>
-                                                            {personnel.username}
+                                                            {personnel.user.username}
                                                         </Col>
 
                                                         <Col>
@@ -413,27 +452,7 @@ export class EditEvent extends Component{
                                         onChange={this.handleImageUrlChange}
                                     />
                                 </Form.Group>
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>Last opp vedlegg</Form.Label>
-                                    <InputGroup className="mb-5">
-                                        <FormControl
-                                            type="file"
-                                            value={this.state.rider}
-                                            onChange={this.handleRiderChange}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
 
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>Last opp kontrakt</Form.Label>
-                                    <InputGroup className="mb-5">
-                                        <FormControl
-                                            type="file"
-                                            value={this.state.contract}
-                                            onChange={this.handleRiderChange}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
                                 <Form.Group as={Col} sm={"6"}>
 
                                     <Form.Label>Aldersgrense</Form.Label>
@@ -502,6 +521,8 @@ export class EditEvent extends Component{
             this.setState({fTime: fromTime});
             this.setState({tTime: toTime});
             this.setState({cancelled: event.cancelled});
+            this.setState({city: event.city})
+            this.setState({placeDescription: event.placeDescription})
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
@@ -522,14 +543,10 @@ export class EditEvent extends Component{
     });
 
 
-    downloadC = (e) => {
-        //For the time being this only fetches the file with the 1-1 key.
-        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
-        let eventId = this.state.eventId;
-        let artistId = this.state.artists[0].userId;
-        console.log(this.state.artists[0].username);
+    downloadC = (e, artist) => {
+
         if(e.target.id == "contract") {
-            service.downloadContract(eventId, artistId)
+            service.downloadContract(this.state.eventId, artist.userId)
                 .then(response => {
                     let fileName = response.name;
                     const link = document.createElement('a');
@@ -543,24 +560,6 @@ export class EditEvent extends Component{
 
     };
 
-    downloadR = (e) => {
-        //For the time being this only fetches the file with the 1-1 key.
-        //window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
-        let eventId = this.state.eventId;
-        let artistId = this.state.artists[0].userId;
-        console.log(this.state.artists[0].username);
-            service.downloadRider(eventId, artistId)
-                .then(response => {
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-
-    };
 
     IncrementAge(){
         this.state.ageLimit++;
