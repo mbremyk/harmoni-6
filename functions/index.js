@@ -536,73 +536,45 @@ app.delete('/auth/events/:eventId', (req, res) => {
 });
 
 
-/**
- *  Get an array of personnel connected to an event
- *
- *  personnel:{
- *      personnelId: number
- *      eventId: number
- *      role: string
- *  }
+/*
+        PERSONNEL
  */
 
 
 /**
- * Add personnel to an event
- * body:
- * {
- *    personnel[]: Array of personnel objects
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @body {Personnel[]}
+ *  @return {json} {jwt: token}
  */
-app.post("/events/:eventId/personnel", (req, res) => {
+app.post("/auth/events/:eventId/personnel", (req, res) => {
     return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
 
 /**
- * Changes the information of personnel
- * body:
- * {
- *    personnel[]: Array of personnel objects
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @body {Personnel}
+ *  @return {json} {jwt: token}
  */
-app.put('/events/:eventId/personnel', (req, res) => {
+app.put('/auth/events/:eventId/personnel', (req, res) => {
     return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
 
 /**
- * Deletes personnel from the event
- * body:
- * {
- *    personnelId: number
- *    eventId:  number
- *    role:  string
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @return {json} {jwt: token}
  */
-
-
-app.delete('/events/:eventId/personnel', (req, res) => {
+app.delete('/auth/events/:eventId/personnel', (req, res) => {
     return db.removePersonnel(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
 
 /**
- *  Get an array of personnel connected to an event
- *
- *  personnel:{
- *      personnelId: number
- *      eventId: number
- *      role: string
- *  }
+ *  @header  x-access-token: string
+ *  @return {json} {jwt: token, Personnel[]}
  */
-app.get("/events/:eventId/personnel", (req, res) => {
+app.get("/auth/events/:eventId/personnel", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     return db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(400));
 });
@@ -614,64 +586,36 @@ app.get("/events/:eventId/personnel", (req, res) => {
 
 
 /**
- * Add i ticket type to an event
- * body:
- * {
- *    eventId: number
- *    type: string
- *    price: number
- *    amount: number
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @body {Ticket[]}
+ *  @return {json} {jwt: token}
  */
-app.post("/events/:eventId/tickets", (req, res) => {
+app.post("/auth/events/:eventId/tickets", (req, res) => {
     return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
 });
 
 
 /**
- * Changes the information of a Ticket
- * body:
- * {
- *    eventId: number
- *    type: string
- *    price: number
- *    amount: number
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @body {Ticket}
+ *  @return {json} {jwt: token}
  */
-app.put('/events/:eventId/tickets', (req, res) => {
+app.put('/auth/events/:eventId/tickets', (req, res) => {
     return db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
 /**
- * Deletes a ticket type from the event
- * body:
- * {
- *    eventId: number
- *    type: string
- *    price: number
- *    amount: number
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @return {json} {jwt: token}
  */
-app.delete('/events/:eventId/tickets', (req, res) => {
+app.delete('/auth/events/:eventId/tickets', (req, res) => {
     return db.removeTicket(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
 
 /**
- *  Get an array of tickets connected to an event
- *
- *  ticket:{
- *      eventId: number
- *      type: string
- *      price: number
- *      amount: number
- *  }
+ *  @header  x-access-token: string
+ *  @return {json} {jwt: token, Ticket[]}
  */
 app.get("/events/:eventId/tickets", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
@@ -685,29 +629,17 @@ app.get("/events/:eventId/tickets", (req, res) => {
 
 
 /**
- * Creates a Gig and ads contract file
- * body:
- * {
- *    artistId: number
- *    eventId: number
- *    contract: FILE
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @body {Gig}
+ *  @return {json} {jwt: token}
  */
-app.post("/events/:eventId/gigs", (req, res) => {
+app.post("/auth/events/:eventId/gigs", (req, res) => {
     db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus());
 });
 
 /**
- *  Get an array of Gig connected to an event
- *
- *  gig:{
- *      eventId: int
- *      artistId: int
- *      contract: int
- *      rider: int
- *  }
+ *  @header  x-access-token: string
+ *  @return {json} {jwt: token, RiderItem[]}
  */
 app.get("/events/:eventId/gigs", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
@@ -716,39 +648,30 @@ app.get("/events/:eventId/gigs", (req, res) => {
 
 
 /**
- * Adds rider items to the database
- * body:
- * {
- *      RiderItem[]
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @body {RiderItem[]}
+ *  @return {json} {jwt: token}
  */
-app.post("/events/:eventId/gigs/:artistId/rider", (req, res) => {
+app.post("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
     db.addRiderItems(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
 
 /**
- * Updates an array of riderItems in the database
- * body:
- * {
- *      RiderItem[]
- * }
- *
- * @return {json} {jwt: token}
+ *  @header  x-access-token: string
+ *  @body {RiderItem[]}
+ *  @return {json} {jwt: token}
  */
-app.put("/events/:eventId/gigs/:artistId/rider", (req, res) => {
+app.put("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
     db.updateRiderItems(req.body).then((updateOk) => updateOk ? res.status(201).send(true) : res.status(401).send(false))
 
 });
 
 /**
- *  Get an array of riderItems connected to gig with params matching the url
- *
+ *  @header  x-access-token: string
  *  @return {json} {jwt: token, RiderItem[]}
  */
-app.get("/events/:eventId/gigs/:artistId/rider", (req, res) => {
+app.get("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
     db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
