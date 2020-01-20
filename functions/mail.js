@@ -19,6 +19,29 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+let sendMail = req => {
+    transporter.sendMail(req.body.mailToDev).then((error, info) => {
+        if (error) {
+            console.error(error);
+            return false;
+        } else {
+            console.log(info.response);
+            if (req.body.email !== "") {
+                transporter.sendMail(req.body.mailToUser, (error, info) => {
+                    if (error) {
+                        console.error(error);
+                        return false;
+                    } else {
+                        return true;
+                    }
+                })
+            } else {
+                return true;
+            }
+        }
+    });
+};
+
 addMailEndpoints = (app, db) => {
     /**
      * Mail midpoint sets relevant attributes for building the mails
@@ -68,26 +91,7 @@ addMailEndpoints = (app, db) => {
         req.body.mailToUser.text = defaultMail.bug;
 
         return Promise.allSettled([
-            transporter.sendMail(req.body.mailToDev).then((error, info) => {
-                if (error) {
-                    console.error(error);
-                    return false;
-                } else {
-                    console.log(info.response);
-                    if (req.body.email !== "") {
-                        transporter.sendMail(req.body.mailToUser, (error, info) => {
-                            if (error) {
-                                console.error(error);
-                                return false;
-                            } else {
-                                return true;
-                            }
-                        })
-                    } else {
-                        return true;
-                    }
-                }
-            }),
+            sendMail(req),
             db.createBug(req.body)
             /*.then(response => {
                 return new Promise((resolve, reject) => resolve("Bug reported in database"));
@@ -109,6 +113,12 @@ addMailEndpoints = (app, db) => {
             });
     });
 
+    app.post("/mail/password", (req, res) => {
+        console.log("POST-request received - /mail/password");
+
+        req.body.mailToUser.subject = `Glemt passord: ${req.body.email}`;
+        req.body.mailToUser.text = defaultMail.password;
+    });
 };
 
 module.exports = {addMailEndpoints};

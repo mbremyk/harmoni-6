@@ -13,6 +13,12 @@ class DefaultMail {
             `Med vennlig hilsen\nHarmoni team 6 support team`;
     }
 
+    get password() {
+        return `Hei, ${this.user}\n\n` +
+            `Vi har mottatt en forespørsel om nytt passord fra din bruker. Hvis du ikke har sendt en forespørsel om nytt passord, kan du se bort ifra denne mailen.\n` +
+            ``
+    }
+
     get subject() {
         return this.subject;
     }
