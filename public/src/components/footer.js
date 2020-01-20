@@ -3,6 +3,12 @@ import * as React from "react";
 import NavLink from "react-bootstrap/NavLink";
 import {CardColumns} from "react-bootstrap";
 
+/**
+ *
+ *         Not in use, see index.html
+ *
+ */
+
 export class Footer extends Component {
 
     render() {
