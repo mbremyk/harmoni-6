@@ -74,8 +74,18 @@ export class myPage extends Component {
                                     <Form.Control autocomplete="new-password" type="password" placeholder="Gjenta nytt passord"
                                               value={this.state.password2} onChange={this.handleNewPassword2Change}/>
                                 </Form.Group>
-                                <Button variant="primary" type="button" onClick={this.save}>
+                                <Button
+                                    className="mr-2"
+                                    variant="primary"
+                                    type="button"
+                                    onClick={this.save}>
                                     Lagre
+                                </Button>
+                                <Button
+                                    variant="secondary"
+                                    type="button"
+                                    href="/hjem">
+                                    Forkast endringer
                                 </Button>
                             </Form>
                         </div>
