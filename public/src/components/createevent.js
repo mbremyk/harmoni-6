@@ -1,4 +1,4 @@
-import {Gig, Event, Personnel, service, SimpleFile, Artist} from "../services";
+import {Artist, Event, Gig, Personnel, service, SimpleFile} from "../services";
 import {Component} from "react-simplified";
 import {HarmoniNavbar} from "./navbar";
 import React from "react";
@@ -16,6 +16,7 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {authService} from "../AuthService";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
+
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
@@ -110,7 +111,7 @@ export class AddEvent extends Component {
         this.setState({ageLimit: event.target.value});
     }
 
-    handleContractChange(event){
+    handleContractChange(event) {
         this.setState({contract: event.target.files[0]});
     }
 
@@ -158,85 +159,131 @@ export class AddEvent extends Component {
         this.setState({personnelRole: event.target.value})
     }
 
-    handleSubmit() {
-
-        let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
-        let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
-        let e = new Event(
-            null,
-            this.state.organizerId,
-            this.state.eventName,
-            this.state.city,
-            this.state.eventAddress,
-            this.state.placeDescription,
-            this.state.eventDescription,
-            this.state.ageLimit,
-            fDateTime,
-            tDateTime,
-            this.state.imageUrl,
-            this.state.image,
-            this.state.cancelled);
-
-        if (this.state.image !== "") {
-            this.toBase64(this.state.image).then(res => {
-                this.state.imageUrl = res;
-
-
-                service.createEvent(e).then(updated => {
-
-                    if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
-                        this.state.artistsAdd.map(artist => {
-                            this.toBase64(this.state.contract).then(cData => {
-                                let contract = new SimpleFile(cData, this.state.contract.name);
-                                service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
-                            })
-                        })
-                    }
-
-                    if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
-
-                        this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-                        service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
-                            this.props.history.push("/arrangement/" + updated.insertId)
-                        }).catch(error => console.log(error))
-                    } else {
-                        this.props.history.push("/arrangement/" + updated.insertId)
-                    }
-                }).catch(err => console.log(err))
-            });
-        } else {
-
-            service.createEvent(e).then(updated => {
-
-                if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
-                    this.state.artistsAdd.map(artist => {
-                        this.toBase64(this.state.contract).then(cData => {
-                            let contract = new SimpleFile(cData, this.state.contract.name);
-                            service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
-                        })
-                    })
-                }
-
-                if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
-
-                    this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-                    service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
-                        this.props.history.push("/arrangement/" + updated.insertId)
-                    }).catch(error => console.log(error))
-                } else {
-                    this.props.history.push("/arrangement/" + updated.insertId)
-                }
-            }).catch(err => console.log(err))
-        }
-    }
+    // handleSubmit() {
+    //
+    //     let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
+    //     let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
+    //
+    //
+    //     if (this.state.image !== "") {
+    //         this.toBase64(this.state.image).then(res => {
+    //             this.state.imageUrl = res;
+    //
+    //
+    //             service.createEvent(e).then(updated => {
+    //
+    //                 if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
+    //                     this.state.artistsAdd.map(artist => {
+    //                         this.toBase64(this.state.contract).then(cData => {
+    //                             let contract = new SimpleFile(cData, this.state.contract.name);
+    //                             service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
+    //                         })
+    //                     })
+    //                 }
+    //
+    //                 if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
+    //
+    //                     this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
+    //                     service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
+    //                         this.props.history.push("/arrangement/" + updated.insertId)
+    //                     }).catch(error => console.log(error))
+    //                 } else {
+    //                     this.props.history.push("/arrangement/" + updated.insertId)
+    //                 }
+    //             }).catch(err => console.log(err))
+    //         });
+    //     } else {
+    //
+    //         service.createEvent(e).then(updated => {
+    //
+    //             if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
+    //                 this.state.artistsAdd.map(artist => {
+    //                     this.toBase64(this.state.contract).then(cData => {
+    //                         let contract = new SimpleFile(cData, this.state.contract.name);
+    //                         service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
+    //                     })
+    //                 })
+    //             }
+    //
+    //             if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
+    //
+    //                 this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
+    //                 service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
+    //                     this.props.history.push("/arrangement/" + updated.insertId)
+    //                 }).catch(error => console.log(error))
+    //             } else {
+    //                 this.props.history.push("/arrangement/" + updated.insertId)
+    //             }
+    //         }).catch(err => console.log(err))
+    //     }
+    // }
 
     toBase64 = (file) => new Promise((resolve, reject) => {
+        if (file === "") {
+            resolve(null);
+            return;
+        }
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
 
+
+    sendGigs = (eventId) => new Promise((resolve, reject) => {
+        if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
+            Promise.all(this.state.artistsAdd.map(artist => {
+                this.toBase64(this.state.contract).then(cData => {
+                    let contract = new SimpleFile(cData, this.state.contract.name);
+                    service
+                        .addGig(new Gig(eventId, artist.userId, contract))
+                        .catch(error => reject(error))
+                })
+            })).then(() => resolve(true));
+        }
+    });
+
+
+    sendPersonnel = (eventId) => new Promise((resolve, reject) => {
+        if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
+            this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, eventId, user.role));
+            service
+                .addPersonnel(this.state.personnelAdd)
+                .then(() => resolve(true))
+                .catch(error => reject(error));
+        }
+    });
+
+    handleSubmit() {
+        let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
+        let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
+
+        this.toBase64(this.state.image).then(image => {
+
+            let newEvent = new Event(
+                null,
+                this.state.organizerId,
+                this.state.eventName,
+                this.state.city,
+                this.state.eventAddress,
+                this.state.placeDescription,
+                this.state.eventDescription,
+                this.state.ageLimit,
+                fDateTime,
+                tDateTime,
+                this.state.imageUrl,
+                image,
+                this.state.cancelled);
+
+            service.createEvent(newEvent).then(created => {
+                this.sendGigs(created.insertId).then(() => {
+                    this.sendPersonnel(created.insertId).then(() => {
+                        this.props.history.push("/arrangement/" + created.insertId)
+                    })
+                });
+            }).catch(err => console.error(err))
+        });
+    }
 
     render() {
 
@@ -371,7 +418,7 @@ export class AddEvent extends Component {
                                                         <Col sm={"2"}>
                                                             <label>Fjern artist</label>
                                                             <Button type="button" variant={"danger"} onClick={() => {
-                                                                this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist),1)
+                                                                this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist), 1)
                                                                 this.setState({artistsAdd: this.state.artistsAdd});
                                                             }
                                                             }>Fjern</Button>
@@ -437,16 +484,16 @@ export class AddEvent extends Component {
                                                     </Col>
                                                 </Row>
                                             </ListGroupItem>
-                                    </React.Fragment>
-                                ))}
-                            </ListGroup>
-                        </Form.Group>
+                                        </React.Fragment>
+                                    ))}
+                                </ListGroup>
+                            </Form.Group>
 
-                        <Form.Group as={Col} sm={"6"}>
-                            <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
-                            <input type="file" className="form-control" encType="multipart/form-data" name="file"
-                                   onChange={this.handleImageUpload}/>
-                        </Form.Group>
+                            <Form.Group as={Col} sm={"6"}>
+                                <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                                <input type="file" className="form-control" encType="multipart/form-data" name="file"
+                                       onChange={this.handleImageUpload}/>
+                            </Form.Group>
 
                             <Form.Group as={Col} sm={"6"}>
                                 <Form.Label>Eller legg inn en bilde-url</Form.Label>

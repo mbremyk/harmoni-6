@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
@@ -339,6 +341,19 @@ class Dao {
                 return false;
             })
     }
+
+    /**
+     * Delete all events with end time older than 90 days
+     *
+     * @returns {number}
+     */
+    deleteOldEvents() {
+        let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
+        oldEvents.map(event => console.log(event.eventId));
+        if(oldEvents.length == null) return 0;
+        else return oldEvents.length
+    }
+
 
     /**
      * Finds all registered events
