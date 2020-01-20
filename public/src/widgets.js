@@ -29,13 +29,12 @@ export class EventInfo extends Component {
      </div>
      {this.props.price}*/
 
-    getAgeLimitInfo(age_limit){
-        if(age_limit !== 0)
-        {
+    getAgeLimitInfo(age_limit) {
+        if (age_limit !== 0) {
             return <div>
                 <b>Aldersgrense:</b> {age_limit}
             </div>
-        }else{
+        } else {
             return <div className="font-weight-bold">
                 Tillat For Alle
             </div>
