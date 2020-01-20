@@ -2,10 +2,30 @@ import axios from 'axios'
 import {authService} from './AuthService'
 
 var url = '';
-if (window.location.href.includes('localhost')) {
+if (window.location.href.includes('localhost:5000')) {
     url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
+} else if (window.location.href.includes('localhost:3000')) {
+    url = 'http://localhost:8080';
 } else {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
+}
+
+export class Artist {
+
+    userId;
+    username;
+    email;
+    contract;
+    document;
+
+    constructor(userId, username, email, contract, document) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.contract = contract;
+        this.document = document
+    }
+
 }
 
 export class User {
@@ -29,19 +49,19 @@ export class Event {
     description;
     cancelled;
 
-	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
-		this.eventId = eventId;
-		this.organizerId = organizerId;
-		this.eventName = eventName;
-		this.address = address;
-		this.description = description;
-		this.ageLimit = ageLimit;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.imageUrl = imageUrl;
-		this.image = image;
-		this.cancelled = cancelled;
-	}
+    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
+        this.eventId = eventId;
+        this.organizerId = organizerId;
+        this.eventName = eventName;
+        this.address = address;
+        this.description = description;
+        this.ageLimit = ageLimit;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.imageUrl = imageUrl;
+        this.image = image;
+        this.cancelled = cancelled;
+    }
 }
 
 export class SimpleFile {
@@ -55,18 +75,16 @@ export class SimpleFile {
 
 }
 
-export class BulkGig {
+export class Gig {
 
     eventId;
-    rider;
+    artistId;
     contract;
-    artists;
 
-    constructor( eventId, artists, rider, contract) {
+    constructor(eventId, artistId, contract) {
         this.eventId = eventId;
-        this.rider = rider;
         this.contract = contract;
-        this.artists = artists;
+        this.artistId = artistId;
     }
 }
 
@@ -77,24 +95,13 @@ export class Ticket {
     amount;
 }
 
-export class BulkPersonnel {
-    personnel ;
-    eventId;
-
-    constructor(personnel, eventId) {
-        this.personnel = personnel;
-        this.eventId = eventId;
-    }
-
-}
-
 export class Personnel {
     personnelId;
     eventId;
     role;
 
-    constructor(personnel, eventId, role) {
-        this.personnelId = personnel;
+    constructor(userId, eventId, role) {
+        this.personnelId = userId;
         this.eventId = eventId;
         this.role = role;
     }
@@ -169,6 +176,11 @@ class Services {
         return axios.put(url + "/auth/events/" + event.eventId, event, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
+    deleteEvent(event) {
+        //console.log(url + '/auth/events/' + event.eventId);
+        return axios.delete(url + '/auth/events/' + event.eventId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
     getEvents() {
         return axios.get(url + '/events').then(response => response.data);
     }
@@ -189,9 +201,8 @@ class Services {
     /*
         PERSONNEL
     */
-    createPersonnel(personnel) {
-        console.log(personnel);
-        return axios.post(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
+    createPersonnel(personnel, id) {
+        return axios.post(url + '/events/' + id + '/personnel', personnel).then(response => response.data);
     }
 
     updatePersonnel(personnel) {
@@ -231,7 +242,7 @@ class Services {
         GIGS
     */
     createGig(gig) {
-        return axios.post(url +'/gigs', gig).then(response => response.data);
+        return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
     }
 
     uploadContract(formData, event, artist) {
@@ -239,23 +250,13 @@ class Services {
     }
 
     getGigForEvent(eventId) {
-        return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
+        return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
-    downloadContract(event, artist)
-    {
+    downloadContract(eventId, artistId) {
         console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url+"/contract/"+event+"/"+artist).then(response => response.data);
+        return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
     }
-    downloadRider(event, artist)
-    {
-        console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url+"/rider/"+event+"/"+artist).then(response => response.data);
-    }
-
-
 }
 
 export let service = new Services();

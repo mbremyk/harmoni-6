@@ -5,6 +5,13 @@
        /*<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
 
 }*/
+
+body {
+    background-image: url(/pictures/geometricPattern.png);
+    background-repeat: repeat;
+    min-height: 100%;
+}
+
 .landingpage {
     height: 100vh;
     min-height: 500px;
@@ -19,20 +26,8 @@
     font-family: 'Lemonada', cursive;
 }
 
-.Footer {
-    position:relative;
-    left:0;
-    bottom:0;
-    right:0;
-}
-
-.body {
-    height: 100vh;
-}
-
 #root {
-    height: 100vh;
-    padding-bottom:60px;
+    height: 100%;
 }
 
 /*Styling for eventinfo*/
@@ -40,24 +35,28 @@
  {
      color: black;
      text-decoration: none;
+
  }
 
 .eventinfo a:hover
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:active
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:link
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:visited
@@ -65,3 +64,13 @@
     color: black;
     text-decoration: none;
 }
+
+.footer {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+}
+
+
+

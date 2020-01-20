@@ -6,41 +6,55 @@ import Container from "react-bootstrap/Container";
 import NavLink from "react-bootstrap/NavLink";
 import {authService} from "../AuthService";
 import {Card} from "react-bootstrap";
+import Alert from "react-bootstrap/Alert";
 
 export class LoginForm extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			email: '',
-			password: ''
-		};
-		this.handleEmailChange = this.handleEmailChange.bind(this);
-		this.handlePasswordChange = this.handlePasswordChange.bind(this);
-	}
+    constructor(props) {
+        super(props);
+        this.state = {
+            email: '',
+            password: '',
+            error: '',
+            errorType: 'success',
+        };
+        this.handleEmailChange = this.handleEmailChange.bind(this);
+        this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    }
 
-	handleEmailChange(event) {
-		this.setState({email: event.target.value});
-	}
+    handleEmailChange(event) {
+        this.setState({email: event.target.value});
+    }
 
-	handlePasswordChange(event) {
-		this.setState({password: event.target.value});
-	}
+    handlePasswordChange(event) {
+        this.setState({password: event.target.value});
+    }
 
-	handleLogin() {
-		if (!this.state.email || !this.state.password) {
-			return;
-		}
-		authService.login(this.state.email, this.state.password).then(res => {
-			window.location = '/hjem'
-		})
-	}
+    setError(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
+    }
 
-	render() {
-		return (
-			<Container style={{width: '40em'}}>
-				<Card style={{padding: '10px', 'margin-top': '20%'}}>
+    handleLogin() {
+        if (!this.state.email || !this.state.password) {
+            this.setError('Alle felter må fylles.', 'danger');
+            return;
+        }
+        authService.login(this.state.email, this.state.password).then(res => {
+            window.location = '/hjem'
+        }).catch(() => this.setError('Innlogging feilet', 'danger'));
+    }
+
+    render() {
+        return (
+            <Container style={{width: '40em'}}>
+                <Card style={{padding: '10px', 'margin-top': '20%'}}>
                     <div style={{padding: '5%'}}>
                         <label className='h1'>Logg inn</label>
+
+                        {(this.state.error) ?
+                            <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                            <div style={{height: '3em'}}/>}
+
                         <Form>
                             <Form.Group controlId="formBasicEmail">
                                 <Form.Label>Email</Form.Label>
@@ -75,8 +89,8 @@ export class LoginForm extends Component {
                             <NavLink href={'/hjem'}>Trykk her om du ikke bli sent videre..</NavLink>
                         </Form>
                     </div>
-				</Card>
-			</Container>
-		);
-	}
+                </Card>
+            </Container>
+        );
+    }
 }

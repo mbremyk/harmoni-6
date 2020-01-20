@@ -19,204 +19,160 @@ export class EventInfo extends Component {
     link;
     myEvent;
 
+    state = {
+        hoverCss: "shadow-sm"
+    };
+
 
     /*<div className="font-weight-bold">
      Pris fra
      </div>
      {this.props.price}*/
 
-    getCancelled() {
+    getAgeLimitInfo(age_limit) {
+        if (age_limit !== 0) {
+            return <div>
+                <b>Aldersgrense:</b> {age_limit}
+            </div>
+        } else {
+            return <div className="font-weight-bold">
+                Tillat For Alle
+            </div>
+        }
+    }
+
+    getCardFooter(myEvent) {
+        if (myEvent) {
+            return <Row>
+                <Col>
+                    <small className="text-muted"> Publisert {this.props.uploaded}</small>
+                </Col>
+                <Col>
+                    <Button href={"/endre-arrangement/" + this.props.link} variant="primary" size="sm">Rediger
+                        Arragement</Button>
+                </Col>
+            </Row>
+        } else return <small className="text-muted"> Publisert {this.props.uploaded}</small>
+    }
+
+    getCancelledTxt() {
         if (this.props.event.cancelled) return "Kansellert!";
         else return "";
     }
 
     render() {
-        if (this.props.myEvent) {
-            return (
-
-
-                <Col md={12} lg={4}>
-
-
-                    <Card>
-
-                        <div className="eventinfo">
-                            <a href={"/arrangement/" + this.props.link}>
-                                <Card className="text-danger">
-                                    <Card.Img src={this.props.imageUrl} alt={this.title} />
-                                    <Card.ImgOverlay>
-                                        <Card.Title><h1>{this.getCancelled()}</h1></Card.Title>
-                                    </Card.ImgOverlay>
-                                </Card>
-                            </a>
-                        </div>
-                        <Card.Body>
-
-
-                            <div className="eventinfo">
-                                <a href={"/arrangement/" + this.props.link}>
-
-                                    <Card.Title>{this.props.title}</Card.Title>
-                                    <Card.Text>
-                                        <div className="font-weight-bold ">
-                                            Adresse
-                                        </div>
-                                        {this.props.address}
-
-                                        <div className="font-weight-bold">
-                                            Aldersgrense
-                                        </div>
-                                        <div className="font-italic">
-                                            {this.props.age_limit}
-                                        </div>
-                                        <div className="font-weight-bold">
-                                            Fra
-                                        </div>
-
-                                        {this.props.start_date}
-
-                                        <div className="font-weight-bold">
-                                            Til
-                                        </div>
-
-                                        {this.props.end_date}
-
-                                    </Card.Text>
-
-                                </a>
-                            </div>
-
-                        </Card.Body>
-                        <Card.Footer>
-                            <Row>
-                                <Col>
-                                    <small className="text-muted"> Publisert {this.props.uploaded}</small>
-                                </Col>
-                                <Col>
-                                    <Button href={"/endre-arrangement/" + this.props.link} variant="primary" size="sm">Rediger
-                                        Arragement</Button>
-                                </Col>
-                            </Row>
-
-                        </Card.Footer>
-                    </Card>
-
-
-                </Col>
-
-
-            );
-
-
-        } else {
-            return (
-
-                <Col md={12} lg={4}>
-
-
-
-
-                    <Card>
-                        {/*<Card.Img variant="top"
-                                  src={this.props.imageUrl}
-                                  alt={this.title}/>*/}
-                        <Card className="text-danger">
-                            <Card.Img src={this.props.imageUrl} alt={this.title} />
+        return (
+            <Col md={12} lg={4} className={"mt-2 mb-2"} style={{cursor: "pointer"}}>
+                <Card onMouseEnter={() => this.setState({hoverCss: "shadow-lg"})}
+                      onMouseLeave={() => this.setState({hoverCss: "shadow-sm"})}
+                      className={this.state.hoverCss}
+                      onClick={() => window.location = "/arrangement/" + this.props.link}
+                >
+                    <Card className="text-danger border-0">
+                        <div style={{height: "13em", overflow: "hidden"}}>
+                            <Card.Img src={this.props.imageUrl} alt={this.title}/>
                             <Card.ImgOverlay>
-                                <Card.Title><h1>{this.getCancelled()}</h1></Card.Title>
+                                <Card.Title><h1>{this.getCancelledTxt()}</h1></Card.Title>
                             </Card.ImgOverlay>
-                        </Card>
-                        <Card.Body>
-
-
+                        </div>
+                    </Card>
+                    <Card.Body>
+                        <div className="eventinfo">
                             <Card.Title>{this.props.title}</Card.Title>
                             <Card.Text>
                                 <div className="font-weight-bold ">
                                     Adresse
                                 </div>
                                 {this.props.address}
-
-                                <div className="font-weight-bold">
-                                    Aldersgrense
-                                </div>
-                                <div className="font-italic">
-                                    {this.props.age_limit}
-                                </div>
+                                {this.getAgeLimitInfo(this.props.age_limit)}
                                 <div className="font-weight-bold">
                                     Fra
                                 </div>
-
                                 {this.props.start_date}
-
                                 <div className="font-weight-bold">
                                     Til
                                 </div>
-
                                 {this.props.end_date}
-
                             </Card.Text>
-
-                            <a href={"/arrangement/" + this.props.link} className="stretched-link"></a>
-
-
-                        </Card.Body>
-                        <Card.Footer>
-                            <small className="text-muted"> Publisert {this.props.uploaded}</small>
-                        </Card.Footer>
-                    </Card>
-
-
-                </Col>
-            );
-        }
-
-
+                        </div>
+                    </Card.Body>
+                    <Card.Footer>
+                        {this.getCardFooter(this.props.myEvent)}
+                    </Card.Footer>
+                </Card>
+            </Col>
+        );
     }
 }
 
-export class DownloadWidget extends Component {
+export class DownloadWidget extends Component  {
     //TODO: Add event keys to fetch correct contract/rider
+    artist = 1;
+    event = 1;
+    type = "";
     render() {
         return (
-            <button onClick={this.download}>Download the file</button>
+            <Button onClick={this.download} variant="primary" title="Last Ned" size="sm">
+                last ned {this.type}
+            </Button>
         )
     }
 
-	download(){
-		//For the time being this only fetches the file with the 1-1 key.
-		//window.location.href="http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/contract/1/1";
-		let eventId = 2;
-		let artistId = 5;
-		service.downloadContract(eventId, artistId)
-			.then( response => {
-				console.log(response);
-				let fileName = response.name;
-				const link = document.createElement('a');
-				link.download = response.name;
-				link.href = 'data:application/octet-stream;base64,'+response.data;
-				link.click();
-		})
+    mounted() {
+        this.artist = this.props.artist;
+        this.event = this.props.event;
+        this.type = this.props.type;
+    }
 
-	}
-	/*b64toBlob (b64Data, contentType='', sliceSize=512) {
-		const byteCharacters = atob(b64Data);
-		const byteArrays = [];
 
-		for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-			const slice = byteCharacters.slice(offset, offset + sliceSize);
+    download () {
+        /*let eventId = this.e.eventId;
+        let artistId = this.artist.userId;*/
+        //let artistId = 1;
+        //console.log(this.artists[0].username);
+        console.log(this.artist);
+        if(this.type == "kontrakt") {
+            service.downloadContract(this.event, this.artist)
+                .then(response => {
+                    console.log("INNI Promise");
+                    console.log("response: "+response);
+                    let fileName = response.name;
+                    const link = document.createElement('a');
+                    link.download = response.name;
+                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
+                    //console.log(ret);
+                    link.href = response.data;
+                    link.click();
+                })
+        }else if(this.type == "rider"){
+            service.downloadRider(this.event, this.artist)
+                .then(response => {
+                    console.log("INNI Promise");
+                    console.log("response: "+response);
+                    let fileName = response.name;
+                    const link = document.createElement('a');
+                    link.download = response.name;
+                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
+                    //console.log(ret);
+                    link.href = response.data;
+                    link.click();
+                })
+        }else{
+            service.downloadOther(this.event, this.artist)
+                .then(response => {
+                    console.log("INNI Promise");
+                    console.log("response: "+response);
+                    let fileName = response.name;
+                    const link = document.createElement('a');
+                    link.download = response.name;
+                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
+                    //console.log(ret);
+                    link.href = response.data;
+                    link.click();
+                })
+        }
 
-			const byteNumbers = new Array(slice.length);
-			for (let i = 0; i < slice.length; i++) {
-				byteNumbers[i] = slice.charCodeAt(i);
-			}
-
-			const byteArray = new Uint8Array(byteNumbers);
-			byteArrays.push(byteArray);
-		}
-
-		const blob = new Blob(byteArrays, {type: contentType});
-		return blob;
-	}*/
+    };
 }
 
 export class UploadWidget extends Component {
