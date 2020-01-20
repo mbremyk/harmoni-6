@@ -437,7 +437,7 @@ app.post("/auth/events", (req, res) => {
 
 
 /**
- * Get all events in database as an array
+ * Get all events in database as an array + checks and deletes old entries
  * {
  *     eventId: int
  *     organizerId: int -> user(userId)
@@ -453,6 +453,9 @@ app.post("/auth/events", (req, res) => {
  */
 app.get("/events", (req, res) => {
     console.log("GET-request - /events");
+    console.log("Deleting events older than 90 days");
+    console.log("Quantity: " + db.deleteOldEvents());
+
     return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
 
@@ -531,13 +534,6 @@ app.delete('/auth/events/:eventId', (req, res) => {
     console.log("DELETE-request - /events/" + req.params.eventId);
     return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
-
-/*app.delete('/jobs/:id', (req, res) => {
-    jobDao.deleteJob(req.params.id, (status, data) => {
-        res.status(status);
-        res.json(data);
-    });
-});*/
 
 
 /**
