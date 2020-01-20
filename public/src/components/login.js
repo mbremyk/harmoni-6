@@ -46,10 +46,14 @@ export class LoginForm extends Component {
 
     render() {
         return (
-            <Container style={{width: '40em'}}>
-                <Card style={{padding: '10px', 'margin-top': '20%'}}>
+            <Container style={{width: '40em', top: '0'}}>
+
+				<h1 className="HarmoniLogo display-3 text-center m-5">Harmoni</h1>
+
+                <Card className="m-5" style={{padding: '10px',}}>
                     <div style={{padding: '5%'}}>
-                        <label className='h1'>Logg inn</label>
+
+                        <h1 className='h1 text-center'>Logg inn</h1>
 
                         {(this.state.error) ?
                             <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
@@ -74,6 +78,7 @@ export class LoginForm extends Component {
                             </Form.Group>
 
                             <Button
+	                            className="mr-2"
                                 onClick={this.handleLogin}
                                 variant="primary"
                                 type="button">
@@ -86,7 +91,7 @@ export class LoginForm extends Component {
                                 Avbryt
                             </Button>
                             <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
-                            <NavLink href={'/hjem'}>Trykk her om du ikke bli sent videre..</NavLink>
+                            <NavLink href={'/nytt-passord'}>Glemt passord</NavLink>
                         </Form>
                     </div>
                 </Card>

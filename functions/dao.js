@@ -116,6 +116,48 @@ class Dao {
             });
     }
 
+    async forgotPassword(email) {
+        let newPass = Math.random().toString(36).substring(7);
+        let salt = await this.getSaltByEmail(email);
+        let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
+
+        console.log('!!! nytt passord: \'' + newPass + '\'');
+
+        return model.UserModel.update(
+            {
+                tempPassword: credentials[0]
+            },
+            {where: {email: email}}
+        ).then(response => response ? newPass : null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    onetimeLogin(email, password) {
+        return model.UserModel.findAll(
+            {where: {[op.and]: [{email: email}, {tempPassword: password}]}})
+            .then(response => response.length === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    deleteOneTimeLogin(email) {
+        return model.UserModel.update(
+            {
+                tempPassword: null
+            },
+            {where: {email: email}}
+        ).then(response => response[0] === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
     updatePassword(user) {
         return model.UserModel.update(
             {
@@ -206,19 +248,22 @@ class Dao {
      * by the database in attribute 'insertId'
      *
      * @param event
-     * @returns {Promise<number>}
+     * @returns {Promise<T>}
      */
     createEvent(event) {
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
                 eventName: event.eventName,
+                city: event.city,
                 address: event.address,
+                placeDescription: event.placeDescription,
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
+                imageUrl: event.imageUrl,
+                image: event.image,
                 description: event.description,
-                imageUrl: event.imageUrl
             })
             .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
@@ -527,6 +572,13 @@ class Dao {
                         return false;
                     })
             });
+
+        /*model.GigModel.update(
+            {contract: contract},
+            { where: { gigId: gig, artistId: artist}}
+        );
+        model.update();*/
+
     }
 
 
@@ -622,8 +674,29 @@ class Dao {
                 return [];
             });
     }
+
+
+    /*
+                         🐞 BUG STUFF 🐛
+     */
+    createBug(body) {
+        return model.BugModel.create({
+            email: body.email,
+            username: body.username,
+            subject: body.subject,
+            bugText: body.text
+        })
+            .then(res => res.bugId !== null)
+            .catch(error => {
+                //console.error(error);
+                return false;
+            });
+    }
 }
 
+
+//model.syncTestData();
+//model.syncModels();
 module.exports = Dao;
 
 
