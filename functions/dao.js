@@ -117,6 +117,9 @@ class Dao {
     }
 
     async forgotPassword(email) {
+        let result = await this.getUserByEmail(req.params.email);
+        if(result === null) { console.log('No email found for temp pass.'); return; }
+
         let newPass = Math.random().toString(36).substring(7);
         let salt = await this.getSaltByEmail(email);
         let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
