@@ -5,7 +5,7 @@
     "serve": "firebase serve --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "run-local": "node index.js",
+    "run-local": "nodemon index.js",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test": "jest --detectOpenHandles --forceExit"
@@ -51,6 +51,7 @@
     "formidable": "^1.2.1",
     "jest": "^24.9.0",
     "multer": "^1.4.2",
+    "nodemailer": "^6.4.2",
     "sequelize": "^5.21.3"
   },
   "private": true

@@ -1,6 +1,6 @@
 import {Component} from "react-simplified";
 import {Container, Row, Col, Button, Form, Alert, Image, Table} from "react-bootstrap";
-import {EventInfo} from '../widgets.js';
+import {EventInfo, DownloadWidget} from '../widgets.js';
 import {createHashHistory} from 'history';
 import * as React from 'react';
 import {Event, service, Ticket, User} from '../services';
@@ -52,7 +52,6 @@ export class EventPage extends Component {
                                 <h6>Arrangert av: {this.user.username}</h6>
                             </Col>
                         </Row>
-                        {this.DownloadContract()}
                         <Row>
                             <Col>
                                 <p>{this.currentEvent.description}</p>
@@ -148,11 +147,25 @@ export class EventPage extends Component {
             .catch((error) => console.log(error));
     }
 
-    //only the artist viewing the page will get this option beside their contact info
-    RiderButton(id) {
+    RenderButtons(id) {
         let token = jwt.decode(authService.getToken());
         if (id == token.userId) {
-            return <Button variant="primary" size="sm" className="float-right">Legg til Rider</Button>;
+            return (
+                <div>
+
+                    <Button variant="primary"
+                            size="sm"
+                            href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
+                        Legg til Rider
+                    </Button>
+
+                    <DownloadWidget type={"kontrakt"} artist={id} event={this.currentEvent.eventId}/>
+
+
+                </div>);
+        } else if (this.isOrganizer) {
+            return <Col><DownloadWidget type={"kontrakt"} artist={id} event={this.currentEvent.eventId}/></Col>;
+
         }
     }
 
@@ -164,25 +177,27 @@ export class EventPage extends Component {
 
                     <Col className="border-bottom border-top"><b>Artist</b></Col>
                     <Col className="border-bottom border-top"><b>Epost</b></Col>
+                    <Col className="border-bottom border-top"></Col>
+
 
                 </Row>
 
 
-                {this.artists.map(person => (
-                    <Row>
-                        <Col>{person.user.username}</Col>
-                        <Col>{person.user.email} {this.RiderButton(person.artistId)}</Col>
-
-
-                    </Row>
-
-                ))}
+                {
+                    this.artists.map(person => (
+                        <Row>
+                            <Col>{person.user.username}</Col>
+                            <Col>{person.user.email} </Col>
+                            <Col>{this.RenderButtons(person.artistId)}</Col>
+                        </Row>
+                    ))}
 
             </div>
 
-
         }
+
     }
+
 
 //returns a list over personnel and their contact info if there is any personnel on the event
     ShowPersonnel() {
@@ -209,21 +224,6 @@ export class EventPage extends Component {
 
         }
 
-    }
-
-    //the button will render if the user is an artist or an organizer
-    DownloadContract() {
-        if (this.isOrganizer || this.isArtist) {
-            return <Row>
-                <Col>
-                    <a href="" download>
-                        <Button variant="primary" aria-label="Left Align" title="Last Ned">
-                            Last Ned Kontrakt
-                        </Button>
-                    </a>
-                </Col>
-            </Row>
-        }
     }
 
     //only organizers get to edit the event so this button will only render when the user is the organizer
@@ -280,7 +280,9 @@ export class EventPage extends Component {
 
     handleDelete = () => {
         if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-            service.deleteEvent(this.currentEvent).then(() => {this.props.history.push("/hjem/")});
+            service.deleteEvent(this.currentEvent).then(() => {
+                this.props.history.push("/hjem/")
+            });
             alert("Arrangementet er nå slettet")
         }
     };

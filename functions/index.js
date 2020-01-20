@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const hashPassword = require("./userhandling");
 let cors = require("cors");
 let fs = require("fs");
+const mail = require("./mail.js");
 
 //Express
 const express = require("express");
@@ -113,7 +114,6 @@ function getToken(user) {
  * get      /validate/email/:email
  * post     /auth/logout
  * post     /auth/refresh
- * put      /forgotPass/:email
  *
  *                      USERS
  * post     /users
@@ -123,7 +123,7 @@ function getToken(user) {
  * get      /auth/users/:userId
  *
  *                      EVENTS
- * post     /events                         ?auth?
+ * post     /auth/events
  * put      /auth/events/:eventId
  * get      /events
  * get      /events/search/:searchText
@@ -145,9 +145,15 @@ function getToken(user) {
  *                      GIGS
  * post     /events/:eventId/gigs           ?auth?
  * get      /events/:eventId/gigs           ?auth?
- * post     /contracts/:eventId/:artistId   ?auth?  ?/events/:eventId/gigs/:artistId?
- * get      /contract/:eventId/:artistId    ?auth?  ?/events/:eventId/gigs/:artistId?
+ * get      /events/:eventId/gigs/:artistId     //contract
+ * post     /events/:eventId/gigs/:artistId/rider
+ * get      /events/:eventId/gigs/:artistId/rider
  *
+ *                      MAIL
+ * @link mail
+ * use      /mail
+ * post     /mail/bug
+ * post     /mail/password
  */
 
 
@@ -384,17 +390,9 @@ app.get("/auth/users/:userId", (req, res) => {
     EVENTS
  */
 
-/**
- *
- */
-app.post("/events", (req, res) => {
-	console.log("POST-request - /events");
-	return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
-});
-
 app.post("/auth/events", (req, res) => {
-	console.log("POST-request - /events");
-	return db.createEvent(req.body).then(response => (response.insertId !== undefined) ? res.status(201).send(response) : res.status(400));
+	console.log("POST-request - /auth/events");
+	 db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
 });
 
 /**
@@ -503,32 +501,20 @@ app.delete('/auth/events/:eventId', (req, res) => {
  * Add personnel to an event
  * body:
  * {
- *    personnelId: number
- *    eventId:  number
- *    role:  string
+ *    personnel[]: Array of personnel objects
  * }
  *
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/personnel", (req, res) => {
-	console.log(Object.keys(req.body));
-	console.log(JSON.stringify(req.body));
-	let eventId = decodeURIComponent(req.params.eventId);
-	req.body.personnel.map(person => {
-		db.addPersonnel(person, eventId)
-			.then(() => console.log(person));
-	});
-	res.status(201);
-	//return db.addPersonnel(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+	return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
 /**
  * Changes the information of personnel
  * body:
  * {
- *    personnelId: number
- *    eventId:  number
- *    role:  string
+ *    personnel[]: Array of personnel objects
  * }
  *
  * @return {json} {jwt: token}
@@ -582,7 +568,7 @@ app.get("/events/:eventId/personnel", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/tickets", (req, res) => {
-	return db.addTicket(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
 });
 
 /**
@@ -636,43 +622,18 @@ app.get("/events/:eventId/tickets", (req, res) => {
     GIGS
  */
 /**
- * Creates a Gig
+ * Creates a Gig and ads contract file
  * body:
  * {
  *    artistId: number
  *    eventId: number
- *    rider?: number
- *    contract?: number
+ *    contract: FILE
  * }
  *
  * @return {json} {jwt: token}
  */
-app.post("/gigs", (req, res) => {
-	console.log("POST-request - /gigs");
-	console.log(req.body.artists);
-	let contractFile = req.body.contract;
-	let riderFile = req.body.rider;
-	/*console.log(riderFile.name);
-	console.log(contractFile.name);*/
-
-	// req.body.artists.shift();
-	req.body.artists.map(artist => {
-		console.log(artist.username);
-		db.addGig(artist.userId, req.body.eventId).then(response => {
-			console.log("Index" + response);
-			if (contractFile != null || riderFile != null) {
-				db.setContract(contractFile, response.eventId, artist.userId)
-					.then(() => {
-						console.log("Contract set");
-						db.setRider(riderFile, response.eventId, artist.userId)
-							.then(() => {
-								console.log("Rider set");
-								res.status(201).send(response)
-							});
-					});
-			}
-		});
-	});
+app.post("/events/:eventId/gigs", (req, res) => {
+    db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus());
 });
 
 /**
@@ -690,85 +651,53 @@ app.get("/events/:eventId/gigs", (req, res) => {
 	return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
-app.post("/contracts/:eventId/:artistId", (req, res) => {
-	console.log("Calling setContract");
-	const {
-		fieldname,
-		originalname,
-		encoding,
-		mimetype,
-		buffer,
-	} = req.files[0];
-	let file = req.files[0];
-	console.log(req.files[0].originalname);
-	console.log(req.files[0]);
 
-	console.log(file.buffer instanceof Buffer);
-	/* let base64String = file.buffer.toString('base64');
-
-	 let buf = new Buffer(base64String, "base64");
-
-	 /*fs.writeFile(`${__dirname}/uploads/`+file.originalname, buf, (err) => {
-		 if (err){
-			 res.send(err);
-		 }else{
-			 console.log('The file has been saved!');
-			 res.send("done");
-		 }
-	 });*/
-	//Todo set access here
-	db.setContract(file, req.params.eventId, req.params.artistId)
-		.then(() => res.send("Change made"));
+/**
+ * Adds rider items to the database
+ * body:
+ * {
+ *      RiderItem[]
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.post("/events/:eventId/gigs/:artistId/rider", (req, res) => {
+    db.addRiderItems(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
-app.get("/contract/:eventId/:artistId", (req, res) => {
-	console.log("downloading file");
 
-	//Todo check access here
-	db.getContract(req.params.eventId, req.params.artistId)
-		.then(result => {
+/**
+ * Updates an array of riderItems in the database
+ * body:
+ * {
+ *      RiderItem[]
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.put("/events/:eventId/gigs/:artistId/rider", (req, res) => {
+    db.updateRiderItems(req.body).then((updateOk) => updateOk ? res.status(201).send(true) : res.status(401).send(false))
 
-				let base64String = result.data;
-				let name = result.name;
-				//let buf = new Buffer(base64String, "base64");
-
-				res.send({name: name, data: base64String});
-				/*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
-					if (err){
-						res.send(err);
-					}else{
-						console.log('The file has been saved!');
-						const file = `${__dirname}/uploads/`+name;
-						res.download(file); // Set disposition and send it.
-					}
-				});*/
-			}
-		);
 });
 
-app.get("/rider/:eventId/:artistId", (req, res) => {
-	console.log("downloading file");
-
-	//Todo check access here
-	db.getRider(req.params.eventId, req.params.artistId)
-		.then(result => {
-
-				let base64String = result.data;
-				let name = result.name;
-				let buf = new Buffer(base64String, "base64");
-
-				res.send({name: name, data: base64String});
-				/*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
-					if (err){
-						res.send(err);
-					}else{
-						console.log('The file has been saved!');
-						const file = `${__dirname}/uploads/`+name;
-						res.download(file); // Set disposition and send it.
-					}
-				});*/
-			}
-		);
+/**
+ *  Get an array of riderItems connected to gig with params matching the url
+ *
+ *  @return {json} {jwt: token, RiderItem[]}
+ */
+app.get("/events/:eventId/gigs/:artistId/rider", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    let artistId = decodeURIComponent(req.params.artistId);
+    db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
 });
+
+/*
+                    MAIL
+ */
+mail.addMailEndpoints(app, db);
+
+/**
+ * @link mail
+ */
 
 console.log("Server initalized");

@@ -23,16 +23,16 @@ function init() {
     }
 }
 
-function initCloud(){
+function initCloud() {
     let pr = new properties.CloudProperties();
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
         dialect: pr.dialect,
         host: pr.databaseURL,
-       // port: pr.port,
+        // port: pr.port,
         timestamps: false,
-        /*dialectOptions: {
-            socketPath: '/cloudsql/caramel-vine-256015:europe-north1:kkdatabase'
-        },*/
+        dialectOptions: {
+            socketPath: '/cloudsql/kkdatabase'
+        },
     });
     return sequelize;
 }
@@ -55,7 +55,7 @@ sequelize.authenticate()
     password;
     salt;
     email;
-};*/
+}; */
 
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
@@ -70,9 +70,61 @@ let UserModel = sequelize.define('user', {
 });
 
 
+/*class Event {
+    eventId;
+    organizerId;    //userId
+    eventName;
+    city;
+    address;
+    placeDescription;
+    ageLimit;
+    startTime;
+    endTime;
+    imageUrl;
+    image;
+    description;
+    cancelled;
+}*/
+
+let EventModel = sequelize.define('event', {
+    eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+    organizerId: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        },
+        allowNull: false
+    },
+    eventName: {type: Sequelize.STRING, allowNull: false},
+    city: {type: Sequelize.STRING, allowNull: true},
+    address: Sequelize.STRING,
+    placeDescription: {type: Sequelize.TEXT, allowNull: true},
+    ageLimit: Sequelize.INTEGER,
+    startTime: {
+        type: Sequelize.DATE,
+        get() {
+            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
+        }
+    },
+    endTime: {
+        type: Sequelize.DATE,
+        get() {
+            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
+        }
+    },
+    imageUrl: {type: Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
+    image: Sequelize.TEXT,
+    description: Sequelize.TEXT,
+    cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
+}, {paranoid: true});
+
+
 /*class File {
     fileId;
-    path;
+    name;
+    contentType;
+    data;
 }
  */
 
@@ -94,67 +146,6 @@ let FileModel = sequelize.define('file', {
 
 }, {paranoid: true});
 
-/*
-let FileAccessModel = sequelize.define('fileAccess', {
-    fileId: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        references: {
-            model: FileModel,
-            key: 'fileId'
-        }
-    },
-    userId: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        references: {
-            model: UserModel,
-            key: 'userId'
-        }
-    }
-});
-*/
-
-/*class Event {
-    eventId;
-    organizerId;    //userId
-    eventName;
-    address;
-    ageLimit;
-    dateTime;
-    description;
-}*/
-
-let EventModel = sequelize.define('event', {
-    eventId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-    organizerId: {
-        type: Sequelize.INTEGER,
-        references: {
-            model: UserModel,
-            key: 'userId'
-        },
-        allowNull: false
-    },
-    eventName: {type: Sequelize.STRING, allowNull: false},
-    address: Sequelize.STRING,
-    ageLimit: Sequelize.INTEGER,
-    startTime: {
-        type: Sequelize.DATE,
-        get() {
-            return moment(this.getDataValue('startTime')).format('YYYY-MM-DD HH:mm');
-        }
-    },
-    endTime: {
-        type: Sequelize.DATE,
-        get() {
-            return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
-        }
-    },
-    imageUrl: {type : Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
-    image: Sequelize.TEXT,
-    description: Sequelize.TEXT,
-    cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
-}, {paranoid: true});
 
 /*class Gig {
     artistId;
@@ -176,13 +167,6 @@ let GigModel = sequelize.define('gig', {
             key: 'eventId'
         }
     },
-    rider: {
-        type: Sequelize.INTEGER,
-        references: {
-            model: FileModel,
-            key: 'fileId'
-        }
-    },
     contract: {
         type: Sequelize.INTEGER,
         references: {
@@ -192,24 +176,42 @@ let GigModel = sequelize.define('gig', {
     }
 }, {paranoid: true});
 
-/*class Ticket {
-    eventId;
-    type;
-    price;
-    amount;
-}*/
 
-let TicketModel = sequelize.define('ticket', {
+/*
+class Rider{
+    artistId;
+    eventId;
+    riderItem;
+    confirmed: boolean
+}
+ */
+let RiderModel = sequelize.define('riderItem', {
+    artistId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: UserModel,
+            key: 'userId'
+        },
+    },
     eventId: {
-        type: Sequelize.INTEGER, primaryKey: true, references: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
             model: EventModel,
             key: 'eventId'
-        }
+        },
     },
-    type: {type: Sequelize.STRING, primaryKey: true},
-    price: Sequelize.INTEGER,
-    amount: Sequelize.INTEGER
+    item: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    },
+    confirmed: {
+        type: Sequelize.BOOLEAN,
+        default: null
+    }
 }, {paranoid: true});
+
 
 /*class Personnel {
     personnelId;
@@ -240,6 +242,32 @@ let PersonnelModel = sequelize.define('personnel', {
     paranoid: true
 });
 
+/*class Ticket {
+    eventId;
+    type;
+    price;
+    amount;
+}*/
+
+let TicketModel = sequelize.define('ticket', {
+    eventId: {
+        type: Sequelize.INTEGER, primaryKey: true, references: {
+            model: EventModel,
+            key: 'eventId'
+        }
+    },
+    type: {type: Sequelize.STRING, primaryKey: true},
+    price: Sequelize.INTEGER,
+    amount: Sequelize.INTEGER
+}, {paranoid: true});
+
+let BugModel = sequelize.define('bug', {
+    bugId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+    email: Sequelize.STRING,
+    username: Sequelize.STRING,
+    subject: Sequelize.STRING,
+    bugText: {type: Sequelize.TEXT, allowNull: false}
+});
 
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
 EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
@@ -275,24 +303,24 @@ let syncModels = () => sequelize.sync({force: false}).then().catch(error => cons
 creates tables in the testdatabase and inserts the test data
 */
 const testData = require('./tests/TestData.js');
-let syncTestData = () => sequelize.sync({force: false}).then(() => {
+let syncTestData = () => sequelize.sync({force: true}).then(() => {
     return UserModel.bulkCreate(testData.users).then(() => {
         return EventModel.bulkCreate(testData.events).then(() => {
-            return PersonnelModel.bulkCreate(testData.personnel).then(() => {
-                return TicketModel.bulkCreate(testData.tickets).then(() => {
-                    return FileModel.bulkCreate(testData.files).then(() => {
-                        return GigModel.bulkCreate(testData.gigs).then(() => true);
-                    })
+            return FileModel.bulkCreate(testData.files).then(() => {
+                return GigModel.bulkCreate(testData.gigs).then(() => {
+                    return RiderModel.bulkCreate(testData.riderItems).then(() => {
+                        return PersonnelModel.bulkCreate(testData.personnel).then(() => {
+                            return TicketModel.bulkCreate(testData.tickets).then(() => true)
+                        })
+                    });
                 });
             });
         });
-    })
-        .catch(error => {
-            console.error(error);
-            return false;
-        });
+    }).catch(error => {
+        console.error(error);
+        return false;
+    });
 });
-//syncTestData();
 
 let dropTables = () => {
     return GigModel.drop().then(() => {
@@ -317,9 +345,11 @@ module.exports = {
     EventModel,
     GigModel,
     PersonnelModel,
+    RiderModel,
     TicketModel,
     FileModel,
     syncModels,
     syncTestData,
-    dropTables
+    dropTables,
+    BugModel
 };

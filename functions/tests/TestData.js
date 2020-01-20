@@ -1,5 +1,5 @@
 /*
-TODO: USERS
+                USERS
  */
 let users = [
     {
@@ -64,16 +64,12 @@ let users = [
         password: 'SS',
         salt: 'salt',
         email: 'sabine@mail.com'
-    }//,
-    // {
-    //     //userId: 10
-    //     username: 'ANON',
-    // }
+    }
 ];
 
 
 /*
-TODO: EVENTS
+                EVENTS
  */
 let events = [
     {
@@ -179,6 +175,9 @@ let events = [
     }
 ];
 
+/*
+                FILES
+ */
 
 let files = [
     {
@@ -189,37 +188,69 @@ let files = [
     {
         name: 'Fil 2',
         contentType: 'text',
+        data: 'DATA'
+    },
+    {
+        name: 'Fil 3',
+        contentType: 'text',
         data: "Lorem var en dårlig idé"
     }
 ];
 
 /*
-TODO: GIGS
+                GIGS
  */
 let gigs = [
     {
         artistId: 5, //Magnus
         eventId: 2, //Ungdomskonert
-        rider: 1,
         contract: 2
     },
     {
         artistId: 6, //Jan
         eventId: 3, //D.D.E
-        rider: null,
-        contract: null
+        contract: 1
     },
     {
         artistId: 8, //Michael
         eventId: 4, //Kygokonsert
-        rider: null,
-        contract: null
+        contract: 3
+    }
+];
+
+/*
+                GIGS
+ */
+let riderItems = [
+    {
+        artistId: 5, //Magnus
+        eventId: 2, //Ungdomskonert
+        item: 'Varm Cola',
+        confirmed: null
+    },
+    {
+        artistId: 5, //Magnus
+        eventId: 2, //Ungdomskonert
+        item: 'Sigg',
+        confirmed: true
+    },
+    {
+        artistId: 5, //Magnus
+        eventId: 2, //Ungdomskonert
+        item: 'Nakkepute',
+        confirmed: false
+    },
+    {
+        artistId: 5, //Magnus
+        eventId: 2, //Ungdomskonert
+        item: 'Litt Sjokolade hadde vært fint',
+        confirmed: true
     }
 ];
 
 
 /*
-TODO: PERSONNEL
+            PERSONNEL
  */
 let personnel = [
     {
@@ -261,7 +292,7 @@ let personnel = [
 
 
 /*
-TODO: TICKETS
+            TICKETS
  */
 let tickets = [
     {
@@ -314,4 +345,4 @@ let tickets = [
     }
 ];
 
-module.exports = {users, events, gigs, personnel, tickets, files};
+module.exports = {users, events, gigs, personnel, tickets, files, riderItems};

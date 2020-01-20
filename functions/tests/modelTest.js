@@ -4,13 +4,11 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeEach(done => Models.syncTestData().then(res => {
-    done();
-}));
+beforeEach(done => Models.syncTestData().then(() => done()));
 
-afterEach(done => Models.dropTables().then(res => {
-    done();
-}));
+// afterEach(done => Models.dropTables().then(res => {
+//     done();
+// }));
 
 
 /*
@@ -86,7 +84,7 @@ describe('Users', () => {
 
     it('correct data in users', done => {
         db.getAllUsers().then(users => {
-            expect(users.length).toBeGreaterThanOrEqual(9);
+            expect(users.length).toBe(9);
             done();
         });
     });
@@ -176,16 +174,20 @@ describe('Events', () => {
 
     it('create event', done => {
         let event = {
-            organizerId: '3',
-            eventName: 'CREATED',
-            address: 'CREATED',
-            ageLimit: '45',
+            organizerId: 1,
+            eventName: 'CREATE TEST',
+            city: 'Trondheim',
+            address: 'Torget 2',
+            placeDescription: '3 etasje',
+            ageLimit: 12,
             startTime: null,
             endTime: null,
-            description: 'if you can see this the event was created properly'
+            imageUrl: 'fake URL',
+            image: null,
+            description: 'Create event test',
         };
         db.createEvent(event).then(response => {
-            expect(response.insertId).toEqual(6);
+            expect(response.insertId).toBe(6);
             done();
         });
     });
@@ -353,7 +355,7 @@ describe('Events', () => {
 
     it('correct data in events', done => {
         db.getAllEvents().then(events => {
-            expect(events.length).toBeGreaterThanOrEqual(5);
+            expect(events.length).toBe(5);
             done();
         });
     });
@@ -410,13 +412,21 @@ describe('Events - search', () => {
  */
 
 describe('Personnel', () => {
-    it('add personnel to event', done => {
-        let personnel = {
-            //eventId: 1,
-            userId: 1,
-            role: 'JEG VIL JOBBE'
-        };
-        db.addPersonnel(personnel, 1).then(response => {
+    it('add personnel[] to event', done => {
+        let personnel = [
+            {
+                eventId: 1,
+                personnelId: 1,
+                rider: null,
+                contract: null
+            },
+            {
+                eventId: 2,
+                personnelId: 2,
+                rider: null,
+                contract: null
+            }];
+        db.addPersonnel(personnel).then(response => {
             expect(response).toBeTruthy();
             done();
         });
@@ -477,34 +487,8 @@ describe('Personnel', () => {
             done();
         });
     });
-});
-
-
-/*
-                    GIGS
- */
-
-describe('Gigs', () => {
-    it('create Gig', done => {
-        let gig = {
-            eventId: 1,
-            artistId: 2,
-            contract: null,
-            rider: null,
-        };
-        db.addGig(2, 1).then(response => {
-            expect(response.eventId).toBe(1);
-            done();
-        });
-    });
-
-    it('correct data in gig', done => {
-        db.getGigs(4).then(gigs => {
-            expect(gigs.length).toBe(1);
-        });
-        done();
-    });
-});
+})
+;
 
 
 /*
@@ -520,7 +504,7 @@ describe('Tickets', () => {
             amount: 69,
 
         };
-        db.addTicket(ticket).then(response => {
+        db.addTickets(ticket).then(response => {
             expect(response).toBeTruthy();
             done();
         });
@@ -554,15 +538,138 @@ describe('Tickets', () => {
 
     it('correct data in tickets', done => {
         db.getTickets(4).then(tickets => {
-            expect(tickets.length).toBeGreaterThanOrEqual(3);
+            expect(tickets.length).toBe(3);
             done();
         });
     });
 });
 
-describe('Files', () => {
 
+/*
+                    GIGS
+ */
+
+describe('Gigs', () => {
+    it('create Gig', done => {
+        let gig = {
+            eventId: 1,
+            artistId: 2,
+            contract: "TEST",
+        };
+        db.addGig(gig).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct data in gig', done => {
+        db.getGigs(2).then(gigs => {
+            expect(gigs.length).toBe(1);
+            expect(gigs.map(gig =>
+                gig.toJSON()).map(gig => (
+                {
+                    eventId: gig.eventId,
+                    artistId: gig.artistId,
+                    artistName: gig.user.username,
+                }
+            ))).toEqual([
+                {
+                    eventId: 2,
+                    artistId: 5,
+                    artistName: 'Michael S.L',
+                }
+            ]);
+        });
+        done();
+    });
+
+
+    it('add riderItem', done => {
+        let item = [{
+            eventId: 2,
+            artistId: 5,
+            item: "TEST"
+        }];
+        db.addRiderItems(item).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+
+    it('update riderItems', done => {
+        let items = [
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Varm Cola',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Sigg',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Nakkepute',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Litt Sjokolade hadde vært fint',
+                confirmed: true
+            }];
+        db.updateRiderItems(items).then(updateOk => {
+            expect(updateOk).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct riderItems', done => {
+        db.getRiderItems(2, 5).then(items => {
+            expect(items.length).toBe(4);
+            expect(items.map(item =>
+                item.toJSON()).map(item => (
+                {
+                    eventId: item.eventId,
+                    artistId: item.artistId,
+                    item: item.item
+                }
+            ))).toEqual([
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Varm Cola',
+                    confirmed: null
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Sigg',
+                    confirmed: true
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Nakkepute',
+                    confirmed: false
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Litt Sjokolade hadde vært fint',
+                    confirmed: true
+                }
+            ]);
+        });
+        done();
+    });
 });
+
 
 describe('Proving math', () => {
     it('1+1=2', done => {
