@@ -206,7 +206,6 @@ describe('Events', () => {
                         startTime: event.startTime,
                         endTime: event.endTime,
                         imageUrl: event.imageUrl,
-                        image: event.image,
                         description: event.description
                     }))).toEqual([
                     {
@@ -218,7 +217,6 @@ describe('Events', () => {
                         startTime: 'Invalid date',
                         endTime: 'Invalid date',
                         imageUrl: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80',
-                        image: null,
                         description: 'Aliquet enim tortor at auctor urna nunc id cursus. Integer eget aliquet nibh praesent tristique ' +
                             'magna. Consectetur adipiscing elit ut aliquam purus sit. Congue nisi vitae suscipit tellus mauris a diam ' +
                             'maecenas. Nulla malesuada pellentesque elit eget gravida cum sociis. Non quam lacus suspendisse faucibus ' +
@@ -250,7 +248,6 @@ describe('Events', () => {
                         startTime: 'Invalid date',
                         endTime: 'Invalid date',
                         imageUrl: 'https://vulkanoslo.no/wp-content/uploads/2019/04/barvulkan_3.jpg',
-                        image: null,
                         description: 'non pulvinar neque laoreet suspendisse interdum. Ullamcorper velit sed ullamcorper morbi tincidunt. ' +
                             'Pellentesque adipiscing commodo elit at imperdiet dui accumsan. Dolor sit amet consectetur adipiscing elit ' +
                             'duis. Porttitor leo a diam sollicitudin. Tempus egestas sed sed risus. Magna sit amet purus gravida quis ' +
@@ -279,7 +276,6 @@ describe('Events', () => {
                     startTime: event.startTime,
                     endTime: event.endTime,
                     imageUrl: event.imageUrl,
-                    image: event.image,
                     description: event.description
                 }).toEqual({
                     eventId: 1,
@@ -290,7 +286,6 @@ describe('Events', () => {
                     startTime: 'Invalid date',
                     endTime: 'Invalid date',
                     imageUrl: 'https://images.readwrite.com/wp-content/uploads/2019/08/Why-You-Love-Online-Quizzes-825x500.jpg',
-                    image: null,
                     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut ' +
                         'labore et dolore magna aliqua. Ultricies integer quis auctor elit. In est ante in nibh mauris cursus ' +
                         'mattis molestie a. Dictumst quisque sagittis purus sit amet. Turpis egestas maecenas pharetra convallis ' +
