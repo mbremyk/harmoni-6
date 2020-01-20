@@ -12,13 +12,8 @@ const jwt = require("jsonwebtoken");
 
 export class RiderPage extends Component {
 
-    state = {
-        counter: Array(1)
-    };
+    state = {inputs: ['input-0']};
 
-    incrementCounter = () => {
-        this.setState({counter: Array(this.state.counter.length + 1)})
-    };
 
     render() {
 
@@ -31,19 +26,24 @@ export class RiderPage extends Component {
                         <Form.Group as={Col} sm={"12"}>
                             <h1 className="font-weight-bold text-center">Rider</h1>
                         </Form.Group>
-                        <Form.Group as={Col}>
-                            <Button variant={"success"} onClick={this.incrementCounter}>+</Button>
-
-
+                        <Form.Group>
+                            <div id="dynamicInput">
+                                {this.state.inputs.map(input => <Form.Control key={input}/>)}
+                            </div>
                         </Form.Group>
-                        <Form.Group as={Col}>
-                            <Button variant={"primary"}>Lagre Rider</Button>
-
-
+                        <Form.Group>
+                            <Button variant="success" onClick={() => this.appendInput()}>
+                                +
+                            </Button>
                         </Form.Group>
-
+                        <Form.Group>
+                            <Button variant="primary">
+                                Lagre Rider
+                            </Button>
+                        </Form.Group>
 
                     </Form>
+
                 </Container>
             </div>
         );
@@ -53,9 +53,9 @@ export class RiderPage extends Component {
     mounted() {
     }
 
-    addInputField() {
-        return <Form.Control/>
-
+    appendInput() {
+        var newInput = `input-${this.state.inputs.length}`;
+        this.setState(prevState => ({inputs: prevState.inputs.concat([newInput])}));
     }
 
 
