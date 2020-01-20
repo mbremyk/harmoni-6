@@ -114,7 +114,6 @@ let EventModel = sequelize.define('event', {
         }
     },
     imageUrl: {type: Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
-    image: Sequelize.TEXT,
     description: Sequelize.TEXT,
     cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
 }, {paranoid: true});

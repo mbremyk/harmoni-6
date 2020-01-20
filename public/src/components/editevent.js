@@ -16,6 +16,7 @@ import {HarmoniNavbar} from "./navbar";
 //import {Event, service} from "../services";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
+import {LoginForm} from "./login";
 
 export class EditEvent extends Component{
 
@@ -92,15 +93,6 @@ export class EditEvent extends Component{
             cancelled: 0
         };
     }
-
-    handleEventCancel = () =>{
-        if (window.confirm("Ønsker du å avlyse arrangementet?") === true) {
-            this.setState({cancelled: true});
-            console.log("Cancelled")
-        } else {
-            console.log("No change")
-        }
-    };
 
     handleEventNameChange(event) {
         this.setState({eventName: event.target.value});
@@ -186,24 +178,18 @@ export class EditEvent extends Component{
 
 
     handleSubmit() {
+
         let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
-        if (this.state.image !== "") {
-            this.toBase64(this.state.image)
-                .then(res => {
-                    let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-                        this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, res, "", this.state.cancelled);
-                        service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
-                });
-        }else{
-            let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-                this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl, "", this.state.cancelled);
-                service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
-        }
+        this.toBase64(this.state.image).then(image => {
 
 
-        //service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
+            let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.city, this.state.eventAddress,
+                this.state.placeDescription, this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, (image ? image : this.state.imageUrl), this.state.cancelled);
+            console.log(ev)
+            service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
+        });
     }
 
     render() {
@@ -359,7 +345,7 @@ export class EditEvent extends Component{
 
                                                             <Col sm={""}>
                                                                 <label>Last ned kontrakt</label>
-                                                                <Button id={"contract"}
+                                                                <Button type="button" id={"contract"}
                                                                         onClick={event => this.downloadC(event, artist)}>Last
                                                                     ned</Button>
                                                             </Col>
@@ -480,14 +466,19 @@ export class EditEvent extends Component{
                             </Form.Row>
 
                             <Row>
+
+                                <Col>
+                                    <Button type="button" variant={"success"} onClick={this.handleSubmit}>Endre
+                                        arragament</Button>
+                                </Col>
+
                                 <Col>
                                     <Button variant={"danger"} type="button" onClick={this.handleEventCancel}>Avlys
                                         arrangement</Button>
                                 </Col>
 
                                 <Col>
-                                    <Button type="button" variant={"success"} onClick={this.handleSubmit}>Endre
-                                        arragament</Button>
+                                    <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
                                 </Col>
 
                             </Row>
@@ -521,8 +512,8 @@ export class EditEvent extends Component{
             this.setState({fTime: fromTime});
             this.setState({tTime: toTime});
             this.setState({cancelled: event.cancelled});
-            this.setState({city: event.city})
-            this.setState({placeDescription: event.placeDescription})
+            this.setState({city: event.city});
+            this.setState({placeDescription: event.placeDescription});
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
@@ -536,14 +527,19 @@ export class EditEvent extends Component{
     }
 
     toBase64 = (file) => new Promise((resolve, reject) => {
+        if (file === "") {
+            resolve(null);
+            return;
+        }
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
 
-
     downloadC = (e, artist) => {
+
+        console.log(artist)
 
         if(e.target.id == "contract") {
             service.downloadContract(this.state.eventId, artist.userId)
@@ -572,4 +568,22 @@ export class EditEvent extends Component{
             this.setState({ageLimit: this.state.ageLimit})
         }
     }
+
+    handleDelete = () => {
+        if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
+            service.deleteEvent(this.state.eventId).then(() => {
+                this.props.history.push("/hjem")
+                alert("Arrangementet er nå slettet")
+            });
+        }
+    };
+
+    handleEventCancel = () => {
+        if (window.confirm("Ønsker du å avlyse arrangementet?") === true) {
+            this.setState({cancelled: true});
+            console.log("Cancelled")
+        } else {
+            console.log("No change")
+        }
+    };
 }

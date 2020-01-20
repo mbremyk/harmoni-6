@@ -171,65 +171,6 @@ export class AddEvent extends Component {
         this.setState({personnelRole: event.target.value})
     }
 
-    // handleSubmit() {
-    //
-    //     let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
-    //     let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
-    //
-    //
-    //     if (this.state.image !== "") {
-    //         this.toBase64(this.state.image).then(res => {
-    //             this.state.imageUrl = res;
-    //
-    //
-    //             service.createEvent(e).then(updated => {
-    //
-    //                 if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
-    //                     this.state.artistsAdd.map(artist => {
-    //                         this.toBase64(this.state.contract).then(cData => {
-    //                             let contract = new SimpleFile(cData, this.state.contract.name);
-    //                             service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
-    //                         })
-    //                     })
-    //                 }
-    //
-    //                 if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
-    //
-    //                     this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-    //                     service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
-    //                         this.props.history.push("/arrangement/" + updated.insertId)
-    //                     }).catch(error => console.log(error))
-    //                 } else {
-    //                     this.props.history.push("/arrangement/" + updated.insertId)
-    //                 }
-    //             }).catch(err => console.log(err))
-    //         });
-    //     } else {
-    //
-    //         service.createEvent(e).then(updated => {
-    //
-    //             if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
-    //                 this.state.artistsAdd.map(artist => {
-    //                     this.toBase64(this.state.contract).then(cData => {
-    //                         let contract = new SimpleFile(cData, this.state.contract.name);
-    //                         service.createGig(new Gig(updated.insertId, artist.userId, contract)).then().catch(error => console.log(error))
-    //                     })
-    //                 })
-    //             }
-    //
-    //             if ((Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length)) {
-    //
-    //                 this.state.personnelAdd = this.state.personnelAdd.map(user => new Personnel(user.userId, updated.insertId, user.role));
-    //                 service.createPersonnel(this.state.personnelAdd, updated.insertId).then(() => {
-    //                     this.props.history.push("/arrangement/" + updated.insertId)
-    //                 }).catch(error => console.log(error))
-    //             } else {
-    //                 this.props.history.push("/arrangement/" + updated.insertId)
-    //             }
-    //         }).catch(err => console.log(err))
-    //     }
-    // }
-
     toBase64 = (file) => new Promise((resolve, reject) => {
         if (file === "") {
             resolve(null);
@@ -245,13 +186,15 @@ export class AddEvent extends Component {
     sendGigs = (eventId) => new Promise((resolve, reject) => {
         if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
             Promise.all(this.state.artistsAdd.map(artist => {
-                this.toBase64(this.state.contract).then(cData => {
-                    let contract = new SimpleFile(cData, this.state.contract.name);
+                this.toBase64(artist.contract).then(cData => {
+                    let contract = new SimpleFile(cData, artist.contract.name);
                     service
                         .addGig(new Gig(eventId, artist.userId, contract))
                         .catch(error => reject(error))
                 })
             })).then(() => resolve(true));
+        } else {
+            resolve(true);
         }
     });
 
@@ -263,6 +206,8 @@ export class AddEvent extends Component {
                 .addPersonnel(this.state.personnelAdd)
                 .then(() => resolve(true))
                 .catch(error => reject(error));
+        } else {
+            resolve(true);
         }
     });
 
@@ -283,8 +228,7 @@ export class AddEvent extends Component {
                 this.state.ageLimit,
                 fDateTime,
                 tDateTime,
-                this.state.imageUrl,
-                image,
+                (image ? image : this.state.imageUrl),
                 this.state.cancelled);
 
             service.createEvent(newEvent).then(created => {

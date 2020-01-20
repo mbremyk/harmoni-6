@@ -233,9 +233,6 @@ export class EventPage extends Component {
                     <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
                         Arragement</Button>
                 </Col>
-                <Col>
-                    <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
-                </Col>
             </Row>
         }
     }
@@ -274,14 +271,4 @@ export class EventPage extends Component {
 
 
     }
-
-    handleDelete = () => {
-        if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-            service.deleteEvent(this.currentEvent).then(() => {
-                this.props.history.push("/hjem/")
-            });
-            alert("Arrangementet er nå slettet")
-        }
-    };
-
 }

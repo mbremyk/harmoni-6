@@ -532,7 +532,7 @@ app.put('/auth/events/:eventId', (req, res) => {
 
 app.delete('/auth/events/:eventId', (req, res) => {
     console.log("DELETE-request - /events/" + req.params.eventId);
-    return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+    return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.sendStatus(201) : res.status(400))
 });
 
 

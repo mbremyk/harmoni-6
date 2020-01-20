@@ -264,7 +264,6 @@ class Dao {
                 startTime: event.startTime,
                 endTime: event.endTime,
                 imageUrl: event.imageUrl,
-                image: event.image,
                 description: event.description,
             })
             .then(created => ({insertId: (created.eventId)}))
@@ -287,6 +286,8 @@ class Dao {
                 organizerId: event.organizerId,
                 eventName: event.eventName,
                 address: event.address,
+                city: event.city,
+                placeDescription: event.placeDescription,
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
