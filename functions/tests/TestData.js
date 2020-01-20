@@ -64,11 +64,7 @@ let users = [
         password: 'SS',
         salt: 'salt',
         email: 'sabine@mail.com'
-    }//,
-    // {
-    //     //userId: 10
-    //     username: 'ANON',
-    // }
+    }
 ];
 
 
