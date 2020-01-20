@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
@@ -116,6 +118,48 @@ class Dao {
             });
     }
 
+    async forgotPassword(email) {
+        let newPass = Math.random().toString(36).substring(7);
+        let salt = await this.getSaltByEmail(email);
+        let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
+
+        console.log('!!! nytt passord: \'' + newPass + '\'');
+
+        return model.UserModel.update(
+            {
+                tempPassword: credentials[0]
+            },
+            {where: {email: email}}
+        ).then(response => response ? newPass : null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    onetimeLogin(email, password) {
+        return model.UserModel.findAll(
+            {where: {[op.and]: [{email: email}, {tempPassword: password}]}})
+            .then(response => response.length === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    deleteOneTimeLogin(email) {
+        return model.UserModel.update(
+            {
+                tempPassword: null
+            },
+            {where: {email: email}}
+        ).then(response => response[0] === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
     updatePassword(user) {
         return model.UserModel.update(
             {
@@ -206,20 +250,22 @@ class Dao {
      * by the database in attribute 'insertId'
      *
      * @param event
-     * @returns {Promise<number>}
+     * @returns {Promise<T>}
      */
     createEvent(event) {
-        console.log(event.imageUrl instanceof String);
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
                 eventName: event.eventName,
+                city: event.city,
                 address: event.address,
+                placeDescription: event.placeDescription,
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
+                imageUrl: event.imageUrl,
+                image: event.image,
                 description: event.description,
-                imageUrl: event.imageUrl
             })
             .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
@@ -295,6 +341,19 @@ class Dao {
                 return false;
             })
     }
+
+    /**
+     * Delete all events with end time older than 90 days
+     *
+     * @returns {number}
+     */
+    deleteOldEvents() {
+        let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
+        oldEvents.map(event => console.log(event.eventId));
+        if(oldEvents.length == null) return 0;
+        else return oldEvents.length
+    }
+
 
     /**
      * Finds all registered events
@@ -436,17 +495,11 @@ class Dao {
     /**
      * creates a new Ticket in the Database, returns false if something goes wrong
      *
-     * @param ticket
+     * @param tickets[]
      * @returns {Promise<boolean>}
      */
-    addTicket(ticket) {
-        return model.TicketModel.create(
-            {
-                eventId: ticket.eventId,
-                type: ticket.type,
-                price: ticket.price,
-                amount: ticket.amount
-            })
+    addTickets(tickets) {
+        return model.TicketModel.bulkCreate(tickets)
             .then(response => response.id !== null)
             .catch(error => {
                 console.error(error);
@@ -534,6 +587,13 @@ class Dao {
                         return false;
                     })
             });
+
+        /*model.GigModel.update(
+            {contract: contract},
+            { where: { gigId: gig, artistId: artist}}
+        );
+        model.update();*/
+
     }
 
 
@@ -571,44 +631,84 @@ class Dao {
         }).catch(error => console.error(error));
     }
 
+    /**
+     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
+     *
+     * @param riderItems[]
+     * @returns {Promise<boolean>}
+     */
+    addRiderItems(riderItems) {
+        return model.RiderModel.bulkCreate(riderItems)
+            .then(response => response[0].item !== null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            })
+    }
+
+
+    /**
+     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
+     *
+     * @param riderItems: RiderItem[]
+     * @returns {Promise<boolean>}
+     */
+    updateRiderItems(riderItems) {
+        let allUpdatesOk = true;
+        return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
+            {
+                confirmed: riderItem.confirmed
+            },
+            {
+                where: {
+                    eventId: riderItem.eventId,
+                    artistId: riderItem.artistId,
+                    item: riderItem.item
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                return false
+            })))
+            .then(() => {
+                return allUpdatesOk;
+            });
+    }
+
+    /**
+     * retrieves the rideritems assosciated with a gig
+     *
+     * @param eventId
+     * @param artistId
+     * @returns {Promise<Gig[]>}
+     */
+    getRiderItems(eventId, artistId) {
+        return model.RiderModel.findAll({where: {eventId: eventId, artistId: artistId}})
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+    }
+
 
     /*
-                           FILE STUFF
+                         🐞 BUG STUFF 🐛
      */
-
-
-    // addFile(eventId, artistId, file) {
-    //     return model.FileModel.create(
-    //         {
-    //             name: gig.contract.name,
-    //             data: gig.contract.data,
-    //             contentType: gig.contract.contentType
-    //         })
-    //         .then((created) => {
-    //             return model.GigModel.create(
-    //                 {
-    //                     artistId: gig.artistId,
-    //                     eventId: gig.eventId,
-    //                     contract: created.fileId
-    //                 })
-    //                 .then(response => response._options.isNewRecord)
-    //                 .catch(error => {
-    //                     console.error(error);
-    //                     return false;
-    //                 })
-    //         });
-    // }
-
-
-    // getFiles(eventId, artistId) {
-    //     return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
-    //         .then(gig => {
-    //                 console.log(gig);
-    //                 return model.FileModel.findByPk(gig[0].rider);
-    //             }
-    //         );
-    // }
+    createBug(body) {
+        return model.BugModel.create({
+            email: body.email,
+            username: body.username,
+            subject: body.subject,
+            bugText: body.text
+        })
+            .then(res => res.bugId !== null)
+            .catch(error => {
+                //console.error(error);
+                return false;
+            });
+    }
 }
+
 
 //model.syncTestData();
 //model.syncModels();

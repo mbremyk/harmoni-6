@@ -4,9 +4,11 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeEach(done => Models.syncTestData().then(res => {
-    done();
-}));
+beforeEach(done => Models.syncTestData().then(() => done()));
+
+// afterEach(done => Models.dropTables().then(res => {
+//     done();
+// }));
 
 
 /*
@@ -82,7 +84,7 @@ describe('Users', () => {
 
     it('correct data in users', done => {
         db.getAllUsers().then(users => {
-            expect(users.length).toBeGreaterThanOrEqual(9);
+            expect(users.length).toBe(9);
             done();
         });
     });
@@ -172,16 +174,20 @@ describe('Events', () => {
 
     it('create event', done => {
         let event = {
-            organizerId: '3',
-            eventName: 'CREATED',
-            address: 'CREATED',
-            ageLimit: '45',
+            organizerId: 1,
+            eventName: 'CREATE TEST',
+            city: 'Trondheim',
+            address: 'Torget 2',
+            placeDescription: '3 etasje',
+            ageLimit: 12,
             startTime: null,
             endTime: null,
-            description: 'if you can see this the event was created properly'
+            imageUrl: 'fake URL',
+            image: null,
+            description: 'Create event test',
         };
         db.createEvent(event).then(response => {
-            expect(response.insertId).toEqual(6);
+            expect(response.insertId).toBe(6);
             done();
         });
     });
@@ -349,7 +355,7 @@ describe('Events', () => {
 
     it('correct data in events', done => {
         db.getAllEvents().then(events => {
-            expect(events.length).toBeGreaterThanOrEqual(5);
+            expect(events.length).toBe(5);
             done();
         });
     });
@@ -485,7 +491,6 @@ describe('Personnel', () => {
 ;
 
 
-
 /*
                 TICKETS
  */
@@ -499,7 +504,7 @@ describe('Tickets', () => {
             amount: 69,
 
         };
-        db.addTicket(ticket).then(response => {
+        db.addTickets(ticket).then(response => {
             expect(response).toBeTruthy();
             done();
         });
@@ -533,7 +538,7 @@ describe('Tickets', () => {
 
     it('correct data in tickets', done => {
         db.getTickets(4).then(tickets => {
-            expect(tickets.length).toBeGreaterThanOrEqual(3);
+            expect(tickets.length).toBe(3);
             done();
         });
     });
@@ -566,16 +571,98 @@ describe('Gigs', () => {
                     eventId: gig.eventId,
                     artistId: gig.artistId,
                     artistName: gig.user.username,
-                    contract: gig.file.name,
-                    contractData: gig.file.data
                 }
             ))).toEqual([
                 {
                     eventId: 2,
                     artistId: 5,
                     artistName: 'Michael S.L',
-                    contract: 'Fil 2',
-                    contractData: 'Lorem var en dårlig idé'
+                }
+            ]);
+        });
+        done();
+    });
+
+
+    it('add riderItem', done => {
+        let item = [{
+            eventId: 2,
+            artistId: 5,
+            item: "TEST"
+        }];
+        db.addRiderItems(item).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+
+    it('update riderItems', done => {
+        let items = [
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Varm Cola',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Sigg',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Nakkepute',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Litt Sjokolade hadde vært fint',
+                confirmed: true
+            }];
+        db.updateRiderItems(items).then(updateOk => {
+            expect(updateOk).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct riderItems', done => {
+        db.getRiderItems(2, 5).then(items => {
+            expect(items.length).toBe(4);
+            expect(items.map(item =>
+                item.toJSON()).map(item => (
+                {
+                    eventId: item.eventId,
+                    artistId: item.artistId,
+                    item: item.item
+                }
+            ))).toEqual([
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Varm Cola',
+                    confirmed: null
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Sigg',
+                    confirmed: true
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Nakkepute',
+                    confirmed: false
+                },
+                {
+                    artistId: 5, //Magnus
+                    eventId: 2, //Ungdomskonert
+                    item: 'Litt Sjokolade hadde vært fint',
+                    confirmed: true
                 }
             ]);
         });
@@ -583,10 +670,6 @@ describe('Gigs', () => {
     });
 });
 
-
-describe('Files', () => {
-
-});
 
 describe('Proving math', () => {
     it('1+1=2', done => {

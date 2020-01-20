@@ -40,7 +40,9 @@ export class Event {
     eventId;
     organizerId;
     eventName;
+    city;
     address;
+    placeDescription;
     ageLimit;
     startTime;
     endTime;
@@ -49,11 +51,13 @@ export class Event {
     description;
     cancelled;
 
-    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
+    constructor(eventId, organizerId, eventName, city, address, placeDescription, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.eventName = eventName;
+        this.city = city;
         this.address = address;
+        this.placeDescription = placeDescription;
         this.description = description;
         this.ageLimit = ageLimit;
         this.startTime = startTime;
@@ -85,6 +89,19 @@ export class Gig {
         this.eventId = eventId;
         this.contract = contract;
         this.artistId = artistId;
+    }
+}
+
+export class RiderItem {
+    eventId;
+    artistId;
+    riderItem;
+    confirmed;
+
+    constructor(eventId, artistId, riderItem) {
+        this.eventId = eventId;
+        this.artistId = artistId;
+        this.riderItem = riderItem;
     }
 }
 
@@ -147,6 +164,10 @@ class Services {
         return axios.get(url + '/validate/email/' + email).then(response => response.data);
     }
 
+    forgotPass(email) {
+        return axios.post(url + '/mail/password', {email: email}, {headers: {"Content-Type": "application/json"}}).then(response => response.data);
+    }
+
 
     /*
         USERS
@@ -184,7 +205,6 @@ class Services {
     }
 
     deleteEvent(event) {
-        //console.log(url + '/auth/events/' + event.eventId);
         return axios.delete(url + '/auth/events/' + event.eventId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
@@ -208,18 +228,35 @@ class Services {
     /*
         PERSONNEL
     */
-    createPersonnel(personnel, id) {
-        return axios.post(url + '/events/' + id + '/personnel', personnel).then(response => response.data);
+
+    /**
+     * @param personnel: Personnel[]
+     * @returns Promise<>: boolean
+     */
+    addPersonnel(personnel) {
+        return axios.post(url + '/events/' + personnel[0].eventId + '/personnel', personnel).then(response => response.data);
     }
 
+    /**
+     * @param personnel: Personnel
+     * @returns Promise<>: boolean
+     */
     updatePersonnel(personnel) {
         return axios.put(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
     }
 
+    /**
+     * @param personnel: Personnel
+     * @returns Promise<>: boolean
+     */
     deletePersonnel(personnel) {
         return axios.delete(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
     }
 
+    /**
+     * @param eventId: number
+     * @returns Promise<>: Personnel[]
+     */
     getPersonnel(eventId) {
         return axios.get(url + '/events/' + eventId + '/personnel').then(response => response.data);
     }
@@ -228,18 +265,34 @@ class Services {
     /*
         TICKETS
     */
-    createTicket(ticket) {
-        return axios.post(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
+    /**
+     * @param tickets: Ticket[]
+     * @returns Promise<>: boolean
+     */
+    addTickets(tickets) {
+        return axios.post(url + '/events/' + tickets[0].eventId + '/ticket', tickets).then(response => response.data);
     }
 
+    /**
+     * @param ticket: Ticket
+     * @returns Promise<>: boolean
+     */
     updateTicket(ticket) {
         return axios.put(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
     }
 
+    /**
+     * @param ticket: Ticket
+     * @returns Promise<>: boolean
+     */
     deleteTicket(ticket) {
         return axios.delete(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
     }
 
+    /**
+     * @param eventId: number
+     * @returns Promise<>: Ticket[]
+     */
     getTicketToEvent(eventId) {
         return axios.get(url + '/events/' + eventId + '/ticket').then(response => response.data);
     }
@@ -248,21 +301,54 @@ class Services {
     /*
         GIGS
     */
-    createGig(gig) {
+    /**
+     * @param gig: Gig with file
+     * @returns Promise<>: boolean
+     */
+    addGig(gig) {
         return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
     }
 
-    uploadContract(formData, event, artist) {
-        return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
-    }
-
+    /**
+     * @param eventId: number
+     * @returns Promise<>: Gig[]
+     */
     getGigForEvent(eventId) {
         return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
+    /**
+     * @param eventId: number
+     * @param artistId: number
+     * @returns Promise<>: Contract
+     */
     downloadContract(eventId, artistId) {
-        console.log("Downloading");
         return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
+    }
+
+    /**
+     * @param riderItems: RiderItem[]
+     * @returns Promise<>: boolean
+     */
+    addRiderItems(riderItems) {
+        return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+    }
+
+    /**
+     * @param riderItems: RiderItem[]
+     * @returns Promise<>: boolean
+     */
+    confirmRiderItems(riderItems) {
+        return axios.put(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+    }
+
+    /**
+     * @param eventId: number
+     * @param artistId: number
+     * @returns Promise<>: boolean
+     */
+    getRiderItems(eventId, artistId) {
+        return axios.get(url + '/events/' + eventId + '/gigs/' + artistId + '/rider').then(response => response.data)
     }
 }
 
