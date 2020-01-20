@@ -16,6 +16,7 @@ import {HarmoniNavbar} from "./navbar";
 //import {Event, service} from "../services";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
+import Alert from "react-bootstrap/Alert";
 
 export class EditEvent extends Component{
 
@@ -85,7 +86,9 @@ export class EditEvent extends Component{
             artistsAdd: [],
             artists: [],
             personnelAdd: [],
-            cancelled: 0
+            cancelled: 0,
+            error: '',
+            errorType: 'success',
         };
     }
 
@@ -111,7 +114,6 @@ export class EditEvent extends Component{
     }
 
     handleAgeLimitChange(event){
-        console.log(event.target.value)
         this.setState({ageLimit: event.target.value});
     }
 
@@ -168,8 +170,19 @@ export class EditEvent extends Component{
         this.setState({personnelRole: event.target.value})
     }
 
+    setError(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
+    }
 
     handleSubmit() {
+
+        // check empty fields
+        if (!this.state.eventName || !this.state.eventAddress || !this.state.eventDescription) {
+            this.setError('Alle felter må fylles', 'danger');
+            return;
+        }
+
         let fDateTime = this.state.fDate + " " + this.state.fTime +":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime +":00";
 
@@ -239,6 +252,8 @@ export class EditEvent extends Component{
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Fra dato</Form.Label>
                             <Form.Control
+                                min={require('moment')().format('YYYY-MM-DD')}
+                                max={this.state.tDate}
                                 value={this.state.fDate}
                                 onChange={this.handleFDate}
                                 type={"date"}
@@ -260,6 +275,7 @@ export class EditEvent extends Component{
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Til dato</Form.Label>
                             <Form.Control
+                                min={this.state.fDate}
                                 value={this.state.tDate}
                                 onChange={this.handleTDate}
                                 type={"date"}
@@ -465,6 +481,10 @@ export class EditEvent extends Component{
                                 <Button variant={"danger"} type="button" onClick={this.handleEventCancel}>Avlys
                                     arrangement</Button>
                             </Col>
+
+                            {(this.state.error) ?
+                                <Alert style={{height: '3em', top: '50%', left: '50%', position: 'fixed', transform: 'translate(-50%, -50%)'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                                <div style={{height: '3em'}}/>}
 
                             <Col>
                                 <Button type="button" variant={"success"} onClick={this.handleSubmit}>Endre

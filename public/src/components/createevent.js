@@ -16,6 +16,7 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {authService} from "../AuthService";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
+import Alert from "react-bootstrap/Alert";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
@@ -89,6 +90,8 @@ export class AddEvent extends Component {
             artists: [],
             personnelAdd: [],
             personnelRole: '',
+            error: '',
+            errorType: 'success',
         };
     }
 
@@ -156,7 +159,18 @@ export class AddEvent extends Component {
         this.setState({personnelRole: event.target.value})
     }
 
+    setError(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
+    }
+
     handleSubmit() {
+
+        // check empty fields
+        if (!this.state.eventName || !this.state.eventAddress || !this.state.eventDescription) {
+            this.setError('Alle felter må fylles ut', 'danger');
+            return;
+        }
 
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
@@ -278,6 +292,8 @@ export class AddEvent extends Component {
                             <Form.Group as={Col} sm={"3"}>
                                 <Form.Label>Fra dato</Form.Label>
                                 <Form.Control
+                                    min={require('moment')().format('YYYY-MM-DD')}
+                                    max={this.state.tDate}
                                     value={this.state.fDate}
                                     onChange={this.handleFDate}
                                     type={"date"}
@@ -299,6 +315,7 @@ export class AddEvent extends Component {
                             <Form.Group as={Col} sm={"3"}>
                                 <Form.Label>Til dato</Form.Label>
                                 <Form.Control
+                                    min={this.state.fDate}
                                     value={this.state.tDate}
                                     onChange={this.handleTDate}
                                     type={"date"}
@@ -473,6 +490,10 @@ export class AddEvent extends Component {
 
                                 </ButtonToolbar>
                             </Form.Group>
+
+                            {(this.state.error) ?
+                                <Alert style={{height: '3em', top: '50%', left: '50%', position: 'fixed', transform: 'translate(-50%, -50%)'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                                <div style={{height: '3em'}}/>}
 
                             <Form.Group as={Col} md={{span: 3, offset: 5}}>
                                 <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
