@@ -404,7 +404,7 @@ app.post("/auth/events", (req, res) => {
 });
 
 /**
- * Get all events in database as an array
+ * Get all events in database as an array + checks and deletes old entries
  * {
  *     eventId: int
  *     organizerId: int -> user(userId)
@@ -419,8 +419,11 @@ app.post("/auth/events", (req, res) => {
  * }
  */
 app.get("/events", (req, res) => {
-	console.log("GET-request - /events");
-	return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
+    console.log("GET-request - /events");
+    console.log("Deleting events older than 90 days");
+    console.log("Quantity: " + db.deleteOldEvents());
+
+    return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
 
 /**
@@ -491,9 +494,10 @@ app.put('/auth/events/:eventId', (req, res) => {
  */
 
 app.delete('/auth/events/:eventId', (req, res) => {
-	console.log("DELETE-request - /events/" + req.params.eventId);
-	return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+    console.log("DELETE-request - /events/" + req.params.eventId);
+    return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.sendStatus(201) : res.status(400))
 });
+
 
 /**
  *  Get an array of personnel connected to an event
@@ -657,6 +661,17 @@ app.post("/events/:eventId/gigs", (req, res) => {
 app.get("/events/:eventId/gigs", (req, res) => {
 	let eventId = decodeURIComponent(req.params.eventId);
 	return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+});
+
+/**
+ * Get a contract connected to an event and a artist
+ *
+ */
+
+app.get("/events/:eventId/gigs/:artistId", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    let artistId = decodeURIComponent(req.params.artistId);
+    db.getContract(eventId, artistId).then(contract => (contract !== null) ? res.status(201).send(contract) : res.sendStatus(400));
 });
 
 

@@ -12,16 +12,43 @@ export class SortedEventView extends Component {
     state = {
         events: [],
         eventsBackup: [],
-        order: "asc",
-        sortingOption: "createdAt"
+        order: "desc",
+        sortingOption: "createdAt",
+        ascDescription: "Eldst først", //  ↑
+        descDescription: "Nyest først", //  ↓
+        orderDescription: ["createdAt", "startTime"],
+
+        childFriendly: "",
+        free: "",
+        hideCancelled: "",
+        showOld: "",
+        filterActive: ""
+    };
+
+    getActiveState = (option) => {
+        if (option === "asc" || option === "desc") return (option === this.state.order) ? "active" : "";
+        return (option === this.state.sortingOption) ? "active" : "";
     };
 
     sortEvents = (sortingOption, order) => {
         this.setState({events: this.state.events.sort(this.compareValues(sortingOption, order))});
+        //this.setState({order: "asc"})
+    };
+
+    handleOrderDescription = (option) => {
+        if (this.state.orderDescription.includes(option)) {
+            this.setState({ascDescription: "Eldst først"});
+            this.setState({descDescription: "Nyest først"})
+        } else {
+            this.setState({ascDescription: "Stigende ↑"});
+            this.setState({descDescription: "Synkende ↓"})
+        }
     };
 
     handleSortingOption = (option) => {
+        this.handleOrderDescription(option);
         this.setState({sortingOption: option});
+        this.setState({option: "active"});
         this.sortEvents(option, this.state.order);
     };
 
@@ -32,15 +59,40 @@ export class SortedEventView extends Component {
     }
 
     handleFilterOption(filter) {
+        this.setState({filterActive: "active"});
         switch (filter) {
             case 'ChildFriendly':
-                this.setState({events: this.state.events.filter(e => e.ageLimit < 7)});
+                this.setState({events: this.state.events.filter(event => event.ageLimit < 7)});
+                this.setState({childFriendly: "active"});
+                break;
+            case 'HideCancelled':
+                this.setState({events: this.state.events.filter(event => !event.cancelled)});
+                this.setState({hideCancelled: "active"});
+                break;
+            case 'ShowOld':
+                this.setState({events: this.state.eventsBackup});
+                this.setState({showOld: "active"});
+                break;
+            case 'Free':
+                //TODO
+                this.setState({showOld: "active"});
                 break;
         }
     }
 
     handleReset() {
-        this.setState({events: this.state.eventsBackup})
+        this.handleEvents(this.state.eventsBackup);
+
+        this.setState({childFriendly: ""});
+        this.setState({free: ""});
+        this.setState({hideCancelled: ""});
+        this.setState({showOld: ""});
+        this.setState({sortingOption: "createdAt"});
+        this.setState({filterActive: ""});
+        this.setState({order: "desc"});
+        this.setState({ascDescription: "Eldst først"});
+        this.setState({descDescription: "Nyest først"})
+
     }
 
     handleOrder(order) {
@@ -49,7 +101,11 @@ export class SortedEventView extends Component {
     }
 
     handleEvents = (events) => {
-        this.setState({events: events, eventsBackup: events})
+        let now = require('moment')().format('YYYY-MM-DD');
+        this.setState({
+            events: events.filter(event => event.endTime > now),
+            eventsBackup: events
+        })
     };
 
     compareValues(key, order = 'asc') {
@@ -85,45 +141,62 @@ export class SortedEventView extends Component {
                         <Row>
                             <Col>
                                 <Dropdown>
-                                    <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                    <Dropdown.Toggle className={"active"} variant="light" id="dropdown-basic">
                                         Sorter arrangementer
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris
+                                        <Dropdown.Item className={this.getActiveState("price")}
+                                                       onClick={() => this.handleSortingOption('price')}>Pris
                                             TODO</Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                                        <Dropdown.Item className={this.getActiveState("ageLimit")}
+                                                       onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
+                                        <Dropdown.Item className={this.getActiveState("createdAt")}
+                                                       onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
+                                        <Dropdown.Item className={this.getActiveState("address")}
+                                                       onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                                        <Dropdown.Item className={this.getActiveState("startTime")}
+                                                       onClick={() => this.handleSortingOption('startTime')}>Dato</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
 
                             </Col>
                             <Col>
                                 <Dropdown>
-                                    <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                    <Dropdown.Toggle className={this.state.filterActive} variant="light"
+                                                     id="dropdown-basic">
                                         Filtere
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
+                                        <Dropdown.Item className={this.state.childFriendly}
+                                                       onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
                                             (6 år) </Dropdown.Item>
-                                        <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis
-                                            Arrangementer
-                                            TODO </Dropdown.Item>
+                                        <Dropdown.Item className={this.state.free}
+                                                       onClick={() => this.handleFilterOption('Free')}>Gratis
+                                            Arrangementer TODO </Dropdown.Item>
+                                        <Dropdown.Item className={this.state.hideCancelled}
+                                                       onClick={() => this.handleFilterOption('HideCancelled')}>
+                                            Skjul kansellerte arrangementer
+                                        </Dropdown.Item>
+                                        <Dropdown.Item className={this.state.showOld}
+                                                       onClick={() => this.handleFilterOption('ShowOld')}>
+                                            Vis gamle arrangementer
+                                        </Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </Col>
                             <Col>
-                                <Button onClick={() => this.handleOrder("asc")} variant={"light"}>Økende ↑</Button>
+                                <Button className={this.getActiveState("asc")} onClick={() => this.handleOrder("asc")}
+                                        variant={"light"}>{this.state.ascDescription}</Button>
                             </Col>
                             <Col>
-                                <Button onClick={() => this.handleOrder("desc")} variant={"light"}>Synkende ↓</Button>
+                                <Button className={this.getActiveState("desc")} onClick={() => this.handleOrder("desc")}
+                                        variant={"light"}>{this.state.descDescription}</Button>
                             </Col>
                             <Col>
                                 <Button variant={"light"} onClick={this.handleReset}>Nullstill</Button>
                             </Col>
+
+
                         </Row>
                     </Card>
                     <Row>
