@@ -44,6 +44,8 @@ if (root)
         <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
         <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
 
+        <Route path='/' component={Footer}/>
+
     </BrowserRouter>,
     root
 );
