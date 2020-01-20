@@ -380,7 +380,7 @@ app.put("/auth/users/:userId", (req, res) => {
  *
  */
 app.delete("/auth/users/:userId", (req, res) => {
-    console.log("GET-request - /auth/users/:userId");
+    console.log("DELETE-request - /auth/users/:userId");
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
 

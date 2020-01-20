@@ -10,6 +10,8 @@ import * as jwt from "jsonwebtoken";
 import Alert from "react-bootstrap/Alert";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import {Card} from "react-bootstrap";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 /*
 * My page container for "/min-side". Ability to change name, email and password for a logged in user.
@@ -18,7 +20,7 @@ export class myPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            userId: '',
+            userId: "",
             username: '',
             email: '',
             password1: '',
@@ -79,9 +81,14 @@ export class myPage extends Component {
                                                   value={this.state.password2}
                                                   onChange={this.handleNewPassword2Change}/>
                                 </Form.Group>
-                                <Button variant="primary" type="button" onClick={this.save}>
-                                    Lagre
-                                </Button>
+                                <Row>
+                                    <Col><Button variant="primary" type="button"
+                                                 onClick={this.save}>Lagre</Button></Col>
+                                    <Col><Button variant="outline-danger" type="button" onClick={this.delete}>Slett
+                                        bruker</Button></Col>
+
+                                </Row>
+
                             </Form>
                         </div>
                     </Card>
@@ -258,4 +265,16 @@ export class myPage extends Component {
     handleNewPassword2Change(event) {
         this.setState({password2: event.target.value});
     }
+
+    delete() {
+        if (window.confirm("Er du sikker på at du vil slette brukeren? \nDette kan ikke reverseres.")) {
+            service.deleteUser(this.state.userId)
+                .then(() => {
+                        authService.deleteToken();
+                        this.props.history.push("/");
+                    }
+                )
+        }
+    }
+
 }
