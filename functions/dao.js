@@ -206,19 +206,22 @@ class Dao {
      * by the database in attribute 'insertId'
      *
      * @param event
-     * @returns {Promise<number>}
+     * @returns {Promise<T>}
      */
     createEvent(event) {
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
                 eventName: event.eventName,
+                city: event.city,
                 address: event.address,
+                placeDescription: event.placeDescription,
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
+                imageUrl: event.imageUrl,
+                image: event.image,
                 description: event.description,
-                imageUrl: event.imageUrl
             })
             .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
