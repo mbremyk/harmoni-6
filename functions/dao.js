@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
@@ -110,6 +112,48 @@ class Dao {
             .then(() => {
                 return model.UserModel.destroy({where: {userId: userId}})
             })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    async forgotPassword(email) {
+        let newPass = Math.random().toString(36).substring(7);
+        let salt = await this.getSaltByEmail(email);
+        let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
+
+        console.log('!!! nytt passord: \'' + newPass + '\'');
+
+        return model.UserModel.update(
+            {
+                tempPassword: credentials[0]
+            },
+            {where: {email: email}}
+        ).then(response => response ? newPass : null)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    onetimeLogin(email, password) {
+        return model.UserModel.findAll(
+            {where: {[op.and]: [{email: email}, {tempPassword: password}]}})
+            .then(response => response.length === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    deleteOneTimeLogin(email) {
+        return model.UserModel.update(
+            {
+                tempPassword: null
+            },
+            {where: {email: email}}
+        ).then(response => response[0] === 1)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -297,6 +341,19 @@ class Dao {
                 return false;
             })
     }
+
+    /**
+     * Delete all events with end time older than 90 days
+     *
+     * @returns {number}
+     */
+    deleteOldEvents() {
+        let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
+        oldEvents.map(event => console.log(event.eventId));
+        if(oldEvents.length == null) return 0;
+        else return oldEvents.length
+    }
+
 
     /**
      * Finds all registered events
@@ -530,6 +587,13 @@ class Dao {
                         return false;
                     })
             });
+
+        /*model.GigModel.update(
+            {contract: contract},
+            { where: { gigId: gig, artistId: artist}}
+        );
+        model.update();*/
+
     }
 
 
@@ -625,8 +689,29 @@ class Dao {
                 return [];
             });
     }
+
+
+    /*
+                         🐞 BUG STUFF 🐛
+     */
+    createBug(body) {
+        return model.BugModel.create({
+            email: body.email,
+            username: body.username,
+            subject: body.subject,
+            bugText: body.text
+        })
+            .then(res => res.bugId !== null)
+            .catch(error => {
+                //console.error(error);
+                return false;
+            });
+    }
 }
 
+
+//model.syncTestData();
+//model.syncModels();
 module.exports = Dao;
 
 

@@ -55,7 +55,7 @@ sequelize.authenticate()
     password;
     salt;
     email;
-};*/
+}; */
 
 let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
@@ -261,6 +261,13 @@ let TicketModel = sequelize.define('ticket', {
     amount: Sequelize.INTEGER
 }, {paranoid: true});
 
+let BugModel = sequelize.define('bug', {
+    bugId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
+    email: Sequelize.STRING,
+    username: Sequelize.STRING,
+    subject: Sequelize.STRING,
+    bugText: {type: Sequelize.TEXT, allowNull: false}
+});
 
 UserModel.hasMany(EventModel, {foreignKey: 'organizerId'});
 EventModel.belongsTo(UserModel, {foreignKey: 'organizerId'});
@@ -315,6 +322,24 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
     });
 });
 
+let dropTables = () => {
+    return GigModel.drop().then(() => {
+        return FileModel.drop().then(() => {
+            return TicketModel.drop().then(() => {
+                return PersonnelModel.drop().then(() => {
+                    return EventModel.drop().then(() => {
+                        return UserModel.drop().then(() => true);
+                    });
+                });
+            });
+        });
+    })
+        .catch(error => {
+            console.error(error);
+            return false;
+        });
+};
+
 module.exports = {
     UserModel,
     EventModel,
@@ -324,5 +349,7 @@ module.exports = {
     TicketModel,
     FileModel,
     syncModels,
-    syncTestData
+    syncTestData,
+    dropTables,
+    BugModel
 };

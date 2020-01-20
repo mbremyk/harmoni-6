@@ -157,6 +157,10 @@ class Services {
         return axios.get(url + '/validate/email/' + email).then(response => response.data);
     }
 
+    forgotPass(email) {
+        return axios.post(url + '/mail/password', {email: email}, {headers: {"Content-Type": "application/json"}}).then(response => response.data);
+    }
+
 
     /*
         USERS
