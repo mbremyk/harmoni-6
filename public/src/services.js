@@ -259,20 +259,19 @@ class Services {
         GIGS
     */
     addGig(gig) {
-        return axios.post(url + '/gigs', gig).then(response => response.data);
+        return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
     }
 
     getGigForEvent(eventId) {
         return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
-    addRiderItems(riderItems) {
-        return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+    downloadContract(eventId, artistId) {
+        return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
     }
 
-    downloadContract(eventId, artistId) {
-        console.log("Downloading...");
-        return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
+    addRiderItems(riderItems) {
+        return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
     }
 
     confirmRiderItems(riderItems) {
