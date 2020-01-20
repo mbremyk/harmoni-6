@@ -14,7 +14,7 @@ export class AuthService {
 			.then(res => {
 				this.setToken(res.jwt); // Setting the token in localStorage
 				return res;
-			})
+			}).catch(res => {return res;})
 	}
 
 	refresh() {

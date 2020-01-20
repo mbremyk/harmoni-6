@@ -29,9 +29,9 @@ export class NewPassword extends Component {
 		setTimeout( () => this.setState({error: '', errorType: 'primary'}), 5000);
 	}
 
-	async handleNewPassword() {
-		let res = await service.forgotPass(this.state.email);
-		console.log('RES ' + res);
+	handleNewPassword() {
+		console.log('REQUEST NEW PASS');
+		service.forgotPass(this.state.email).then(res => console.log('res ' + res));
 	}
 
 	render() {

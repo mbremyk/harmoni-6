@@ -122,7 +122,6 @@ export class Personnel {
         this.eventId = eventId;
         this.role = role;
     }
-
 }
 
 class Services {
@@ -161,7 +160,6 @@ class Services {
         return axios.post(url + '/mail/password', {email: email}, {headers: {"Content-Type": "application/json"}}).then(response => response.data);
     }
 
-
     /*
         USERS
     */
@@ -184,7 +182,6 @@ class Services {
     getUser(userId) {
         return axios.get(url + '/users/' + userId).then(response => response.data);
     }
-
 
     /*
         EVENTS
