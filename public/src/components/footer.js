@@ -7,7 +7,7 @@ export class Footer extends Component {
 
     render() {
         return (
-            <div className="footer bg-light text-center p-5 mt-5 mb-0 fixed-bottom">
+            <div className="footer bg-light text-center p-5 mt-5 mb-0">
                 <CardColumns>
                     <p className="text-dark font-italic">Harmoni</p>
                     <p className="text-dark">

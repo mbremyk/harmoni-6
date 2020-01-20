@@ -270,7 +270,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     addTickets(tickets) {
-        return axios.post(url + '/events/' + tickets[0].eventId + '/ticket', tickets).then(response => response.data);
+        return axios.post(url + '/events/' + tickets[0].eventId + '/tickets', tickets).then(response => response.data);
     }
 
     /**
@@ -278,7 +278,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     updateTicket(ticket) {
-        return axios.put(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
+        return axios.put(url + '/events/' + ticket.eventId + '/tickets', ticket).then(response => response.data);
     }
 
     /**
@@ -286,7 +286,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     deleteTicket(ticket) {
-        return axios.delete(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
+        return axios.delete(url + '/events/' + ticket.eventId + '/tickets', ticket).then(response => response.data);
     }
 
     /**
@@ -294,7 +294,7 @@ class Services {
      * @returns Promise<>: Ticket[]
      */
     getTicketToEvent(eventId) {
-        return axios.get(url + '/events/' + eventId + '/ticket').then(response => response.data);
+        return axios.get(url + '/events/' + eventId + '/tickets').then(response => response.data);
     }
 
 
