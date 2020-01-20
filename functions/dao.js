@@ -267,7 +267,6 @@ class Dao {
                 startTime: event.startTime,
                 endTime: event.endTime,
                 imageUrl: event.imageUrl,
-                image: event.image,
                 description: event.description,
             })
             .then(created => ({insertId: (created.eventId)}))
@@ -290,6 +289,8 @@ class Dao {
                 organizerId: event.organizerId,
                 eventName: event.eventName,
                 address: event.address,
+                city: event.city,
+                placeDescription: event.placeDescription,
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
@@ -575,7 +576,6 @@ class Dao {
             {
                 name: gig.contract.name,
                 data: gig.contract.data,
-                contentType: gig.contract.contentType
             })
             .then((created) => {
                 return model.GigModel.create(

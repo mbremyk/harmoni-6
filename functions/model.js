@@ -114,7 +114,6 @@ let EventModel = sequelize.define('event', {
         }
     },
     imageUrl: {type: Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
-    image: Sequelize.TEXT,
     description: Sequelize.TEXT,
     cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
 }, {paranoid: true});
@@ -135,9 +134,6 @@ let FileModel = sequelize.define('file', {
         autoIncrement: true
     },
     name: {
-        type: Sequelize.STRING
-    },
-    contentType: {
         type: Sequelize.STRING
     },
     data: {
@@ -291,9 +287,6 @@ TicketModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 
 FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
-
-FileModel.hasOne(GigModel, {foreignKey: 'rider'});
-GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
 
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));

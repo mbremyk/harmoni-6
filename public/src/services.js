@@ -51,7 +51,7 @@ export class Event {
     description;
     cancelled;
 
-    constructor(eventId, organizerId, eventName, city, address, placeDescription, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
+    constructor(eventId, organizerId, eventName, city, address, placeDescription, description, ageLimit, startTime, endTime, imageUrl, cancelled) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.eventName = eventName;
@@ -63,7 +63,6 @@ export class Event {
         this.startTime = startTime;
         this.endTime = endTime;
         this.imageUrl = imageUrl;
-        this.image = image;
         this.cancelled = cancelled;
     }
 }
@@ -194,8 +193,8 @@ class Services {
         return axios.put(url + "/auth/events/" + event.eventId, event, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
-    deleteEvent(event) {
-        return axios.delete(url + '/auth/events/' + event.eventId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    deleteEvent(eventId) {
+        return axios.delete(url + '/auth/events/' + eventId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     getEvents() {
