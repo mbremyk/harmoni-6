@@ -6,6 +6,10 @@ let db = new dao();
 
 beforeEach(done => Models.syncTestData().then(() => done()));
 
+// afterEach(done => Models.dropTables().then(res => {
+//     done();
+// }));
+
 
 /*
                             USERS

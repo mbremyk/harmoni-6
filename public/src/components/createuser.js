@@ -99,10 +99,13 @@ export class CreateUserForm extends Component {
 		});
 	}
 
-    render() {
-        return (
-            <Container style={{width: '40em'}}>
-                <Card style={{padding: '10px', marginTop: '20%'}}>
+	render() {
+		return (
+			<Container style={{width: '40em'}}>
+
+				<h1 className="HarmoniLogo display-3 text-center m-3">Harmoni</h1>
+
+				<Card className="" style={{padding: '10px'}}>
                     <div style={{padding: '5%'}}>
                         <label className='h1'>Lag ny bruker</label>
 
@@ -150,11 +153,12 @@ export class CreateUserForm extends Component {
                             </Form.Group>
 
                             <Button
-                                onClick={this.handleSubmit}
-                                variant="primary"
-                                type="button">
-                                Opprett bruker
-                            </Button>
+                                className="mr-2"
+								onClick={this.handleSubmit}
+								variant="primary"
+								type="button">
+								Opprett bruker
+							</Button>
 
                             <Button
                                 href="/"

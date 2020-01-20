@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const hashPassword = require("./userhandling");
 let cors = require("cors");
 let fs = require("fs");
+const mail = require("./mail.js");
 
 //Express
 const express = require("express");
@@ -113,7 +114,6 @@ function getToken(user) {
  * get      /validate/email/:email
  * post     /auth/logout
  * post     /auth/refresh
-
  *
  *                      USERS
  * post     /users
@@ -149,6 +149,11 @@ function getToken(user) {
  * post     /events/:eventId/gigs/:artistId/rider
  * get      /events/:eventId/gigs/:artistId/rider
  *
+ *                      MAIL
+ * @link mail
+ * use      /mail
+ * post     /mail/bug
+ * post     /mail/password
  */
 
 
@@ -190,8 +195,8 @@ app.use("/auth", (req, res, next) => {
  *
  * @return {json} {jwt: token}
  */
-app.post("/login", (req, res) => {
-    console.log("POST-request - /login");
+app.post("/login2", (req, res) => {
+        console.log("POST-request - /login");
 
     return db.getSaltByEmail(req.body.email)
         .then(salt => {
@@ -207,7 +212,8 @@ app.post("/login", (req, res) => {
                             let token = getToken(user.dataValues);
                             res.json({jwt: token});
                         })
-                    } else {
+                    }
+                    else {
                         res.status(401);
                         res.json({error: "Not authorized"})
                     }
@@ -216,6 +222,41 @@ app.post("/login", (req, res) => {
         });
 });
 
+app.post("/login", async (req, res) => {
+    console.log("POST-request - /login");
+
+    let salt = await db.getSaltByEmail(req.body.email);
+    let credentials = await hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt);
+
+    let ok1 = await db.loginOk(req.body.email, credentials[0]);
+    let ok2 = await db.onetimeLogin(req.body.email, credentials[0]);
+
+    console.log('login:' + ok1 + ' ' + ok2);
+
+    if(ok1) {
+
+        return db.getUserByEmail(req.body.email).then(user => {
+            console.log(user.dataValues);
+            let token = getToken(user.dataValues);
+            res.json({jwt: token});
+        });
+
+    } else if(ok2) {
+
+        let result = await db.deleteOneTimeLogin(req.body.email);
+        return db.getUserByEmail(req.body.email).then(user => {
+            console.log(user.dataValues);
+            let token = getToken(user.dataValues);
+            res.json({jwt: token});
+        });
+
+    } else {
+
+        res.status(401);
+        res.json({error: "Not authorized"})
+    }
+
+});
 
 app.get("/validate/username/:username", (req, res) => {
     console.log("GET-request - /validate/username/:username");
@@ -270,6 +311,15 @@ app.post("/auth/refresh", (req, res) => {
         let token = getToken(user[0].dataValues);
         res.json({jwt: token});
     });
+});
+
+app.put('/forgotPass/:email', (req, res) => {
+    console.log('PUT-request - /forgotPass/:email');
+
+    let email = req.params.email;
+    return db.forgotPassword(email)
+        .then(success => success ? res.status(201) : res.status(400))
+        .catch(error => console.error(error));
 });
 
 
@@ -713,6 +763,15 @@ app.get("/events/:eventId/gigs/:artistId/rider", (req, res) => {
     let artistId = decodeURIComponent(req.params.artistId);
     db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
 });
+
+/*
+                    MAIL
+ */
+mail.addMailEndpoints(app, db);
+
+/**
+ * @link mail
+ */
 
 
 console.log("Server initalized");
