@@ -6,6 +6,10 @@ let db = new dao();
 
 beforeEach(done => Models.syncTestData().then(() => done()));
 
+// afterEach(done => Models.dropTables().then(res => {
+//     done();
+// }));
+
 
 /*
                             USERS
@@ -170,13 +174,17 @@ describe('Events', () => {
 
     it('create event', done => {
         let event = {
-            organizerId: '3',
-            eventName: 'CREATED',
-            address: 'CREATED',
-            ageLimit: '45',
+            organizerId: 1,
+            eventName: 'CREATE TEST',
+            city: 'Trondheim',
+            address: 'Torget 2',
+            placeDescription: '3 etasje',
+            ageLimit: 12,
             startTime: null,
             endTime: null,
-            description: 'if you can see this the event was created properly'
+            imageUrl: 'fake URL',
+            image: null,
+            description: 'Create event test',
         };
         db.createEvent(event).then(response => {
             expect(response.insertId).toBe(6);
