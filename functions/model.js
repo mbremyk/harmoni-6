@@ -28,11 +28,11 @@ function initCloud() {
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
         dialect: pr.dialect,
         host: pr.databaseURL,
-       // port: pr.port,
+        // port: pr.port,
         timestamps: false,
-        /*dialectOptions: {
-            socketPath: '/cloudsql/caramel-vine-256015:europe-north1:kkdatabase'
-        },*/
+        dialectOptions: {
+            socketPath: '/cloudsql/kkdatabase'
+        },
     });
     return sequelize;
 }
@@ -113,7 +113,7 @@ let EventModel = sequelize.define('event', {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    imageUrl: {type : Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
+    imageUrl: {type: Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
     cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}

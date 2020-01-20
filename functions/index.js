@@ -12,10 +12,10 @@ let fs = require("fs");
 const express = require("express");
 const app = express();
 
-if(!process.env.FIREBASE_CONFIG){
+if (!process.env.FIREBASE_CONFIG) {
     console.log("running local server");
     app.listen(8080);
-}else{
+} else {
     console.log("running firebase server");
     const main = express();
     main.use('/api/v1', app);
@@ -334,6 +334,7 @@ app.delete("/auth/users/:userId", (req, res) => {
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
 
+
 /**
  *
  */
@@ -495,7 +496,6 @@ app.delete('/auth/events/:eventId', (req, res) => {
 });*/
 
 
-
 /**
  *  Get an array of personnel connected to an event
  *
@@ -517,7 +517,7 @@ app.delete('/auth/events/:eventId', (req, res) => {
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/personnel", (req, res) => {
-    db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201) : res.status(400));
+    return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
 
@@ -671,7 +671,7 @@ app.post("/events/:eventId/gigs", (req, res) => {
  */
 app.get("/events/:eventId/gigs", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+    return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
 

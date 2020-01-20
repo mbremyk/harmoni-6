@@ -1,4 +1,5 @@
 import axios from 'axios'
+import {authService} from './AuthService'
 
 var url = '';
 if (window.location.href.includes('localhost:5000')) {
@@ -7,6 +8,24 @@ if (window.location.href.includes('localhost:5000')) {
     url = 'http://localhost:8080';
 } else {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
+}
+
+export class Artist {
+
+    userId;
+    username;
+    email;
+    contract;
+    document;
+
+    constructor(userId, username, email, contract, document) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.contract = contract;
+        this.document = document
+    }
+
 }
 
 export class User {
@@ -69,7 +88,7 @@ export class Gig {
     constructor(eventId, artistId, contract) {
         this.eventId = eventId;
         this.contract = contract;
-        this.artists = artistId;
+        this.artistId = artistId;
     }
 }
 
@@ -162,6 +181,7 @@ class Services {
         return axios.get(url + '/users/' + userId).then(response => response.data);
     }
 
+
     /*
         EVENTS
     */
@@ -248,6 +268,11 @@ class Services {
 
     addRiderItems(riderItems) {
         return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+    }
+
+    downloadContract(eventId, artistId) {
+        console.log("Downloading...");
+        return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
     }
 
     confirmRiderItems(riderItems) {

@@ -29,13 +29,12 @@ export class EventInfo extends Component {
      </div>
      {this.props.price}*/
 
-    getAgeLimitInfo(age_limit){
-        if(age_limit !== 0)
-        {
+    getAgeLimitInfo(age_limit) {
+        if (age_limit !== 0) {
             return <div>
                 <b>Aldersgrense:</b> {age_limit}
             </div>
-        }else{
+        } else {
             return <div className="font-weight-bold">
                 Tillat For Alle
             </div>
@@ -113,7 +112,7 @@ export class DownloadWidget extends Component  {
     type = "";
     render() {
         return (
-            <Button onClick={this.download} variant="link" aria-label="Left Align" title="Last Ned">
+            <Button onClick={this.download} variant="primary" title="Last Ned" size="sm">
                 last ned {this.type}
             </Button>
         )

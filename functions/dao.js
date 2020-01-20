@@ -540,7 +540,6 @@ class Dao {
         return model.GigModel.findAll({
             include: [
                 {model: model.UserModel, attributes: ['username', 'email']},
-                {model: model.FileModel}
             ],
             where: {eventId: eventId}
         })
@@ -550,63 +549,19 @@ class Dao {
             });
     }
 
-    /**
-     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
-     *
-     * @param riderItems[]
-     * @returns {Promise<boolean>}
-     */
-    addRiderItems(riderItems) {
-        return model.RiderModel.bulkCreate(riderItems)
-            .then(response => response[0].item !== null)
-            .catch(error => {
-                console.error(error);
-                return false;
-            })
+    getContractId(eventId, artistId) {
+        return model.GigModel.findOne({
+            where: {eventId: eventId, artistId: artistId},
+            attributes: ["contract"]
+        }).catch(error => console.error(error));
     }
 
-
-    /**
-     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
-     *
-     * @param riderItems: RiderItem[]
-     * @returns {Promise<boolean>}
-     */
-    updateRiderItems(riderItems) {
-        let allUpdatesOk = true;
-        return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
-            {
-                confirmed: riderItem.confirmed
-            },
-            {
-                where: {
-                    eventId: riderItem.eventId,
-                    artistId: riderItem.artistId,
-                    item: riderItem.item
-                }
+    getContract(eventId, artistId) {
+        return this.getContractId(eventId, artistId).then((gig) => {
+            return model.FileModel.findOne({
+                where: {fileId: gig.contract}
             })
-            .catch(error => {
-                console.error(error);
-                return false
-            })))
-            .then(() => {
-                return allUpdatesOk;
-            });
-    }
-
-    /**
-     * retrieves the rideritems assosciated with a gig
-     *
-     * @param eventId
-     * @param artistId
-     * @returns {Promise<Gig[]>}
-     */
-    getRiderItems(eventId, artistId) {
-        return model.RiderModel.findAll({where: {eventId: eventId, artistId: artistId}})
-            .catch(error => {
-                console.error(error);
-                return [];
-            });
+        }).catch(error => console.error(error));
     }
 }
 
