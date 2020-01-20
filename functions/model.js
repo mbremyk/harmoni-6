@@ -61,6 +61,7 @@ let UserModel = sequelize.define('user', {
     userId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     username: {type: Sequelize.STRING, unique: true, allowNull: false},
     password: Sequelize.STRING.BINARY,
+    tempPassword: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
     email: {type: Sequelize.STRING, unique: true, allowNull: false}
 }, {

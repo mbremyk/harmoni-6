@@ -78,6 +78,7 @@ export class LoginForm extends Component {
                             </Form.Group>
 
                             <Button
+	                            className="mr-2"
                                 onClick={this.handleLogin}
                                 variant="primary"
                                 type="button">
@@ -90,7 +91,7 @@ export class LoginForm extends Component {
                                 Avbryt
                             </Button>
                             <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
-                            <NavLink href={'/hjem'}>Trykk her om du ikke bli sent videre..</NavLink>
+                            <NavLink href={'/nytt-passord'}>Glemt passord</NavLink>
                         </Form>
                     </div>
 				</Card>

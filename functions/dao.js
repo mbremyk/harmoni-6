@@ -116,6 +116,48 @@ class Dao {
             });
     }
 
+    async forgotPassword(email) {
+        let newPass = Math.random().toString(36).substring(7);
+        let salt = await this.getSaltByEmail(email);
+        let credentials = await hashPassword.hashPassword(newPass, salt);
+
+        console.log('!!! nytt passord: \'' + newPass + '\'');
+
+        return model.UserModel.update(
+            {
+                tempPassword: credentials[0]
+            },
+            {where: {email: email}}
+            ).then(response => response[0] === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    onetimeLogin(email, password) {
+        return model.UserModel.findAll(
+            {where: {[op.and]: [{email: email}, {tempPassword: password}]}})
+            .then(response => response.length === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
+    deleteOneTimeLogin(email) {
+        return model.UserModel.update(
+            {
+                tempPassword: null
+            },
+            {where: {email: email}}
+        ).then(response => response[0] === 1)
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
     updatePassword(user) {
         return model.UserModel.update(
             {

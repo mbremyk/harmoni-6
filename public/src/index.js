@@ -20,6 +20,7 @@ import {SearchResults} from "./components/searchresults";
 
 //const history = createHashHistory();
 import {createBrowserHistory} from "history";
+import {NewPassword} from "./components/newpassword";
 
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
@@ -32,6 +33,7 @@ if (root)
         <Route exact path="/ny-bruker" component={CreateUserForm}/>
         <Route exact path="/arrangement/:id" component={EventPage}/>
         <Route exact path="/logg-inn" component={LoginForm}/>
+        <Route exact path="/nytt-passord" component={NewPassword}/>
         <Route exact path="/sok/:input" component={SearchResults}/>
 
         <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>

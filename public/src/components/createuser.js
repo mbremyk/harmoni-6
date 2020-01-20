@@ -153,6 +153,7 @@ export class CreateUserForm extends Component {
 							</Form.Group>
 
 							<Button
+								className="mr-2"
 								onClick={this.handleSubmit}
 								variant="primary"
 								type="button">
