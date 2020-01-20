@@ -71,11 +71,16 @@ export class AddEvent extends Component {
         this.image = this.handleImageUpload.bind(this);
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
         this.personnelRole = this.handlePersonnelRole.bind(this);
+        this.city = this.handleCityChange.bind(this);
+        this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
+
 
         this.state = {
             organizerId: '',
             eventName: '',
             eventAddress: '',
+            city: '',
+            placeDescription: '',
             eventDescription: '',
             ageLimit: 0,
             fDate: require('moment')().format('YYYY-MM-DD'),
@@ -94,6 +99,14 @@ export class AddEvent extends Component {
 
     handleEventNameChange(event) {
         this.setState({eventName: event.target.value});
+    }
+
+    handleCityChange(event) {
+        this.setState({city: event.target.value});
+    }
+
+    handlePlaceDescriptionChange(event) {
+        this.setState({placeDescription: event.target.value});
     }
 
     handleEventAddressChange(event) {
@@ -166,8 +179,8 @@ export class AddEvent extends Component {
             this.toBase64(this.state.image).then(res => {
                 this.state.imageUrl = res;
 
-                let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-                    this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
+                let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.city, this.state.eventAddress,
+                    this.state.placeDescription, this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
                     this.state.image, this.state.cancelled);
 
                 service.createEvent(e).then(updated => {
@@ -194,9 +207,11 @@ export class AddEvent extends Component {
             });
         } else {
 
-            let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-                this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
+            let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.city, this.state.eventAddress,
+                this.state.placeDescription, this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
                 this.state.image, this.state.cancelled);
+
+            console.log(e)
 
             service.createEvent(e).then(updated => {
 
@@ -249,7 +264,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Arrangementsnavn</Form.Label>
                                     <Form.Control
-                                        placeholder="Navn på arrangement . . ."
+                                        placeholder="Navn på arrangement"
                                         value={this.state.eventName}
                                         onChange={this.handleEventNameChange}
                                     />
@@ -258,7 +273,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>Adresse</Form.Label>
                                     <Form.Control
-                                        placeholder="Adresse der arrangementet skal holdes . . ."
+                                        placeholder="Adresse der arrangementet skal holdes"
                                         value={this.state.eventAddress}
                                         onChange={this.handleEventAddressChange}
 
@@ -268,17 +283,29 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>By</Form.Label>
                                     <Form.Control
-                                        placeholder="Adresse der arrangementet skal holdes . . ."
-                                        value={this.state.eventAddress}
-                                        onChange={this.handleEventAddressChange}
+                                        placeholder="By der arrangementet skal holdes"
+                                        value={this.state.city}
+                                        onChange={this.handleCityChange}
 
+                                    />
+                                </Form.Group>
+
+
+                                <Form.Group as={Col} sm={12}>
+                                    <Form.Label>Plass beskrivelse</Form.Label>
+                                    <Form.Control
+                                        placeholder="For eksempel 3. etajse"
+                                        as="textarea"
+                                        rows="8"
+                                        value={this.state.placeDescription}
+                                        onChange={this.handlePlaceDescriptionChange}
                                     />
                                 </Form.Group>
 
                                 <Form.Group as={Col} sm={12}>
                                     <Form.Label>Beskrivelse</Form.Label>
                                     <Form.Control
-                                        placeholder="Her kan du skrive en kort beskrivelse av arrangementet (max. 500 ord) . . ."
+                                        placeholder="Her kan du skrive en beskrivelse av arrangementet"
                                         as="textarea"
                                         rows="8"
                                         value={this.state.eventDescription}
