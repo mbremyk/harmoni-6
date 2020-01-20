@@ -305,8 +305,8 @@ class Services {
      * @param eventId: number
      * @returns Promise<>: Gig[]
      */
-    getGigForEvent(eventId) {
-        return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
+    getGigs(eventId) {
+        return axios.get(url + '/auth/events/' + eventId + '/gigs', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
