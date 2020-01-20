@@ -32,7 +32,7 @@ export class LandingPage extends Component {
 						<Row style={{padding: "5em"}}>
 							<Col className="text-center mt-5">
 								<NavLink href='#scrollTo'>
-									<h2 className="text-white">Bla ned for å se arrangementer</h2>
+									<h2 className="text-white"><u>Bla ned</u> for å se arrangementer</h2>
 									<i className="fa fa-angle-down" style={{'font-size':'64px',color: 'white'}}></i>
 								</NavLink>
 							</Col>
@@ -70,6 +70,6 @@ export class LandingPage extends Component {
 
 	scroll() {
 		let element = document.getElementById('scrollTo');
-		element.scrollTo();
+		element.scrollIntoView({behavior: "smooth"});
 	}
 }
