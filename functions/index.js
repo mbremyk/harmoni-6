@@ -671,8 +671,9 @@ app.post("/events/:eventId/gigs", (req, res) => {
  */
 app.get("/events/:eventId/gigs", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+    db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
+
 
 /**
  * Adds rider items to the database
@@ -687,6 +688,21 @@ app.post("/events/:eventId/gigs/:artistId/rider", (req, res) => {
     db.addRiderItems(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
 });
 
+
+/**
+ * Updates an array of riderItems in the database
+ * body:
+ * {
+ *      RiderItem[]
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+app.put("/events/:eventId/gigs/:artistId/rider", (req, res) => {
+    db.updateRiderItems(req.body).then((updateOk) => updateOk ? res.status(201).send(true) : res.status(401).send(false))
+
+});
+
 /**
  *  Get an array of riderItems connected to gig with params matching the url
  *
@@ -695,7 +711,7 @@ app.post("/events/:eventId/gigs/:artistId/rider", (req, res) => {
 app.get("/events/:eventId/gigs/:artistId/rider", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
-    return db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
+    db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
 });
 
 

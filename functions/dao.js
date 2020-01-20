@@ -57,7 +57,7 @@ class Dao {
      */
     updateUser(user) {
 
-        if(user.password !== ''){
+        if (user.password !== '') {
             return hashPassword.hashPassword(user.password).then(credentials => {
                 return model.UserModel.update(
                     {
@@ -563,6 +563,35 @@ class Dao {
                 console.error(error);
                 return false;
             })
+    }
+
+
+    /**
+     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
+     *
+     * @param riderItems: RiderItem[]
+     * @returns {Promise<boolean>}
+     */
+    updateRiderItems(riderItems) {
+        let allUpdatesOk = true;
+        return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
+            {
+                confirmed: riderItem.confirmed
+            },
+            {
+                where: {
+                    eventId: riderItem.eventId,
+                    artistId: riderItem.artistId,
+                    item: riderItem.item
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                return false
+            })))
+            .then(() => {
+                return allUpdatesOk;
+            });
     }
 
     /**

@@ -18,7 +18,7 @@ function init() {
                 dialect: pr.dialect,
                 dialectOptions: {dateStrings: true,},
                 pool: {max: 10, min: 0, idle: 10000},
-                logging: false
+                logging: true
             });
     }
 }

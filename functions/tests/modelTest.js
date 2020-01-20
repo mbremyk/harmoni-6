@@ -4,9 +4,7 @@ const dao = require('../dao.js');
 let db = new dao();
 
 
-beforeEach(done => Models.syncTestData().then(res => {
-    done();
-}));
+beforeEach(done => Models.syncTestData().then(() => done()));
 
 
 /*
@@ -485,7 +483,6 @@ describe('Personnel', () => {
 ;
 
 
-
 /*
                 TICKETS
  */
@@ -591,6 +588,39 @@ describe('Gigs', () => {
         }];
         db.addRiderItems(item).then(response => {
             expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+
+    it('update riderItems', done => {
+        let items = [
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Varm Cola',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Sigg',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Nakkepute',
+                confirmed: true
+            },
+            {
+                artistId: 5, //Magnus
+                eventId: 2, //Ungdomskonert
+                item: 'Litt Sjokolade hadde vært fint',
+                confirmed: true
+            }];
+        db.updateRiderItems(items).then(updateOk => {
+            expect(updateOk).toBeTruthy();
             done();
         });
     });
