@@ -1,4 +1,4 @@
-import {Gig, Event, Personnel, service, SimpleFile, Artist} from "../services";
+import {Gig, Event, Personnel, service, SimpleFile, Artist, Ticket} from "../services";
 import {Component} from "react-simplified";
 import {HarmoniNavbar} from "./navbar";
 import React from "react";
@@ -72,6 +72,9 @@ export class AddEvent extends Component {
         this.image = this.handleImageUpload.bind(this);
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
         this.personnelRole = this.handlePersonnelRole.bind(this);
+        this.ticketType = this.handleTicketType.bind(this);
+        this.ticketPrice = this.handleTicketPrice.bind(this);
+        this.ticketAmount = this.handleTicketAmount.bind(this);
 
         this.state = {
             organizerId: '',
@@ -90,6 +93,10 @@ export class AddEvent extends Component {
             artists: [],
             personnelAdd: [],
             personnelRole: '',
+            ticketType: '',
+            ticketPrice: 0,
+            ticketAmount: 0,
+            tickets: [],
             error: '',
             errorType: 'success',
         };
@@ -155,8 +162,24 @@ export class AddEvent extends Component {
     }
 
     handlePersonnelRole(event, personell) {
-        personell.role = event.target.value
+        personell.role = event.target.value;
         this.setState({personnelRole: event.target.value})
+    }
+
+    handleTicketType(event){
+        this.setState({ticketType: event.target.value});
+    }
+
+    handleTicketPrice(event){
+        this.setState({ticketPrice: event.target.value});
+    }
+
+    handleTicketAmount(event){
+        this.setState({ticketAmount: event.target.value});
+    }
+
+    handleTicket(){
+        this.setState({tickets: [...this.state.tickets, new Ticket(null, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
     }
 
     setError(message, variant) {
@@ -491,15 +514,90 @@ export class AddEvent extends Component {
                                 </ButtonToolbar>
                             </Form.Group>
 
+                            <Form.Row >
+
+                                <Form.Group as={Col} sm={"3"}>
+
+                                    <Form.Label>Billett-type</Form.Label>
+                                    <Form.Control
+                                        placeholder="Navn på billettype . . ."
+                                        value={this.state.ticketType}
+                                        onChange={this.handleTicketType}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Billettpris</Form.Label>
+                                    <InputGroup>
+
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="Billettpris . . ."
+                                            value={this.state.ticketPrice}
+                                            onChange={this.handleTicketPrice}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Antall billetter</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Antall billetter . . ."
+                                        value={this.state.ticketAmount}
+                                        onChange={this.handleTicketAmount}
+                                    />
+
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Button onClick={this.handleTicket}>Legg til billett-typen</Button>
+                                </Form.Group>
+
+                            </Form.Row>
+
+                            <ListGroup>
+                                {this.state.tickets.map( t =>
+                                <React.Fragment>
+                                    <ListGroupItem>
+                                        <Row>
+                                            <Col>
+                                            {"Billett-type: " + t.type}
+                                            </Col>
+                                            <Col>
+                                            {"Billettpris:  " + t.price}
+                                            </Col>
+                                            <Col>
+                                            {"Antall billetter: " + t.amount}
+                                            </Col>
+                                            <Col>
+                                                <Button type="button" variant={"danger"} onClick={() => {
+                                                    this.state.tickets.splice(this.state.tickets.indexOf(t), 1);
+                                                    this.setState({tickets: this.state.tickets});
+                                                }
+                                                }>Fjern</Button>
+                                            </Col>
+                                        </Row>
+                                    </ListGroupItem>
+                                </React.Fragment>
+                                )}
+                            </ListGroup>
+
                             {(this.state.error) ?
                                 <Alert style={{height: '3em', top: '50%', left: '50%', position: 'fixed', transform: 'translate(-50%, -50%)'}} variant={this.state.errorType}>{this.state.error}</Alert> :
                                 <div style={{height: '3em'}}/>}
 
-                            <Form.Group as={Col} md={{span: 3, offset: 5}}>
-                                <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
-                            </Form.Group>
-
                         </Form.Row>
+
+                        <Form.Row>
+                        <Form.Group as={Col} md={{span: 3, offset: 5}}>
+                            <Button  type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                        </Form.Group>
+                        </Form.Row>
+
                     </Form>
                 </Container>
             </div>

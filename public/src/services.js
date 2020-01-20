@@ -93,6 +93,13 @@ export class Ticket {
     type;
     price;
     amount;
+
+    constructor(eventId, type, price, amount){
+        this.eventId = eventId;
+        this.type = type;
+        this.price = price;
+        this.amount = amount;
+    }
 }
 
 export class Personnel {
