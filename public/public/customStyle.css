@@ -6,7 +6,7 @@
 
 }*/
 
-body{
+body {
     background-image: url(/pictures/geometricPattern.png);
     background-repeat: repeat;
     min-height: 100vh;
@@ -36,24 +36,28 @@ root{
  {
      color: black;
      text-decoration: none;
+
  }
 
 .eventinfo a:hover
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:active
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:link
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:visited

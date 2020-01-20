@@ -10,6 +10,24 @@ if (window.location.href.includes('localhost:5000')) {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
 
+export class Artist {
+
+    userId;
+    username;
+    email;
+    contract;
+    document;
+
+    constructor(userId, username, email, contract, document) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.contract = contract;
+        this.document = document
+    }
+
+}
+
 export class User {
     userId;
     username;
@@ -57,18 +75,16 @@ export class SimpleFile {
 
 }
 
-export class BulkGig {
+export class Gig {
 
     eventId;
-    rider;
+    artistId;
     contract;
-    artists;
 
-    constructor(eventId, artists, rider, contract) {
+    constructor(eventId, artistId, contract) {
         this.eventId = eventId;
-        this.rider = rider;
         this.contract = contract;
-        this.artists = artists;
+        this.artistId = artistId;
     }
 }
 
@@ -79,24 +95,13 @@ export class Ticket {
     amount;
 }
 
-export class BulkPersonnel {
-    personnel;
-    eventId;
-
-    constructor(personnel, eventId) {
-        this.personnel = personnel;
-        this.eventId = eventId;
-    }
-
-}
-
 export class Personnel {
     personnelId;
     eventId;
     role;
 
-    constructor(personnel, eventId, role) {
-        this.personnelId = personnel;
+    constructor(userId, eventId, role) {
+        this.personnelId = userId;
         this.eventId = eventId;
         this.role = role;
     }
@@ -163,6 +168,7 @@ class Services {
         return axios.get(url + '/users/' + userId).then(response => response.data);
     }
 
+
     /*
         EVENTS
     */
@@ -199,9 +205,8 @@ class Services {
     /*
         PERSONNEL
     */
-    createPersonnel(personnel) {
-        console.log(personnel);
-        return axios.post(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
+    createPersonnel(personnel, id) {
+        return axios.post(url + '/events/' + id + '/personnel', personnel).then(response => response.data);
     }
 
     updatePersonnel(personnel) {
@@ -241,7 +246,7 @@ class Services {
         GIGS
     */
     createGig(gig) {
-        return axios.post(url + '/gigs', gig).then(response => response.data);
+        return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
     }
 
     uploadContract(formData, event, artist) {
@@ -252,19 +257,11 @@ class Services {
         return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
-    downloadContract(event, artist) {
+    downloadContract(eventId, artistId) {
         console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url + "/contract/" + event + "/" + artist).then(response => response.data);
+
+        return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
     }
-
-    downloadRider(event, artist) {
-        console.log("Downloading");
-        //This approach to downloading the files does not work
-        return axios.get(url + "/rider/" + event + "/" + artist).then(response => response.data);
-    }
-
-
 }
 
 export let service = new Services();

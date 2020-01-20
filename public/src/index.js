@@ -21,6 +21,7 @@ import {SearchResults} from "./components/searchresults";
 //const history = createHashHistory();
 import {createBrowserHistory} from "history";
 import {NewPassword} from "./components/newpassword";
+import {RiderPage, Riderpage} from "./components/riderpage";
 
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
@@ -36,13 +37,14 @@ if (root)
         <Route exact path="/nytt-passord" component={NewPassword}/>
         <Route exact path="/sok/:input" component={SearchResults}/>
 
-        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
-        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+            <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
+	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
+	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
+	        <PrivateRoute authed={authService.loggedIn()} exact path="/arrangement/:id/legg-til-rider" component={RiderPage}/>
 
         <Route path="/" component={Footer}/>
     </BrowserRouter>,

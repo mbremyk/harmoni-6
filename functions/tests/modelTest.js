@@ -410,13 +410,21 @@ describe('Events - search', () => {
  */
 
 describe('Personnel', () => {
-    it('add personnel to event', done => {
-        let personnel = {
-            //eventId: 1,
-            userId: 1,
-            role: 'JEG VIL JOBBE'
-        };
-        db.addPersonnel(personnel, 1).then(response => {
+    it('add personnel[] to event', done => {
+        let personnel = [
+            {
+                eventId: 1,
+                personnelId: 1,
+                rider: null,
+                contract: null
+            },
+            {
+                eventId: 2,
+                personnelId: 2,
+                rider: null,
+                contract: null
+            }];
+        db.addPersonnel(personnel).then(response => {
             expect(response).toBeTruthy();
             done();
         });
@@ -477,34 +485,9 @@ describe('Personnel', () => {
             done();
         });
     });
-});
+})
+;
 
-
-/*
-                    GIGS
- */
-
-describe('Gigs', () => {
-    it('create Gig', done => {
-        let gig = {
-            eventId: 1,
-            artistId: 2,
-            contract: null,
-            rider: null,
-        };
-        db.addGig(2, 1).then(response => {
-            expect(response.eventId).toBe(1);
-            done();
-        });
-    });
-
-    it('correct data in gig', done => {
-        db.getGigs(4).then(gigs => {
-            expect(gigs.length).toBe(1);
-        });
-        done();
-    });
-});
 
 
 /*
@@ -559,6 +542,51 @@ describe('Tickets', () => {
         });
     });
 });
+
+
+/*
+                    GIGS
+ */
+
+describe('Gigs', () => {
+    it('create Gig', done => {
+        let gig = {
+            eventId: 1,
+            artistId: 2,
+            contract: "TEST",
+        };
+        db.addGig(gig).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
+    it('correct data in gig', done => {
+        db.getGigs(2).then(gigs => {
+            expect(gigs.length).toBe(1);
+            expect(gigs.map(gig =>
+                gig.toJSON()).map(gig => (
+                {
+                    eventId: gig.eventId,
+                    artistId: gig.artistId,
+                    artistName: gig.user.username,
+                    contract: gig.file.name,
+                    contractData: gig.file.data
+                }
+            ))).toEqual([
+                {
+                    eventId: 2,
+                    artistId: 5,
+                    artistName: 'Michael S.L',
+                    contract: 'Fil 2',
+                    contractData: 'Lorem var en dårlig idé'
+                }
+            ]);
+        });
+        done();
+    });
+});
+
 
 describe('Files', () => {
 

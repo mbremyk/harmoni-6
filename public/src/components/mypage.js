@@ -32,7 +32,7 @@ export class myPage extends Component {
 
     setError(message, variant) {
         this.setState({error: message, errorType: variant});
-        setTimeout( () => this.setState({error: '', errorType: 'primary'}), 5000);
+        setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
     render() {
@@ -45,34 +45,39 @@ export class myPage extends Component {
                         <div style={{padding: '5%'}}>
                             <label className='h1'>Min side</label>
 
-                            {(this.state.error)?
-                                <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                            {(this.state.error) ?
+                                <Alert style={{height: '3em'}}
+                                       variant={this.state.errorType}>{this.state.error}</Alert> :
                                 <div style={{height: '3em'}}/>}
 
                             <Form>
                                 <Form.Group>
                                     <Form.Label>Brukernavn</Form.Label>
                                     <Form.Control autocomplete="username" value={this.state.username}
-                                              onChange={this.handleUsernameChange}>
+                                                  onChange={this.handleUsernameChange}>
                                     </Form.Control>
                                 </Form.Group>
                                 <Form.Group controlId="formBasicEmail">
                                     <Form.Label>E-post</Form.Label>
-                                    <Form.Control autocomplete="email" value={this.state.email} onChange={this.handleEmailChange}>
+                                    <Form.Control autocomplete="email" value={this.state.email}
+                                                  onChange={this.handleEmailChange}>
                                     </Form.Control>
                                 </Form.Group>
                                 <Form.Group controlId="formNewPassword">
                                     <Form.Label>Nytt passord</Form.Label>
                                     <Form.Control autocomplete="new-password" type="password" placeholder="Nytt passord"
-                                              value={this.state.password1} onChange={this.handleNewPassword1Change}/>
+                                                  value={this.state.password1}
+                                                  onChange={this.handleNewPassword1Change}/>
                                 </Form.Group>
 
                                 <PasswordStrengthMeter password={this.state.password1}/>
 
                                 <Form.Group controlId="formRepNewPassword">
                                     <Form.Label>Gjenta nytt passord</Form.Label>
-                                    <Form.Control autocomplete="new-password" type="password" placeholder="Gjenta nytt passord"
-                                              value={this.state.password2} onChange={this.handleNewPassword2Change}/>
+                                    <Form.Control autocomplete="new-password" type="password"
+                                                  placeholder="Gjenta nytt passord"
+                                                  value={this.state.password2}
+                                                  onChange={this.handleNewPassword2Change}/>
                                 </Form.Group>
                                 <Button variant="primary" type="button" onClick={this.save}>
                                     Lagre
@@ -109,36 +114,36 @@ export class myPage extends Component {
 
     async save() {
 
-        if(!this.state.email || !this.state.username) {
+        if (!this.state.email || !this.state.username) {
             this.setError('Alle felter må fylles', 'danger');
             return;
         }
 
-        if(this.state.password1 !== this.state.password2) {
+        if (this.state.password1 !== this.state.password2) {
             this.setError('Passordene må være like', 'danger');
             return;
         }
 
-        if(!!this.state.password1){
+        if (!!this.state.password1) {
             if (this.state.password1.length < 5) {
                 this.setError('Passord må inneholde minst 5 tegn', 'danger');
                 return;
             }
         }
 
-        if(this.state.oldEmail !== this.state.email) {
+        if (this.state.oldEmail !== this.state.email) {
             let taken1 = await service.validateEmail(this.state.email);
 
-            if(taken1) {
+            if (taken1) {
                 this.setError('Epost ikke tilgjengelig', 'danger');
                 return;
             }
         }
 
-        if(this.state.oldUsername !== this.state.username) {
+        if (this.state.oldUsername !== this.state.username) {
             let taken2 = await service.validateUsername(this.state.username);
 
-            if(taken2) {
+            if (taken2) {
                 this.setError('Brukernavn ikke tilgjengelig', 'danger');
                 return;
             }
@@ -155,7 +160,7 @@ export class myPage extends Component {
             this.setError('Bruker oppdatert!', 'success');
             this.setState({password1: '', password2: ''});
             this.setState({oldUsername: user.username, oldEmail: user.email});
-        }). catch(err => {
+        }).catch(err => {
             console.log(err);
             this.setError('Kunne ikke oppdatere bruker', 'danger');
             this.setState({username: this.state.oldUsername, email: this.state.oldEmail});

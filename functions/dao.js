@@ -57,7 +57,7 @@ class Dao {
      */
     updateUser(user) {
 
-        if(user.password !== ''){
+        if (user.password !== '') {
             return hashPassword.hashPassword(user.password).then(credentials => {
                 return model.UserModel.update(
                     {
@@ -251,6 +251,7 @@ class Dao {
      * @returns {Promise<number>}
      */
     createEvent(event) {
+        console.log(event.imageUrl instanceof String);
         return model.EventModel.create(
             {
                 organizerId: event.organizerId,
@@ -397,53 +398,6 @@ class Dao {
             });
     }
 
-    /*
-                                 GIG
-     */
-
-    /**
-     * creates a new Gig in the Database, artistId and eventId
-     * in the gig object has to be unique, returns false if something goes wrong
-     *
-     * @param gig
-     * @returns {Promise<boolean>}
-     */
-    addGig(artistId, eventId) {
-        console.log("Adding gig");
-        return model.GigModel.create(
-            {
-                artistId: artistId,
-                eventId: eventId,
-                rider: null,
-                contract: null,
-            })
-            .then(response => {
-                response.id !== null;
-                console.log("Dao: " + response);
-                return response
-            })
-            .catch(error => {
-                console.error(error);
-                //return false;
-            });
-    }
-
-    /**
-     * retrieves the gig assosciated with an event
-     *
-     * @param eventId
-     * @returns {Promise<Gig[]>}
-     */
-    getGigs(eventId) {
-        return model.GigModel.findAll({
-            include: [{model: model.UserModel, attributes: ['username', 'email']}],
-            where: {eventId: eventId}
-        })
-            .catch(error => {
-                console.error(error);
-                return [];
-            });
-    }
 
     /*
                             PERSONNEL
@@ -452,22 +406,16 @@ class Dao {
     /**
      * adds personnel to an event, return
      *
-     * @param personnel
+     * @param personnel[]
      * @returns {Promise<boolean>}
      */
-    addPersonnel(personnel, eventId) {
-        return model.PersonnelModel.create(
-            {
-                personnelId: personnel.userId,
-                //eventId: personnel.eventId,
-                eventId: eventId,
-                role: personnel.role
-            })
-            .then(response => response.id !== null)
+    addPersonnel(personnel) {
+        return model.PersonnelModel.bulkCreate(personnel)
+            .then(response => response[0]._options.isNewRecord)
             .catch(error => {
                 console.error(error);
                 return false;
-            });
+            })
     }
 
     /**
@@ -597,28 +545,36 @@ class Dao {
             });
     }
 
-    setContract(contract, gig, artist) {
-        console.log(Object.keys(contract));
-        console.log(Object.keys(contract.name));
-        console.log(contract.data);
-        /*console.log(contract.data instanceof ArrayBuffer);
-        const buf = new Buffer.from(contract.data);
-        let base64String = buf.toString('base64');*/
-        let contentType = contract.contentType;
+    /*
+                                GIG
+    */
 
-
-
-        return model.FileModel.create({name: contract.name, data: contract.data, contentType: contentType})
-            .then(fileInstance => {
-                console.log(fileInstance);
-                console.log(gig);
-                console.log(artist);
-                model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
-                    .then(gig => {
-                            console.log(contract);
-                            gig.update({contract: fileInstance.fileId});
-                        }
-                    );
+    /**
+     * creates a new Gig in the Database, artistId and eventId
+     * in the gig object has to be unique, returns false if something goes wrong
+     *
+     * @param gig
+     * @returns {Promise<boolean>}
+     */
+    addGig(gig) {
+        return model.FileModel.create(
+            {
+                name: gig.contract.name,
+                data: gig.contract.data,
+                contentType: gig.contract.contentType
+            })
+            .then((created) => {
+                return model.GigModel.create(
+                    {
+                        artistId: gig.artistId,
+                        eventId: gig.eventId,
+                        contract: created.fileId
+                    })
+                    .then(response => response._options.isNewRecord)
+                    .catch(error => {
+                        console.error(error);
+                        return false;
+                    })
             });
 
         /*model.GigModel.update(
@@ -629,51 +585,78 @@ class Dao {
 
     }
 
-    setRider(rider, gig, artist) {
-        /*const buf = new Buffer.from(rider.data);
-        let base64String = buf.toString('base64');*/
-        let contentType = rider.contentType;
 
-        return model.FileModel.create({name: rider.name, data: rider.data, contentType: contentType})
-            .then(fileInstance => {
-                console.log(fileInstance);
-                console.log(gig);
-                console.log(artist);
-                model.GigModel.findOne({where: {eventId: gig, artistId: artist}})
-                    .then(gig => {
-                            //console.log(contract);
-                            gig.update({rider: fileInstance.fileId});
-                        }
-                    );
+    /**
+     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
+     *
+     * @param eventId
+     * @returns {Promise<Gig[]>}
+     */
+    getGigs(eventId) {
+        return model.GigModel.findAll({
+            include: [
+                {model: model.UserModel, attributes: ['username', 'email']},
+            ],
+            where: {eventId: eventId}
+        })
+            .catch(error => {
+                console.error(error);
+                return [];
             });
-
     }
 
-
-    getContract(gig, artist) {
-        console.log("event: " + gig);
-        console.log("artist: " + artist);
-        console.log("starting download");
-        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
-            .then(gig => {
-                    console.log(gig);
-                    return model.FileModel.findByPk(gig[0].contract);
-                }
-            );
+    getContractId(eventId, artistId) {
+        return model.GigModel.findOne({
+            where: {eventId: eventId, artistId: artistId},
+            attributes: ["contract"]
+        }).catch(error => console.error(error));
     }
 
-    getRider(gig, artist) {
-        return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
-            .then(gig => {
-                    console.log(gig);
-                    return model.FileModel.findByPk(gig[0].rider);
-                }
-            );
+    getContract(eventId, artistId) {
+        return this.getContractId(eventId, artistId).then((gig) => {
+            return model.FileModel.findOne({
+                where: {fileId: gig.contract}
+            })
+        }).catch(error => console.error(error));
     }
+
 
     /*
                            FILE STUFF
      */
+
+
+    // addFile(eventId, artistId, file) {
+    //     return model.FileModel.create(
+    //         {
+    //             name: gig.contract.name,
+    //             data: gig.contract.data,
+    //             contentType: gig.contract.contentType
+    //         })
+    //         .then((created) => {
+    //             return model.GigModel.create(
+    //                 {
+    //                     artistId: gig.artistId,
+    //                     eventId: gig.eventId,
+    //                     contract: created.fileId
+    //                 })
+    //                 .then(response => response._options.isNewRecord)
+    //                 .catch(error => {
+    //                     console.error(error);
+    //                     return false;
+    //                 })
+    //         });
+    // }
+
+
+    // getFiles(eventId, artistId) {
+    //     return model.GigModel.findAll({where: {eventId: gig, artistId: artist}})
+    //         .then(gig => {
+    //                 console.log(gig);
+    //                 return model.FileModel.findByPk(gig[0].rider);
+    //             }
+    //         );
+    // }
 
 
     /*
@@ -693,6 +676,7 @@ class Dao {
             });
     }
 }
+
 
 //model.syncTestData();
 //model.syncModels();

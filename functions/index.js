@@ -13,10 +13,10 @@ const mail = require("./mail.js");
 const express = require("express");
 const app = express();
 
-if(!process.env.FIREBASE_CONFIG){
+if (!process.env.FIREBASE_CONFIG) {
     console.log("running local server");
     app.listen(8080);
-}else{
+} else {
     console.log("running firebase server");
     const main = express();
     main.use('/api/v1', app);
@@ -114,7 +114,6 @@ function getToken(user) {
  * get      /validate/email/:email
  * post     /auth/logout
  * post     /auth/refresh
- * put      /forgotPass/:email
  *
  *                      USERS
  * post     /users
@@ -153,6 +152,7 @@ function getToken(user) {
  * @link mail
  * use      /mail
  * post     /mail/bug
+ * post     /mail/password
  */
 
 
@@ -383,6 +383,7 @@ app.delete("/auth/users/:userId", (req, res) => {
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
 
+
 /**
  *
  */
@@ -544,7 +545,6 @@ app.delete('/auth/events/:eventId', (req, res) => {
 });*/
 
 
-
 /**
  *  Get an array of personnel connected to an event
  *
@@ -560,23 +560,13 @@ app.delete('/auth/events/:eventId', (req, res) => {
  * Add personnel to an event
  * body:
  * {
- *    personnelId: number
- *    eventId:  number
- *    role:  string
+ *    personnel[]: Array of personnel objects
  * }
  *
  * @return {json} {jwt: token}
  */
 app.post("/events/:eventId/personnel", (req, res) => {
-    console.log(Object.keys(req.body));
-    console.log(JSON.stringify(req.body));
-    let eventId = decodeURIComponent(req.params.eventId);
-    req.body.personnel.map(person => {
-        db.addPersonnel(person, eventId)
-            .then(() => console.log(person));
-    });
-    res.status(201);
-    //return db.addPersonnel(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+    return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.status(400));
 });
 
 
@@ -584,9 +574,7 @@ app.post("/events/:eventId/personnel", (req, res) => {
  * Changes the information of personnel
  * body:
  * {
- *    personnelId: number
- *    eventId:  number
- *    role:  string
+ *    personnel[]: Array of personnel objects
  * }
  *
  * @return {json} {jwt: token}
@@ -706,43 +694,18 @@ app.get("/events/:eventId/tickets", (req, res) => {
 
 
 /**
- * Creates a Gig
+ * Creates a Gig and ads contract file
  * body:
  * {
  *    artistId: number
  *    eventId: number
- *    rider?: number
- *    contract?: number
+ *    contract: FILE
  * }
  *
  * @return {json} {jwt: token}
  */
-app.post("/gigs", (req, res) => {
-    console.log("POST-request - /gigs");
-    console.log(req.body.artists);
-    let contractFile = req.body.contract;
-    let riderFile = req.body.rider;
-    /*console.log(riderFile.name);
-    console.log(contractFile.name);*/
-
-    // req.body.artists.shift();
-    req.body.artists.map(artist => {
-        console.log(artist.username);
-        db.addGig(artist.userId, req.body.eventId).then(response => {
-            console.log("Index" + response);
-            if(contractFile != null || riderFile != null){
-                db.setContract(contractFile, response.eventId, artist.userId)
-                    .then(() => {
-                        console.log("Contract set");
-                        db.setRider(riderFile, response.eventId, artist.userId)
-                            .then(() => {
-                                console.log("Rider set");
-                                res.status(201).send(response)
-                            });
-                    });
-            }
-        });
-    });
+app.post("/events/:eventId/gigs", (req, res) => {
+    db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus());
 });
 
 /**
@@ -760,16 +723,17 @@ app.get("/events/:eventId/gigs", (req, res) => {
     return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
-
-app.post("/contracts/:eventId/:artistId", (req, res) => {
-    console.log("Calling setContract");
-    const {
-        fieldname,
-        originalname,
-        encoding,
-        mimetype,
-        buffer,
-    } = req.files[0];
+/**
+ * Adds a file to the database and connetcs the file to a specific Gig
+ * body:
+ * {
+ *    files: File[]
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+// TODO
+app.post("/events/:eventId/gigs/:artistId", (req, res) => {
     let file = req.files[0];
     console.log(req.files[0].originalname);
     console.log(req.files[0]);
@@ -787,49 +751,35 @@ app.post("/contracts/:eventId/:artistId", (req, res) => {
              res.send("done");
          }
      });*/
-    //Todo set access here
     db.setContract(file, req.params.eventId, req.params.artistId)
         .then(() => res.send("Change made"));
 });
 
 
-app.get("/contract/:eventId/:artistId", (req, res) => {
+/**
+ * Finds all files assosciated with a specific gig
+ * body:
+ * {
+ *    files: File[]
+ * }
+ *
+ * @return {json} {jwt: token}
+ */
+//TODO
+app.get("/events/:eventId/gigs/:artistId", (req, res) => {
     console.log("downloading file");
 
-    //Todo check access here
     db.getContract(req.params.eventId, req.params.artistId)
         .then(result => {
 
-                let base64String = result.data;
-                let name = result.name;
-                //let buf = new Buffer(base64String, "base64");
+            console.log(result)
 
-                res.send({name: name, data: base64String});
-                /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
-                    if (err){
-                        res.send(err);
-                    }else{
-                        console.log('The file has been saved!');
-                        const file = `${__dirname}/uploads/`+name;
-                        res.download(file); // Set disposition and send it.
-                    }
-                });*/
-            }
-        );
-});
+            let base64String = result.data;
+            let name = result.name;
 
-app.get("/rider/:eventId/:artistId", (req, res) => {
-    console.log("downloading file");
+            console.log(result.name)
 
-    //Todo check access here
-    db.getRider(req.params.eventId, req.params.artistId)
-        .then(result => {
-
-                let base64String = result.data;
-                let name = result.name;
-                let buf = new Buffer(base64String, "base64");
-
-                res.send({name: name, data: base64String});
+            res.send({name: name, data: base64String});
                 /*fs.writeFile(`${__dirname}/uploads/`+name, buf, (err) => {
                     if (err){
                         res.send(err);
