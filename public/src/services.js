@@ -95,13 +95,13 @@ export class Gig {
 export class RiderItem {
     eventId;
     artistId;
-    riderItem;
+    item;
     confirmed;
 
-    constructor(eventId, artistId, riderItem) {
+    constructor(eventId, artistId, item) {
         this.eventId = eventId;
         this.artistId = artistId;
-        this.riderItem = riderItem;
+        this.item = item;
     }
 }
 
