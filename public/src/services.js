@@ -40,7 +40,9 @@ export class Event {
     eventId;
     organizerId;
     eventName;
+    city;
     address;
+    placeDescription;
     ageLimit;
     startTime;
     endTime;
@@ -49,11 +51,13 @@ export class Event {
     description;
     cancelled;
 
-    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
+    constructor(eventId, organizerId, eventName, city, address, placeDescription, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.eventName = eventName;
+        this.city = city;
         this.address = address;
+        this.placeDescription = placeDescription;
         this.description = description;
         this.ageLimit = ageLimit;
         this.startTime = startTime;
@@ -85,6 +89,19 @@ export class Gig {
         this.eventId = eventId;
         this.contract = contract;
         this.artistId = artistId;
+    }
+}
+
+export class RiderItem {
+    eventId;
+    artistId;
+    riderItem;
+    confirmed;
+
+    constructor(eventId, artistId, riderItem) {
+        this.eventId = eventId;
+        this.artistId = artistId;
+        this.riderItem = riderItem;
     }
 }
 
@@ -201,8 +218,8 @@ class Services {
     /*
         PERSONNEL
     */
-    createPersonnel(personnel, id) {
-        return axios.post(url + '/events/' + id + '/personnel', personnel).then(response => response.data);
+    addPersonnel(personnel) {
+        return axios.post(url + '/events/' + personnel[0].eventId + '/personnel', personnel).then(response => response.data);
     }
 
     updatePersonnel(personnel) {
@@ -221,8 +238,8 @@ class Services {
     /*
         TICKETS
     */
-    createTicket(ticket) {
-        return axios.post(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
+    addTickets(tickets) {
+        return axios.post(url + '/events/' + tickets[0].eventId + '/ticket', tickets).then(response => response.data);
     }
 
     updateTicket(ticket) {
@@ -241,12 +258,8 @@ class Services {
     /*
         GIGS
     */
-    createGig(gig) {
+    addGig(gig) {
         return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
-    }
-
-    uploadContract(formData, event, artist) {
-        return axios.post(url + "/contract/" + event + "/" + artist, formData).then(response => console.log(response.data));
     }
 
     getGigForEvent(eventId) {
@@ -254,8 +267,19 @@ class Services {
     }
 
     downloadContract(eventId, artistId) {
-        console.log("Downloading");
         return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
+    }
+
+    addRiderItems(riderItems) {
+        return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+    }
+
+    confirmRiderItems(riderItems) {
+        return axios.put(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+    }
+
+    getRiderItems(eventId, artistId) {
+        return axios.get(url + '/events/' + eventId + '/gigs/' + artistId + '/rider').then(response => response.data)
     }
 }
 
