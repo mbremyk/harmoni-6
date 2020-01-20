@@ -100,7 +100,6 @@ export class Personnel {
         this.eventId = eventId;
         this.role = role;
     }
-
 }
 
 class Services {

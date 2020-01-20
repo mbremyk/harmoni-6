@@ -230,16 +230,14 @@ app.post("/login", async (req, res) => {
     if(ok1) {
 
         return db.getUserByEmail(req.body.email).then(user => {
-            console.log(user.dataValues);
             let token = getToken(user.dataValues);
             res.json({jwt: token});
         });
 
     } else if(ok2) {
 
-        let res = await db.deleteOneTimeLogin(req.body.email);
+        let ikkeres = await db.deleteOneTimeLogin(req.body.email);
         return db.getUserByEmail(req.body.email).then(user => {
-            console.log(user.dataValues);
             let token = getToken(user.dataValues);
             res.json({jwt: token});
         });
@@ -249,7 +247,6 @@ app.post("/login", async (req, res) => {
         res.status(401);
         res.json({error: "Not authorized"})
     }
-
 });
 
 app.get("/validate/username/:username", (req, res) => {
@@ -307,14 +304,14 @@ app.post("/auth/refresh", (req, res) => {
     });
 });
 
-app.put('/forgotPass/:email'), (req, res) => {
+app.put('/forgotPass/:email', (req, res) => {
     console.log('PUT-request - /forgotPass/:email');
 
     let email = decodeURIComponent(req.params.email);
     return db.forgotPassword(email)
         .then(success => success ? res.status(201) : res.status(400))
         .catch(error => console.error(error));
-}
+});
 
 
 /*

@@ -119,7 +119,7 @@ class Dao {
     async forgotPassword(email) {
         let newPass = Math.random().toString(36).substring(7);
         let salt = await this.getSaltByEmail(email);
-        let credentials = await hashPassword.hashPassword(newPass, salt);
+        let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
 
         console.log('!!! nytt passord: \'' + newPass + '\'');
 
