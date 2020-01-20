@@ -653,7 +653,7 @@ app.get("/auth/events/:eventId/gigs", (req, res) => {
  *
  */
 
-app.get("/events/:eventId/gigs/:artistId", (req, res) => {
+app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
     db.getContract(eventId, artistId).then(contract => (contract !== null) ? res.status(201).send(contract) : res.sendStatus(400));
