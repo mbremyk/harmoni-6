@@ -1,5 +1,5 @@
 import {Component} from "react-simplified";
-import {Col, Card, Button} from "react-bootstrap";
+import {Button, Card, Col} from "react-bootstrap";
 import * as React from 'react';
 import Row from "react-bootstrap/Row";
 
@@ -105,15 +105,14 @@ export class EventInfo extends Component {
     }
 }
 
-export class DownloadWidget extends Component  {
-    //TODO: Add event keys to fetch correct contract/rider
-    artist = 1;
-    event = 1;
-    type = "";
+export class DownloadWidget extends Component {
+    artist = '';
+    event = '';
+
     render() {
         return (
             <Button onClick={this.download} variant="primary" title="Last Ned" size="sm">
-                last ned {this.type}
+                Last ned kontrakt
             </Button>
         )
     }
@@ -121,62 +120,22 @@ export class DownloadWidget extends Component  {
     mounted() {
         this.artist = this.props.artist;
         this.event = this.props.event;
-        this.type = this.props.type;
     }
 
 
-    download () {
-        /*let eventId = this.e.eventId;
-        let artistId = this.artist.userId;*/
-        //let artistId = 1;
-        //console.log(this.artists[0].username);
-        console.log(this.artist);
-        if(this.type == "kontrakt") {
-            service.downloadContract(this.event, this.artist)
-                .then(response => {
-                    console.log("INNI Promise");
-                    console.log("response: "+response);
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }else if(this.type == "rider"){
-            service.downloadRider(this.event, this.artist)
-                .then(response => {
-                    console.log("INNI Promise");
-                    console.log("response: "+response);
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }else{
-            service.downloadOther(this.event, this.artist)
-                .then(response => {
-                    console.log("INNI Promise");
-                    console.log("response: "+response);
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }
-
+    download() {
+        service
+            .downloadContract(this.event, this.artist)
+            .then(response => {
+                const link = document.createElement('a');
+                link.download = response.name;
+                link.href = response.data;
+                link.click();
+            })
     };
 }
 
 export class UploadWidget extends Component {
-    //TODO: Make sexy
     render() {
         return (
             <div className="container">
@@ -189,16 +148,12 @@ export class UploadWidget extends Component {
         )
     }
 
-	fileHandler = (e) => {
-        let eventId = 2;
-        let artistId = 5;
+    fileHandler = (e) => {
         e.preventDefault();
         let selectedFile = e.target.files[0];
         let data = new FormData();
         data.append("file", selectedFile);
         console.log(data);
-        // service.uploadContract(data, eventId, artistId)
-        // 	.then(res => console.log(res));
     };
 
 }

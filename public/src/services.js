@@ -226,7 +226,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     addPersonnel(personnel) {
-        return axios.post(url + '/events/' + personnel[0].eventId + '/personnel', personnel).then(response => response.data);
+        return axios.post(url + '/auth/events/' + personnel[0].eventId + '/personnel', personnel, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -234,7 +234,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     updatePersonnel(personnel) {
-        return axios.put(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
+        return axios.put(url + '/auth/events/' + personnel.eventId + '/personnel/' + personnel.personnelId, personnel, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -242,7 +242,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     deletePersonnel(personnel) {
-        return axios.delete(url + '/events/' + personnel.eventId + '/personnel', personnel).then(response => response.data);
+        return axios.delete(url + '/auth/events/' + personnel.eventId + '/personnel/' + personnel.personnelId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -250,7 +250,7 @@ class Services {
      * @returns Promise<>: Personnel[]
      */
     getPersonnel(eventId) {
-        return axios.get(url + '/events/' + eventId + '/personnel').then(response => response.data);
+        return axios.get(url + '/auth/events/' + eventId + '/personnel', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
 
@@ -262,7 +262,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     addTickets(tickets) {
-        return axios.post(url + '/events/' + tickets[0].eventId + '/ticket', tickets).then(response => response.data);
+        return axios.post(url + '/auth/events/' + tickets[0].eventId + '/ticket', tickets, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -270,7 +270,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     updateTicket(ticket) {
-        return axios.put(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
+        return axios.put(url + '/auth/events/' + ticket.eventId + '/ticket/' + ticket.type, ticket, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -278,7 +278,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     deleteTicket(ticket) {
-        return axios.delete(url + '/events/' + ticket.eventId + '/ticket', ticket).then(response => response.data);
+        return axios.delete(url + '/auth/events/' + ticket.eventId + '/ticket/' + ticket.type, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -298,15 +298,15 @@ class Services {
      * @returns Promise<>: boolean
      */
     addGig(gig) {
-        return axios.post(url + '/events/' + gig.eventId + '/gigs', gig).then(response => response.data);
+        return axios.post(url + '/auth/events/' + gig.eventId + '/gigs', gig, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
      * @param eventId: number
      * @returns Promise<>: Gig[]
      */
-    getGigForEvent(eventId) {
-        return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
+    getGigs(eventId) {
+        return axios.get(url + '/auth/events/' + eventId + '/gigs', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -315,7 +315,7 @@ class Services {
      * @returns Promise<>: Contract
      */
     downloadContract(eventId, artistId) {
-        return axios.get(url + "/events/" + eventId + "/gigs/" + artistId).then(response => response.data);
+        return axios.get(url + "/auth/events/" + eventId + "/gigs/" + artistId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -323,7 +323,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     addRiderItems(riderItems) {
-        return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+        return axios.post(url + '/auth/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
 
     /**
@@ -331,7 +331,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     confirmRiderItems(riderItems) {
-        return axios.put(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+        return axios.put(url + '/auth/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
 
     /**
@@ -340,7 +340,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     getRiderItems(eventId, artistId) {
-        return axios.get(url + '/events/' + eventId + '/gigs/' + artistId + '/rider').then(response => response.data)
+        return axios.get(url + '/auth/events/' + eventId + '/gigs/' + artistId + '/rider', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
 }
 
