@@ -39,7 +39,9 @@ export class EventPage extends Component {
                         <Row>
 
                             <Col>
-                                <h6>Fra {this.currentEvent.startTime} Til {this.currentEvent.endTime}</h6>
+                                <Row>
+                                    <h6>Fra: {this.currentEvent.startTime}<br/>Til: {this.currentEvent.endTime}</h6>
+                                </Row>
                             </Col>
 
                             {this.RenderAgeLimit()}
@@ -48,19 +50,16 @@ export class EventPage extends Component {
                             </Col>
                             {this.RenderArtist()}
                             <Col>
-                                <h6>Arrangert av: {this.user.username}</h6>
+                                <Row>
+                                    <Col><h6>Arrangør: {this.user.username}</h6></Col>
+                                    <Col><h6>Email: {this.user.email}</h6></Col>
+                                </Row>
                             </Col>
                         </Row>
                         <Row>
                             <Col>
                                 <p>{this.currentEvent.description}</p>
                             </Col>
-                        </Row>
-                        <Row>
-                            <Col><h5>Kontakt Arrangør</h5></Col>
-                        </Row>
-                        <Row>
-                            <Col><h6>Email: {this.user.email}</h6></Col>
                         </Row>
                         <Row>
                             <Col>
@@ -124,7 +123,7 @@ export class EventPage extends Component {
 //gets all the artist working on that event and checks if the person viewing it is a an artist
     getArtistsForEvent() {
         service
-            .getGigForEvent(this.props.match.params.id)
+            .getGigs(this.props.match.params.id)
             .then(artists => {
                 this.artists = artists;
                 let token = jwt.decode(authService.getToken());
@@ -146,9 +145,9 @@ export class EventPage extends Component {
             .catch((error) => console.log(error));
     }
 
-    RenderButtons(id) {
+    RenderButtons(artistId) {
         let token = jwt.decode(authService.getToken());
-        if (id == token.userId) {
+        if (artistId === token.userId) {
             return (
                 <div>
 
@@ -157,14 +156,10 @@ export class EventPage extends Component {
                             href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
                         Legg til Rider
                     </Button>
-
-                    <DownloadWidget type={"kontrakt"} artist={id} event={this.currentEvent.eventId}/>
-
-
+                    <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
         } else if (this.isOrganizer) {
-            return <Col><DownloadWidget type={"kontrakt"} artist={id} event={this.currentEvent.eventId}/></Col>;
-
+            return <Col><DownloadWidget artist={artistId} event={this.currentEvent.eventId}/></Col>;
         }
     }
 
@@ -180,17 +175,13 @@ export class EventPage extends Component {
 
 
                 </Row>
-
-
-                {
-                    this.artists.map(person => (
-                        <Row>
-                            <Col>{person.user.username}</Col>
-                            <Col>{person.user.email} </Col>
-                            <Col>{this.RenderButtons(person.artistId)}</Col>
-                        </Row>
-                    ))}
-
+                {this.artists.map(person => (
+                    <Row>
+                        <Col>{person.user.username}</Col>
+                        <Col>{this.RenderButtons(person.artistId)}</Col>
+                        <Col>{person.user.email} </Col>
+                    </Row>
+                ))}
             </div>
 
         }
@@ -205,14 +196,15 @@ export class EventPage extends Component {
 
             return <div>
                 <Row className="tableheader">
-                    <Col className="border-bottom border-top"><b>Personnel</b></Col>
+                    <Col className="border-bottom border-top"><b>Ansvarlig</b></Col>
+                    <Col className="border-bottom border-top"><b>Oppgave</b></Col>
                     <Col className="border-bottom border-top"><b>Epost</b></Col>
                 </Row>
 
                 {this.personnel.map(person => (
 
                     <Row>
-
+                        <Col className>{person.user.username}</Col>
                         <Col className>{person.role}</Col>
                         <Col className>{person.user.email}</Col>
                     </Row>
