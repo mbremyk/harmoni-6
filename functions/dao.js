@@ -121,7 +121,7 @@ class Dao {
         let salt = await this.getSaltByEmail(email);
         let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
 
-        console.log('!!! nytt passord: \'' + newPass + '\'');
+        console.log('!!! nytt passord: \'' + newPass + '\' for '+ email);
 
         return model.UserModel.update(
             {

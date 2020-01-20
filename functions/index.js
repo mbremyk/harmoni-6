@@ -291,7 +291,6 @@ app.put('/forgotPass/:email', (req, res) => {
     USERS
 */
 
-
 /**
  * Create new user
  * body:

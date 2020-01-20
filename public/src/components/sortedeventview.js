@@ -80,7 +80,7 @@ export class SortedEventView extends Component {
 	render() {
 		if (this.state.events !== []) {
 			return (
-				<Container>
+				<Container id="scrollTo">
 					<Card bg={"light"}>
 						<Row>
 							<Col>

@@ -3,6 +3,7 @@ import {Container, Row, Col, Button, Form, Alert} from "react-bootstrap";
 import {SortedEventView, SortingOptions} from './sortedeventview';
 import * as React from 'react';
 import {Event, service, Ticket} from '../services';
+import NavLink from "react-bootstrap/NavLink";
 
 export class LandingPage extends Component {
 	state = {
@@ -23,16 +24,17 @@ export class LandingPage extends Component {
 								<h1 className="HarmoniLogo display-3 text-center">Harmoni</h1>
 							</Col>
 						</Row>
-						<Row style={{padding: "3em"}}>
+						<Row style={{padding: "5em "}}>
 							<Col className="text-center">
-								<Button variant="primary"
-								        size="lg"
-								        onClick={() => this.logIn()} href="logg-inn">Logg inn</Button>
+								<h2><NavLink href="/logg-inn"><u className="text-white">Logg inn</u></NavLink> for å se dine arrangementer</h2>
 							</Col>
 						</Row>
-						<Row style={{padding: "3em"}}>
-							<Col className="text-center">
-								<h2>Logg inn for å se dine arrangementer</h2>
+						<Row style={{padding: "5em"}}>
+							<Col className="text-center mt-5">
+								<NavLink href='#scrollTo'>
+									<h2 className="text-white">Bla ned for å se arrangementer</h2>
+									<i className="fa fa-angle-down" style={{'font-size':'64px',color: 'white'}}></i>
+								</NavLink>
 							</Col>
 						</Row>
 					</Container>
@@ -41,7 +43,6 @@ export class LandingPage extends Component {
 			</div>
 		);
 	}
-
 
 	mounted() {
 		service
@@ -65,5 +66,10 @@ export class LandingPage extends Component {
 				return lowestPrice;
 			})
 			.catch((error) => console.log(error));
+	}
+
+	scroll() {
+		let element = document.getElementById('scrollTo');
+		element.scrollTo();
 	}
 }
