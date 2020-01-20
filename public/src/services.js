@@ -247,7 +247,11 @@ class Services {
     }
 
     addRiderItems(riderItems) {
-        return axios.get(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider').then(response => response.data)
+        return axios.post(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
+    }
+
+    confirmRiderItems(riderItems) {
+        return axios.put(url + '/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems).then(response => response.data)
     }
 
     getRiderItems(eventId, artistId) {
