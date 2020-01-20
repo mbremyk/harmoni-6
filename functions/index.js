@@ -131,23 +131,23 @@ function getToken(user) {
  * get      /auth/events/users/:userId
  *
  *                      PERSONNEL
- * post     /events/:eventId/personnel      ?auth?
- * put      /events/:eventId/personnel      ?auth?
- * delete   /events/:eventId/personnel      ?auth?
- * get      /events/:eventId/personnel      ?auth?
+ * post     /auth/events/:eventId/personnel
+ * put      /auth/events/:eventId/personnel/:personnelId
+ * delete   /auth/events/:eventId/personnel/:personnelId
+ * get      /auth/events/:eventId/personnel
  *
  *                      TICKETS
- * post     /events/:eventId/tickets        ?auth?
- * put      /events/:eventId/tickets        ?auth?
- * delete   /events/:eventId/tickets        ?auth?
- * get      /events/:eventId/tickets        ?auth?
+ * post     /auth/events/:eventId/tickets
+ * put      /auth/events/:eventId/tickets/:type
+ * delete   /auth/events/:eventId/tickets/:type
+ * get      /events/:eventId/tickets
  *
  *                      GIGS
- * post     /events/:eventId/gigs           ?auth?
- * get      /events/:eventId/gigs           ?auth?
- * get      /events/:eventId/gigs/:artistId     //contract
- * post     /events/:eventId/gigs/:artistId/rider
- * get      /events/:eventId/gigs/:artistId/rider
+ * post     /auth/events/:eventId/gigs
+ * get      /auth/events/:eventId/gigs
+ * get      /auth/events/:eventId/gigs/:artistId
+ * post     /auth/events/:eventId/gigs/:artistId/rider
+ * get      /auth/events/:eventId/gigs/:artistId/rider
  *
  *                      MAIL
  * @link mail
@@ -608,8 +608,10 @@ app.put('/auth/events/:eventId/tickets', (req, res) => {
  *  @header  x-access-token: string
  *  @return {json} {jwt: token}
  */
-app.delete('/auth/events/:eventId/tickets', (req, res) => {
-    return db.removeTicket(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+app.delete('/auth/events/:eventId/tickets/:type', (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    let type = decodeURIComponent(req.params.type);
+    return db.removeTicket(eventId, type).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
 
@@ -641,7 +643,7 @@ app.post("/auth/events/:eventId/gigs", (req, res) => {
  *  @header  x-access-token: string
  *  @return {json} {jwt: token, RiderItem[]}
  */
-app.get("/events/:eventId/gigs", (req, res) => {
+app.get("/auth/events/:eventId/gigs", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
