@@ -34,13 +34,19 @@ export class SortedEventView extends Component {
     handleFilterOption(filter) {
         switch (filter) {
             case 'ChildFriendly':
-                this.setState({events: this.state.events.filter(e => e.ageLimit < 7)});
+                this.setState({events: this.state.events.filter(event => event.ageLimit < 7)});
+                break;
+            case 'HideCancelled':
+                this.setState({events: this.state.events.filter(event => !event.cancelled)});
+                break;
+            case 'ShowOld':
+                this.setState({events: this.state.eventsBackup});
                 break;
         }
     }
 
     handleReset() {
-        this.setState({events: this.state.eventsBackup})
+        this.handleEvents(this.state.eventsBackup);
     }
 
     handleOrder(order) {
@@ -49,7 +55,10 @@ export class SortedEventView extends Component {
     }
 
     handleEvents = (events) => {
-        this.setState({events: events, eventsBackup: events})
+        let now = require('moment')().format('YYYY-MM-DD');
+        this.setState({
+            events: events.filter(event => event.endTime > now),
+            eventsBackup: events})
     };
 
     compareValues(key, order = 'asc') {
@@ -89,14 +98,11 @@ export class SortedEventView extends Component {
                                         Sorter arrangementer
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris
-                                            TODO</Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleSortingOption('price')}>Pris TODO</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleSortingOption('startTime')}>Dato</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
 
@@ -110,8 +116,13 @@ export class SortedEventView extends Component {
                                         <Dropdown.Item onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
                                             (6 år) </Dropdown.Item>
                                         <Dropdown.Item onClick={() => this.handleFilterOption('Free')}>Gratis
-                                            Arrangementer
-                                            TODO </Dropdown.Item>
+                                            Arrangementer TODO </Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleFilterOption('HideCancelled')}>
+                                        Skjul kansellerte arrangementer
+                                        </Dropdown.Item>
+                                        <Dropdown.Item onClick={() => this.handleFilterOption('ShowOld')}>
+                                            Vis gamle arrangementer
+                                        </Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </Col>
@@ -124,6 +135,8 @@ export class SortedEventView extends Component {
                             <Col>
                                 <Button variant={"light"} onClick={this.handleReset}>Nullstill</Button>
                             </Col>
+
+
                         </Row>
                     </Card>
                     <Row>

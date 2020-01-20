@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+const moment = require("moment");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
@@ -273,6 +275,18 @@ class Dao {
                 console.error(error);
                 return false;
             })
+    }
+
+    /**
+     * Delete all events with end time older than 90 days
+     *
+     * @returns {number}
+     */
+    deleteOldEvents() {
+        let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
+        oldEvents.map(event => console.log(event.eventId));
+        if(oldEvents.length == null) return 0;
+        else return oldEvents.length
     }
 
     /**
