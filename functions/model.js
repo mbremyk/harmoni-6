@@ -26,8 +26,9 @@ function init() {
 function initCloud(){
     let pr = new properties.CloudProperties();
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
-        dialect: 'mysql',
-        host: '/cloudsql/kkdatabase',
+        dialect: pr.dialect,
+        host: pr.databaseURL,
+        // port: pr.port,
         timestamps: false,
         dialectOptions: {
             socketPath: '/cloudsql/kkdatabase'
@@ -148,7 +149,7 @@ let EventModel = sequelize.define('event', {
             return moment(this.getDataValue('endTime')).format('YYYY-MM-DD HH:mm');
         }
     },
-    imageUrl: Sequelize.TEXT,
+    imageUrl: {type: Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
     image: Sequelize.TEXT,
     description: Sequelize.TEXT,
     cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}

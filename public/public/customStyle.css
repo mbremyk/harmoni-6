@@ -5,6 +5,13 @@
        /*<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
 
 }*/
+
+body {
+    background-image: url(/pictures/geometricPattern.png);
+    background-repeat: repeat;
+    min-height: 100%;
+}
+
 .landingpage {
     height: 100vh;
     min-height: 500px;
@@ -56,5 +63,14 @@
 {
     color: black;
     text-decoration: none;
-
 }
+
+.footer {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+}
+
+
+
