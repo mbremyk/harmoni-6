@@ -75,7 +75,9 @@ export class AddEvent extends Component {
         this.state = {
             organizerId: '',
             eventName: '',
+            eventCity: '',
             eventAddress: '',
+            placeDescription: '',
             eventDescription: '',
             ageLimit: 0,
             fDate: require('moment')().format('YYYY-MM-DD'),
@@ -160,14 +162,25 @@ export class AddEvent extends Component {
 
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
+        let e = new Event(
+            null,
+            this.state.organizerId,
+            this.state.eventName,
+            this.state.city,
+            this.state.eventAddress,
+            this.state.placeDescription,
+            this.state.eventDescription,
+            this.state.ageLimit,
+            fDateTime,
+            tDateTime,
+            this.state.imageUrl,
+            this.state.image,
+            this.state.cancelled);
 
         if (this.state.image !== "") {
             this.toBase64(this.state.image).then(res => {
                 this.state.imageUrl = res;
 
-                let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-                    this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
-                    this.state.image, this.state.cancelled);
 
                 service.createEvent(e).then(updated => {
 
@@ -192,10 +205,6 @@ export class AddEvent extends Component {
                 }).catch(err => console.log(err))
             });
         } else {
-
-            let e = new Event(0, this.state.organizerId, this.state.eventName, this.state.eventAddress,
-                this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl,
-                this.state.image, this.state.cancelled);
 
             service.createEvent(e).then(updated => {
 

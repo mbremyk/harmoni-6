@@ -123,7 +123,7 @@ function getToken(user) {
  * get      /auth/users/:userId
  *
  *                      EVENTS
- * post     /events                         ?auth?
+ * post     /auth/events
  * put      /auth/events/:eventId
  * get      /events
  * get      /events/search/:searchText
@@ -427,18 +427,12 @@ app.get("/auth/users/:userId", (req, res) => {
  */
 
 
-/**
- *
- */
-app.post("/events", (req, res) => {
-    console.log("POST-request - /events");
-    return db.createEvent(req.body).then(response => (response.insertId) ? res.status(201).send(response) : res.status(400));
-});
+
 
 
 app.post("/auth/events", (req, res) => {
-    console.log("POST-request - /events");
-    return db.createEvent(req.body).then(response => (response.insertId !== undefined) ? res.status(201).send(response) : res.status(400));
+    console.log("POST-request - /auth/events");
+    db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
 });
 
 

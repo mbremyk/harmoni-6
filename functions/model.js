@@ -97,9 +97,9 @@ let EventModel = sequelize.define('event', {
         allowNull: false
     },
     eventName: {type: Sequelize.STRING, allowNull: false},
-    city: Sequelize.STRING,
+    city: {type: Sequelize.STRING, allowNull: true},
     address: Sequelize.STRING,
-    placeDescription: Sequelize.TEXT,
+    placeDescription: {type: Sequelize.TEXT, allowNull: true},
     ageLimit: Sequelize.INTEGER,
     startTime: {
         type: Sequelize.DATE,
