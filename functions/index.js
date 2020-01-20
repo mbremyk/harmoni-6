@@ -242,7 +242,7 @@ app.post("/login", async (req, res) => {
 
     } else if(ok2) {
 
-        let res = await db.deleteOneTimeLogin(req.body.email);
+        let result = await db.deleteOneTimeLogin(req.body.email);
         return db.getUserByEmail(req.body.email).then(user => {
             console.log(user.dataValues);
             let token = getToken(user.dataValues);

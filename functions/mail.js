@@ -19,25 +19,14 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-let sendMail = req => {
-    transporter.sendMail(req.body.mailToDev).then((error, info) => {
+let sendMail = mail => {
+    transporter.sendMail(mail).then((error, info) => {
         if (error) {
             console.error(error);
             return false;
         } else {
             console.log(info.response);
-            if (req.body.email !== "") {
-                transporter.sendMail(req.body.mailToUser, (error, info) => {
-                    if (error) {
-                        console.error(error);
-                        return false;
-                    } else {
-                        return true;
-                    }
-                })
-            } else {
-                return true;
-            }
+            return true;
         }
     });
 };
@@ -88,10 +77,11 @@ addMailEndpoints = (app, db) => {
         req.body.mailToDev.text = `Feilrapport fra ${defaultMail.user}, mailadresse: ${defaultMail.email}\n\n${defaultMail.text}`;
 
         req.body.mailToUser.subject = `RE: Feilrapport: ${req.body.mailToUser.subject}`;
-        req.body.mailToUser.text = defaultMail.bug;
+        req.body.mailToUser.text = defaultMail.bugText;
 
         return Promise.allSettled([
-            sendMail(req),
+            sendMail(req.body.mailToDev),
+            sendMail(req.body.mailToUser),
             db.createBug(req.body)
             /*.then(response => {
                 return new Promise((resolve, reject) => resolve("Bug reported in database"));
@@ -107,6 +97,8 @@ addMailEndpoints = (app, db) => {
                         console.log(res.value);
                     } else if (res.status == 'rejected') {
                         console.log(res.reason);
+                    } else {
+                        console.log(res);
                     }
                 });
                 res.sendStatus(200);
@@ -117,7 +109,23 @@ addMailEndpoints = (app, db) => {
         console.log("POST-request received - /mail/password");
 
         req.body.mailToUser.subject = `Glemt passord: ${req.body.email}`;
-        req.body.mailToUser.text = defaultMail.password;
+
+        return db.forgotPassword(req.body.email)
+            .then(response => {
+                if (response) {
+                    defaultMail.password = response;
+                    req.body.mailToUser.text = defaultMail.passwordText;
+                    sendMail(req.body.mailToUser);
+                    res.sendStatus(201);
+                } else {
+                    throw new Error("No new password received from dao");
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                res.sendStatus(500);
+            });
+
     });
 };
 

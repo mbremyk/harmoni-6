@@ -4,7 +4,7 @@ import {authService} from './AuthService'
 var url = '';
 if (window.location.href.includes('localhost:5000')) {
     url = 'http://localhost:5001/harmoni-6/us-central1/webApi/api/v1';
-}else if (window.location.href.includes('localhost:3000')) {
+} else if (window.location.href.includes('localhost:3000')) {
     url = 'http://localhost:8080';
 } else {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
@@ -31,19 +31,19 @@ export class Event {
     description;
     cancelled;
 
-	constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
-		this.eventId = eventId;
-		this.organizerId = organizerId;
-		this.eventName = eventName;
-		this.address = address;
-		this.description = description;
-		this.ageLimit = ageLimit;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.imageUrl = imageUrl;
-		this.image = image;
-		this.cancelled = cancelled;
-	}
+    constructor(eventId, organizerId, eventName, address, description, ageLimit, startTime, endTime, imageUrl, image, cancelled) {
+        this.eventId = eventId;
+        this.organizerId = organizerId;
+        this.eventName = eventName;
+        this.address = address;
+        this.description = description;
+        this.ageLimit = ageLimit;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.imageUrl = imageUrl;
+        this.image = image;
+        this.cancelled = cancelled;
+    }
 }
 
 export class SimpleFile {
@@ -64,7 +64,7 @@ export class BulkGig {
     contract;
     artists;
 
-    constructor( eventId, artists, rider, contract) {
+    constructor(eventId, artists, rider, contract) {
         this.eventId = eventId;
         this.rider = rider;
         this.contract = contract;
@@ -80,7 +80,7 @@ export class Ticket {
 }
 
 export class BulkPersonnel {
-    personnel ;
+    personnel;
     eventId;
 
     constructor(personnel, eventId) {
@@ -136,7 +136,7 @@ class Services {
     }
 
     forgotPass(email) {
-        return axios.put(url + '/forgotPass/' + email).then(response => response.data);
+        return axios.post(url + '/mail/password', {email: email}, {headers: {"Content-Type": "application/json"}}).then(response => response.data);
     }
 
 
@@ -241,7 +241,7 @@ class Services {
         GIGS
     */
     createGig(gig) {
-        return axios.post(url +'/gigs', gig).then(response => response.data);
+        return axios.post(url + '/gigs', gig).then(response => response.data);
     }
 
     uploadContract(formData, event, artist) {
@@ -249,20 +249,19 @@ class Services {
     }
 
     getGigForEvent(eventId) {
-        return axios.get(url + '/events/'+ eventId + '/gigs').then(response => response.data);
+        return axios.get(url + '/events/' + eventId + '/gigs').then(response => response.data);
     }
 
-    downloadContract(event, artist)
-    {
+    downloadContract(event, artist) {
         console.log("Downloading");
         //This approach to downloading the files does not work
-        return axios.get(url+"/contract/"+event+"/"+artist).then(response => response.data);
+        return axios.get(url + "/contract/" + event + "/" + artist).then(response => response.data);
     }
-    downloadRider(event, artist)
-    {
+
+    downloadRider(event, artist) {
         console.log("Downloading");
         //This approach to downloading the files does not work
-        return axios.get(url+"/rider/"+event+"/"+artist).then(response => response.data);
+        return axios.get(url + "/rider/" + event + "/" + artist).then(response => response.data);
     }
 
 
