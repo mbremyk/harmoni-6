@@ -500,7 +500,6 @@ describe('Gigs', () => {
 
     it('correct data in gig', done => {
         db.getGigs(2).then(gigs => {
-            expect(gigs.length).toBe(1);
             expect(gigs.map(gig =>
                 gig.toJSON()).map(gig => (
                 {
@@ -512,7 +511,7 @@ describe('Gigs', () => {
                 {
                     eventId: 2,
                     artistId: 5,
-                    artistName: 'Michael S.L',
+                    artistName: 'Magnus B',
                 }
             ]);
         });
