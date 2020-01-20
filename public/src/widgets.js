@@ -5,6 +5,8 @@ import Row from "react-bootstrap/Row";
 
 
 import {service} from "./services";
+import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
 
 export class EventInfo extends Component {
     event;
@@ -105,11 +107,12 @@ export class EventInfo extends Component {
     }
 }
 
-export class DownloadWidget extends Component  {
+export class DownloadWidget extends Component {
     //TODO: Add event keys to fetch correct contract/rider
     artist = 1;
     event = 1;
     type = "";
+
     render() {
         return (
             <Button onClick={this.download} variant="primary" title="Last Ned" size="sm">
@@ -125,17 +128,17 @@ export class DownloadWidget extends Component  {
     }
 
 
-    download () {
+    download() {
         /*let eventId = this.e.eventId;
         let artistId = this.artist.userId;*/
         //let artistId = 1;
         //console.log(this.artists[0].username);
         console.log(this.artist);
-        if(this.type == "kontrakt") {
+        if (this.type == "kontrakt") {
             service.downloadContract(this.event, this.artist)
                 .then(response => {
                     console.log("INNI Promise");
-                    console.log("response: "+response);
+                    console.log("response: " + response);
                     let fileName = response.name;
                     const link = document.createElement('a');
                     link.download = response.name;
@@ -144,11 +147,11 @@ export class DownloadWidget extends Component  {
                     link.href = response.data;
                     link.click();
                 })
-        }else if(this.type == "rider"){
+        } else if (this.type == "rider") {
             service.downloadRider(this.event, this.artist)
                 .then(response => {
                     console.log("INNI Promise");
-                    console.log("response: "+response);
+                    console.log("response: " + response);
                     let fileName = response.name;
                     const link = document.createElement('a');
                     link.download = response.name;
@@ -157,11 +160,11 @@ export class DownloadWidget extends Component  {
                     link.href = response.data;
                     link.click();
                 })
-        }else{
+        } else {
             service.downloadOther(this.event, this.artist)
                 .then(response => {
                     console.log("INNI Promise");
-                    console.log("response: "+response);
+                    console.log("response: " + response);
                     let fileName = response.name;
                     const link = document.createElement('a');
                     link.download = response.name;
@@ -189,7 +192,7 @@ export class UploadWidget extends Component {
         )
     }
 
-	fileHandler = (e) => {
+    fileHandler = (e) => {
         let eventId = 2;
         let artistId = 5;
         e.preventDefault();
@@ -200,5 +203,57 @@ export class UploadWidget extends Component {
         // service.uploadContract(data, eventId, artistId)
         // 	.then(res => console.log(res));
     };
+
+}
+
+export class ModalPopup extends Component {
+    state = {
+        show: false,
+        password: ""
+    };
+
+    handleClose = () => this.setState({show: false});
+    handleShow = () => this.setState({show: true});
+    handlePassword = (event) => this.setState({password: event.target.value});
+    handleSubmit = (event) => {
+        event.preventDefault();
+        this.setState({show: false});
+        this.props.onDelete(this.state.password);
+    };
+
+    render() {
+        return (
+            <>
+                <Button variant="danger" onClick={this.handleShow}>
+                    Slett bruker
+                </Button>
+                <Modal show={this.state.show} onHide={this.handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Slett bruker</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form onSubmit={this.handleSubmit}>
+                            <Form.Group>
+                                <Form.Label>Skriv inn ditt passord for å bekrefte sletting</Form.Label>
+                                <Form.Control value={this.state.password}
+                                              type={"password"}
+                                              onChange={this.handlePassword}>
+                                </Form.Control>
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button type={"button"} variant="secondary" onClick={this.handleClose}>
+                            Avbryt
+                        </Button>
+                        <Button type={"submit"} variant="primary" onClick={this.handleSubmit}>
+                            Ok
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            </>
+        );
+    }
+
 
 }
