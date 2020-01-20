@@ -310,7 +310,7 @@ app.post("/auth/refresh", (req, res) => {
 app.put('/forgotPass/:email'), (req, res) => {
     console.log('PUT-request - /forgotPass/:email');
 
-    let email = req.params.email;
+    let email = decodeURIComponent(req.params.email);
     return db.forgotPassword(email)
         .then(success => success ? res.status(201) : res.status(400))
         .catch(error => console.error(error));

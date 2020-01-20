@@ -136,9 +136,8 @@ class Services {
     }
 
     forgotPass(email) {
-        return axios.put(url + '/forgotPass/' + email).then(response => response.data);
+        return axios.put(url + '/forgotPass/' + encodeURIComponent(email)).then(response => response.data);
     }
-
 
     /*
         USERS
