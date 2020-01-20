@@ -199,6 +199,14 @@ app.post("/login", async (req, res) => {
 	console.log("POST-request - /login");
 
 	let salt = await db.getSaltByEmail(req.body.email);
+
+	if (salt.length !== 1) {
+		console.log('No email found');
+		res.status(401);
+		res.json({error: "Not authorized"})
+		return;
+	}
+
 	let credentials = await hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt);
 
 	let ok1 = await db.loginOk(req.body.email, credentials[0]);
