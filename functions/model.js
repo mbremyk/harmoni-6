@@ -136,9 +136,6 @@ let FileModel = sequelize.define('file', {
     name: {
         type: Sequelize.STRING
     },
-    contentType: {
-        type: Sequelize.STRING
-    },
     data: {
         type: Sequelize.TEXT
     }

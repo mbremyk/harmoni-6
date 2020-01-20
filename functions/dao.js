@@ -573,7 +573,6 @@ class Dao {
             {
                 name: gig.contract.name,
                 data: gig.contract.data,
-                contentType: gig.contract.contentType
             })
             .then((created) => {
                 return model.GigModel.create(
