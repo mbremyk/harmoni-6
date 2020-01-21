@@ -233,7 +233,7 @@ class Services {
     }
 
     getMyEventsByUserId(userId) {
-        return axios.get(url + '/auth/events/users/' + userId + "/myevents/", {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.get(url + '/myevents/users/' + userId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
 

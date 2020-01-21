@@ -350,11 +350,14 @@ class Dao {
      *
      * @returns {number}
      */
-    deleteOldEvents() {
-        let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
-        oldEvents.map(event => console.log(event.eventId));
-        if(oldEvents.length == null) return 0;
-        else return oldEvents.length
+     deleteOldEvents() {
+        let quantity;
+        model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}})
+            .then(e => {
+                this.quantity = e.length;
+                e.map(e => this.deleteEvent(e.eventId))
+            });
+        return quantity;
     }
 
 
@@ -410,29 +413,33 @@ class Dao {
      * @param userId
      * @returns {Promise<Events[]>}
      */
-    getMyEventsByUserId(userId) {
-        let eventsWhereUserIsArtist = model.GigModel.findAll({where:{artistId: userId}})
+    async getMyEventsByUserId(userId) {
+        let personnelEvents = await model.PersonnelModel.findAll({where: {personnelId: userId}})
             .catch(error => {
                 console.error(error);
                 return [];
-            });
-        let eventsWhereUserIsPersonnel = model.PersonnelModel.findAll({where: {personnelId: userId}})
+            }).then(e => e.map(e => e.eventId));
+
+        let artistEvents = await model.GigModel.findAll({where: {artistId: userId}})
             .catch(error => {
                 console.error(error);
                 return [];
-            });
+            }).then(e => e.map(e => e.eventId));
 
         return model.EventModel.findAll({where: {
             [Op.or]:[
-                {eventId: eventsWhereUserIsArtist.map(e => e.eventId) },
-                {eventId: eventsWhereUserIsPersonnel.map(e => e.eventId) }
+                {eventId:  artistEvents},
+                {eventId: personnelEvents}
             ]}})
             .catch(error => {
             console.error(error);
             return [];
-        });
+        })
+
+
 
     }
+
 
 
     /**

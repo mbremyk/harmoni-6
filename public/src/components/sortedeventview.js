@@ -13,8 +13,8 @@ export class SortedEventView extends Component {
     state = {
         events: [],
         eventsBackup: [],
-        order: "desc",
-        sortingOption: "createdAt",
+        order: "asc",
+        sortingOption: "startTime",
         ascDescription: "Eldst først", //  ↑
         descDescription: "Nyest først", //  ↓
         orderDescription: ["createdAt", "startTime"],
@@ -88,9 +88,9 @@ export class SortedEventView extends Component {
         this.setState({free: ""});
         this.setState({hideCancelled: ""});
         this.setState({showOld: ""});
-        this.setState({sortingOption: "createdAt"});
+        this.setState({sortingOption: "startTime"});
         this.setState({filterActive: ""});
-        this.setState({order: "desc"});
+        this.setState({order: "asc"});
         this.setState({ascDescription: "Eldst først"});
         this.setState({descDescription: "Nyest først"})
 
