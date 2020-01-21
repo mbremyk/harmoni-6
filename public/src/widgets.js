@@ -310,7 +310,21 @@ export class MailForm extends Component {
         }
     }
 
-    toggleForm(on) {
+    toggleMail(){
+        if(this.state.toggle){
+            //this.state.toggle = false;
+            this.setState({toggle: false });
+            this.setState({arrow: "▼"});
+            //this.state.arrow = "▼";
+        }else{
+            //this.state.toggle = true;
+            this.setState({toggle: true});
+
+            this.setState({arrow: "▲"});
+        }
+    }
+
+    toggleForm(on){
         if (on && this.state.hasRecipients) {
             return (
                 <Form>
