@@ -6,6 +6,7 @@ import {Event, service, User} from '../services';
 import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
 import NavLink from "react-bootstrap/NavLink";
+import {MailForm} from "../widgets";
 
 const jwt = require("jsonwebtoken");
 
@@ -68,8 +69,7 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         {this.EditButton()}
-
-
+                        {this.emailForm()}
                     </Container>
                 </div>
 
