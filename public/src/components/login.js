@@ -11,6 +11,9 @@ import Alert from "react-bootstrap/Alert";
 export class LoginForm extends Component {
     constructor(props) {
         super(props);
+
+        if(authService.loggedIn()) { window.location = '/hjem'; }
+
         this.state = {
             email: '',
             password: '',
