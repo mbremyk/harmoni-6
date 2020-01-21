@@ -184,33 +184,6 @@ app.use("/auth", (req, res, next) => {
  *
  * @return {json} {jwt: token}
  */
-app.post("/login2", (req, res) => {
-        console.log("POST-request - /login");
-
-    return db.getSaltByEmail(req.body.email)
-        .then(salt => {
-            if (salt.length !== 1) {
-                res.sendStatus(401);
-                return;
-            }
-            hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt).then(credentials => {
-                db.loginOk(req.body.email, credentials[0]).then(ok => {
-                    if (ok) {
-                        db.getUserByEmail(req.body.email).then(user => {
-                            console.log(user.dataValues);
-                            let token = getToken(user.dataValues);
-                            res.json({jwt: token});
-                        })
-                    }
-                    else {
-                        res.status(401);
-                        res.json({error: "Not authorized"})
-                    }
-                });
-            });
-        });
-});
-
 app.post("/login", async (req, res) => {
     console.log("POST-request - /login");
 
