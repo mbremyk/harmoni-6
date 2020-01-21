@@ -1,4 +1,4 @@
-import {Event, Personnel, Gig, service} from "../services";
+import {Event, Personnel, service, User} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -66,6 +66,7 @@ export class EditEvent extends Component {
         this.artists = this.handleArtists.bind(this);
         this.imageUrl = this.handleImageUrlChange.bind(this);
         this.image = this.handleImageUpload.bind(this);
+        this.personnel = this.handlePersonnel.bind(this);
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
         this.city = this.handleCityChange.bind(this);
         this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
@@ -120,7 +121,6 @@ export class EditEvent extends Component {
     }
 
     handleAgeLimitChange(event) {
-        console.log(event.target.value)
         this.setState({ageLimit: event.target.value});
     }
 
@@ -165,8 +165,17 @@ export class EditEvent extends Component {
     }
 
     handlePersonnel(event) {
-        this.setState({oldPersonnel: [...this.state.oldPersonnel, ...event]});
-        this.setState({personnel: [...this.state.personnel, ...event]});
+        let array = [];
+        event.map(pers => array.push(new User(pers.personnelId, pers.user.username, pers.user.email)));
+        event.map((pers, i) => array[i].role = pers.role);
+        this.setState({oldPersonnel: [...this.state.oldPersonnel, ...array]});
+        this.setState({personnel: [...this.state.personnel, ...array]});
+    }
+
+    handlePersonnelRole(event, personnel) {
+        personnel.role = event.target.value;
+        this.setState({personnelAdd: [...this.state.personnelAdd]});
+        this.setState({personnel: [...this.state.personnel]});
     }
 
     handlePersonnelAdd(event) {
@@ -176,21 +185,18 @@ export class EditEvent extends Component {
         });
     }
 
-    handlePersonnelRole(event, personnel) {
-        personnel.role = event.target.value;
-    }
-
     handlePersonnelRemoval(event, personnel) {
-        this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1);
+        this.state.personnel.splice(this.state.personnel.indexOf(personnel), 1);
         this.setState({personnelAdd: this.state.personnelAdd});
-        this.state.oldPersonnel.splice(this.state.oldPersonnel.indexOf(personnel), 1);
-        this.setState({oldPersonnel: this.state.oldPersonnel});
-        this.setState({personnelRemove: [...this.state.personnelRemove, personnel]});
+        if (this.state.oldPersonnel.indexOf(personnel) > 0) {
+            this.setState({personnelRemove: [...this.state.personnelRemove, new Personnel(personnel.userId ? personnel.userId : personnel.personnelId, this.state.eventId, "")]});
+        } else {
+            this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1);
+        }
     }
 
 
     handleSubmit() {
-
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
 
@@ -211,23 +217,33 @@ export class EditEvent extends Component {
 
             service.updateEvent(ev).then(() => {
                 this.updatePersonnel().then(() => {
-                    this.props.history.push("/arrangement/" + ev.eventId);
+                    this.props.history.push("/arrangement/" + this.state.eventId);
                 })
             });
         });
     }
 
     updatePersonnel = () => new Promise((resolve, reject) => {
-        Promise.all(
-            [
-                service.updatePersonnel(this.state.oldPersonnel),
-                this.state.personnelRemove.map(person => service.deletePersonnel(person)),
-                service.addPersonnel(this.state.personnelAdd.map(user => new Personnel(user.userId, this.state.eventId, user.role)))
-            ])
-            .then(() => resolve(true))
-            .catch(error => {
-                reject(error)
-            });
+        let promises = [];
+        if (Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length > 0) {
+            promises.push(service.addPersonnel(this.state.personnelAdd.map(user => new Personnel(user.userId, this.state.eventId, user.role))).catch(error => {
+                console.log(error);
+                reject(error);
+            }))
+        }
+        if (Array.isArray(this.state.oldPersonnel) && this.state.oldPersonnel.length > 0) {
+            promises.push(service.updatePersonnel(this.state.oldPersonnel.map(user => new Personnel(user.userId, this.state.eventId, user.role))).catch(error => {
+                console.log(error);
+                reject(error);
+            }))
+        }
+        if (Array.isArray(this.state.personnelRemove) && this.state.personnelRemove.length > 0) {
+            promises.push(this.state.personnelRemove.map(person => service.deletePersonnel(this.state.eventId, person.personnelId).catch(error => {
+                console.log(error);
+                reject(error);
+            })))
+        }
+        Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
     });
 
     render() {
@@ -351,7 +367,8 @@ export class EditEvent extends Component {
                                             Velg artist
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
+                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                       as={this.CustomMenu}>
                                             {this.state.artists.filter(artist => !this.state.artistsAdd.some(e => e.userId === artist.userId)).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
@@ -414,8 +431,9 @@ export class EditEvent extends Component {
                                             Velg personell
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
-                                            {this.state.artists.filter(artist => !this.state.personnelAdd.some(e => e.userId === artist.userId)).map(artist => (
+                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                       as={this.CustomMenu}>
+                                            {this.state.artists.filter(artist => !this.state.personnel.some(e => (e.personnelId === artist.userId || e.userId === artist.userId))).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
                                                 </Dropdown.Item>
@@ -434,7 +452,7 @@ export class EditEvent extends Component {
                                                 <ListGroupItem>
                                                     <Row>
                                                         <Col>
-                                                            {personnel.user.username}
+                                                            {personnel.user ? personnel.user.username : personnel.username}
                                                         </Col>
 
                                                         <Col>
@@ -446,10 +464,8 @@ export class EditEvent extends Component {
                                                         </Col>
 
                                                         <Col>
-                                                            <Button type="button" variant={"danger"} onClick={() => {
-                                                                this.handlePersonnelRemoval(personnel);
-                                                            }
-                                                            }>Fjern</Button>
+                                                            <Button type="button" variant={"danger"}
+                                                                    onClick={event => this.handlePersonnelRemoval(event, personnel)}>X</Button>
                                                         </Col>
                                                     </Row>
                                                 </ListGroupItem>
@@ -504,13 +520,12 @@ export class EditEvent extends Component {
                             <Row>
 
                                 <Col>
-                                    <Button type="button" variant={"success"} onClick={this.handleSubmit}>Endre
-                                        arragament</Button>
+                                    <Button type="button" variant={"success"} onClick={this.handleSubmit}>Lagre</Button>
                                 </Col>
 
                                 <Col>
-                                    <Button variant={"danger"} type="button" onClick={this.handleEventCancel}>Avlys
-                                        arrangement</Button>
+                                    <Button variant={"danger"} type="button"
+                                            onClick={this.handleEventCancel}>Avlys</Button>
                                 </Col>
 
                                 <Col>
@@ -553,11 +568,9 @@ export class EditEvent extends Component {
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
-            service.getGigs(this.props.match.params.id)
-                .then(g => {
-                    console.log(g);
-                    g.map(u => this.handleArtistsAdd(u.artistId));
-                })
+            service.getGigs(this.props.match.params.id).then(g => {
+                g.map(u => this.handleArtistsAdd(u.artistId));
+            })
                 .catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
     }
