@@ -1,15 +1,5 @@
 class DefaultMail {
 
-    constructor() {
-        this.user = '';
-        this.date = '';
-        this.text = '';
-        this.subject = '';
-        this.email = '';
-        this.password = '';
-        this.hilsen = `Med vennlig hilsen\nHarmoni team 6 support team`;
-    }
-
 
     set hilsen(hilsen) {
     }
@@ -31,6 +21,17 @@ class DefaultMail {
             `Ditt engangspassord er: ${this.password}\n` +
             `Dette passordet virker kun én gang, og det anbefales å bytte passord på Min Side så fort du har logget inn.\n\n` +
             this.hilsen;
+    }
+
+
+    constructor() {
+        this.hilsen = `Med vennlig hilsen\nHarmoni team 6 support team`;
+        this.user;
+        this.date;
+        this.ext;
+        this.subject;
+        this.email;
+        this.password;
     }
 }
 
