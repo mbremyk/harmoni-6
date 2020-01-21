@@ -517,8 +517,6 @@ app.post("/auth/events/:eventId/personnel", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId/personnel', (req, res) => {
-    return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
-app.put('/events/:eventId/personnel', (req, res) => {
 	return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
