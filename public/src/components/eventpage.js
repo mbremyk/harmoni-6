@@ -351,5 +351,4 @@ export class EventPage extends Component {
         url = url.replace(/[^\w\s-]/g,'');
         window.open('https://www.google.com/maps/search/' + url);
     }
-
 }
