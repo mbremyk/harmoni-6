@@ -7,6 +7,7 @@ import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
 import NavLink from "react-bootstrap/NavLink";
 import {MailForm} from "../widgets";
+import Card from "react-bootstrap/Card";
 
 const jwt = require("jsonwebtoken");
 
@@ -29,54 +30,50 @@ export class EventPage extends Component {
                 <div>
                     {this.RenderNavbar()}
                     <Container>
+                        <Card className='p-2'>
 
-                        <Image src={this.currentEvent.imageUrl} height="auto" width="100%"/>
+                            <Image src={this.currentEvent.imageUrl} height="auto" width="100%"/>
 
-                        <Row>
-                            <Col>
-                                <h1>{this.currentEvent.eventName}</h1>
-                            </Col>
-                        </Row>
-                        <Row>
+                            <Row>
+                                <Col>
+                                    <h1>{this.currentEvent.eventName}</h1>
+                                </Col>
+                            </Row>
+                            <Row>
 
-                            <Col>
-                                <Row>
-                                    <h6>Fra: {this.currentEvent.startTime}<br/>Til : {this.currentEvent.endTime}</h6>
-                                </Row>
-                            </Col>
+                                <Col>
+                                        <h6>Fra: {this.currentEvent.startTime}<br/>Til : {this.currentEvent.endTime}</h6>
+                                </Col>
 
-                            {this.RenderAgeLimit()}
-                            <Col>
-                                <h6>Adresse: {this.currentEvent.address}</h6>
-                            </Col>
-                            {this.RenderArtist()}
-                            <Col>
-                                <Row>
-                                    <Col><h6>Arrangør: {this.user.username}</h6></Col>
-                                    <Col><h6>Email: {this.user.email}</h6></Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <p>{this.currentEvent.description}</p>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                {this.ShowArtist()}
-                                {this.ShowPersonnel()}
-                            </Col>
-                        </Row>
-                        {this.EditButton()}
-                        {this.emailForm()}
+                                {this.RenderAgeLimit()}
+                                <Col>
+                                    <h6>Adresse: {this.currentEvent.address}</h6>
+                                </Col>
+                                {this.RenderArtist()}
+                                <Col>
+                                    <Row>
+                                        <Col><h6>Arrangør: {this.user.username}</h6></Col>
+                                        <Col><h6>Email: {this.user.email}</h6></Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    <p>{this.currentEvent.description}</p>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    {this.ShowArtist()}
+                                    {this.ShowPersonnel()}
+                                </Col>
+                            </Row>
+                            {this.EditButton()}
+                            <MailForm/>
+                        </Card>
                     </Container>
                 </div>
-
-
             );
-
-
         }
     }
 
@@ -92,14 +89,10 @@ export class EventPage extends Component {
                 if (this.currentEvent.organizerId == token.userId) {
                     this.isOrganizer = true;
                 }
-
-
             })
             .catch((error) => console.log(error));
         this.getPersonnelForEvent();
         this.getArtistsForEvent();
-
-
     }
 
 //gets all the people working on that event and checks if the person viewing it is a part of the personnel
@@ -128,7 +121,7 @@ export class EventPage extends Component {
                 this.artists = artists;
                 let token = jwt.decode(authService.getToken());
                 this.artists.map(person => {
-                    if (person.artistId == token.userId) {
+                    if (person.artistId === token.userId) {
                         this.isArtist = true;
                     }
                 });
@@ -188,7 +181,6 @@ export class EventPage extends Component {
         }
 
     }
-
 
 //returns a list over personnel and their contact info if there is any personnel on the event
     ShowPersonnel() {
@@ -324,13 +316,10 @@ export class EventPage extends Component {
             return <Col>
                 <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
             </Col>
-
         } else {
             return <Col>
                 <h6>Tillat for alle</h6>
             </Col>
         }
-
-
     }
 }
