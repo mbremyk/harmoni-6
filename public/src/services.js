@@ -16,12 +16,14 @@ export class Artist {
     username;
     email;
     contract;
+    document;
 
-    constructor(userId, username, email, contract) {
+    constructor(userId, username, email, contract, document) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.contract = contract;
+        this.document = document
     }
 
 }
