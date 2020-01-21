@@ -107,7 +107,7 @@ export class EventPage extends Component {
                         this.isPersonnel = true;
                     }
                 });
-                console.log("Er jeg personnel? " + this.isPersonnel)
+
             })
             .catch((error) => console.log(error));
 
@@ -125,7 +125,6 @@ export class EventPage extends Component {
                         this.isArtist = true;
                     }
                 });
-                console.log("Er jeg artist? " + this.isArtist);
 
             })
             .catch((error) => console.log(error));
@@ -143,18 +142,35 @@ export class EventPage extends Component {
         if (artistId === token.userId) {
             return (
                 <div>
-
-                    <Button variant="primary"
-                            size="sm"
-                            href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
-                        Legg til Rider
+                    <Button
+                        className="m-2"
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
                     </Button>
                     <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
+
         } else if (this.isOrganizer) {
-            return <Col><DownloadWidget artist={artistId} event={this.currentEvent.eventId}/></Col>;
+            return (
+                <div>
+                    <Button
+                        className="m-2"
+
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
+                    </Button>
+
+                    <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
+                </div>
+            );
+
         }
     }
+
 
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
@@ -322,4 +338,5 @@ export class EventPage extends Component {
             </Col>
         }
     }
+
 }
