@@ -526,6 +526,26 @@ app.get("/auth/events/users/:userId", (req, res) => {
 
 
 /**
+ * header:
+ *      {
+ *          x-access-token: string
+ *      }
+ */
+app.get("/auth/events/users/:userId/myevents", (req, res) => {
+    console.log("GET-request - /events/user/:userId/myevents");
+    let token = req.headers['x-access-token'];
+    let decoded = jwt.decode(token);
+    if (decoded.userId == req.params.userId) {
+        return db.getMyEventsByUserId(decoded.userId)
+            .then(events => res.send(events))
+            .catch(error => console.error(error));
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+
+/**
  * Changes the information of an Event
  * body:
  * {

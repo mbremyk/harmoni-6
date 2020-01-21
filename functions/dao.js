@@ -405,6 +405,37 @@ class Dao {
     }
 
     /**
+     * retrieves all events a user is artist or personnel
+     *
+     * @param userId
+     * @returns {Promise<Events[]>}
+     */
+    getMyEventsByUserId(userId) {
+        let eventsWhereUserIsArtist = model.GigModel.findAll({where:{artistId: userId}})
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+        let eventsWhereUserIsPersonnel = model.PersonnelModel.findAll({where: {personnelId: userId}})
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+
+        return model.EventModel.findAll({where: {
+            [Op.or]:[
+                {eventId: eventsWhereUserIsArtist.map(e => e.eventId) },
+                {eventId: eventsWhereUserIsPersonnel.map(e => e.eventId) }
+            ]}})
+            .catch(error => {
+            console.error(error);
+            return [];
+        });
+
+    }
+
+
+    /**
      * retrieves the event by its ID
      *
      * @param eventId
