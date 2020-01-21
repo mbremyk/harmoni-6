@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
@@ -350,7 +350,7 @@ class Dao {
     deleteOldEvents() {
         let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
         oldEvents.map(event => console.log(event.eventId));
-        if(oldEvents.length == null) return 0;
+        if (oldEvents.length == null) return 0;
         else return oldEvents.length
     }
 
@@ -438,20 +438,22 @@ class Dao {
     /**
      * Updates the role of personnel, cannot change event or person as these are the primary key
      *
-     * @param personnel
+     * @param personnel[]
      * @returns {Promise<boolean>}
      */
     updatePersonnel(personnel) {
-        return model.PersonnelModel.update(
+        return Promise.all(personnel.map(person => model.PersonnelModel.update(
             {
-                role: personnel.role
+                role: person.role
             },
-            {where: {eventId: personnel.eventId, personnelId: personnel.personnelId}})
-            .then(response => response[0] === 1)
+            {where: {eventId: person.eventId, personnelId: person.personnelId}})))
+            .then(() => {
+                return true
+            })
             .catch(error => {
-                console.error(error);
-                return false;
-            });
+                console.log(error);
+                return false
+            })
     }
 
     /**
@@ -511,20 +513,22 @@ class Dao {
     /**
      * Updates a new Ticket in the Database, returns false if something goes wrong
      *
-     * @param ticket
+     * @param tickets: Ticket[]
      * @returns {Promise<boolean>}
      */
-    updateTicket(ticket) {
-        return model.TicketModel.update(
+    updateTickets(tickets) {
+        return Promise.all(tickets.map(ticket => model.TicketModel.update(
             {
                 price: ticket.price,
                 amount: ticket.amount
             },
             {where: {eventId: ticket.eventId, type: ticket.type}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
             .catch(error => {
                 console.error(error);
-                return false;
+                return false
+            })))
+            .then(() => {
+                return true;
             });
     }
 
@@ -655,7 +659,6 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateRiderItems(riderItems) {
-        let allUpdatesOk = true;
         return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
             {
                 confirmed: riderItem.confirmed
@@ -672,7 +675,7 @@ class Dao {
                 return false
             })))
             .then(() => {
-                return allUpdatesOk;
+                return true;
             });
     }
 
