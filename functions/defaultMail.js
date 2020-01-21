@@ -17,8 +17,8 @@ class DefaultMail {
 
     get passwordText() {
         return `Hei, ${this.user}\n\n` +
-            `Vi har mottatt en forespørsel om nytt passord fra din bruker. Hvis du ikke har sendt en forespørsel om nytt passord, kan du se bort ifra denne mailen.\n` +
-            `Ditt engangspassord er: ${this.password}\n` +
+            `Vi har mottatt en forespørsel om nytt passord fra din bruker. Hvis du ikke har sendt en forespørsel om nytt passord, kan du se bort ifra denne mailen.\n\n` +
+            `Ditt engangspassord er: ${this.password}\n\n` +
             `Dette passordet virker kun én gang, og det anbefales å bytte passord på Min Side så fort du har logget inn.\n\n` +
             this.hilsen;
     }

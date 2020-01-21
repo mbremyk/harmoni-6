@@ -1,4 +1,4 @@
-import {Event, Personnel, service} from "../services";
+import {Event, Personnel, Gig, service} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -351,9 +351,8 @@ export class EditEvent extends Component {
                                             Velg artist
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                       as={this.CustomMenu}>
-                                            {this.state.artists.map(artist => (
+                                        <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
+                                            {this.state.artists.filter(artist => !this.state.artistsAdd.some(e => e.userId === artist.userId)).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
                                                 </Dropdown.Item>
@@ -415,9 +414,8 @@ export class EditEvent extends Component {
                                             Velg personell
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                       as={this.CustomMenu}>
-                                            {this.state.artists.map(artist => (
+                                        <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
+                                            {this.state.artists.filter(artist => !this.state.personnelAdd.some(e => e.userId === artist.userId)).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
                                                 </Dropdown.Item>
