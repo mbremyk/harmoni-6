@@ -249,7 +249,7 @@ export class AddEvent extends Component {
             <div>
                 <HarmoniNavbar/>
                 <Container>
-                    <Card className={"p-5"}>
+                    <Card className={"p-5 mt-2"}>
                         <Form>
                             <Form.Row>
 
@@ -362,11 +362,13 @@ export class AddEvent extends Component {
 
                                         <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
                                                        as={this.CustomMenu}>
-                                            {this.state.artists.map(artist => (
+
+                                            {this.state.artists.filter(artist => !this.state.artistsAdd.some(e => e.userId === artist.userId)).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
                                                 </Dropdown.Item>
-                                            ))}
+                                            ))})
+
                                         </Dropdown.Menu>
 
                                     </Dropdown>
@@ -425,7 +427,7 @@ export class AddEvent extends Component {
 
                                         <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
                                                        as={this.CustomMenu}>
-                                            {this.state.artists.map(artist => (
+                                            {this.state.artists.filter(artist => !this.state.personnelAdd.some(e => e.userId === artist.userId)).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
                                                 </Dropdown.Item>

@@ -184,7 +184,6 @@ export class EditEvent extends Component{
 
         this.toBase64(this.state.image).then(image => {
 
-
             let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.city, this.state.eventAddress,
                 this.state.placeDescription, this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, (image ? image : this.state.imageUrl), this.state.cancelled);
             console.log(ev)
@@ -314,7 +313,7 @@ export class EditEvent extends Component{
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
-                                            {this.state.artists.map(artist => (
+                                            {this.state.artists.filter(artist => !this.state.artistsAdd.some(e => e.userId === artist.userId)).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
                                                 </Dropdown.Item>
@@ -379,7 +378,7 @@ export class EditEvent extends Component{
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu style = {{overflowY: 'scroll', maxHeight:"300px"}} as={this.CustomMenu}>
-                                            {this.state.artists.map(artist => (
+                                            {this.state.artists.filter(artist => !this.state.personnelAdd.some(e => e.userId === artist.userId)).map(artist => (
                                                 <Dropdown.Item eventKey={artist.userId}>
                                                     {artist.username}
                                                 </Dropdown.Item>

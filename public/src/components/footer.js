@@ -6,6 +6,12 @@ import {MailForm} from "../widgets";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
+/**
+ *
+ *         Not in use, see index.html
+ *
+ */
+
 export class Footer extends Component {
 
     render() {

@@ -136,7 +136,7 @@ export class SortedEventView extends Component {
     render() {
         if (this.state.events !== []) {
             return (
-                <Container>
+                <Container id="scrollTo">
                     <Card bg={"light"}>
                         <Row>
                             <Col>
@@ -232,7 +232,6 @@ export class SortedEventView extends Component {
                 .then(events => (this.handleEvents(events)))
                 .catch((error) => console.log(error));
         }
-
     }
 }
 
