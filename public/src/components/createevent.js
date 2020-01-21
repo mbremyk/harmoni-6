@@ -166,8 +166,8 @@ export class AddEvent extends Component {
         this.setState({tTime: event.target.value})
     }
 
-    handlePersonnelRole(event, personell) {
-        personell.role = event.target.value
+    handlePersonnelRole(event, personnel) {
+        personnel.role = event.target.value;
         this.setState({personnelRole: event.target.value})
     }
 
@@ -186,8 +186,8 @@ export class AddEvent extends Component {
     sendGigs = (eventId) => new Promise((resolve, reject) => {
         if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
             Promise.all(this.state.artistsAdd.map(artist => {
-                this.toBase64(artist.contract).then(cData => {
-                    let contract = new SimpleFile(cData, artist.contract.name);
+                this.toBase64(artist.contract).then(contractData => {
+                    let contract = new SimpleFile(contractData, artist.contract.name);
                     service
                         .addGig(new Gig(eventId, artist.userId, contract))
                         .catch(error => reject(error))
@@ -394,14 +394,15 @@ export class AddEvent extends Component {
                                                             <Col>
                                                             </Col>
 
-                                                        <Col sm={"2"}>
-                                                            <label>Fjern artist</label>
-                                                            <Button type="button" variant={"danger"} onClick={() => {
-                                                                this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist), 1)
-                                                                this.setState({artistsAdd: this.state.artistsAdd});
-                                                            }
-                                                            }>Fjern</Button>
-                                                        </Col>
+                                                            <Col sm={"2"}>
+                                                                <label>Fjern artist</label>
+                                                                <Button type="button" variant={"danger"}
+                                                                        onClick={() => {
+                                                                            this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist), 1)
+                                                                            this.setState({artistsAdd: this.state.artistsAdd});
+                                                                        }
+                                                                        }>Fjern</Button>
+                                                            </Col>
 
                                                         </Row>
                                                     </ListGroupItem>
@@ -454,25 +455,26 @@ export class AddEvent extends Component {
                                                             />
                                                         </Col>
 
-                                                    <Col>
-                                                        <Button type="button" variant={"danger"} onClick={() => {
-                                                            this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1)
-                                                            this.setState({personnelAdd: this.state.personnelAdd});
-                                                        }
-                                                        }>Fjern</Button>
-                                                    </Col>
-                                                </Row>
-                                            </ListGroupItem>
-                                        </React.Fragment>
-                                    ))}
-                                </ListGroup>
-                            </Form.Group>
+                                                        <Col>
+                                                            <Button type="button" variant={"danger"} onClick={() => {
+                                                                this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1)
+                                                                this.setState({personnelAdd: this.state.personnelAdd});
+                                                            }
+                                                            }>Fjern</Button>
+                                                        </Col>
+                                                    </Row>
+                                                </ListGroupItem>
+                                            </React.Fragment>
+                                        ))}
+                                    </ListGroup>
+                                </Form.Group>
 
-                            <Form.Group as={Col} sm={"6"}>
-                                <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
-                                <input type="file" className="form-control" encType="multipart/form-data" name="file"
-                                       onChange={this.handleImageUpload}/>
-                            </Form.Group>
+                                <Form.Group as={Col} sm={"6"}>
+                                    <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                                    <input type="file" className="form-control" encType="multipart/form-data"
+                                           name="file"
+                                           onChange={this.handleImageUpload}/>
+                                </Form.Group>
 
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>Eller legg inn en bilde-url</Form.Label>
