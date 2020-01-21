@@ -643,7 +643,7 @@ app.get("/events/:eventId/tickets", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/gigs", (req, res) => {
-    db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus());
+    db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(503));
 });
 
 /**

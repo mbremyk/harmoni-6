@@ -1,9 +1,15 @@
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
+const mail = require("./mail.js");
+const props = require("./properties.js");
+const isCI = require('is-ci');
+const test = (process.env.NODE_ENV === 'test');
+
+let mailProps = new props.MailProperties();
 
 
 class Dao {
@@ -350,7 +356,7 @@ class Dao {
     deleteOldEvents() {
         let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
         oldEvents.map(event => console.log(event.eventId));
-        if(oldEvents.length == null) return 0;
+        if (oldEvents.length == null) return 0;
         else return oldEvents.length
     }
 
@@ -582,7 +588,24 @@ class Dao {
                         eventId: gig.eventId,
                         contract: created.fileId
                     })
-                    .then(response => response._options.isNewRecord)
+                    .then(response => {
+                        if (!isCI && !test) {
+                            this.getUserById(gig.artistId)
+                                .then(user => {
+                                    this.getEventByEventId(gig.eventId)
+                                        .then(event => {
+                                            let email = {
+                                                to: user.email,
+                                                from: mailProps.username,
+                                                subject: "Artistprivilegier for " + event.eventName,
+                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på '<a href="https://harmoni-6.firebaseapp.com/">Harmoni</a>'\nDu kan finne arrangementet på ${'<a href={`https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}`}>${`https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}`}</a>'}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                            };
+                                            mail.sendMail(email);
+                                        })
+                                });
+                        }
+                        return response._options.isNewRecord
+                    })
                     .catch(error => {
                         console.error(error);
                         return false;
