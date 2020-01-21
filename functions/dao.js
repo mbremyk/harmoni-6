@@ -598,7 +598,7 @@ class Dao {
                                                 to: user.email,
                                                 from: mailProps.username,
                                                 subject: "Artistprivilegier for " + event.eventName,
-                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på '<a href="https://harmoni-6.firebaseapp.com/">Harmoni</a>'\nDu kan finne arrangementet på ${'<a href={`https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}`}>${`https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}`}</a>'}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\nFor å laste ned kontrakt eller legge til en rider må du logge inn på siden\n\nMed vennlig hilsen\nHarmoni team 6`
                                             };
                                             mail.sendMail(email);
                                         })
