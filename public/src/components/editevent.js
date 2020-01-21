@@ -1,4 +1,4 @@
-import {Event, service} from "../services";
+import {Event, Personnel, service} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -89,7 +89,12 @@ export class EditEvent extends Component {
             imageUrl: '',
             artistsAdd: [],
             artists: [],
-            personnelAdd: [],
+
+            personnel: [], //all personnel used to render them on the page
+            oldPersonnel: [], //personnel already registered
+            personnelAdd: [], //personnel added
+            personnelRemove: [], //personnel for removal
+
             cancelled: 0
         };
     }
@@ -104,10 +109,6 @@ export class EditEvent extends Component {
 
     handlePlaceDescriptionChange(event) {
         this.setState({placeDescription: event.target.value});
-    }
-
-    handleEventAddressChange(event) {
-        this.setState({eventAddress: event.target.value});
     }
 
     handleEventAddressChange(event) {
@@ -147,14 +148,6 @@ export class EditEvent extends Component {
         this.setState({artists: [...this.state.artists, ...event]})
     }
 
-    handlePersonnel(event) {
-        this.setState({personnelAdd: [...this.state.personnelAdd, ...event]})
-    }
-
-    handlePersonnelAdd(event) {
-        service.getUser(event).then((user) => this.setState({personnelAdd: [...this.state.personnelAdd, user]}));
-    }
-
     handleFDate(event) {
         this.setState({fDate: event.target.value})
     }
@@ -171,9 +164,28 @@ export class EditEvent extends Component {
         this.setState({tTime: event.target.value})
     }
 
+    handlePersonnel(event) {
+        this.setState({oldPersonnel: [...this.state.oldPersonnel, ...event]});
+        this.setState({personnel: [...this.state.personnel, ...event]});
+    }
+
+    handlePersonnelAdd(event) {
+        service.getUser(event).then((user) => {
+            this.setState({personnelAdd: [...this.state.personnelAdd, user]});
+            this.setState({personnel: [...this.state.personnel, user]});
+        });
+    }
+
     handlePersonnelRole(event, personnel) {
         personnel.role = event.target.value;
-        this.setState({personnelRole: event.target.value})
+    }
+
+    handlePersonnelRemoval(event, personnel) {
+        this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1);
+        this.setState({personnelAdd: this.state.personnelAdd});
+        this.state.oldPersonnel.splice(this.state.oldPersonnel.indexOf(personnel), 1);
+        this.setState({oldPersonnel: this.state.oldPersonnel});
+        this.setState({personnelRemove: [...this.state.personnelRemove, personnel]});
     }
 
 
@@ -197,9 +209,26 @@ export class EditEvent extends Component {
                 (image ? image : this.state.imageUrl),
                 this.state.cancelled);
 
-            service.updateEvent(ev).then(() => this.props.history.push("/arrangement/" + ev.eventId));
+            service.updateEvent(ev).then(() => {
+                this.updatePersonnel().then(() => {
+                    this.props.history.push("/arrangement/" + ev.eventId);
+                })
+            });
         });
     }
+
+    updatePersonnel = () => new Promise((resolve, reject) => {
+        Promise.all(
+            [
+                service.updatePersonnel(this.state.oldPersonnel),
+                this.state.personnelRemove.map(person => service.deletePersonnel(person)),
+                service.addPersonnel(this.state.personnelAdd.map(user => new Personnel(user.userId, this.state.eventId, user.role)))
+            ])
+            .then(() => resolve(true))
+            .catch(error => {
+                reject(error)
+            });
+    });
 
     render() {
 
@@ -402,7 +431,7 @@ export class EditEvent extends Component {
                                 <Form.Group as={Col} sm={"10"}>
 
                                     <ListGroup title={"Valgt personell"}>
-                                        {this.state.personnelAdd.map(personnel => (
+                                        {this.state.personnel.map(personnel => (
                                             <React.Fragment key={personnel.userId}>
                                                 <ListGroupItem>
                                                     <Row>
@@ -420,8 +449,7 @@ export class EditEvent extends Component {
 
                                                         <Col>
                                                             <Button type="button" variant={"danger"} onClick={() => {
-                                                                this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1)
-                                                                this.setState({personnelAdd: this.state.personnelAdd});
+                                                                this.handlePersonnelRemoval(personnel);
                                                             }
                                                             }>Fjern</Button>
                                                         </Col>
