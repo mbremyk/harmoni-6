@@ -138,6 +138,7 @@ export class DownloadWidget extends Component {
         service
             .downloadContract(this.event, this.artist)
             .then(response => {
+                console.log(response);
                 const link = document.createElement('a');
                 link.download = response.name;
                 link.href = response.data;
@@ -357,8 +358,8 @@ export class MailForm extends Component {
 
     getUser() {
         let token = jwt.decode(authService.getToken());
-        console.log(token.email);
-        if (!token.email) {
+        // console.log(token);
+        if (!token) {
             this.setAlert("ERROR", "danger");
             return undefined;
         } else {
@@ -373,12 +374,12 @@ export class MailForm extends Component {
         if (bug) {
             if (!user) {
                 let userMail = "anon@UwU.com";
-                let mail = new BugMail(userMail, this.state.description, this.state.text);
+                let mail = new BugMail(userMail, "anonymous", this.state.description, this.state.text);
                 service.sendBug(mail)
                     .then(res => (this.setAlert(res.toString(), "info")))
                     .catch(err => this.setAlert(err.toString(), "danger"));
             } else {
-                let mail = new BugMail(user.email, this.state.description, this.state.text);
+                let mail = new BugMail(user.email, "anonymous", this.state.description, this.state.text);
                 service.sendBug(mail)
                     .then(res => (this.setAlert(res.toString(), "info")))
                     .catch(err => this.setAlert(err.toString(), "danger"));

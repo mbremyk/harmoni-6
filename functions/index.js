@@ -394,11 +394,12 @@ app.get("/auth/users/:userId", (req, res) => {
 app.post("/events", (req, res) => {
     console.log("POST-request - /events");
     if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
-        filehandler.uploadToCloud(req.body.imageUrl, "img.png" )
-            .then(url => {
-                console.log(url);
-                req.body.imageUrl = url;
-                console.log(req.body.imageUrl);
+        let name = "image.png";
+        filehandler.uploadToCloud(req.body.imageUrl, name, true)
+            .then(urldata => {
+                console.log(urldata);
+                req.body.imageUrl = urldata.url;
+                console.log("in post events:" + req.body.imageUrl);
                 db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
             });
     }else{
@@ -412,11 +413,12 @@ app.post("/events", (req, res) => {
 app.post("/auth/events", (req, res) => {
     console.log("POST-request - /events");
     if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
-        filehandler.uploadToCloud(req.body.imageUrl, "img.png" )
-            .then(url => {
-                console.log(url);
-                req.body.imageUrl = url;
-                console.log(req.body.imageUrl);
+        let name = "image.png";
+        filehandler.uploadToCloud(req.body.imageUrl, name, true)
+            .then(urldata => {
+                console.log(urldata);
+                req.body.imageUrl = urldata.url;
+                console.log("in post events:" + req.body.imageUrl);
                 db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
             });
     }else{
@@ -645,7 +647,18 @@ app.get("/events/:eventId/tickets", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/gigs", (req, res) => {
-    db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(503));
+    console.log(req.body);
+    if (req.body.contract.data && req.body.contract.data.includes("base64")) {
+        filehandler.uploadToCloud(req.body.contract.data, req.body.contract.name, false)
+            .then(file => {
+                req.body.contract.data = file.url;
+                req.body.contract.name = file.name;
+                console.log("Req body in gigs" + req.body);
+                db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(503));
+            });
+    } else {
+        db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(503));
+    }
 });
 
 /**
@@ -665,7 +678,20 @@ app.get("/auth/events/:eventId/gigs", (req, res) => {
 app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
-    db.getContract(eventId, artistId).then(contract => (contract !== null) ? res.status(201).send(contract) : res.sendStatus(400));
+    //db.getContract(eventId, artistId).then(contract => (contract !== null) ? res.status(201).send(contract) : res.sendStatus(400));
+    db.getContract(eventId, artistId).then(contract => {
+        filehandler.downloadFromCloud(contract.name)
+            .then(dataString => {
+                console.log("Før: " + contract.data);
+                contract.data = dataString;
+                console.log("Etter: " + contract.data);
+                res.status(201).send(contract);
+            })
+            .catch(err => {
+                console.log(err);
+                res.sendStatus(400);
+            })
+    });
 });
 
 
