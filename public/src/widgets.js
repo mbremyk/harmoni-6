@@ -1,5 +1,5 @@
 import {Component} from "react-simplified";
-import {Col, Card, Button, Form} from "react-bootstrap";
+import {Col, Card, Button, Form, Modal} from "react-bootstrap";
 import * as React from 'react';
 import Row from "react-bootstrap/Row";
 import moment from "moment";
@@ -9,9 +9,7 @@ import {authService} from "./AuthService";
 
 const jwt = require("jsonwebtoken");
 
-import {service} from "./services";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
+
 
 export class EventInfo extends Component {
     event;
