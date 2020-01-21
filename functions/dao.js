@@ -451,7 +451,7 @@ class Dao {
      * retrieves the event by its ID
      *
      * @param eventId
-     * @returns {Promise<Event>}
+     * @returns {Promise<{}>}
      */
     getEventByEventId(eventId) {
         return model.EventModel.findOne({where: {eventId: eventId}})
@@ -474,7 +474,28 @@ class Dao {
      */
     addPersonnel(personnel) {
         return model.PersonnelModel.bulkCreate(personnel)
-            .then(response => response[0]._options.isNewRecord)
+            .then(response => {
+                if (!isCI && !test) {
+                    this.getEventByEventId(response[0].eventId)
+                        .then(event => {
+                            let rep = response.map(r => r.dataValues.personnelId);
+                            model.UserModel.findAll({where: {userId: {[op.in]: rep}}, attributes: ['email']})
+                                .then(users => users.map(r => r.dataValues.email))
+                                .then(users => {
+                                    let email = {
+                                        from: mailProps.username,
+                                        to: users,
+                                        subject: `Personellprivilegier for ${event.eventName}`,
+                                        text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                    };
+                                    mail.sendMail(email);
+                                });
+                        });
+
+                }
+
+                return response[0]._options.isNewRecord
+            })
             .catch(error => {
                 console.error(error);
                 return false;
@@ -721,7 +742,7 @@ class Dao {
         let allUpdatesOk = true;
         return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
             {
-                confirmed: riderItem.confirmed
+                confirmed: (riderItem.confirmed ? true : false)
             },
             {
                 where: {
