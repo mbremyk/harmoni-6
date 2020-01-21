@@ -79,8 +79,18 @@ export class myPage extends Component {
                                                   value={this.state.password2}
                                                   onChange={this.handleNewPassword2Change}/>
                                 </Form.Group>
-                                <Button variant="primary" type="button" onClick={this.save}>
+                                <Button
+                                    className="mr-2"
+                                    variant="primary"
+                                    type="button"
+                                    onClick={this.save}>
                                     Lagre
+                                </Button>
+                                <Button
+                                    variant="secondary"
+                                    type="button"
+                                    href="/hjem">
+                                    Forkast endringer
                                 </Button>
                             </Form>
                         </div>
@@ -166,82 +176,6 @@ export class myPage extends Component {
             this.setState({username: this.state.oldUsername, email: this.state.oldEmail});
         });
     }
-
-    // Gammel metode
-    /*save() {
-        let user = new User();
-        user.email = this.state.email;
-        user.username = this.state.username;
-        user.userId = this.state.userId;
-
-        if (this.state.password1 !== this.state.password2) {
-            this.setError("Passordene er ulike.", 'danger');
-            return;
-        }
-        //Update password
-        if (this.state.password1 !== "" && this.state.password1 === this.state.password2) {
-            user.password = this.state.password1;
-            service.updatePassword(user)
-                .then(res => console.log("Password updated" + res))
-                .then(this.setError("Passord oppdatert.", 'success'))
-                .then(this.state.password1 = "")
-                .then(this.state.password2 = "")
-                .catch(err => this.setError("En feil har oppstått", 'danger'));
-        }
-        //Update username
-        if (user.username !== this.state.oldUsername && user.email === this.state.oldEmail) {
-            service.validateUsername(user.username).then(taken1 => {
-                console.log('Check username, taken: ' + taken1);
-                if (taken1) {
-                    this.setError('Brukernavn er i bruk :(', 'danger');
-                } else {
-                    service.updateUser(user)
-                        .then(res => console.log("User updated: " + res + " Password: " + user.password + " test"))
-                        .then(window.location.reload())
-                        .then(this.setError('Brukernavn oppdatert.', 'success'))
-                        .catch(err => this.setError("En feil har oppståt", 'danger'));
-                }
-            });
-            //Update email
-        } else if (user.username === this.state.oldUsername && user.email !== this.state.oldEmail) {
-            service.validateEmail(user.email).then(taken2 => {
-                console.log('Check email, taken: ' + taken2);
-                if (taken2) {
-                    this.setError('Epost er i bruk','danger');
-                } else {
-                    service.updateUser(user)
-                        .then(res => console.log("User updated: " + res))
-                        .then(window.location.reload())
-                        .then(this.setError('E-post oppdatert.', 'success'))
-                        .catch(err => this.setError("En feil har oppståt", 'danger'));
-                }
-            });
-            //update username and email
-        } else if (user.username !== this.state.oldUsername && user.email !== this.state.oldEmail) {
-            service.validateUsername(user.username).then(taken1 => {
-                console.log('Check username, taken: ' + taken1);
-                if (taken1) {
-                    this.setError('Brukernavn er i bruk :(', 'danger');
-                } else {
-                    // check email availability
-                    service.validateEmail(user.email).then(taken2 => {
-                        console.log('Check email, taken: ' + taken2);
-                        if (taken2) {
-                            this.setError('Epost er i bruk', 'danger');
-                        } else {
-                            service.updateUser(user)
-                                .then(res => console.log("User updated: " + res))
-                                .then(window.location.reload())
-                                .then(this.setError('Brukernavn og e-post oppdatert.', 'success'))
-                                .catch(err => this.setError("En feil har oppståt", 'danger'));
-                        }
-                    })
-                }
-            });
-        } else {
-            window.location.reload();
-        }
-    }*/
 
     handleUsernameChange(event) {
         this.setState({username: event.target.value});
