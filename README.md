@@ -67,9 +67,9 @@ firebase deploy
 # Security
 **Tokens:**
 
-All user-related api-calls requiere the _x-access-token_ to be set
+All user-related api-calls require the _x-access-token_ to be set
 in the request header. Token-related api calls  are routed through the
-_/auth_ middleware serverside, that verfies said token.
+_/auth_ middleware server-side, that verfies said token.
 
 
 **Router Guards:**
@@ -77,8 +77,6 @@ _/auth_ middleware serverside, that verfies said token.
 Checks if the user has a valid token, and if so lets the user access
 the pages reserved for logged-in users. In a sense, in works similarly to
 _/auth_ only clientside.
-
-**File Security:**
 
 **Clientside Hashing/Salting:**
 
@@ -89,3 +87,6 @@ The hash and its salt is then stored in databse.
 
 **Password Checking:**
 
+When a user registers for the system he/she is required to provide 
+a substantially difficult password (5 symbols minimum, needs more than just numbers).
+This is done with the _zxcvbn_ library to check strength on registration.
