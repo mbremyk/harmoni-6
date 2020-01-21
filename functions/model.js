@@ -114,7 +114,6 @@ let EventModel = sequelize.define('event', {
         }
     },
     imageUrl: {type: Sequelize.TEXT, defaultValue: "https://picsum.photos/500"},
-
     description: Sequelize.TEXT,
     cancelled: {type: Sequelize.BOOLEAN, defaultValue: false}
 }, {paranoid: true});
@@ -135,9 +134,6 @@ let FileModel = sequelize.define('file', {
         autoIncrement: true
     },
     name: {
-        type: Sequelize.STRING
-    },
-    contentType: {
         type: Sequelize.STRING
     },
     data: {
@@ -292,9 +288,6 @@ TicketModel.belongsTo(EventModel, {foreignKey: 'eventId'});
 FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
-FileModel.hasOne(GigModel, {foreignKey: 'rider'});
-GigModel.belongsTo(FileModel, {foreignKey: 'rider'});
-
 
 let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
 
@@ -322,23 +315,6 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
     });
 });
 
-let dropTables = () => {
-    return GigModel.drop().then(() => {
-        return FileModel.drop().then(() => {
-            return TicketModel.drop().then(() => {
-                return PersonnelModel.drop().then(() => {
-                    return EventModel.drop().then(() => {
-                        return UserModel.drop().then(() => true);
-                    });
-                });
-            });
-        });
-    })
-        .catch(error => {
-            console.error(error);
-            return false;
-        });
-};
 
 module.exports = {
     UserModel,
@@ -350,6 +326,5 @@ module.exports = {
     FileModel,
     syncModels,
     syncTestData,
-    dropTables,
     BugModel
 };

@@ -1,9 +1,8 @@
 import {Component} from "react-simplified";
-import {Container, Row, Col, Button, Form, Alert, Image, Table} from "react-bootstrap";
-import {EventInfo, DownloadWidget} from '../widgets.js';
-import {createHashHistory} from 'history';
+import {Button, Col, Container, Image, Row} from "react-bootstrap";
+import {DownloadWidget} from '../widgets.js';
 import * as React from 'react';
-import {Event, service, Ticket, User} from '../services';
+import {Event, service, User} from '../services';
 import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
 
@@ -39,7 +38,9 @@ export class EventPage extends Component {
                         <Row>
 
                             <Col>
-                                <h6>Fra {this.currentEvent.startTime} Til {this.currentEvent.endTime}</h6>
+                                <Row>
+                                    <h6>Fra: {this.currentEvent.startTime}<br/>Til : {this.currentEvent.endTime}</h6>
+                                </Row>
                             </Col>
 
                             {this.RenderAgeLimit()}
@@ -48,19 +49,16 @@ export class EventPage extends Component {
                             </Col>
                             {this.RenderArtist()}
                             <Col>
-                                <h6>Arrangert av: {this.user.username}</h6>
+                                <Row>
+                                    <Col><h6>Arrangør: {this.user.username}</h6></Col>
+                                    <Col><h6>Email: {this.user.email}</h6></Col>
+                                </Row>
                             </Col>
                         </Row>
                         <Row>
                             <Col>
                                 <p>{this.currentEvent.description}</p>
                             </Col>
-                        </Row>
-                        <Row>
-                            <Col><h5>Kontakt Arrangør</h5></Col>
-                        </Row>
-                        <Row>
-                            <Col><h6>Email: {this.user.email}</h6></Col>
                         </Row>
                         <Row>
                             <Col>
@@ -124,7 +122,7 @@ export class EventPage extends Component {
 //gets all the artist working on that event and checks if the person viewing it is a an artist
     getArtistsForEvent() {
         service
-            .getGigForEvent(this.props.match.params.id)
+            .getGigs(this.props.match.params.id)
             .then(artists => {
                 this.artists = artists;
                 let token = jwt.decode(authService.getToken());
@@ -146,9 +144,9 @@ export class EventPage extends Component {
             .catch((error) => console.log(error));
     }
 
-    RenderButtons(id) {
+    RenderButtons(artistId) {
         let token = jwt.decode(authService.getToken());
-        if (id == token.userId) {
+        if (artistId === token.userId) {
             return (
                 <div>
 
@@ -157,40 +155,33 @@ export class EventPage extends Component {
                             href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
                         Legg til Rider
                     </Button>
-
-                    <DownloadWidget type={"kontrakt"} artist={id} event={this.currentEvent.eventId}/>
-
-
+                    <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
         } else if (this.isOrganizer) {
-            return <Col><DownloadWidget type={"kontrakt"} artist={id} event={this.currentEvent.eventId}/></Col>;
-
+            return <Col><DownloadWidget artist={artistId} event={this.currentEvent.eventId}/></Col>;
         }
     }
 
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
         if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
+            let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <div>
                 <Row>
 
-                    <Col className="border-bottom border-top"><b>Artist</b></Col>
+                    <Col className="border-bottom border-top"><b>{'' + artist}</b></Col>
                     <Col className="border-bottom border-top"><b>Epost</b></Col>
-                    <Col className="border-bottom border-top"></Col>
+                    <Col className="border-bottom border-top"> </Col>
 
 
                 </Row>
-
-
-                {
-                    this.artists.map(person => (
-                        <Row>
-                            <Col>{person.user.username}</Col>
-                            <Col>{person.user.email} </Col>
-                            <Col>{this.RenderButtons(person.artistId)}</Col>
-                        </Row>
-                    ))}
-
+                {this.artists.map(person => (
+                    <Row>
+                        <Col>{person.user.username}</Col>
+                        <Col>{person.user.email} </Col>
+                        <Col>{this.RenderButtons(person.artistId)}</Col>
+                    </Row>
+                ))}
             </div>
 
         }
@@ -205,16 +196,17 @@ export class EventPage extends Component {
 
             return <div>
                 <Row className="tableheader">
-                    <Col className="border-bottom border-top"><b>Personnel</b></Col>
-                    <Col className="border-bottom border-top"><b>Epost</b></Col>
+                    <Col className="border-bottom border-top"><b>Personell</b></Col>
+                    <Col className="border-bottom border-top"><b> </b></Col>
+                    <Col className="border-bottom border-top"><b>Oppgave</b></Col>
                 </Row>
 
                 {this.personnel.map(person => (
 
                     <Row>
-
-                        <Col className>{person.role}</Col>
+                        <Col className>{person.user.username}</Col>
                         <Col className>{person.user.email}</Col>
+                        <Col className>{person.role}</Col>
                     </Row>
 
                 ))}
@@ -233,9 +225,6 @@ export class EventPage extends Component {
                     <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
                         Arragement</Button>
                 </Col>
-                <Col>
-                    <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
-                </Col>
             </Row>
         }
     }
@@ -249,8 +238,9 @@ export class EventPage extends Component {
 
     RenderArtist() {
         if (this.artists.length !== 0) {
+            let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <Col>
-                <h6>Artister: {this.artists.map(artist => (
+                <h6>{artist}: {this.artists.map(artist => (
 
                     <h5>{artist.user.username}</h5>
 
@@ -274,14 +264,4 @@ export class EventPage extends Component {
 
 
     }
-
-    handleDelete = () => {
-        if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-            service.deleteEvent(this.currentEvent).then(() => {
-                this.props.history.push("/hjem/")
-            });
-            alert("Arrangementet er nå slettet")
-        }
-    };
-
 }
