@@ -17,6 +17,7 @@ import {HarmoniNavbar} from "./navbar";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Alert from "react-bootstrap/Alert";
+import moment from "moment";
 
 export class EditEvent extends Component{
 
@@ -79,6 +80,8 @@ export class EditEvent extends Component{
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
+            maxTime: moment('23:59'),
+            minTime: moment('00:00'),
             rider: '',
             contract: '',
             image: '',
@@ -154,7 +157,12 @@ export class EditEvent extends Component{
     }
 
     handleFTime(event) {
-        this.setState({fTime: event.target.value})
+        this.setState({fTime: event.target.value});
+        if (this.state.fDate === this.state.tDate){
+            this.setState({maxTime: this.state.tTime})
+        }else{
+            this.setState({maxTime: moment('23:59')})
+        }
     }
 
     handleTDate(event) {
@@ -162,7 +170,12 @@ export class EditEvent extends Component{
     }
 
     handleTTime(event) {
-        this.setState({tTime: event.target.value})
+        this.setState({tTime: event.target.value});
+        if (this.state.fDate === this.state.tDate){
+            this.setState({minTime: this.state.fTime})
+        }else{
+            this.setState({minTime: moment('00:00')})
+        }
     }
 
     handlePersonnelRole(event, personell) {
@@ -194,7 +207,7 @@ export class EditEvent extends Component{
                         service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
                 });
         }else{
-            let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, this.state.eventAddress,
+            let ev = new Event(this.state.eventId, this.state.organizerId, this.state.eventName, "", this.state.eventAddress, "",
                 this.state.eventDescription, this.state.ageLimit, fDateTime, tDateTime, this.state.imageUrl, "", this.state.cancelled);
                 service.updateEvent(ev).then(this.props.history.push("/arrangement/" + this.state.eventId));
         }
@@ -252,7 +265,6 @@ export class EditEvent extends Component{
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Fra dato</Form.Label>
                             <Form.Control
-                                min={require('moment')().format('YYYY-MM-DD')}
                                 max={this.state.tDate}
                                 value={this.state.fDate}
                                 onChange={this.handleFDate}
@@ -264,11 +276,12 @@ export class EditEvent extends Component{
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Fra klokkeslett</Form.Label>
                             <Form.Control
+                                max={this.state.maxTime}
                                 value={this.state.fTime}
                                 onChange={this.handleFTime}
                                 type={"time"}
-
                             />
+                            <span className="customStyle"/>
                         </Form.Group>
 
 
@@ -279,18 +292,18 @@ export class EditEvent extends Component{
                                 value={this.state.tDate}
                                 onChange={this.handleTDate}
                                 type={"date"}
-
                             />
                         </Form.Group>
 
                         <Form.Group as={Col} sm={"3"}>
                             <Form.Label>Til klokkeslett</Form.Label>
                             <Form.Control
+                                min={this.state.minTime}
                                 value={this.state.tTime}
                                 onChange={this.handleTTime}
                                 type={"time"}
-
                             />
+                            <span className="customStyle"/>
                         </Form.Group>
 
 
@@ -590,6 +603,14 @@ export class EditEvent extends Component{
         if (this.state.ageLimit > 0) {
             this.state.ageLimit--;
             this.setState({ageLimit: this.state.ageLimit})
+        }
+    }
+
+    maxTime(){
+        if(this.state.fDate === this.state.tDate){
+            return this.state.tTime
+        }else{
+            return require('moment')('23:59').format('HH:mm')
         }
     }
 }

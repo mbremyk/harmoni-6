@@ -73,3 +73,21 @@ root{
     width: 100%;
     text-align: center;
 }
+
+input + span {
+    padding-right: 10px;
+}
+
+input:invalid + span:after {
+    position: absolute;
+    content: '✖';
+    text-decoration-color: #f1b0b7;
+    padding-left: 5px;
+}
+
+input:valid + span:after {
+    position: absolute;
+    content: '✓';
+    text-decoration-color: lightgreen;
+    padding-left: 5px;
+}
