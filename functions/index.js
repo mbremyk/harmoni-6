@@ -183,18 +183,6 @@ app.use("/auth", (req, res, next) => {
  * @return {json} {jwt: token}
  */
 app.post("/login", async (req, res) => {
-	console.log("POST-request - /login");
-
-	let salt = await db.getSaltByEmail(req.body.email);
-
-	if (salt.length !== 1) {
-		console.log('No email found');
-		res.status(401);
-		res.json({error: "Not authorized"})
-		return;
-	}
-
-app.post("/login", async (req, res) => {
     console.log("POST-request - /login");
 
     let salt = await db.getSaltByEmail(req.body.email);
@@ -496,7 +484,7 @@ app.get("/auth/events/users/:userId", (req, res) => {
     console.log("GET-request - /events/user/:userId");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
-    if (decoded.userId == req.params.userId) {
+    if (decoded.userId === req.params.userId) {
         return db.getEventsByOrganizerId(decoded.userId)
             .then(events => res.send(events))
             .catch(error => console.error(error));
@@ -516,7 +504,7 @@ app.get("/auth/events/users/:userId/myevents", (req, res) => {
     console.log("GET-request - /events/user/:userId/myevents");
     let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
-    if (decoded.userId == req.params.userId) {
+    if (decoded.userId === req.params.userId) {
         return db.getMyEventsByUserId(decoded.userId)
             .then(events => res.send(events))
             .catch(error => console.error(error));
@@ -718,6 +706,5 @@ mail.addMailEndpoints(app, db);
 /**
  * @link mail
  */
-
 
 console.log("Server initalized");
