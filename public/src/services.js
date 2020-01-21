@@ -249,11 +249,11 @@ class Services {
     }
 
     /**
-     * @param personnel: Personnel
+     * @param personnel: Personnel[]
      * @returns Promise<>: boolean
      */
     updatePersonnel(personnel) {
-        return axios.put(url + '/auth/events/' + personnel.eventId + '/personnel/' + personnel.personnelId, personnel, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.put(url + '/auth/events/' + personnel.eventId + '/personnel', personnel, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -281,7 +281,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     addTickets(tickets) {
-        return axios.post(url + '/auth/events/' + tickets[0].eventId + '/ticket', tickets, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.post(url + '/auth/events/' + tickets[0].eventId + '/tickets', tickets, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -289,7 +289,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     updateTicket(ticket) {
-        return axios.put(url + '/auth/events/' + ticket.eventId + '/ticket/' + ticket.type, ticket, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.put(url + '/auth/events/' + ticket.eventId + '/tickets', ticket, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -297,7 +297,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     deleteTicket(ticket) {
-        return axios.delete(url + '/auth/events/' + ticket.eventId + '/ticket/' + ticket.type, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.delete(url + '/auth/events/' + ticket.eventId + '/tickets/' + ticket.type, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -305,7 +305,7 @@ class Services {
      * @returns Promise<>: Ticket[]
      */
     getTicketToEvent(eventId) {
-        return axios.get(url + '/events/' + eventId + '/ticket').then(response => response.data);
+        return axios.get(url + '/events/' + eventId + '/tickets').then(response => response.data);
     }
 
 
