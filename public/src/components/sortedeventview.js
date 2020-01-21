@@ -106,7 +106,7 @@ export class SortedEventView extends Component {
         this.setState({
             events: events.filter(event => moment(now).isBefore(event.endTime)),
             eventsBackup: events
-        })
+        });
     };
 
     compareValues(key, order = 'asc') {

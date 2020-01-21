@@ -46,6 +46,10 @@ export class HomePage extends Component {
             .getEventsByOrganizer(token.userId)
             .then(myEvents => (this.myEvents = myEvents))
             .catch((error) => console.log(error));
+
+        service
+            .getMyEventsByUserId(token.userId)
+            .then(events => console.log(events));
         this.getAllEvents();
 
     }
@@ -62,7 +66,7 @@ export class HomePage extends Component {
     getOtherEvents() {
         let token = jwt.decode(authService.getToken());
         let otherEvents = this.allEvents.filter(e => e.organizerId !== token.userId);
-        console.log(otherEvents);
+        //console.log(otherEvents);
         return otherEvents;
     }
 }
