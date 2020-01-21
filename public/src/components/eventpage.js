@@ -229,8 +229,6 @@ export class EventPage extends Component {
 
 
 
-
-
     //the button will render if the user is an artist or an organizer
     DownloadContract() {
         if (this.isOrganizer || this.isArtist) {

@@ -245,6 +245,20 @@ export class MailForm extends Component{
         }
     }
 
+    toggleMail(){
+        if(this.state.toggle){
+            //this.state.toggle = false;
+            this.setState({toggle: false });
+            this.setState({arrow: "▼"});
+            //this.state.arrow = "▼";
+        }else{
+            //this.state.toggle = true;
+            this.setState({toggle: true});
+
+            this.setState({arrow: "▲"});
+        }
+    }
+
     toggleForm(on){
         console.log(this.state.hasRecipients);
         console.log(this.state.description);
