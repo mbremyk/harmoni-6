@@ -26,7 +26,6 @@ if (!process.env.FIREBASE_CONFIG) {
     exports.webApi = functions.https.onRequest(main);
 }
 
-
 app.use(cors({origin: true}));
 
 app.use(bodyParser.json({limit: '100mb', extended: true}));
