@@ -42,7 +42,7 @@ class DefaultMail {
         this.hilsen = `\nMed vennlig hilsen\nHarmoni team 6 support team`;
         this.user;
         this.date;
-        this.ext;
+        this.text;
         this.subject;
         this.email;
         this.password;

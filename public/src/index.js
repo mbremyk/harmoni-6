@@ -19,6 +19,7 @@ import {SearchResults} from "./components/searchresults";
 import {createBrowserHistory} from "history";
 import {NewPassword} from "./components/newpassword";
 import {RiderPage, Riderpage} from "./components/riderpage";
+import {BugForm} from "./components/reportbug";
 
 const history = createBrowserHistory();
 const url = "http://localhost:5001/harmoni-6/us-central1/webApi/api/v1/";
@@ -28,7 +29,7 @@ if (root)
     ReactDOM.render(
     <BrowserRouter history={history}>
         <Route exact path="/" component={LandingPage}/>
-        <Route exact path="/bugs" component={() => <MailForm toggleable={false} description={"Jeg har en bug"} hasRecipients={false}/>}/>
+        <Route exact path="/bugs" component={BugForm}/>
         <Route exact path="/ny-bruker" component={CreateUserForm}/>
         <Route exact path="/arrangement/:id" component={EventPage}/>
         <Route exact path="/logg-inn" component={LoginForm}/>
