@@ -527,7 +527,7 @@ app.get("/auth/events/users/:userId/myevents", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId', (req, res) => {
-    return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(404).send(false))
 });
 
 
@@ -556,7 +556,7 @@ app.delete('/auth/events/:eventId', (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/personnel", (req, res) => {
-	return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
+    return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(true) : res.sendStatus(503).send(false));
 });
 
 
@@ -566,7 +566,7 @@ app.post("/auth/events/:eventId/personnel", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId/personnel', (req, res) => {
-	return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(404).send(false))
 });
 
 
