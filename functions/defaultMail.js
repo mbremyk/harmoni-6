@@ -17,10 +17,6 @@ class DefaultMail {
     set subject(subject) {
     }
 
-    get subject() {
-        return this.subject;
-    }
-
     get bugText() {
         return `Hei, ${this.user}\n\n` +
             `Vi har mottatt din rapport og har satt våre fremste utviklere på saken.\n` +
