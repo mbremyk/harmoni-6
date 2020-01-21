@@ -95,7 +95,7 @@ export class LoginForm extends Component {
                                 type="button">
                                 Avbryt
                             </Button>
-                            <NavLink href={'/ny-bruker'}>Opprett bruker her!</NavLink>
+                            <NavLink className='mt-3' href={'/ny-bruker'}>Opprett bruker her!</NavLink>
                             <NavLink href={'/nytt-passord'}>Glemt passord</NavLink>
                         </Form>
                     </div>

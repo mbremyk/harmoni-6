@@ -69,7 +69,7 @@ export class EventPage extends Component {
                                 </Col>
                             </Row>
                             {this.EditButton()}
-                            {this.emailForm()}
+                            <MailForm/>
                         </Card>
                     </Container>
                 </div>
