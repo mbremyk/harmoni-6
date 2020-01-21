@@ -23,7 +23,7 @@ export class HomePage extends Component {
         return (
             <div>
                 <HarmoniNavbar/>
-                <Row>
+                <Row className={"pt-5 pb-2"}>
                     <Col>
                         <h1 className="text-center">Arrangementer jeg organiserer</h1>
                     </Col>
@@ -31,7 +31,7 @@ export class HomePage extends Component {
                 <Row>
                     <SortedEventView myEvent={true} events={this.eventsUserOrganizes}/>
                 </Row>
-                <Row>
+                <Row className={"pt-5 pb-2"}>
                     <Col>
                         <h1 className="text-center">Arrangementer jeg er artist eller er personell for</h1>
                     </Col>
@@ -39,7 +39,7 @@ export class HomePage extends Component {
                 <Row>
                     <SortedEventView  events={this.eventsUserIsArtistOrPersonnel}/>
                 </Row>
-                <Row>
+                <Row className={"pt-5 pb-2"}>
                     <Col>
                         <h1 className="text-center">Andre Arrangementer</h1>
                     </Col>
