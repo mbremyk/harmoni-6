@@ -355,30 +355,36 @@ export class MailForm extends Component {
 
     }
 
-    getUserEmail() {
+    getUser() {
         let token = jwt.decode(authService.getToken());
+        console.log(token.email);
         if (!token.email) {
-            return token.email;
-        } else {
             this.setAlert("ERROR", "danger");
-            return undefined
+            return undefined;
+        } else {
+            return token;
         }
     }
 
     sendMail(bug) {
         console.log("Sendmail called");
         //let bug = false;
-        let userMail = this.getUserEmail();
+        let user = this.getUser();
         if (bug) {
-            if (!userMail) {
-                let userMail = "anon UwU";
+            if (!user) {
+                let userMail = "anon@UwU.com";
+                let mail = new BugMail(userMail, this.state.description, this.state.text);
+                service.sendBug(mail)
+                    .then(res => (this.setAlert(res.toString(), "info")))
+                    .catch(err => this.setAlert(err.toString(), "danger"));
+            } else {
+                let mail = new BugMail(user.email, this.state.description, this.state.text);
+                service.sendBug(mail)
+                    .then(res => (this.setAlert(res.toString(), "info")))
+                    .catch(err => this.setAlert(err.toString(), "danger"));
             }
-            let mail = new BugMail(userMail, this.state.description, this.state.text);
-            service.sendBug(mail)
-                .then(res => (this.setAlert(res.toString(), "info")))
-                .catch(err => this.setAlert(err.toString(), "danger"));
         } else {
-            if (!userMail) {
+            if (!user) {
                 this.setAlert("NOT LOGGED IN", "danger");
             }
             let to = [];
@@ -387,9 +393,11 @@ export class MailForm extends Component {
                     to.push(address);
                 }
             });
-            console.log(to);
-            let mail = new Mail(to, userMail, this.state.description, this.state.text);
-            service.sendMails()
+            console.log(this.state.text);
+            let mail = new Mail(to, user.email, user.username, this.state.description, this.state.text);
+            console.log("Recipients");
+            console.log(mail);
+            service.sendMails(mail)
                 .then(res => (this.setAlert(res.toString(), "info")))
                 .catch(err => this.setAlert(err.toString(), "danger"))
         }
