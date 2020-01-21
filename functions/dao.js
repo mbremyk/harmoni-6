@@ -119,7 +119,7 @@ class Dao {
     }
 
     async forgotPassword(email) {
-        let result = await this.getUserByEmail(req.params.email);
+        let result = await this.getUserByEmail(email);
         if(result === null) { console.log('No email found for temp pass.'); return; }
 
         let newPass = Math.random().toString(36).substring(7);
