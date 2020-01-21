@@ -85,7 +85,7 @@ export class EventInfo extends Component {
                         <div style={{height: "13em", overflow: "hidden"}}>
                             <Card.Img src={this.props.imageUrl} alt={this.title}/>
                             <Card.ImgOverlay>
-                                <Card.Title><h1>{this.getImageOverlayTxt()}</h1></Card.Title>
+                                <Card.Title><h1 className="imageText">{this.getImageOverlayTxt()}</h1></Card.Title>
                             </Card.ImgOverlay>
                         </div>
                     </Card>

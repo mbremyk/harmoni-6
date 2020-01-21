@@ -47,12 +47,12 @@ export class EventPage extends Component {
                                         {this.currentEvent.description}
                                     </div>
 
-                                </Col>
                                 <Col>
                                     <ListGroup>
                                         <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
                                         <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6></ListGroup.Item>
                                         <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
+                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne kart</Button></ListGroup.Item>
                                         <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
                                         <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
                                         <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
@@ -122,7 +122,7 @@ export class EventPage extends Component {
                         this.isPersonnel = true;
                     }
                 });
-                console.log("Er jeg personnel? " + this.isPersonnel)
+
             })
             .catch((error) => console.log(error));
 
@@ -140,7 +140,6 @@ export class EventPage extends Component {
                         this.isArtist = true;
                     }
                 });
-                console.log("Er jeg artist? " + this.isArtist);
 
             })
             .catch((error) => console.log(error));
@@ -158,18 +157,35 @@ export class EventPage extends Component {
         if (artistId === token.userId) {
             return (
                 <div>
-
-                    <Button variant="primary"
-                            size="sm"
-                            href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
-                        Legg til Rider
+                    <Button
+                        className="m-2"
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
                     </Button>
                     <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
+
         } else if (this.isOrganizer) {
-            return <Col><DownloadWidget artist={artistId} event={this.currentEvent.eventId}/></Col>;
+            return (
+                <div>
+                    <Button
+                        className="m-2"
+
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
+                    </Button>
+
+                    <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
+                </div>
+            );
+
         }
     }
+
 
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
@@ -291,5 +307,16 @@ export class EventPage extends Component {
             return <h6><b>Aldersgrense:</b> Tillat for alle</h6>
 
         }
+    }
+
+    addressClicked() {
+        let res = this.currentEvent.address.split(" ");
+        var url = "";
+        res.map(i => {
+            url += i + "-";
+        });
+        url = url.substring(0, url.length - 1);
+        url = url.replace(/[^\w\s-]/g,'');
+        window.open('https://www.google.com/maps/search/' + url);
     }
 }
