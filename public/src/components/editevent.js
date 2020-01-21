@@ -1,4 +1,4 @@
-import {service, Event, Gig} from "../services";
+import {service, Event, Gig, Ticket} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -71,6 +71,11 @@ export class EditEvent extends Component{
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
         this.city = this.handleCityChange.bind(this);
         this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
+        this.ticketType = this.handleTicketType.bind(this);
+        this.ticketPrice = this.handleTicketPrice.bind(this);
+        this.ticketAmount = this.handleTicketAmount.bind(this);
+        this.tickets = this.handleTickets.bind(this);
+        this.tickets = this.handleTicketsAdd.bind(this);
 
         this.state = {
             eventId: 0,
@@ -95,6 +100,10 @@ export class EditEvent extends Component{
             artists: [],
             personnelAdd: [],
             cancelled: 0,
+            ticketType: '',
+            ticketPrice: 0,
+            ticketAmount: 0,
+            tickets: [],
             error: '',
             errorType: 'success',
         };
@@ -162,33 +171,57 @@ export class EditEvent extends Component{
 
     handleFDate(event) {
         this.setState({fDate: event.target.value})
+        this.handleMaxMinTime();
     }
 
     handleFTime(event) {
         this.setState({fTime: event.target.value});
-        if (this.state.fDate === this.state.tDate){
-            this.setState({maxTime: this.state.tTime})
-        }else{
-            this.setState({maxTime: moment('23:59')})
-        }
+        this.handleMaxMinTime();
     }
 
     handleTDate(event) {
-        this.setState({tDate: event.target.value})
+        this.setState({tDate: event.target.value});
+        this.handleMaxMinTime();
     }
 
     handleTTime(event) {
         this.setState({tTime: event.target.value});
-        if (this.state.fDate === this.state.tDate){
-            this.setState({minTime: this.state.fTime})
-        }else{
-            this.setState({minTime: moment('00:00')})
+        this.handleMaxMinTime();
+    }
+
+    handleMaxMinTime() {
+        if (this.state.fDate === this.state.tDate) {
+            this.setState({maxTime: this.state.tTime});
+            this.setState({minTime: this.state.fTime});
+        } else {
+            this.setState({minTime: moment('00:00', 'HH:mm').format('HH:mm')});
+            this.setState({maxTime: moment('23:59', 'HH:mm').format('HH:mm')});
         }
     }
 
     handlePersonnelRole(event, personell) {
-        personell.role = event.target.value
+        personell.role = event.target.value;
         this.setState({personnelRole: event.target.value})
+    }
+
+    handleTicketType(event) {
+        this.setState({ticketType: event.target.value})
+    }
+
+    handleTicketPrice(event) {
+        this.setState({ticketPrice: event.target.value})
+    }
+
+    handleTicketAmount(event) {
+        this.setState({ticketAmount: event.target.value})
+    }
+
+    handleTickets(event) {
+        this.setState({tickets: [...this.state.tickets, ...event]});
+    }
+
+    handleTicketsAdd() {
+        this.setState({tickets: [this.state.tickets, new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
     }
 
     setError(message, variant) {
@@ -291,9 +324,9 @@ export class EditEvent extends Component{
                                     <Form.Label>Fra dato</Form.Label>
                                     <Form.Control
                                         max={this.state.tDate}
-                                value={this.state.fDate}
-                                onChange={this.handleFDate}
-                                type={"date"}
+                                        value={this.state.fDate}
+                                        onChange={this.handleFDate}
+                                        type={"date"}
 
                                     />
                                 </Form.Group>
@@ -302,9 +335,9 @@ export class EditEvent extends Component{
                                     <Form.Label>Fra klokkeslett</Form.Label>
                                     <Form.Control
                                         max={this.state.maxTime}
-                                value={this.state.fTime}
-                                onChange={this.handleFTime}
-                                type={"time"}
+                                        value={this.state.fTime}
+                                        onChange={this.handleFTime}
+                                        type={"time"}
                             />
                                     <span className="customStyle"/>
                                 </Form.Group>
@@ -314,9 +347,9 @@ export class EditEvent extends Component{
                                     <Form.Label>Til dato</Form.Label>
                                     <Form.Control
                                         min={this.state.fDate}
-                                value={this.state.tDate}
-                                onChange={this.handleTDate}
-                                type={"date"}
+                                        value={this.state.tDate}
+                                        onChange={this.handleTDate}
+                                        type={"date"}
                             />
                         </Form.Group>
 
@@ -324,9 +357,9 @@ export class EditEvent extends Component{
                                     <Form.Label>Til klokkeslett</Form.Label>
                                     <Form.Control
                                         min={this.state.minTime}
-                                value={this.state.tTime}
-                                onChange={this.handleTTime}
-                                type={"time"}
+                                        value={this.state.tTime}
+                                        onChange={this.handleTTime}
+                                        type={"time"}
                             />
                                     <span className="customStyle"/>
                                 </Form.Group>
@@ -494,6 +527,77 @@ export class EditEvent extends Component{
                                 </Form.Group>
                             </Form.Row>
 
+                            <Form.Row>
+
+                                <Form.Group as={Col} sm={"3"}>
+
+                                    <Form.Label>Billett-type</Form.Label>
+                                    <Form.Control
+                                        placeholder="Navn på billettype . . ."
+                                        value={this.state.ticketType}
+                                        onChange={this.handleTicketType}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Billettpris</Form.Label>
+                                    <InputGroup>
+
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="Billettpris . . ."
+                                            value={this.state.ticketPrice}
+                                            onChange={this.handleTicketPrice}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Antall billetter</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Antall billetter . . ."
+                                        value={this.state.ticketAmount}
+                                        onChange={this.handleTicketAmount}
+                                    />
+
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Button onClick={this.handleTicketsAdd}>Legg til billett-typen</Button>
+                                </Form.Group>
+
+                            </Form.Row>
+
+                            <ListGroup title={"Billett-typer på dette arrangementet"}>
+                                {this.state.tickets.map(ticket =>
+                                    <React.Fragment>
+                                        <ListGroupItem key={ticket.type}>
+                                            <Row>
+                                                <Col>
+                                                    {"Billett-type: " + ticket.type}
+                                                </Col>
+                                                <Col>
+                                                    {"Billettpris:  " + ticket.price}
+                                                </Col>
+                                                <Col>
+                                                    {"Antall billetter: " + ticket.amount}
+                                                </Col>
+                                                <Col>
+                                                    <Button type="button" variant={"danger"} onClick={() => {
+                                                        this.state.tickets.splice(this.state.tickets.indexOf(ticket), 1);
+                                                        this.setState({tickets: this.state.tickets});
+                                                    }
+                                                    }>Fjern</Button>
+                                                </Col>
+                                            </Row>
+                                        </ListGroupItem>
+                                    </React.Fragment>
+                                )}
+                            </ListGroup>
                             <Row>
 
                                 <Col>
@@ -510,7 +614,7 @@ export class EditEvent extends Component{
                                 <Alert style={{height: '3em', top: '50%', left: '50%', position: 'fixed', transform: 'translate(-50%, -50%)'}} variant={this.state.errorType}>{this.state.error}</Alert> :
                                 <div style={{height: '3em'}}/>}
 
-                            <Col>
+                                <Col>
                                 <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
                                 </Col>
 
@@ -549,8 +653,9 @@ export class EditEvent extends Component{
             this.setState({placeDescription: event.placeDescription});
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
+            service.getTicketToEvent(this.props.match.params.id).then(this.handleTickets).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnel).catch((err) => console.log(err.message));
-            service.getGigForEvent(this.props.match.params.id)
+            service.getGigs(this.props.match.params.id)
                 .then(g => {
                     console.log(g);
                     g.map(u => this.handleArtistsAdd(u.artistId));

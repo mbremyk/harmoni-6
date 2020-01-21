@@ -277,7 +277,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     updateTicket(ticket) {
-        return axios.put(url + '/auth/events/' + ticket.eventId + '/ticket/' + ticket.type, ticket, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.put(url + '/auth/events/' + ticket.eventId + '/tickets/' + ticket.type, ticket, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -285,7 +285,7 @@ class Services {
      * @returns Promise<>: boolean
      */
     deleteTicket(ticket) {
-        return axios.delete(url + '/auth/events/' + ticket.eventId + '/ticket/' + ticket.type, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.delete(url + '/auth/events/' + ticket.eventId + '/tickets/' + ticket.type, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**

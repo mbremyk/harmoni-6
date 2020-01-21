@@ -17,6 +17,7 @@ import {authService} from "../AuthService";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Alert from "react-bootstrap/Alert";
+import moment from "moment";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
@@ -91,6 +92,8 @@ export class AddEvent extends Component {
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
+            maxTime: moment('23:59'),
+            minTime: moment('00:00'),
             contract: '',
             image: '',
             imageUrl: '',
@@ -161,18 +164,32 @@ export class AddEvent extends Component {
 
     handleFDate(event) {
         this.setState({fDate: event.target.value})
+        this.handleMaxMinTime();
     }
 
     handleFTime(event) {
-        this.setState({fTime: event.target.value})
+        this.setState({fTime: event.target.value});
+        this.handleMaxMinTime();
     }
 
     handleTDate(event) {
         this.setState({tDate: event.target.value})
+        this.handleMaxMinTime();
     }
 
     handleTTime(event) {
-        this.setState({tTime: event.target.value})
+        this.setState({tTime: event.target.value});
+        this.handleMaxMinTime();
+    }
+
+    handleMaxMinTime() {
+        if (this.state.fDate === this.state.tDate) {
+            this.setState({maxTime: this.state.tTime});
+            this.setState({minTime: this.state.fTime});
+        } else {
+            this.setState({minTime: moment('00:00', 'HH:mm').format('HH:mm')});
+            this.setState({maxTime: moment('23:59', 'HH:mm').format('HH:mm')});
+        }
     }
 
     handlePersonnelRole(event, personnel) {
@@ -364,10 +381,10 @@ export class AddEvent extends Component {
                                     <Form.Label>Fra dato</Form.Label>
                                     <Form.Control
                                         min={require('moment')().format('YYYY-MM-DD')}
-                                    max={this.state.tDate}
-                                    value={this.state.fDate}
-                                    onChange={this.handleFDate}
-                                    type={"date"}
+                                        max={this.state.tDate}
+                                        value={this.state.fDate}
+                                        onChange={this.handleFDate}
+                                        type={"date"}
 
                                     />
                                 </Form.Group>
@@ -387,9 +404,9 @@ export class AddEvent extends Component {
                                     <Form.Label>Til dato</Form.Label>
                                     <Form.Control
                                         min={this.state.fDate}
-                                    value={this.state.tDate}
-                                    onChange={this.handleTDate}
-                                    type={"date"}
+                                        value={this.state.tDate}
+                                        onChange={this.handleTDate}
+                                        type={"date"}
 
                                     />
                                 </Form.Group>
