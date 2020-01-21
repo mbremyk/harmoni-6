@@ -116,13 +116,13 @@ export class Gig {
 export class RiderItem {
     eventId;
     artistId;
-    riderItem;
+    item;
     confirmed;
 
-    constructor(eventId, artistId, riderItem) {
+    constructor(eventId, artistId, item) {
         this.eventId = eventId;
         this.artistId = artistId;
-        this.riderItem = riderItem;
+        this.item = item;
     }
 }
 
@@ -360,7 +360,7 @@ class Services {
     /**
      * @param eventId: number
      * @param artistId: number
-     * @returns Promise<>: boolean
+     * @returns Promise<>: RiderItem[]
      */
     getRiderItems(eventId, artistId) {
         return axios.get(url + '/auth/events/' + eventId + '/gigs/' + artistId + '/rider', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)

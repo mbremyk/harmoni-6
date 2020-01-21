@@ -4,6 +4,9 @@ class DefaultMail {
     set hilsen(hilsen) {
     }
 
+    set subject(subject) {
+    }
+
     get bugText() {
         return `Hei, ${this.user}\n\n` +
             `Vi har mottatt din rapport og har satt våre fremste utviklere på saken.\n` +
@@ -39,7 +42,7 @@ class DefaultMail {
         this.hilsen = `\nMed vennlig hilsen\nHarmoni team 6 support team`;
         this.user;
         this.date;
-        this.ext;
+        this.text;
         this.subject;
         this.email;
         this.password;

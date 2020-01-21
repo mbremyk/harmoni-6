@@ -6,6 +6,8 @@ import moment from "moment";
 import Alert from "react-bootstrap/Alert";
 import {BugMail, Mail, service} from "./services";
 import {authService} from "./AuthService";
+import {HarmoniNavbar} from "./components/navbar";
+import NavLink from "react-bootstrap/NavLink";
 
 const jwt = require("jsonwebtoken");
 
@@ -83,7 +85,7 @@ export class EventInfo extends Component {
                         <div style={{height: "13em", overflow: "hidden"}}>
                             <Card.Img src={this.props.imageUrl} alt={this.title}/>
                             <Card.ImgOverlay>
-                                <Card.Title><h1>{this.getImageOverlayTxt()}</h1></Card.Title>
+                                <Card.Title><h1 className="imageText">{this.getImageOverlayTxt()}</h1></Card.Title>
                             </Card.ImgOverlay>
                         </div>
                     </Card>
@@ -227,7 +229,6 @@ export class ModalPopup extends Component {
 export class MailForm extends Component {
     constructor(props) {
         super(props);
-        console.log(props.hasRecipients);
         this.state = {
             recipientString: this.getRecipentString(props) ? this.getRecipentString(props) : "",
             description: props.description ? props.description : "",
@@ -243,7 +244,6 @@ export class MailForm extends Component {
     }
 
     getRecipentString(props) {
-        console.log("getRes called");
         let recipients = "";
         if (props.artists) {
             props.artists.map(user => {
@@ -254,7 +254,6 @@ export class MailForm extends Component {
     }
 
     getAllMails(props) {
-        console.log("getMails called");
         let mails = [];
         if (props.artists) {
             props.artists.map(user => {
@@ -278,34 +277,37 @@ export class MailForm extends Component {
     }
 
     handleDescriptionChange = (e) => {
-        //this.setState({description: ""});
-        console.log(e.target.value);
         this.setState({description: e.target.value});
     }
 
     render() {
         if (this.state.toggleable) {
             return (
-                <div className={"container"} style={{marginTop: "10px"}}>
-                    {(this.state.error) ?
-                        <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
-                        <div style={{height: '3em'}}/>}
-                    <Button className={"btn-info"} onClick={this.toggleMail}>
-                        Send epost {this.state.arrow}
-                    </Button>
-                    {(this.state.toggle) ? this.toggleForm(this.state.toggle) : <div style={{height: "3em"}}/>}
+                <div>
+                    <div className={"container"}>
+                        <Card className="m-5 p-4">
+                            <div>
+                                <Button className={"btn-info"} onClick={this.toggleMail}>
+                                    Send epost {this.state.arrow}
+                                </Button>
+                                {(this.state.toggle) ? this.toggleForm(this.state.toggle) : <div style={{height: "3em"}}/>}
+                            </div>
+                        </Card>
+                    </div>
                 </div>
             )
         } else {
             return (
-                <div className={"container"} style={{marginTop: "10px"}}>
-                    {(this.state.error) ?
-                        <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
-                        <div style={{height: '3em'}}/>}
-                    {this.toggleForm(true)}
+                <div>
+                    <div className={"container"}>
+                        <Card className="m-5 p-4">
+                            <div>
+                                {this.toggleForm(true)}
+                            </div>
+                        </Card>
+                    </div>
                 </div>
             )
-
         }
     }
 
@@ -324,36 +326,63 @@ export class MailForm extends Component {
     }
 
     toggleForm(on){
-        console.log(this.state.hasRecipients);
-        console.log(this.state.description);
         if (on && this.state.hasRecipients) {
             return (
-                <Form style={{marginTop: "10px"}}>
-                    <h1>Send en epost til flere </h1>
+                <Form>
+                    <h1 className='h1 text-center'>Send en epost til flere </h1>
+                    {(this.state.error) ?
+                        <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                        <div style={{height: '3em'}}/>}
+                    <Form.Label>Mottaker:</Form.Label>
                     <Form.Control as="textarea" onChange={this.handleRecipientChange} value={this.state.recipientString}
                                   placeholder={"mottakere"} rows="1" style={{display: 'flex'}}/>
+                    <Form.Label>Tittel:</Form.Label>
                     <Form.Control as="textarea" value={this.state.description} onChange={this.handleDescriptionChange}
                                   placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                    <Form.Label>Innhold:</Form.Label>
                     <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
                                   style={{display: 'flex'}}/>
-                    <Button style={{marginTop: "10px"}} className={"btn-primary"} onClick={() => this.sendMail(false)}
-                            block>Send Email</Button>
+                    <Button
+                        className={"btn-primary mt-2 mr-2"}
+                        onClick={() => this.sendMail(true)}>
+                        Send Email
+                    </Button>
+                    <Button
+                        className={"btn-secondary mt-2"}
+                        onClick={() => this.props.history.pop()}>
+                        Avbryt
+                    </Button>
                 </Form>
             )
         } else if (!on) {
             return null;
         } else {
-            return <Form style={{marginTop: "10px"}}>
-                <h1>Send en epost </h1>
+            return <Form>
+                <h1 className='h1 text-center'>Send en epost </h1>
+                {(this.state.error) ?
+                    <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                    <div style={{height: '3em'}}/>}
+                <Form.Label>Tittel:</Form.Label>
                 <Form.Control as="textarea" value={this.state.description} onChange={this.handleDescriptionChange}
                               placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                <Form.Label>Innhold:</Form.Label>
                 <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
                               style={{display: 'flex'}}/>
-                <Button style={{marginTop: "10px"}} className={"btn-primary"} onClick={() => this.sendMail(true)} block>Send
-                    Email</Button>
+                <Button
+                    className={"btn-primary mt-2 mr-2"}
+                    onClick={() => this.sendMail(true)}>
+                    Send Email
+                </Button>
+                <Button
+                    className={"btn-secondary mt-2"}
+                    onClick={() => {
+                        let path = authService.loggedIn()? '/hjem' : '/';
+                        window.location = path;
+                    }}>
+                    Avbryt
+                </Button>
             </Form>
         }
-
     }
 
     getUser() {
@@ -394,7 +423,6 @@ export class MailForm extends Component {
                     to.push(address);
                 }
             });
-            console.log(this.state.text);
             let mail = new Mail(to, user.email, user.username, this.state.description, this.state.text);
             console.log("Recipients");
             console.log(mail);
@@ -403,37 +431,4 @@ export class MailForm extends Component {
                 .catch(err => this.setAlert(err.toString(), "danger"))
         }
     }
-
-    /* yo(){
-         <Form style={{marginTop: "10px"}}>
-             <form value={this.description} as="textarea"  placeholder={"beskrivelse"}
-                   rows="2" style={{display: 'flex'}}
-                   onChange={(event: SyntheticInputEvent<HTMLInputElement>) => (this.description = event.target.value)}>
-                 <Form.Control as="textarea"  placeholder={"beskrivelse"}
-                               rows="2" style={{display: 'flex'}}/>
-             </form>
-             <form
-                 onChange={(event: SyntheticInputEvent<HTMLInputElement>) => (this.text = event.target.value)}>
-                 <Form.Control as="textarea" placeholder={"tekst"} rows="3" style={{display: 'flex'}}/>
-             </form>
-             <Button className={"btn-primary"} onClick={this.sendMail}>Send Email</Button>
-         </Form>
-     }*/
-
-    /*mounted(){
-        if(this.props.description){
-            this.description = this.props.description
-        }else if(this.props.hasRecipients){
-            console.log("in Mounted"+this.props.hasRecipients);
-            this.hasRecipients = this.props.hasRecipients
-        }
-        this.props.artists.map(user => {
-            this.recipientString+=user.email+", ";
-            this.mails.push(user.email);
-        });
-
-    }*/
-
 }
-
-
