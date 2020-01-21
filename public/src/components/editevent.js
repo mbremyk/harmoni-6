@@ -76,6 +76,7 @@ export class EditEvent extends Component{
         this.ticketAmount = this.handleTicketAmount.bind(this);
         this.tickets = this.handleTickets.bind(this);
         this.tickets = this.handleTicketsAdd.bind(this);
+        this.deletedTickets = this.handleTicketsDelete.bind(this);
 
         this.state = {
             eventId: 0,
@@ -90,8 +91,8 @@ export class EditEvent extends Component{
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
-            maxTime: moment('23:59'),
-            minTime: moment('00:00'),
+            maxTime: moment('23:59', 'HH:mm').format('HH:mm'),
+            minTime: moment('00:00', 'HH:mm').format('HH:mm'),
             rider: '',
             contract: '',
             image: '',
@@ -104,6 +105,8 @@ export class EditEvent extends Component{
             ticketPrice: 0,
             ticketAmount: 0,
             tickets: [],
+            addedTickets: [],
+            deletedTickets: [],
             error: '',
             errorType: 'success',
         };
@@ -170,7 +173,7 @@ export class EditEvent extends Component{
     }
 
     handleFDate(event) {
-        this.setState({fDate: event.target.value})
+        this.setState({fDate: event.target.value});
         this.handleMaxMinTime();
     }
 
@@ -199,8 +202,8 @@ export class EditEvent extends Component{
         }
     }
 
-    handlePersonnelRole(event, personell) {
-        personell.role = event.target.value;
+    handlePersonnelRole(event, personnel) {
+        personnel.role = event.target.value;
         this.setState({personnelRole: event.target.value})
     }
 
@@ -221,7 +224,11 @@ export class EditEvent extends Component{
     }
 
     handleTicketsAdd() {
-        this.setState({tickets: [this.state.tickets, new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
+        this.setState({tickets: [this.state.addedTickets, new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
+    }
+
+    handleTicketsDelete(ticket) {
+        this.setState({deletedTickets: [...this.state.deletedTickets, ticket]})
     }
 
     setError(message, variant) {
@@ -414,7 +421,7 @@ export class EditEvent extends Component{
                                                             <Col sm={""}>
                                                                 <label>Fjern artist</label>
                                                                 <Button type="button" variant={"danger"} onClick={() => {
-                                                                    this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist), 1)
+                                                                    this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist), 1);
                                                                     this.setState({artistsAdd: this.state.artistsAdd});
                                                                 }
                                                                 }>Fjern</Button>
@@ -533,7 +540,6 @@ export class EditEvent extends Component{
                                     <Form.Label>Billett-type</Form.Label>
                                     <Form.Control
                                         placeholder="Navn på billettype . . ."
-                                        value={this.state.ticketType}
                                         onChange={this.handleTicketType}
                                     />
                                 </Form.Group>
@@ -545,7 +551,6 @@ export class EditEvent extends Component{
                                         <Form.Control
                                             type="number"
                                             placeholder="Billettpris . . ."
-                                            value={this.state.ticketPrice}
                                             onChange={this.handleTicketPrice}
                                         />
                                         <InputGroup.Append>
@@ -559,7 +564,6 @@ export class EditEvent extends Component{
                                     <Form.Control
                                         type="number"
                                         placeholder="Antall billetter . . ."
-                                        value={this.state.ticketAmount}
                                         onChange={this.handleTicketAmount}
                                     />
 
@@ -577,18 +581,34 @@ export class EditEvent extends Component{
                                         <ListGroupItem key={ticket.type}>
                                             <Row>
                                                 <Col>
-                                                    {"Billett-type: " + ticket.type}
+                                                    <Form.Label>Billett-type</Form.Label>
+                                                    <Form.Control
+                                                        placeholder="Billett-type"
+                                                        value={ticket.type}
+                                                        onChange={this.handleTicketType}
+                                                    />
                                                 </Col>
                                                 <Col>
-                                                    {"Billettpris:  " + ticket.price}
+                                                    <Form.Label>Billett-pris</Form.Label>
+                                                    <Form.Control
+                                                        placeholder="Billett-pris"
+                                                        value={ticket.price}
+                                                        onChange={this.handleTicketPrice}
+                                                    />
                                                 </Col>
                                                 <Col>
-                                                    {"Antall billetter: " + ticket.amount}
+                                                    <Form.Label>Antall billetter</Form.Label>
+                                                    <Form.Control
+                                                        placeholder="Antall billetter"
+                                                        value={ticket.amount}
+                                                        onChange={this.handleTicketAmount}
+                                                    />
                                                 </Col>
                                                 <Col>
                                                     <Button type="button" variant={"danger"} onClick={() => {
                                                         this.state.tickets.splice(this.state.tickets.indexOf(ticket), 1);
                                                         this.setState({tickets: this.state.tickets});
+                                                        this.handleTicketsDelete(ticket);
                                                     }
                                                     }>Fjern</Button>
                                                 </Col>
