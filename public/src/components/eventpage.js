@@ -48,6 +48,7 @@ export class EventPage extends Component {
                             {this.RenderAgeLimit()}
                             <Col>
                                 <h6>Adresse: {this.currentEvent.address}</h6>
+                                <Button type="button" onClick={this.addressClicked}>Åpne kart</Button>
                             </Col>
                             {this.RenderArtist()}
                             <Col>
@@ -332,5 +333,15 @@ export class EventPage extends Component {
         }
 
 
+    }
+    addressClicked() {
+        let res = this.currentEvent.address.split(" ");
+        var url = "";
+        res.map(i => {
+            url += i + "-";
+        });
+        url = url.substring(0, url.length - 1);
+        url = url.replace(/[^\w\s-]/g,'');
+        window.open('https://www.google.com/maps/search/' + url);
     }
 }
