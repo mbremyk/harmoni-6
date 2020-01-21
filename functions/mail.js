@@ -1,15 +1,16 @@
 const nodemailer = require('nodemailer');
-const properties = require('./properties.js');
+const isCI = require('is-ci');
+const properties = isCI ? "" : require('./properties.js');
 const defMail = require('./defaultMail.js');
 const express = require('express');
 const moment = require('moment');
 
-const mailProps = new properties.MailProperties();
+const mailProps = isCI ? "" : new properties.MailProperties();
 const defaultMail = new defMail.DefaultMail();
 const deployed = true;
 
-const username = mailProps.username;
-const password = mailProps.password;
+const username = isCI ? "" : mailProps.username;
+const password = isCI ? "" : mailProps.password;
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -25,7 +26,6 @@ let sendMail = mail => {
             console.error(error);
             return false;
         } else {
-            console.log(info.response);
             return true;
         }
     });
@@ -127,6 +127,64 @@ addMailEndpoints = (app, db) => {
             });
 
     });
+
+    app.post("/mail/contact", (req, res) => {
+        console.log("POST-request received - /mail/contact");
+        req.body.mailToDev.subject = `Kontakt: ${req.body.mailToDev.subject}`;
+        req.body.mailToDev.text = `Kontakt fra ${defaultMail.user}, mailadresse: ${defaultMail.email}\n\n${defaultMail.text}`;
+
+        req.body.mailToUser.subject = `RE: Kontakt: ${req.body.mailToUser.subject}`;
+        req.body.mailToUser.text = defaultMail.contactText;
+
+        return Promise.allSettled([
+            sendMail(req.body.mailToDev),
+            sendMail(req.body.mailToUser)
+        ])
+            .then(results => {
+                results.forEach(res => {
+                    if (res.status == 'fulfilled') {
+                        console.log(res.value);
+                    } else if (res.status == 'rejected') {
+                        console.log(res.reason);
+                    } else {
+                        console.log(res);
+                    }
+                });
+                res.sendStatus(200);
+            });
+    });
+
+    /**
+     * body:
+     * {
+     *     //mail body
+     *     to: string[]
+     * }
+     */
+    app.post("/mail/info", (req, res) => {
+        console.log("POST-request received - /mail/info");
+        let to = req.body.to;
+
+        new Promise((resolve, reject) => {
+
+                let dm = new defMail.DefaultMail();
+                dm.email = req.body.email;
+                let mail = {
+                    from: username,
+                    replyTo: dm.email,
+                    to: to,
+                    subject: "FW:" + defaultMail.subject,
+                    text: defaultMail.infoText
+                };
+                return sendMail(mail);
+            }
+        )
+            .then(res.sendStatus(202))
+            .catch(error => {
+                console.error(error);
+                res.sendStatus(503);
+            });
+    });
 };
 
-module.exports = {addMailEndpoints};
+module.exports = {addMailEndpoints, sendMail};

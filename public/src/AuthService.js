@@ -9,12 +9,11 @@ export class AuthService {
 	}
 
 	login(email, password) {
-		// Get a token from api server using the fetch api
 		return service.login(email, password)
 			.then(res => {
-				this.setToken(res.jwt); // Setting the token in localStorage
+				this.setToken(res.jwt);
 				return res;
-			})
+			}).catch(res => {return res;})
 	}
 
 	refresh() {
@@ -25,8 +24,7 @@ export class AuthService {
 	}
 
 	loggedIn() {
-		// Checks if there is a saved token and it's still valid
-		const token = this.getToken(); // Getting token from localstorage
+		const token = this.getToken();
 		return !!token && !this.isTokenExpired(token);
 	}
 
@@ -39,12 +37,10 @@ export class AuthService {
 	}
 
 	setToken(token) {
-		// Saves user token to localStorage
 		localStorage.setItem('token', token)
 	}
 
 	getToken() {
-		// Retrieves the user token from localStorage
 		return localStorage.getItem('token')
 	}
 
@@ -53,12 +49,10 @@ export class AuthService {
 	}
 
 	logout() {
-		// Clear user token and profile data from localStorage
 		return service.logout().then(res => this.deleteToken());
 	}
 
 	_checkStatus(response) {
-		// raises an error in case response status is not a success
 		if (response.status >= 200 && response.status < 300) { // Success status lies between 200 to 300
 			return response
 		} else {
