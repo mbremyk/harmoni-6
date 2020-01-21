@@ -7,6 +7,7 @@ import {EventInfo} from "../widgets";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import moment from "moment";
 
 export class SortedEventView extends Component {
     state = {
@@ -101,9 +102,9 @@ export class SortedEventView extends Component {
     }
 
     handleEvents = (events) => {
-        let now = require('moment')().format('YYYY-MM-DD');
+        let now = moment().format('YYYY-MM-DD HH:MM');
         this.setState({
-            events: events.filter(event => event.endTime > now),
+            events: events.filter(event => moment(now).isBefore(event.endTime)),
             eventsBackup: events
         })
     };
