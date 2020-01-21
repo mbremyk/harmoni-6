@@ -1,9 +1,15 @@
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
+const mail = require("./mail.js");
+const isCI = require('is-ci');
+const props = isCI ? "" : require("./properties.js");
+const test = (process.env.NODE_ENV === 'test');
+
+let mailProps = isCI ? "" : new props.MailProperties();
 
 
 class Dao {
@@ -119,11 +125,17 @@ class Dao {
     }
 
     async forgotPassword(email) {
+        let result = await this.getUserByEmail(email);
+        if (result === null) {
+            console.log('No email found for temp pass.');
+            return;
+        }
+
         let newPass = Math.random().toString(36).substring(7);
         let salt = await this.getSaltByEmail(email);
         let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
 
-        console.log('!!! nytt passord: \'' + newPass + '\'');
+        console.log('!!! nytt passord: \'' + newPass + '\' for ' + email);
 
         return model.UserModel.update(
             {
@@ -269,7 +281,6 @@ class Dao {
             .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
                 console.error(error);
-                return null;
             });
     }
 
@@ -351,7 +362,7 @@ class Dao {
     deleteOldEvents() {
         let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
         oldEvents.map(event => console.log(event.eventId));
-        if(oldEvents.length == null) return 0;
+        if (oldEvents.length == null) return 0;
         else return oldEvents.length
     }
 
@@ -401,6 +412,40 @@ class Dao {
                 return [];
             });
     }
+
+    /**
+     * retrieves all events a user is artist or personnel
+     *
+     * @param userId
+     * @returns {Promise<Events[]>}
+     */
+    getMyEventsByUserId(userId) {
+        let eventsWhereUserIsArtist = model.GigModel.findAll({where: {artistId: userId}})
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+        let eventsWhereUserIsPersonnel = model.PersonnelModel.findAll({where: {personnelId: userId}})
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+
+        return model.EventModel.findAll({
+            where: {
+                [Op.or]: [
+                    {eventId: eventsWhereUserIsArtist.map(e => e.eventId)},
+                    {eventId: eventsWhereUserIsPersonnel.map(e => e.eventId)}
+                ]
+            }
+        })
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+
+    }
+
 
     /**
      * retrieves the event by its ID
@@ -583,7 +628,24 @@ class Dao {
                         eventId: gig.eventId,
                         contract: created.fileId
                     })
-                    .then(response => response._options.isNewRecord)
+                    .then(response => {
+                        if (!isCI && !test) {
+                            this.getUserById(gig.artistId)
+                                .then(user => {
+                                    this.getEventByEventId(gig.eventId)
+                                        .then(event => {
+                                            let email = {
+                                                to: user.email,
+                                                from: mailProps.username,
+                                                subject: "Artistprivilegier for " + event.eventName,
+                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\nFor å laste ned kontrakt eller legge til en rider må du logge inn på siden\n\nMed vennlig hilsen\nHarmoni team 6`
+                                            };
+                                            mail.sendMail(email);
+                                        })
+                                });
+                        }
+                        return response._options.isNewRecord
+                    })
                     .catch(error => {
                         console.error(error);
                         return false;

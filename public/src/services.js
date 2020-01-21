@@ -36,6 +36,25 @@ export class User {
     email;
 }
 
+export class BugMail {
+    from;
+    description;
+    text;
+
+    constructor(from, description, text){
+        this.from = from;
+        this.description = description;
+        this.text = text;
+    }
+}
+export class Mail extends BugMail{
+    to;
+    constructor(to, from, description, text){
+        super(from, description, text);
+        this.to = text;
+    }
+}
+
 export class Event {
     eventId;
     organizerId;
@@ -121,7 +140,6 @@ export class Personnel {
         this.eventId = eventId;
         this.role = role;
     }
-
 }
 
 class Services {
@@ -160,7 +178,6 @@ class Services {
         return axios.post(url + '/mail/password', {email: email}, {headers: {"Content-Type": "application/json"}}).then(response => response.data);
     }
 
-
     /*
         USERS
     */
@@ -183,7 +200,6 @@ class Services {
     getUser(userId) {
         return axios.get(url + '/users/' + userId).then(response => response.data);
     }
-
 
     /*
         EVENTS
@@ -214,6 +230,10 @@ class Services {
 
     getEventsByOrganizer(userId) {
         return axios.get(url + '/auth/events/users/' + userId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
+    getMyEventsByUserId(userId) {
+        return axios.get(url + '/auth/events/users/' + userId + "/myevents/", {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
 
@@ -342,6 +362,18 @@ class Services {
     getRiderItems(eventId, artistId) {
         return axios.get(url + '/auth/events/' + eventId + '/gigs/' + artistId + '/rider', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
+    /*
+        EMAIL
+     */
+    sendBug(mail){
+        return axios.post(url+"/mail/bug", mail).then(response => response.data);
+    }
+
+    sendMails(mail){
+        return axios.post(url+"/mail/info", mail).then(response => response.data);
+    }
+
+
 }
 
 export let service = new Services();
