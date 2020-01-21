@@ -113,7 +113,7 @@ export class EventPage extends Component {
                         this.isPersonnel = true;
                     }
                 });
-                console.log("Er jeg personnel? " + this.isPersonnel)
+
             })
             .catch((error) => console.log(error));
 
@@ -148,10 +148,12 @@ export class EventPage extends Component {
         if (artistId === token.userId) {
             return (
                 <div>
-                    <Button variant="primary"
-                            size="sm"
-                            href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
-                        Legg til Rider
+                    <Button
+                        className="m-2"
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
                     </Button>
                     <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
@@ -159,12 +161,16 @@ export class EventPage extends Component {
         } else if (this.isOrganizer) {
             return (
                 <div>
-                    <Button variant="primary">
-                        Godkjenn Rider
+                    <Button
+                        className="m-2"
+
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
                     </Button>
-                    <Col>
-                        <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
-                    </Col>
+
+                    <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
                 </div>
             );
 
@@ -274,19 +280,5 @@ export class EventPage extends Component {
 
 
     }
-
-    /*
-        getRiderItems(artistid)
-        {
-            var riderItems = [];
-            service.getRiderItems(this.currentEvent.eventId, artistid)
-                .then(items => {
-                    console.log(items);
-                    riderItems = items;
-                    return riderItems;
-                })
-                .catch((error) => console.log(error));
-        }*/
-
 
 }

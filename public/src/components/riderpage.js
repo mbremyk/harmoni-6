@@ -1,13 +1,9 @@
 import {Component} from "react-simplified";
-import {Container, Row, Col, Button, Form, Alert, Image, Table, ListGroupItem, ListGroup} from "react-bootstrap";
-import {EventInfo} from '../widgets.js';
-import {createHashHistory} from 'history';
+import {Container, Row, Col, Button, Form, ListGroupItem, ListGroup, Card} from "react-bootstrap";
 import * as React from 'react';
-import {Event, RiderItem, service, Ticket, User} from '../services';
+import {Event, RiderItem, service} from '../services';
 import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
-import Card from "react-bootstrap/Card";
-
 const jwt = require("jsonwebtoken");
 
 
@@ -19,7 +15,8 @@ export class RiderPage extends Component {
         oldItems: [],
         currentItem: '',
         isConfirmed: false,
-        newItems: []
+        newItems: [],
+        event: new Event(),
 
 
     };
@@ -28,7 +25,8 @@ export class RiderPage extends Component {
     render() {
 
         return <div>
-            {this.renderRider()}
+            <HarmoniNavbar/>
+            {this.renderRiderForArtist()}
         </div>
 
 
@@ -36,15 +34,15 @@ export class RiderPage extends Component {
 
     mounted() {
         service
-            .getRiderItems(this.props.match.params.id, this.userId)
+            .getRiderItems(this.props.match.params.eventid, this.props.match.params.artistid)
             .then(riderItems => {
                 this.setState({oldItems: riderItems});
+                this.getEvent();
 
                 this.state.oldItems.map(item => {
                     if (item.confirmed == true || item.confirmed == false) {
                         this.setState({isConfirmed: true});
                     }
-                    console.log(item)
                 });
 
             })
@@ -54,7 +52,7 @@ export class RiderPage extends Component {
 
     saveItems() {
 
-        this.setState({newItems: [...this.state.newItems, new RiderItem(this.props.match.params.id, this.userId, this.state.currentItem)]});
+        this.setState({newItems: [...this.state.newItems, new RiderItem(this.props.match.params.eventid, this.props.match.params.artistid, this.state.currentItem)]});
         this.setState({currentItem: ''});
 
 
@@ -67,95 +65,233 @@ export class RiderPage extends Component {
     saveRider() {
         service
             .addRiderItems(this.state.newItems)
-            .then(() => this.props.history.push("/arrangement/" + this.props.match.params.id))
+            .then(() => this.props.history.push("/arrangement/" + this.props.match.params.eventid))
             .catch(error => console.log(error));
     }
 
-    renderRider() {
-        if (this.state.isConfirmed) {
-            return (
-                <div>
-                    <HarmoniNavbar/>
-                    <Container>
-                        <h1 className="font-weight-bold text-center">Din Rider</h1>
-                        <Form.Group>
-                            <ListGroup>
-                                <React.Fragment>
-                                    {this.state.oldItems.map(Olditem =>
-
-                                        <ListGroupItem>
-                                            {Olditem.item}
-                                        </ListGroupItem>
-                                    )}
-                                </React.Fragment>
-                            </ListGroup>
-
-                        </Form.Group>
-                    </Container>
-                </div>
-            );
-
-
-        } else {
-            return (
-                <div>
-                    <HarmoniNavbar/>
-                    <Container>
-                        <Card className="p-4">
-                            <Form>
-                                <Form.Group as={Col} sm={"12"}>
-                                    <h1 className="font-weight-bold text-center">Rider</h1>
-                                </Form.Group>
-
+    renderRiderForArtist() {
+        if (this.props.match.params.artistid == this.userId) {
+            if (this.state.isConfirmed) {
+                return (
+                    <div>
+                        <Container>
+                            <Card className="p-4">
+                                <h1 className="font-weight-bold text-center">Din Rider</h1>
                                 <Form.Group>
                                     <ListGroup>
                                         <React.Fragment>
-                                            {this.state.oldItems.map(item =>
+                                            {this.state.oldItems.filter(item => item.confirmed == 1).map(item =>
 
                                                 <ListGroupItem>
-                                                    {item.item}
+                                                    <Row>
+                                                        <Col>
+                                                            {item.item}
+                                                        </Col>
+                                                        <Col sm={4}>
+                                                            <h6 className="text-success">Godkjent av arrangør</h6>
+                                                        </Col>
+
+                                                    </Row>
                                                 </ListGroupItem>
                                             )}
                                         </React.Fragment>
-
                                         <React.Fragment>
+                                            {this.state.oldItems.filter(item => item.confirmed == 0).map(item =>
 
-                                            {this.state.newItems.map(item =>
-                                                (
-                                                    <ListGroupItem>
-                                                        {item.item}
-                                                    </ListGroupItem>
-                                                ))}
+                                                <ListGroupItem>
+                                                    <Row>
+                                                        <Col>
+                                                            {item.item}
+                                                        </Col>
+                                                        <Col sm={4}>
+                                                            <h6 className="text-danger">Avslått av arrangør</h6>
+                                                        </Col>
+
+                                                    </Row>
+                                                </ListGroupItem>
+                                            )}
                                         </React.Fragment>
                                     </ListGroup>
 
                                 </Form.Group>
+                            </Card>
+                        </Container>
+                    </div>
+                );
 
+
+            } else {
+                return (
+                    <div>
+                        <Container>
+                            <Card className="p-4">
+                                <Form>
+                                    <Form.Group as={Col} sm={"12"}>
+                                        <h1 className="font-weight-bold text-center">Rider</h1>
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <ListGroup>
+                                            <React.Fragment>
+                                                {this.state.oldItems.map(item =>
+
+                                                    <ListGroupItem>
+                                                        {item.item}
+                                                    </ListGroupItem>
+                                                )}
+                                            </React.Fragment>
+
+                                            <React.Fragment>
+
+                                                {this.state.newItems.map(item =>
+                                                    (
+                                                        <ListGroupItem>
+                                                            {item.item}
+                                                        </ListGroupItem>
+                                                    ))}
+                                            </React.Fragment>
+                                        </ListGroup>
+
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <Row>
+                                            <Col><Form.Control value={this.state.currentItem}
+                                                               onChange={this.handleInputChange}/></Col>
+                                            <Col sm={2}><Button variant="success" onClick={this.saveItems}>Legg
+                                                til i rider</Button></Col>
+                                        </Row>
+
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <Button variant="primary" onClick={() => this.saveRider()}>
+                                            Lagre Rider
+                                        </Button>
+                                    </Form.Group>
+
+                                </Form>
+                            </Card>
+
+                        </Container>
+                    </div>
+                );
+
+            }
+
+        } else if (this.state.event.organizerId == this.userId) {
+            if (this.state.isConfirmed === false && this.state.oldItems.length !== 0) {
+                return (
+                    <div>
+                        <Container>
+                            <Card className="p-4">
+                                <h1 className="font-weight-bold text-center">Din Rider</h1>
                                 <Form.Group>
-                                    <Row>
-                                        <Col><Form.Control value={this.state.currentItem}
-                                                           onChange={this.handleInputChange}/></Col>
-                                        <Col sm={2}><Button variant="success" onClick={this.saveItems}>Legg
-                                            til i rider</Button></Col>
-                                    </Row>
+                                    <ListGroup>
+                                        {this.state.oldItems.map(item =>
+
+
+                                            <ListGroupItem>
+
+                                                <Form.Check type="checkbox" label={item.item}
+                                                            onClick={() => this.addConfirmedItem(item)}/>
+
+
+                                            </ListGroupItem>
+                                        )}
+                                    </ListGroup>
 
                                 </Form.Group>
+                                <Button variant="success" onClick={() => this.saveConfirmedItems()}>Godkjenn</Button>
+                            </Card>
+                        </Container>
+                    </div>
+                );
 
+            } else if (this.state.isConfirmed === true && this.state.oldItems.length !== 0) {
+                return (
+                    <div>
+                        <Container>
+                            <Card className="p-4">
+                                <h1 className="font-weight-bold text-center">Rider</h1>
                                 <Form.Group>
-                                    <Button variant="primary" onClick={() => this.saveRider()}>
-                                        Lagre Rider
-                                    </Button>
+                                    <ListGroup>
+                                        <React.Fragment>
+                                            {this.state.oldItems.filter(item => item.confirmed == 1).map(item =>
+
+                                                <ListGroupItem>
+                                                    <Row>
+                                                        <Col>
+                                                            {item.item}
+                                                        </Col>
+                                                        <Col sm={4}>
+                                                            <h6 className="text-success">Godkjent</h6>
+                                                        </Col>
+
+                                                    </Row>
+                                                </ListGroupItem>
+                                            )}
+                                        </React.Fragment>
+                                        <React.Fragment>
+                                            {this.state.oldItems.filter(item => item.confirmed == 0).map(item =>
+
+                                                <ListGroupItem>
+                                                    <Row>
+                                                        <Col>
+                                                            {item.item}
+                                                        </Col>
+                                                        <Col sm={4}>
+                                                            <h6 className="text-danger">Avslått</h6>
+                                                        </Col>
+
+                                                    </Row>
+                                                </ListGroupItem>
+                                            )}
+                                        </React.Fragment>
+                                    </ListGroup>
+
                                 </Form.Group>
+                            </Card>
+                        </Container>
+                    </div>
+                );
+            } else if (this.state.oldItems.length === 0) {
 
-                            </Form>
-                        </Card>
-
-                    </Container>
-                </div>
-            );
+                return (
+                    <div>
+                        <Container>
+                            <Card className={"m-4"}>
+                                <h1 className="font-weight-bold text-center">Artisten har ikke lastet opp en rider</h1>
+                            </Card>
+                        </Container>
+                    </div>
+                );
+            }
 
         }
 
+
+    }
+
+
+    getEvent() {
+        service
+            .getEventByEventId(this.props.match.params.eventid)
+            .then(event => {
+                this.setState({event: event});
+            })
+            .catch((error) => console.log(error));
+    }
+
+    saveConfirmedItems() {
+        service
+            .confirmRiderItems(this.state.oldItems)
+            .then(() => this.props.history.push("/arrangement/" + this.props.match.params.eventid))
+            .catch(error => console.log(error));
+    }
+
+    addConfirmedItem(item) {
+        item.confirmed = true;
 
     }
 

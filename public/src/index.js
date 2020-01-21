@@ -37,14 +37,15 @@ if (root)
         <Route exact path="/nytt-passord" component={NewPassword}/>
         <Route exact path="/sok/:input" component={SearchResults}/>
 
-            <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
-            <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
-            <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
-            <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
-            <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
-	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
-	        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
-	        <PrivateRoute authed={authService.loggedIn()} exact path="/arrangement/:id/legg-til-rider" component={RiderPage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/min-side" component={myPage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/logg-ut" component={Logout}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/hjem" component={HomePage}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/opprett-arrangement" component={AddEvent}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/endre-arrangement/:id" component={EditEvent}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={UploadWidget}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/Upload" component={DownloadWidget}/>
+        <PrivateRoute authed={authService.loggedIn()} exact path="/arrangement/:eventid/rider/:artistid"
+                      component={RiderPage}/>
 
         <Route path="/" component={Footer}/>
     </BrowserRouter>,

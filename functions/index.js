@@ -683,7 +683,7 @@ app.put("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
 app.get("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
-    db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(404));
+    db.getRiderItems(eventId, artistId).then(riderItems => riderItems ? res.status(201).send(riderItems) : res.status(404).send([]));
 });
 
 /*
