@@ -26,17 +26,6 @@ if (!process.env.FIREBASE_CONFIG) {
 	exports.webApi = functions.https.onRequest(main);
 }
 
-
-app.use(fileParser({
-	rawBodyOptions: {
-		limit: '15mb',  //file size limit
-	},
-	busboyOptions: {
-		limits: {
-			fields: 20   //Number text fields allowed
-		}
-	},
-}));
 app.use(cors({origin: true}));
 
 app.use(bodyParser.json({limit: '100mb', extended: true}));
