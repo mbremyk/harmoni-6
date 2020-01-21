@@ -32,18 +32,13 @@ export class HarmoniNavbar extends Component {
                             <Nav.Link href="/min-side">Min side</Nav.Link>
                             <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
                         </Nav>
-                        <Form inline>
+                        <Form inline onSubmit={this.search}>
                             <FormControl type="text"
                                          placeholder="Søk"
                                          className="mr-sm-2"
                                          value={this.state.input}
                                          onChange={this.handleInputChange}
-                                         onKeyPress={(event) => {
-                                             if (event.key === "Enter") {
-                                                 alert("Search clicked, input: " + this.state.input + "\n Kun knappen fungerer TODO");
-                                                 this.search()
-                                             }
-                                         }}/>
+                                         />
                             <Button variant="outline-success" onClick={this.search}>Søk</Button>
                         </Form>
                     </Navbar.Collapse>
@@ -52,12 +47,8 @@ export class HarmoniNavbar extends Component {
         );
     }
 
-    search() {
-        //let url = "/sok/" + this.state.input;
-        //alert("Search clicked, input: " + this.state.input + "\n Bruk knappen! Fuck js...");
+    search(event) {
+        event.preventDefault();
         window.location = ("/sok/" + this.state.input);
-        //window.location.replace("https://www.w3schools.com");
-        //this.props.history.push("/sok/" + this.state.input);
-        return false;
     }
 }
