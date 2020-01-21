@@ -34,14 +34,19 @@ export class LoginForm extends Component {
         setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
-    handleLogin() {
+    async handleLogin() {
         if (!this.state.email || !this.state.password) {
             this.setError('Alle felter må fylles.', 'danger');
             return;
         }
-        authService.login(this.state.email, this.state.password).then(res => {
-            window.location = '/hjem'
-        }).catch(() => this.setError('Innlogging feilet', 'danger'));
+
+        let result = await authService.login(this.state.email, this.state.password);
+
+        if(authService.loggedIn()) {
+	        window.location = '/hjem'
+        } else {
+	        this.setError('Innlogging feilet', 'danger');
+        }
     }
 
     render() {
