@@ -186,4 +186,4 @@ addMailEndpoints = (app, db) => {
     });
 };
 
-module.exports = {addMailEndpoints};
+module.exports = {addMailEndpoints, sendMail};
