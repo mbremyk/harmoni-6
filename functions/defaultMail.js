@@ -1,14 +1,24 @@
 class DefaultMail {
-    user;
-    date;
-    text;
-    subject;
-    email;
-    password;
 
-    hilsen = `Med vennlig hilsen\nHarmoni team 6 support team`;
+    constructor() {
+        this.user = '';
+        this.date = '';
+        this.text = '';
+        this.subject = '';
+        this.email = '';
+        this.password = '';
+        this.hilsen = `Med vennlig hilsen\nHarmoni team 6 support team`;
+    }
+
 
     set hilsen(hilsen) {
+    }
+
+    set subject(subject) {
+    }
+
+    get subject() {
+        return this.subject;
     }
 
     get bugText() {
@@ -25,14 +35,6 @@ class DefaultMail {
             `Ditt engangspassord er: ${this.password}\n` +
             `Dette passordet virker kun én gang, og det anbefales å bytte passord på Min Side så fort du har logget inn.\n\n` +
             this.hilsen;
-    }
-
-    get subject() {
-        return this.subject;
-    }
-
-    constructor() {
-
     }
 }
 
