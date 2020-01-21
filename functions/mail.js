@@ -163,6 +163,7 @@ addMailEndpoints = (app, db) => {
      */
     app.post("/mail/info", (req, res) => {
         console.log("POST-request received - /mail/info");
+        console.log(req.body);
         let to = req.body.to;
 
         new Promise((resolve, reject) => {
