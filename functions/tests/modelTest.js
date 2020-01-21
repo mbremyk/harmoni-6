@@ -378,11 +378,11 @@ describe('Personnel', () => {
     });
 
     it('update personnel', done => {
-        let personnel = {
+        let personnel = [{
             eventId: 2,
             personnelId: 4,
             role: 'UPDATED'
-        };
+        }];
         db.updatePersonnel(personnel).then(response => {
             expect(response).toBeTruthy();
             done();
@@ -452,13 +452,13 @@ describe('Tickets', () => {
     });
 
     it('update Ticket', done => {
-        let ticket = {
+        let tickets = [{
             eventId: 4,
             type: 'Golden Circle',
             price: 1234,
             amount: 56,
-        };
-        db.updateTicket(ticket).then(response => {
+        }];
+        db.updateTickets(tickets).then(response => {
             expect(response).toBeTruthy();
             done();
         });
