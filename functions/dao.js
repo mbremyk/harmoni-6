@@ -791,7 +791,7 @@ class Dao {
         let allUpdatesOk = true;
         return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
             {
-                confirmed: riderItem.confirmed
+                confirmed: (riderItem.confirmed ? true : false)
             },
             {
                 where: {

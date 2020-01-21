@@ -4,6 +4,9 @@ class DefaultMail {
     set hilsen(hilsen) {
     }
 
+    set subject(subject) {
+    }
+
     get bugText() {
         return `Hei, ${this.user}\n\n` +
             `Vi har mottatt din rapport og har satt våre fremste utviklere på saken.\n` +
