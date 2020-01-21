@@ -1,15 +1,16 @@
 const nodemailer = require('nodemailer');
-const properties = require('./properties.js');
+const isCI = require('is-ci');
+const properties = isCI ? "" : require('./properties.js');
 const defMail = require('./defaultMail.js');
 const express = require('express');
 const moment = require('moment');
 
-const mailProps = new properties.MailProperties();
+const mailProps = isCI ? "" : new properties.MailProperties();
 const defaultMail = new defMail.DefaultMail();
 const deployed = true;
 
-const username = mailProps.username;
-const password = mailProps.password;
+const username = isCI ? "" : mailProps.username;
+const password = isCI ? "" : mailProps.password;
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
