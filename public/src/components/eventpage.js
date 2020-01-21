@@ -5,6 +5,8 @@ import * as React from 'react';
 import {Event, service, User} from '../services';
 import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
+import NavLink from "react-bootstrap/NavLink";
+import {MailForm} from "../widgets";
 
 const jwt = require("jsonwebtoken");
 
@@ -67,8 +69,7 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         {this.EditButton()}
-
-
+                        {this.emailForm()}
                     </Container>
                 </div>
 
@@ -217,6 +218,72 @@ export class EventPage extends Component {
 
     }
 
+    emailForm(){
+        if(this.artists.length != 0){
+            return <MailForm hasRecipients={true} description={"Info"} artists={this.artists} toggleable={true}/>
+        }else{
+            return null;
+        }
+
+    }
+
+
+
+
+    //the button will render if the user is an artist or an organizer
+    DownloadContract() {
+        if (this.isOrganizer || this.isArtist) {
+            return <Row>
+                <Col>
+                    <a href="" download>
+                        <Button variant="primary" aria-label="Left Align" title="Last Ned">
+                            Last Ned Kontrakt
+                        </Button>
+                    </a>
+                </Col>
+            </Row>
+        }
+    }
+
+    /*DownloadContract() {
+        if (!this.artists) {
+            return null;
+        } else {
+            if (this.isOrganizer) {
+                return (
+                    <div>
+                        {this.artists.map(artist => (
+                            <Row>
+                                <Col>
+                                    <DownloadWidget event={this.currentEvent.eventId} type={"kontrakt"}
+                                                    artist={this.artist}/>
+                                </Col>
+                            </Row>
+                        ))};
+                        <Col>
+                            <DownloadWidget event={this.currentEvent.eventId} type={"annent"} artist={this.artist}/>
+                        </Col>
+                    </div>
+                )
+            } else if (this.isArtist) {
+                return (
+                    <div>
+                        <Row>
+                            <Col>
+                                <DownloadWidget event={this.currentEvent.eventId} type={"kontract"}
+                                                artist={this.user.userId}/>
+                            </Col>
+                            <Col>
+                                <DownloadWidget event={this.currentEvent.eventId} type={"rider"}
+                                                artist={this.user.userId}/>
+                            </Col>
+                        </Row>
+                    </div>
+                )
+            }
+        }
+    }*/
+
     //only organizers get to edit the event so this button will only render when the user is the organizer
     EditButton() {
         if (this.isOrganizer) {
@@ -233,6 +300,8 @@ export class EventPage extends Component {
     RenderNavbar() {
         if (authService.loggedIn()) {
             return <HarmoniNavbar/>
+        } else {
+            return <NavLink href="/"><h1 className="HarmoniLogo display-3 text-center m-5 text-body">Harmoni</h1></NavLink>
         }
     }
 

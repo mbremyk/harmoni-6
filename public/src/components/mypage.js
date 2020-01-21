@@ -10,6 +10,9 @@ import * as jwt from "jsonwebtoken";
 import Alert from "react-bootstrap/Alert";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import {Card} from "react-bootstrap";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import {ModalPopup} from "../widgets";
 
 /*
 * My page container for "/min-side". Ability to change name, email and password for a logged in user.
@@ -18,7 +21,7 @@ export class myPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            userId: '',
+            userId: "",
             username: '',
             email: '',
             password1: '',
@@ -79,9 +82,25 @@ export class myPage extends Component {
                                                   value={this.state.password2}
                                                   onChange={this.handleNewPassword2Change}/>
                                 </Form.Group>
-                                <Button variant="primary" type="button" onClick={this.save}>
+                                <Button
+                                    className="mr-2"
+                                    variant="primary"
+                                    type="button"
+                                    onClick={this.save}>
                                     Lagre
                                 </Button>
+                                <Button
+                                    className="mr-2"
+                                    variant="secondary"
+                                    type="button"
+                                    href="/hjem">
+                                    Forkast endringer
+                                </Button>
+                                <ModalPopup onClose={this.delete}
+                                            title={"Slett bruker"}
+                                            label={"Skriv inn ditt passord for å bekrefte sletting"} />
+
+
                             </Form>
                         </div>
                     </Card>
@@ -167,82 +186,6 @@ export class myPage extends Component {
         });
     }
 
-    // Gammel metode
-    /*save() {
-        let user = new User();
-        user.email = this.state.email;
-        user.username = this.state.username;
-        user.userId = this.state.userId;
-
-        if (this.state.password1 !== this.state.password2) {
-            this.setError("Passordene er ulike.", 'danger');
-            return;
-        }
-        //Update password
-        if (this.state.password1 !== "" && this.state.password1 === this.state.password2) {
-            user.password = this.state.password1;
-            service.updatePassword(user)
-                .then(res => console.log("Password updated" + res))
-                .then(this.setError("Passord oppdatert.", 'success'))
-                .then(this.state.password1 = "")
-                .then(this.state.password2 = "")
-                .catch(err => this.setError("En feil har oppstått", 'danger'));
-        }
-        //Update username
-        if (user.username !== this.state.oldUsername && user.email === this.state.oldEmail) {
-            service.validateUsername(user.username).then(taken1 => {
-                console.log('Check username, taken: ' + taken1);
-                if (taken1) {
-                    this.setError('Brukernavn er i bruk :(', 'danger');
-                } else {
-                    service.updateUser(user)
-                        .then(res => console.log("User updated: " + res + " Password: " + user.password + " test"))
-                        .then(window.location.reload())
-                        .then(this.setError('Brukernavn oppdatert.', 'success'))
-                        .catch(err => this.setError("En feil har oppståt", 'danger'));
-                }
-            });
-            //Update email
-        } else if (user.username === this.state.oldUsername && user.email !== this.state.oldEmail) {
-            service.validateEmail(user.email).then(taken2 => {
-                console.log('Check email, taken: ' + taken2);
-                if (taken2) {
-                    this.setError('Epost er i bruk','danger');
-                } else {
-                    service.updateUser(user)
-                        .then(res => console.log("User updated: " + res))
-                        .then(window.location.reload())
-                        .then(this.setError('E-post oppdatert.', 'success'))
-                        .catch(err => this.setError("En feil har oppståt", 'danger'));
-                }
-            });
-            //update username and email
-        } else if (user.username !== this.state.oldUsername && user.email !== this.state.oldEmail) {
-            service.validateUsername(user.username).then(taken1 => {
-                console.log('Check username, taken: ' + taken1);
-                if (taken1) {
-                    this.setError('Brukernavn er i bruk :(', 'danger');
-                } else {
-                    // check email availability
-                    service.validateEmail(user.email).then(taken2 => {
-                        console.log('Check email, taken: ' + taken2);
-                        if (taken2) {
-                            this.setError('Epost er i bruk', 'danger');
-                        } else {
-                            service.updateUser(user)
-                                .then(res => console.log("User updated: " + res))
-                                .then(window.location.reload())
-                                .then(this.setError('Brukernavn og e-post oppdatert.', 'success'))
-                                .catch(err => this.setError("En feil har oppståt", 'danger'));
-                        }
-                    })
-                }
-            });
-        } else {
-            window.location.reload();
-        }
-    }*/
-
     handleUsernameChange(event) {
         this.setState({username: event.target.value});
     }
@@ -258,4 +201,27 @@ export class myPage extends Component {
     handleNewPassword2Change(event) {
         this.setState({password2: event.target.value});
     }
+
+    async delete(password) {
+        let oldToken = authService.getToken()
+
+        let res = await authService.login(this.state.email ,password);
+        //if(res.status === 401) return console.log("TEST!");
+
+        if(oldToken !== authService.getToken()){
+            service.deleteUser(this.state.userId)
+                .then(() => {
+                        authService.deleteToken();
+                        this.props.history.push("/#");
+                    }
+                )
+        }else{
+            this.setError("Feil passord!", "danger")
+        }
+
+
+
+
+    }
+
 }
