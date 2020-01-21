@@ -360,13 +360,7 @@ class Dao {
      * @returns {number}
      */
      deleteOldEvents() {
-        let quantity;
-        model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}})
-            .then(e => {
-                this.quantity = e.length;
-                e.map(e => this.deleteEvent(e.eventId))
-            });
-        return quantity;
+        return model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
     }
 
 
@@ -435,16 +429,18 @@ class Dao {
                 return [];
             }).then(e => e.map(e => e.eventId));
 
-        return model.EventModel.findAll({where: {
-            [Op.or]:[
-                {eventId:  artistEvents},
-                {eventId: personnelEvents}
-            ]}})
-            .catch(error => {
-            console.error(error);
-            return [];
+        return model.EventModel.findAll({
+            where: {
+                [Op.or]: [
+                    {eventId: artistEvents},
+                    {eventId: personnelEvents}
+                ]
+            }
         })
-
+            .catch(error => {
+                console.error(error);
+                return [];
+            })
 
 
     }
