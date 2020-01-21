@@ -34,6 +34,12 @@ export class User {
     password;
     salt;
     email;
+
+    constructor(userId, username, email) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+    }
 }
 
 export class BugMail {
@@ -254,15 +260,16 @@ class Services {
      * @returns Promise<>: boolean
      */
     updatePersonnel(personnel) {
-        return axios.put(url + '/auth/events/' + personnel.eventId + '/personnel', personnel, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+        return axios.put(url + '/auth/events/' + personnel[0].eventId + '/personnel', personnel, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
-     * @param personnel: Personnel
+     * @param eventId: number
+     * @param personnelId: number
      * @returns Promise<>: boolean
      */
-    deletePersonnel(personnel) {
-        return axios.delete(url + '/auth/events/' + personnel.eventId + '/personnel/' + personnel.personnelId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    deletePersonnel(eventId, personnelId) {
+        return axios.delete(url + '/auth/events/' + eventId + '/personnel/' + personnelId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
