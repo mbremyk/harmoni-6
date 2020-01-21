@@ -92,8 +92,8 @@ export class AddEvent extends Component {
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
-            maxTime: moment('23:59'),
-            minTime: moment('00:00'),
+            maxTime: moment('23:59', 'HH:mm').format('HH:mm'),
+            minTime: moment('00:00', 'HH:mm').format('HH:mm'),
             contract: '',
             image: '',
             imageUrl: '',
@@ -186,9 +186,6 @@ export class AddEvent extends Component {
         if (this.state.fDate === this.state.tDate) {
             this.setState({maxTime: this.state.tTime});
             this.setState({minTime: this.state.fTime});
-        } else {
-            this.setState({minTime: moment('00:00', 'HH:mm').format('HH:mm')});
-            this.setState({maxTime: moment('23:59', 'HH:mm').format('HH:mm')});
         }
     }
 
@@ -392,11 +389,13 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Fra klokkeslett</Form.Label>
                                     <Form.Control
+                                        max={this.state.maxTime}
                                         value={this.state.fTime}
                                         onChange={this.handleFTime}
                                         type={"time"}
 
                                     />
+                                    <span className="customStyle"/>
                                 </Form.Group>
 
 
@@ -414,11 +413,13 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Til klokkeslett</Form.Label>
                                     <Form.Control
+                                        min={this.state.minTime}
                                         value={this.state.tTime}
                                         onChange={this.handleTTime}
                                         type={"time"}
 
                                     />
+                                    <span className="customStyle"/>
                                 </Form.Group>
 
                                 <Form.Group as={Col} sm={"2"}>
