@@ -387,27 +387,6 @@ app.get("/auth/users/:userId", (req, res) => {
  */
 
 
-/**
- *
- */
-app.post("/events", (req, res) => {
-    console.log("POST-request - /events");
-    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
-        filehandler.uploadToCloud(req.body.imageUrl, "img.png" )
-            .then(url => {
-                console.log(url);
-                req.body.imageUrl = url;
-                console.log(req.body.imageUrl);
-                db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
-            });
-    }else{
-        db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
-    }
-
-});
-
-
-
 app.post("/auth/events", (req, res) => {
     console.log("POST-request - /events");
     if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
@@ -697,7 +676,7 @@ app.put("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
 app.get("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
-    db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
+    db.getRiderItems(eventId, artistId).then(riderItems => riderItems ? res.status(201).send(riderItems) : res.status(404).send([]));
 });
 
 /*

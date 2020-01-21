@@ -48,6 +48,8 @@ export class EventPage extends Component {
                                 {this.RenderAgeLimit()}
                                 <Col>
                                     <h6>Adresse: {this.currentEvent.address}</h6>
+                                    <Button type="button" onClick={this.addressClicked}>Åpne kart</Button>
+
                                 </Col>
                                 {this.RenderArtist()}
                                 <Col>
@@ -107,7 +109,7 @@ export class EventPage extends Component {
                         this.isPersonnel = true;
                     }
                 });
-                console.log("Er jeg personnel? " + this.isPersonnel)
+
             })
             .catch((error) => console.log(error));
 
@@ -125,7 +127,6 @@ export class EventPage extends Component {
                         this.isArtist = true;
                     }
                 });
-                console.log("Er jeg artist? " + this.isArtist);
 
             })
             .catch((error) => console.log(error));
@@ -143,18 +144,35 @@ export class EventPage extends Component {
         if (artistId === token.userId) {
             return (
                 <div>
-
-                    <Button variant="primary"
-                            size="sm"
-                            href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
-                        Legg til Rider
+                    <Button
+                        className="m-2"
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
                     </Button>
                     <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
+
         } else if (this.isOrganizer) {
-            return <Col><DownloadWidget artist={artistId} event={this.currentEvent.eventId}/></Col>;
+            return (
+                <div>
+                    <Button
+                        className="m-2"
+
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
+                    </Button>
+
+                    <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
+                </div>
+            );
+
         }
     }
+
 
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
@@ -321,5 +339,16 @@ export class EventPage extends Component {
                 <h6>Tillat for alle</h6>
             </Col>
         }
+    }
+
+    addressClicked() {
+        let res = this.currentEvent.address.split(" ");
+        var url = "";
+        res.map(i => {
+            url += i + "-";
+        });
+        url = url.substring(0, url.length - 1);
+        url = url.replace(/[^\w\s-]/g,'');
+        window.open('https://www.google.com/maps/search/' + url);
     }
 }
