@@ -5,6 +5,7 @@ import * as React from 'react';
 import {Event, service, User} from '../services';
 import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
+import NavLink from "react-bootstrap/NavLink";
 import {MailForm} from "../widgets";
 
 const jwt = require("jsonwebtoken");
@@ -299,6 +300,8 @@ export class EventPage extends Component {
     RenderNavbar() {
         if (authService.loggedIn()) {
             return <HarmoniNavbar/>
+        } else {
+            return <NavLink href="/"><h1 className="HarmoniLogo display-3 text-center m-5 text-body">Harmoni</h1></NavLink>
         }
     }
 
