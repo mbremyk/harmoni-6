@@ -54,16 +54,12 @@ export default function AddEvent() {
         service.getUsers().then(users => setArtists(users)).catch((err) => console.log(err.message));
     }, []);
 
-    async function sendGigs(eventId) {
+    function sendGigs(eventId) {
         new Promise((resolve, reject) => {
-            console.log(artistsAdd)
             if ((Array.isArray(artistsAdd) && artistsAdd.length)) {
                 Promise.all(artistsAdd.map(artist => {
-                    console.log(artist.contract)
                     toBase64(artist.contract).then(contractData => {
-                        console.log(contractData)
                         let contract = new SimpleFile(contractData, artist.contract.name);
-                        console.log(new Gig(eventId, artist.userId, contract));
                         service
                             .addGig(new Gig(eventId, artist.userId, contract))
                             .catch(error => reject(error))
@@ -79,9 +75,7 @@ export default function AddEvent() {
         let fDateTime = fDate + " " + fTime + ":00";
         let tDateTime = tDate + " " + tTime + ":00";
 
-        console.log(image);
-
-        toBase64(image).then(i => {
+        toBase64(image).then(image => {
 
             let newEvent = new Event(
                 null,
@@ -94,34 +88,34 @@ export default function AddEvent() {
                 ageLimit,
                 fDateTime,
                 tDateTime,
-                (i ? image : imageUrl),
+                (image ? image : imageUrl),
                 cancelled);
 
             service.createEvent(newEvent).then(created => {
                 sendGigs(created.insertId).then(() => {
                     sendPersonnel(created.insertId).then(() => {
-                        //window.location= "/arrangement/" + created.insertId
+                        this.props.history.push("/arrangement/" + created.insertId)
                     })
                 });
             }).catch(err => console.error(err))
         });
     }
 
-    async function toBase64(file) {
-        new Promise((resolve, reject) => {
+    function toBase64(file) {
+        new Promise
+        ((resolve, reject) => {
             if (file === "") {
-                console.log("ttetetest")
                 resolve(null);
+                return;
             }
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
             reader.onerror = error => reject(error);
-        });
+        })
     }
 
-
-    async function sendPersonnel(eventId) {
+    function sendPersonnel(eventId) {
         new Promise((resolve, reject) => {
             if ((Array.isArray(personnelAdd) && personnelAdd.length)) {
                 let temp = personnelAdd.map(user => new Personnel(user.userId, eventId, user.role));
@@ -137,6 +131,7 @@ export default function AddEvent() {
     }
 
     function IncrementAge() {
+
         setAgeLimit(ageLimit + 1)
     }
 
