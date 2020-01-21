@@ -1,7 +1,5 @@
 const model = require('./model.js');
-const Blob = require("cross-blob");
 const fs = require("fs");
-var FileReader = require('filereader');
 const uuidv4 = require('uuid/v4');
 
 const Cloud = require('@google-cloud/storage');

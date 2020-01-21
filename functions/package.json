@@ -39,6 +39,7 @@
     "is-ci": "latest",
     "jsonwebtoken": "latest",
     "moment": "latest",
+    "nodemailer": "^6.4.2",
     "morgan": "^1.9.1"
   },
   "devDependencies": {
@@ -52,9 +53,9 @@
     "formidable": "^1.2.1",
     "jest": "^24.9.0",
     "multer": "^1.4.2",
+    "nodemailer": "^6.4.2",
     "sequelize": "^5.21.3",
-    "uuid": "^3.4.0",
-    "nodemailer": "^6.4.2"
+    "uuid": "^3.4.0"
   },
   "private": true
 }

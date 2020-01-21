@@ -1,9 +1,15 @@
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
+const mail = require("./mail.js");
+const isCI = require('is-ci');
+const props = isCI ? "" : require("./properties.js");
+const test = (process.env.NODE_ENV === 'test');
+
+let mailProps = isCI ? "" : new props.MailProperties();
 
 
 class Dao {
@@ -120,13 +126,16 @@ class Dao {
 
     async forgotPassword(email) {
         let result = await this.getUserByEmail(email);
-        if(result === null) { console.log('No email found for temp pass.'); return; }
+        if (result === null) {
+            console.log('No email found for temp pass.');
+            return;
+        }
 
         let newPass = Math.random().toString(36).substring(7);
         let salt = await this.getSaltByEmail(email);
         let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
 
-        console.log('!!! nytt passord: \'' + newPass + '\' for '+ email);
+        console.log('!!! nytt passord: \'' + newPass + '\' for ' + email);
 
         return model.UserModel.update(
             {
@@ -441,12 +450,11 @@ class Dao {
     }
 
 
-
     /**
      * retrieves the event by its ID
      *
      * @param eventId
-     * @returns {Promise<Event>}
+     * @returns {Promise<{}>}
      */
     getEventByEventId(eventId) {
         return model.EventModel.findOne({where: {eventId: eventId}})
