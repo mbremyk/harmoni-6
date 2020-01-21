@@ -11,7 +11,7 @@ import {HomePage} from "./components/homepage";
 import {EventPage} from "./components/eventpage";
 import {Logout} from './components/logout'
 import {EditEvent} from "./components/editevent";
-import {UploadWidget, DownloadWidget} from "./widgets";
+import {UploadWidget, DownloadWidget, MailForm} from "./widgets";
 import {Footer} from "./components/footer";
 
 import {authService} from "./AuthService";
@@ -29,6 +29,7 @@ if (root)
     ReactDOM.render(
     <BrowserRouter history={history}>
         <Route exact path="/" component={LandingPage}/>
+        <Route exact path="/bugs" component={() => <MailForm toggleable={false} description={"Jeg har en bug"} hasRecipients={false}/>}/>
         <Route exact path="/ny-bruker" component={CreateUserForm}/>
         <Route exact path="/arrangement/:id" component={EventPage}/>
         <Route exact path="/logg-inn" component={LoginForm}/>

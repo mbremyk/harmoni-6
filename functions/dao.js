@@ -224,7 +224,6 @@ class Dao {
             .then(created => ({insertId: (created.eventId)}))
             .catch(error => {
                 console.error(error);
-                return null;
             });
 
     }

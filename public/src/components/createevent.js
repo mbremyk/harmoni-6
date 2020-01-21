@@ -179,7 +179,7 @@ export class AddEvent extends Component{
                                         service.createEvent(e)
                                             .then(updated => {
                                                     //console.log(this.state.personnelAdd);
-                                                    service.createGig(new BulkGig(updated.insertId, this.state.artistsAdd, contract, rider))
+                                                    service.createGig(new BulkGig(updated, this.state.artistsAdd, contract, rider))
                                                         .then(() => service.createPersonnel(new BulkPersonnel(this.state.personnelAdd, updated.insertId )));
                                                     // service.createPersonnel(new BulkPersonel(updated.insertId, this.state.personnelAdd));
                                                     /*this.state.artistsAdd.map(a =>

@@ -1,10 +1,13 @@
 import {Component} from "react-simplified";
-import {Col, Card, Button} from "react-bootstrap";
+import {Col, Card, Button, Form} from "react-bootstrap";
 import * as React from 'react';
 import Row from "react-bootstrap/Row";
+import Alert from "react-bootstrap/Alert";
+import {BugMail, Mail, service} from "./services";
+import {authService} from "./AuthService";
 
+const jwt = require("jsonwebtoken");
 
-import {service} from "./services";
 
 export class EventInfo extends Component {
     event;
@@ -201,5 +204,244 @@ export class UploadWidget extends Component {
 		service.uploadContract(data, eventId, artistId)
 			.then(res => console.log(res));
 	};
+}
+
+export class MailForm extends Component{
+    constructor(props) {
+        super(props);
+        console.log(props.hasRecipients);
+        this.state = {
+            recipientString: this.getRecipentString(props) ? this.getRecipentString(props) : "",
+            description: props.description ? props.description : "",
+            text: "",
+            mails: this.getAllMails(props) ? this.getAllMails(props): [],
+            hasRecipients: props.hasRecipients ? true : false,
+            toggle: false,
+            toggleable: props.toggleable ? props.toggleable: false,
+            arrow: "▼",
+            error: "",
+            errorType: ""
+        };
+    }
+
+    getRecipentString(props){
+        console.log("getRes called");
+        let recipients = "";
+        if(props.artists){
+            props.artists.map(user => {
+                recipients = recipients += user.user.email + ", "
+            });
+        }
+        return recipients;
+    }
+
+    getAllMails(props){
+        console.log("getMails called");
+        let mails = [];
+        if(props.artists){
+            props.artists.map(user => {
+                mails.push(user.user.email);
+            });
+        }
+        return mails;
+    }
+
+    handleRecipientChange = (e) =>{
+        this.setState({recipientString: e.target.value});
+    }
+
+    setAlert(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout( () => this.setState({error: '', errorType: 'primary'}), 5000);
+    }
+
+    handleTextChange = (e) =>{
+        this.setState({text: e.target.value});
+    }
+
+    handleDescriptionChange = (e) =>{
+        //this.setState({description: ""});
+        console.log(e.target.value);
+        this.setState({description: e.target.value});
+    }
+
+    render(){
+        if(this.state.toggleable){
+            return(
+                <div className={"container"} style={{marginTop: "10px"}}>
+                    {(this.state.error)?
+                        <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                        <div style={{height: '3em'}}/>}
+                    <Button className={"btn-info"} onClick={this.toggleMail}>
+                        Send epost {this.state.arrow}
+                    </Button>
+                    {(this.state.toggle) ? this.toggleForm(this.state.toggle): <div style={{height: "3em"}}/>}
+                </div>
+            )
+        }else{
+                return(
+                    <div className={"container"} style={{marginTop: "10px"}}>
+                        {(this.state.error)?
+                            <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                            <div style={{height: '3em'}}/>}
+                        {this.toggleForm(true)}
+                    </div>
+                )
+
+        }
+    }
+    /*{(this.state.error)?
+                            <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                            <div style={{height: '3em'}}/>}
+                        {this.toggleForm(true)}*/
+
+    toggleMail(){
+        if(this.state.toggle){
+            //this.state.toggle = false;
+            this.setState({toggle: false });
+            this.setState({arrow: "▼"});
+            //this.state.arrow = "▼";
+        }else{
+            //this.state.toggle = true;
+            this.setState({toggle: true});
+            /*if(this.props.description){
+                this.setState({description : this.props.description});
+            }else if(this.props.hasRecipients){
+                console.log("in Mounted"+this.props.hasRecipients);
+                this.setState({hasRecipients: this.props.hasRecipients })
+                if(!this.state.recipientString){
+                    this.props.artists.map(user => {
+                        this.setState({recipientString: this.state.recipientString+=user.user.email+", " });
+                        this.mails.push(user.user.email);
+                    });
+                }
+            }*/
+            this.setState({arrow: "▲"});
+        }
+    }
+
+    /*mounted() {
+        if(this.props.description){
+            this.setState({description : this.props.description});
+        }else if(this.props.hasRecipients){
+            console.log("in Mounted"+this.props.hasRecipients);
+            this.setState({hasRecipients: this.props.hasRecipients });
+            if(!this.state.recipientString){
+                this.props.artists.map(user => {
+                    this.setState({recipientString: this.state.recipientString+=user.user.email+", " });
+                    this.mails.push(user.user.email);
+                });
+            }
+        }
+    }*/
+
+    /*recipients(){
+        if(this.props.hasRecipients){
+            return(
+                <Form.Control as="textarea" onChange={this.handleRecipientChange} value={this.recipientString} placeholder={"mottakere"} rows="1" style={{display: 'flex'}}/>
+            )
+        }else{
+            return null;
+        }
+
+    }*/
+
+    toggleForm(on){
+        console.log(this.state.hasRecipients);
+        console.log(this.state.description);
+        if(on && this.state.hasRecipients){
+            return (
+                <Form style={{marginTop: "10px"}}>
+                    <h1>Send en epost til flere </h1>
+                    <Form.Control as="textarea" onChange={this.handleRecipientChange} value={this.state.recipientString} placeholder={"mottakere"} rows="1" style={{display: 'flex'}}/>
+                    <Form.Control as="textarea" value={this.state.description} onChange={this.handleDescriptionChange}  placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                    <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3" style={{display: 'flex'}}/>
+                    <Button style={{marginTop: "10px"}} className={"btn-primary"} onClick={() => this.sendMail(false)} block>Send Email</Button>
+                </Form>
+            )
+        }else if(!on){
+            return null;
+        }else{
+           return <Form style={{marginTop: "10px"}}>
+                <h1>Send en epost </h1>
+                <Form.Control as="textarea" value={this.state.description} onChange={this.handleDescriptionChange}  placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3" style={{display: 'flex'}}/>
+                <Button style={{marginTop: "10px"}} className={"btn-primary"} onClick={() => this.sendMail(true)} block>Send Email</Button>
+            </Form>
+        }
+
+    }
+
+    getUserEmail() {
+        let token = jwt.decode(authService.getToken());
+        if (!token.email) {
+            return token.email;
+        }else{
+            this.setAlert("ERROR", "danger");
+            return undefined
+        }
+    }
+
+    sendMail(bug){
+        console.log("Sendmail called");
+        //let bug = false;
+        let userMail = this.getUserEmail();
+        if(bug){
+            if(!userMail){
+                let userMail = "anon UwU";
+            }
+            let mail = new BugMail(userMail, this.state.description, this.state.text);
+           service.sendBug(mail)
+                .then(res => (this.setAlert(res.toString(), "info")))
+                .catch(err => this.setAlert(err.toString(), "danger"));
+        }else{
+            if(!userMail){
+                this.setAlert("NOT LOGGED IN", "danger");
+            }
+            let to = [];
+            this.state.mails.map(address => {
+                if(this.state.recipientString.search(address) !== -1){
+                    to.push(address);
+                }
+            });
+            console.log(to);
+            let mail = new Mail(to, userMail, this.state.description, this.state.text);
+            service.sendMails()
+                .then(res => (this.setAlert(res.toString(), "info")))
+                .catch(err => this.setAlert(err.toString(), "danger"))
+        }
+    }
+
+   /* yo(){
+        <Form style={{marginTop: "10px"}}>
+            <form value={this.description} as="textarea"  placeholder={"beskrivelse"}
+                  rows="2" style={{display: 'flex'}}
+                  onChange={(event: SyntheticInputEvent<HTMLInputElement>) => (this.description = event.target.value)}>
+                <Form.Control as="textarea"  placeholder={"beskrivelse"}
+                              rows="2" style={{display: 'flex'}}/>
+            </form>
+            <form
+                onChange={(event: SyntheticInputEvent<HTMLInputElement>) => (this.text = event.target.value)}>
+                <Form.Control as="textarea" placeholder={"tekst"} rows="3" style={{display: 'flex'}}/>
+            </form>
+            <Button className={"btn-primary"} onClick={this.sendMail}>Send Email</Button>
+        </Form>
+    }*/
+
+    /*mounted(){
+        if(this.props.description){
+            this.description = this.props.description
+        }else if(this.props.hasRecipients){
+            console.log("in Mounted"+this.props.hasRecipients);
+            this.hasRecipients = this.props.hasRecipients
+        }
+        this.props.artists.map(user => {
+            this.recipientString+=user.email+", ";
+            this.mails.push(user.email);
+        });
+
+    }*/
 
 }
+
+

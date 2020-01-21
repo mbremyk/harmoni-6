@@ -18,6 +18,25 @@ export class User {
     email;
 }
 
+export class BugMail {
+    from;
+    description;
+    text;
+
+    constructor(from, description, text){
+        this.from = from;
+        this.description = description;
+        this.text = text;
+    }
+}
+export class Mail extends BugMail{
+    to;
+    constructor(to, from, description, text){
+        super(from, description, text);
+        this.to = text;
+    }
+}
+
 export class Event {
     eventId;
     organizerId;
@@ -259,6 +278,17 @@ class Services {
         console.log("Downloading");
         //This approach to downloading the files does not work
         return axios.get(url+"/rider/"+event+"/"+artist).then(response => response.data);
+    }
+
+    /*
+        EMAIL
+     */
+    sendBug(mail){
+        return axios.post(url+"/mail/bug", mail).then(response => response.data);
+    }
+
+    sendMails(mail){
+        return axios.post(url+"/mail/info", mail).then(response => response.data);
     }
 
 

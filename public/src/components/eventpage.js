@@ -6,6 +6,7 @@ import * as React from 'react';
 import {Event, service, Ticket, User} from '../services';
 import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
+import {MailForm} from "../widgets";
 
 const jwt = require("jsonwebtoken");
 
@@ -69,8 +70,7 @@ export class EventPage extends Component {
                             </Col>
                         </Row>
                         {this.EditButton()}
-
-
+                        {this.emailForm()}
                     </Container>
                 </div>
 
@@ -252,6 +252,20 @@ export class EventPage extends Component {
         }
 
     }
+
+    emailForm(){
+        if(this.artists.length != 0){
+            return <MailForm hasRecipients={true} description={"Info"} artists={this.artists} toggleable={true}/>
+        }else{
+            return null;
+        }
+
+    }
+
+
+
+
+
 
     //the button will render if the user is an artist or an organizer
     DownloadContract() {
