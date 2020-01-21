@@ -96,7 +96,9 @@ export class myPage extends Component {
                                     href="/hjem">
                                     Forkast endringer
                                 </Button>
-                                <ModalPopup onDelete={this.delete}/>
+                                <ModalPopup onClose={this.delete}
+                                            title={"Slett bruker"}
+                                            label={"Skriv inn ditt passord for å bekrefte sletting"} />
 
 
                             </Form>

@@ -2,6 +2,7 @@ import {Component} from "react-simplified";
 import {Col, Card, Button} from "react-bootstrap";
 import * as React from 'react';
 import Row from "react-bootstrap/Row";
+import moment from "moment";
 
 
 import {service} from "./services";
@@ -57,8 +58,12 @@ export class EventInfo extends Component {
         } else return <small className="text-muted"> Publisert {this.props.uploaded}</small>
     }
 
-    getCancelledTxt() {
-        if (this.props.event.cancelled) return "Kansellert!";
+    getImageOverlayTxt() {
+        let now = moment().format('YYYY-MM-DD HH:MM');
+        moment(now).add(1, 'h');
+        if (this.props.event.cancelled) {return "Utgått!";}
+        else if (moment(now).isBetween(this.props.start_date, this.props.end_date, null, "[]")){return "Pågår nå!";}
+        else if(moment(now).isAfter(this.props.end_date)){return "Arkivert"}
         else return "";
     }
 
@@ -70,11 +75,11 @@ export class EventInfo extends Component {
                       className={this.state.hoverCss}
                       onClick={() => window.location = "/arrangement/" + this.props.link}
                 >
-                    <Card className="text-danger border-0">
+                    <Card className="text-warning border-0">
                         <div style={{height: "13em", overflow: "hidden"}}>
                             <Card.Img src={this.props.imageUrl} alt={this.title}/>
                             <Card.ImgOverlay>
-                                <Card.Title><h1>{this.getCancelledTxt()}</h1></Card.Title>
+                                <Card.Title><h1>{this.getImageOverlayTxt()}</h1></Card.Title>
                             </Card.ImgOverlay>
                         </div>
                     </Card>
@@ -218,7 +223,7 @@ export class ModalPopup extends Component {
     handleSubmit = (event) => {
         event.preventDefault();
         this.setState({show: false});
-        this.props.onDelete(this.state.password);
+        this.props.onClose(this.state.password);
     };
 
     render() {
@@ -229,12 +234,12 @@ export class ModalPopup extends Component {
                 </Button>
                 <Modal show={this.state.show} onHide={this.handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Slett bruker</Modal.Title>
+                        <Modal.Title>{this.props.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form onSubmit={this.handleSubmit}>
                             <Form.Group>
-                                <Form.Label>Skriv inn ditt passord for å bekrefte sletting</Form.Label>
+                                <Form.Label>{this.props.label}</Form.Label>
                                 <Form.Control value={this.state.password}
                                               type={"password"}
                                               onChange={this.handlePassword}>
