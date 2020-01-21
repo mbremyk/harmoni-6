@@ -5,11 +5,11 @@ const sequelize = require("sequelize");
 const model = require('./model.js');
 const op = sequelize.Op;
 const mail = require("./mail.js");
-const props = require("./properties.js");
 const isCI = require('is-ci');
+const props = isCI ? "" : require("./properties.js");
 const test = (process.env.NODE_ENV === 'test');
 
-let mailProps = new props.MailProperties();
+let mailProps = isCI ? "" : new props.MailProperties();
 
 
 class Dao {
@@ -126,13 +126,16 @@ class Dao {
 
     async forgotPassword(email) {
         let result = await this.getUserByEmail(email);
-        if(result === null) { console.log('No email found for temp pass.'); return; }
+        if (result === null) {
+            console.log('No email found for temp pass.');
+            return;
+        }
 
         let newPass = Math.random().toString(36).substring(7);
         let salt = await this.getSaltByEmail(email);
         let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
 
-        console.log('!!! nytt passord: \'' + newPass + '\' for '+ email);
+        console.log('!!! nytt passord: \'' + newPass + '\' for ' + email);
 
         return model.UserModel.update(
             {
@@ -417,7 +420,7 @@ class Dao {
      * @returns {Promise<Events[]>}
      */
     getMyEventsByUserId(userId) {
-        let eventsWhereUserIsArtist = model.GigModel.findAll({where:{artistId: userId}})
+        let eventsWhereUserIsArtist = model.GigModel.findAll({where: {artistId: userId}})
             .catch(error => {
                 console.error(error);
                 return [];
@@ -428,15 +431,18 @@ class Dao {
                 return [];
             });
 
-        return model.EventModel.findAll({where: {
-            [Op.or]:[
-                {eventId: eventsWhereUserIsArtist.map(e => e.eventId) },
-                {eventId: eventsWhereUserIsPersonnel.map(e => e.eventId) }
-            ]}})
+        return model.EventModel.findAll({
+            where: {
+                [Op.or]: [
+                    {eventId: eventsWhereUserIsArtist.map(e => e.eventId)},
+                    {eventId: eventsWhereUserIsPersonnel.map(e => e.eventId)}
+                ]
+            }
+        })
             .catch(error => {
-            console.error(error);
-            return [];
-        });
+                console.error(error);
+                return [];
+            });
 
     }
 
