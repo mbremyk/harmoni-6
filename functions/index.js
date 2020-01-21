@@ -2,9 +2,10 @@ Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
-const bodyParser = require("body-parser");
+let bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const hashPassword = require("./userhandling");
+const filehandler = require("./filehandler");
 let cors = require("cors");
 let fs = require("fs");
 const mail = require("./mail.js");
@@ -25,22 +26,11 @@ if (!process.env.FIREBASE_CONFIG) {
     exports.webApi = functions.https.onRequest(main);
 }
 
-const {fileParser} = require('express-multipart-file-parser');
 
-app.use(fileParser({
-    rawBodyOptions: {
-        limit: '15mb',  //file size limit
-    },
-    busboyOptions: {
-        limits: {
-            fields: 20   //Number text fields allowed
-        }
-    },
-}));
 app.use(cors({origin: true}));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({limit: '100mb', extended: true}));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 const path = require('path');
 
 const main = express();
@@ -54,7 +44,6 @@ const model = require('./model.js');
 const dao = require('./dao.js');
 let db = new dao();
 model.syncModels();
-
 let privateKey = (publicKey = "shhhhhverysecret");
 const deployed = true;
 
@@ -427,6 +416,24 @@ app.get("/auth/users/:userId", (req, res) => {
  */
 
 
+/**
+ *
+ */
+app.post("/events", (req, res) => {
+    console.log("POST-request - /events");
+    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
+        filehandler.uploadToCloud(req.body.imageUrl, "img.png" )
+            .then(url => {
+                console.log(url);
+                req.body.imageUrl = url;
+                console.log(req.body.imageUrl);
+                db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
+            });
+    }else{
+        db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
+    }
+
+});
 
 
 
