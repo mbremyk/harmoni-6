@@ -264,7 +264,6 @@ class Dao {
                 startTime: event.startTime,
                 endTime: event.endTime,
                 imageUrl: event.imageUrl,
-                image: event.image,
                 description: event.description,
             })
             .then(created => ({insertId: (created.eventId)}))
@@ -287,6 +286,8 @@ class Dao {
                 organizerId: event.organizerId,
                 eventName: event.eventName,
                 address: event.address,
+                city: event.city,
+                placeDescription: event.placeDescription,
                 ageLimit: event.ageLimit,
                 startTime: event.startTime,
                 endTime: event.endTime,
@@ -457,11 +458,12 @@ class Dao {
     /**
      * Removes Personnel from an event
      *
-     * @param personnel
+     * @param eventId
+     * @param personnelId
      */
-    removePersonnel(personnel) {
+    removePersonnel(eventId, personnelId) {
         return model.PersonnelModel.destroy(
-            {where: {eventId: personnel.eventId, personnelId: personnel.personnelId}})
+            {where: {eventId: eventId, personnelId: personnelId}})
             .then(() => true)
             .catch(error => {
                 console.error(error);
@@ -530,10 +532,11 @@ class Dao {
     /**
      * Removes and entry from the Tickets in the Database
      *
-     * @param ticket
+     * @param eventId
+     * @param type
      */
-    removeTicket(ticket) {
-        return model.TicketModel.destroy({where: {eventId: ticket.eventId, type: ticket.type}})
+    removeTicket(eventId, type) {
+        return model.TicketModel.destroy({where: {eventId: eventId, type: type}})
             .then(() => true)
             .catch(error => {
                 console.error(error);
@@ -572,7 +575,6 @@ class Dao {
             {
                 name: gig.contract.name,
                 data: gig.contract.data,
-                contentType: gig.contract.contentType
             })
             .then((created) => {
                 return model.GigModel.create(
