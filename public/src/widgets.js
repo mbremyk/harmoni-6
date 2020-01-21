@@ -158,17 +158,92 @@ export class UploadWidget extends Component {
         data.append("file", selectedFile);
         console.log(data);
     };
+}
 
-    /*recipients(){
-        if(this.props.hasRecipients){
+export class MailForm extends Component{
+    constructor(props) {
+        super(props);
+        console.log(props.hasRecipients);
+        this.state = {
+            recipientString: this.getRecipentString(props) ? this.getRecipentString(props) : "",
+            description: props.description ? props.description : "",
+            text: "",
+            mails: this.getAllMails(props) ? this.getAllMails(props): [],
+            hasRecipients: props.hasRecipients ? true : false,
+            toggle: false,
+            toggleable: props.toggleable ? props.toggleable: false,
+            arrow: "▼",
+            error: "",
+            errorType: ""
+        };
+    }
+
+    getRecipentString(props){
+        console.log("getRes called");
+        let recipients = "";
+        if(props.artists){
+            props.artists.map(user => {
+                recipients = recipients += user.user.email + ", "
+            });
+        }
+        return recipients;
+    }
+
+    getAllMails(props){
+        console.log("getMails called");
+        let mails = [];
+        if(props.artists){
+            props.artists.map(user => {
+                mails.push(user.user.email);
+            });
+        }
+        return mails;
+    }
+
+    handleRecipientChange = (e) =>{
+        this.setState({recipientString: e.target.value});
+    }
+
+    setAlert(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout( () => this.setState({error: '', errorType: 'primary'}), 5000);
+    }
+
+    handleTextChange = (e) =>{
+        this.setState({text: e.target.value});
+    }
+
+    handleDescriptionChange = (e) =>{
+        //this.setState({description: ""});
+        console.log(e.target.value);
+        this.setState({description: e.target.value});
+    }
+
+    render(){
+        if(this.state.toggleable){
             return(
-                <Form.Control as="textarea" onChange={this.handleRecipientChange} value={this.recipientString} placeholder={"mottakere"} rows="1" style={{display: 'flex'}}/>
+                <div className={"container"} style={{marginTop: "10px"}}>
+                    {(this.state.error)?
+                        <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                        <div style={{height: '3em'}}/>}
+                    <Button className={"btn-info"} onClick={this.toggleMail}>
+                        Send epost {this.state.arrow}
+                    </Button>
+                    {(this.state.toggle) ? this.toggleForm(this.state.toggle): <div style={{height: "3em"}}/>}
+                </div>
             )
         }else{
-            return null;
-        }
+            return(
+                <div className={"container"} style={{marginTop: "10px"}}>
+                    {(this.state.error)?
+                        <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                        <div style={{height: '3em'}}/>}
+                    {this.toggleForm(true)}
+                </div>
+            )
 
-    }*/
+        }
+    }
 
     toggleForm(on){
         console.log(this.state.hasRecipients);
