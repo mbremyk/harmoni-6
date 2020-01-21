@@ -27,7 +27,6 @@ if (!process.env.FIREBASE_CONFIG) {
 }
 
 app.use(cors({origin: true}));
-
 app.use(bodyParser.json({limit: '100mb', extended: true}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 const path = require('path');
@@ -527,7 +526,9 @@ app.get("/auth/events/users/:userId/myevents", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId', (req, res) => {
-    return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    let userId = jwt.decode(req.headers['x-access-token']).userId;
+	if(req.body.organizerId !== userId) { res.status(401); console.log('Not authorized to update event'); return; }
+	return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
 
@@ -707,6 +708,5 @@ mail.addMailEndpoints(app, db);
 /**
  * @link mail
  */
-
 
 console.log("Server initalized");
