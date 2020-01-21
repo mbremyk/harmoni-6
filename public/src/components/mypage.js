@@ -10,6 +10,9 @@ import * as jwt from "jsonwebtoken";
 import Alert from "react-bootstrap/Alert";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import {Card} from "react-bootstrap";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import {ModalPopup} from "../widgets";
 
 /*
 * My page container for "/min-side". Ability to change name, email and password for a logged in user.
@@ -18,7 +21,7 @@ export class myPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            userId: '',
+            userId: "",
             username: '',
             email: '',
             password1: '',
@@ -87,11 +90,17 @@ export class myPage extends Component {
                                     Lagre
                                 </Button>
                                 <Button
+                                    className="mr-2"
                                     variant="secondary"
                                     type="button"
                                     href="/hjem">
                                     Forkast endringer
                                 </Button>
+                                <ModalPopup onClose={this.delete}
+                                            title={"Slett bruker"}
+                                            label={"Skriv inn ditt passord for å bekrefte sletting"} />
+
+
                             </Form>
                         </div>
                     </Card>
@@ -192,4 +201,27 @@ export class myPage extends Component {
     handleNewPassword2Change(event) {
         this.setState({password2: event.target.value});
     }
+
+    async delete(password) {
+        let oldToken = authService.getToken()
+
+        let res = await authService.login(this.state.email ,password);
+        //if(res.status === 401) return console.log("TEST!");
+
+        if(oldToken !== authService.getToken()){
+            service.deleteUser(this.state.userId)
+                .then(() => {
+                        authService.deleteToken();
+                        this.props.history.push("/#");
+                    }
+                )
+        }else{
+            this.setError("Feil passord!", "danger")
+        }
+
+
+
+
+    }
+
 }
