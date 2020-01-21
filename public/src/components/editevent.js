@@ -1,4 +1,5 @@
 import {service, Event, Gig} from "../services";
+import {authService} from "../AuthService";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -17,6 +18,8 @@ import {HarmoniNavbar} from "./navbar";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import {LoginForm} from "./login";
+
+const jwt = require("jsonwebtoken");
 
 export class EditEvent extends Component{
 
@@ -194,6 +197,8 @@ export class EditEvent extends Component{
     render() {
 
         if(!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
+
+        if (!(this.state.organizerId == jwt.decode(authService.getToken()).userId)) return null;
 
         return(
             <div>

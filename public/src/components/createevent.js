@@ -1,4 +1,4 @@
-import {Artist, Event, Gig, Personnel, service, SimpleFile} from "../services";
+import {Artist, Event, Gig, Personnel, service, SimpleFile, User} from "../services";
 import {Component} from "react-simplified";
 import {HarmoniNavbar} from "./navbar";
 import React from "react";
@@ -74,6 +74,8 @@ export class AddEvent extends Component {
         this.personnelRole = this.handlePersonnelRole.bind(this);
         this.city = this.handleCityChange.bind(this);
         this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
+        this.addArtistByMail = this.handleAddArtistByMailChange.bind(this);
+        this.artistEmail = this.handleArtistEmailChange.bind(this);
 
 
         this.state = {
@@ -95,7 +97,14 @@ export class AddEvent extends Component {
             artists: [],
             personnelAdd: [],
             personnelRole: '',
+            addArtistByMail: [],
+            artistEmail: "",
         };
+    }
+
+    handleArtistEmailChange(event, artist) {
+        artist.artistEmail = event.target.value;
+        this.setState({artistEmail: event.target.value});
     }
 
     handleEventNameChange(event) {
@@ -133,6 +142,10 @@ export class AddEvent extends Component {
 
     handleImageUrlChange(event) {
         this.setState({imageUrl: event.target.value})
+    }
+
+    handleAddArtistByMailChange(event) {
+        this.setState({addArtistByMail: [...this.state.addArtistByMail, event]})
     }
 
     handleArtistsAdd(event) {
@@ -184,6 +197,26 @@ export class AddEvent extends Component {
 
 
     sendGigs = (eventId) => new Promise((resolve, reject) => {
+
+        console.log(this.state.addArtistByMail)
+
+        this.state.addArtistByMail.map(artist => {
+            let u = new User();
+            u.email = artist.artistEmail;
+            u.password = "";
+            u.username = "";
+            service.createUser(u).then(createdUser => {
+                console.log("hallo???")
+                console.log(createdUser.insertId)
+                artist.userId = createdUser.insertId
+            }).catch(error => console.log(error))
+        })
+
+
+        console.log(this.state.addArtistByMail)
+
+        this.state.addArtistByMail.map(artist => this.setState({artistsAdd: [...this.state.artistsAdd, artist]}))
+
         if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
             Promise.all(this.state.artistsAdd.map(artist => {
                 this.toBase64(artist.contract).then(contractData => {
@@ -350,54 +383,118 @@ export class AddEvent extends Component {
                                     />
                                 </Form.Group>
 
-                                <Form.Group as={Col} sm={"2"}>
+                                <Form.Group as={Col} sm={"12"}>
 
-                                    <Form.Label>Artist</Form.Label>
+                                    <Row>
+                                        <Col>
+                                            <Button type="button" variant={"success"}
+                                                    onClick={() => {
+                                                        this.addArtistByMail(new Artist(null, null, null, ""))
+                                                    }
+                                                    }>Legg til med mail</Button>
+                                        </Col>
 
-                                    <Dropdown onSelect={this.handleArtistsAdd}>
+                                        <Col>
 
-                                        <Dropdown.Toggle variant={"success"} id="dropdown">
-                                            Velg artist
-                                        </Dropdown.Toggle>
+                                            <Dropdown onSelect={this.handleArtistsAdd}>
 
-                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                       as={this.CustomMenu}>
+                                                <Dropdown.Toggle variant={"success"} id="dropdown">
+                                                    Velg artist
+                                                </Dropdown.Toggle>
 
-                                            {this.state.artists.filter(artist => !this.state.artistsAdd.some(e => e.userId === artist.userId)).map(artist => (
-                                                <Dropdown.Item eventKey={artist.userId}>
-                                                    {artist.username}
-                                                </Dropdown.Item>
-                                            ))})
+                                                <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                               as={this.CustomMenu}>
 
-                                        </Dropdown.Menu>
+                                                    {this.state.artists.filter(artist => !this.state.artistsAdd.some(e => e.userId === artist.userId)).map(artist => (
+                                                        <Dropdown.Item eventKey={artist.userId}>
+                                                            {artist.username}
+                                                        </Dropdown.Item>
+                                                    ))})
 
-                                    </Dropdown>
+                                                </Dropdown.Menu>
+
+                                            </Dropdown>
+                                        </Col>
+
+                                        <Col>
+                                            <Dropdown onSelect={this.handlePersonnelAdd}>
+
+                                                <Dropdown.Toggle variant={"success"} id="dropdown">
+                                                    Velg personell
+                                                </Dropdown.Toggle>
+
+                                                <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                               as={this.CustomMenu}>
+                                                    {this.state.artists.filter(artist => !this.state.personnelAdd.some(e => e.userId === artist.userId)).map(artist => (
+                                                        <Dropdown.Item eventKey={artist.userId}>
+                                                            {artist.username}
+                                                        </Dropdown.Item>
+                                                    ))}
+                                                </Dropdown.Menu>
+
+                                            </Dropdown>
+                                        </Col>
+
+
+                                    </Row>
+
+
 
                                 </Form.Group>
 
-                                <Form.Group as={Col} sm={"10"}>
+                                <Form.Group as={Col} sm={"12"}>
 
-                                    <ListGroup title={"Valgte artister"}>
+                                    <Card>
+                                        <Card.Title>
+                                            <h2 className="text-center">Artister</h2>
+                                        </Card.Title>
+
+                                        <ListGroup title={"Valgt personell"} className={"p-3"}>
+                                            {this.state.addArtistByMail.map(artist => (
+                                                <ListGroup.Item>
+
+
+                                                    <Row>
+
+                                                        <Form.Group as={Col} controlId="formBasicEmail">
+                                                            <Form.Control
+                                                                type="email"
+                                                                placeholder="Skriv inn email"
+                                                                value={artist.email}
+                                                                onChange={event => this.handleArtistEmailChange(event, artist)}/>
+                                                        </Form.Group>
+
+                                                        <Col>
+                                                            <Button type="button" variant={"danger"}
+                                                                    onClick={() => {
+                                                                        this.state.addArtistByMail.splice(this.state.addArtistByMail.indexOf(artist), 1)
+                                                                        this.setState({addArtistByMail: this.state.addArtistByMail});
+                                                                    }}>Fjern</Button>
+                                                        </Col>
+                                                    </Row>
+                                                </ListGroup.Item>
+                                            ))}
+
                                         {this.state.artistsAdd.map(artist => (
                                             <React.Fragment key={artist.userId}>
-                                                <Card>
-                                                    <Card.Title
-                                                        className="font-weight-bold text-center">{artist.username}</Card.Title>
-                                                    <ListGroupItem>
+                                                <ListGroup.Item>
                                                         <Row>
 
-                                                            <Form.Group as={Col} sm={"5"}>
-                                                                <label>Last opp kontrakt</label>
+                                                            <Col sm={"2"}>
+                                                                <label>{artist.username}</label>
+                                                            </Col>
+
+                                                            <Col sm={"2"}>
+                                                                <label>Last opp kontrakt:</label>
+                                                            </Col>
+
+                                                            <Form.Group as={Col} sm={"6"}>
                                                                 <input type="file" className="form-control"
                                                                        encType="multipart/form-data" name="file"
                                                                        onChange={event => this.handleContractChange(event, artist)}/>
                                                             </Form.Group>
 
-                                                            <Col>
-                                                            </Col>
-
                                                             <Col sm={"2"}>
-                                                                <label>Fjern artist</label>
                                                                 <Button type="button" variant={"danger"}
                                                                         onClick={() => {
                                                                             this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist), 1)
@@ -407,43 +504,27 @@ export class AddEvent extends Component {
                                                             </Col>
 
                                                         </Row>
-                                                    </ListGroupItem>
-                                                </Card>
+                                                </ListGroup.Item>
                                             </React.Fragment>
                                         ))}
-                                    </ListGroup>
+                                        </ListGroup>
+                                    </Card>
 
                                 </Form.Group>
 
-                                <Form.Group as={Col} sm={"2"}>
+                                <Form.Group as={Col} sm={"12"}>
 
-                                    <Form.Label>Personell</Form.Label>
+                                    <Card>
+                                        <Card.Title>
+                                            <h2 className="text-center">Personell</h2>
+                                        </Card.Title>
 
-                                    <Dropdown onSelect={this.handlePersonnelAdd}>
-
-                                        <Dropdown.Toggle variant={"success"} id="dropdown">
-                                            Velg personell
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                       as={this.CustomMenu}>
-                                            {this.state.artists.filter(artist => !this.state.personnelAdd.some(e => e.userId === artist.userId)).map(artist => (
-                                                <Dropdown.Item eventKey={artist.userId}>
-                                                    {artist.username}
-                                                </Dropdown.Item>
-                                            ))}
-                                        </Dropdown.Menu>
-
-                                    </Dropdown>
-
-                                </Form.Group>
-
-                                <Form.Group as={Col} sm={"10"}>
-
-                                    <ListGroup title={"Valgt personell"}>
+                                        <ListGroup title={"Valgt personell"} className={"p-3"}>
                                         {this.state.personnelAdd.map(personnel => (
                                             <React.Fragment key={personnel.userId}>
-                                                <ListGroupItem>
+
+                                                <ListGroup.Item>
+
                                                     <Row>
                                                         <Col>
                                                             {personnel.username}
@@ -465,10 +546,13 @@ export class AddEvent extends Component {
                                                             }>Fjern</Button>
                                                         </Col>
                                                     </Row>
-                                                </ListGroupItem>
+
+                                                </ListGroup.Item>
                                             </React.Fragment>
                                         ))}
                                     </ListGroup>
+                                    </Card>
+
                                 </Form.Group>
 
                                 <Form.Group as={Col} sm={"6"}>
