@@ -131,7 +131,6 @@ export class EventPage extends Component {
                         this.isArtist = true;
                     }
                 });
-                console.log("Er jeg artist? " + this.isArtist);
 
             })
             .catch((error) => console.log(error));
@@ -149,7 +148,6 @@ export class EventPage extends Component {
         if (artistId === token.userId) {
             return (
                 <div>
-
                     <Button variant="primary"
                             size="sm"
                             href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
@@ -157,10 +155,22 @@ export class EventPage extends Component {
                     </Button>
                     <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
+
         } else if (this.isOrganizer) {
-            return <Col><DownloadWidget artist={artistId} event={this.currentEvent.eventId}/></Col>;
+            return (
+                <div>
+                    <Button variant="primary">
+                        Godkjenn Rider
+                    </Button>
+                    <Col>
+                        <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
+                    </Col>
+                </div>
+            );
+
         }
     }
+
 
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
@@ -264,4 +274,19 @@ export class EventPage extends Component {
 
 
     }
+
+    /*
+        getRiderItems(artistid)
+        {
+            var riderItems = [];
+            service.getRiderItems(this.currentEvent.eventId, artistid)
+                .then(items => {
+                    console.log(items);
+                    riderItems = items;
+                    return riderItems;
+                })
+                .catch((error) => console.log(error));
+        }*/
+
+
 }

@@ -196,7 +196,7 @@ app.use("/auth", (req, res, next) => {
  * @return {json} {jwt: token}
  */
 app.post("/login2", (req, res) => {
-        console.log("POST-request - /login");
+    console.log("POST-request - /login");
 
     return db.getSaltByEmail(req.body.email)
         .then(salt => {
@@ -212,8 +212,7 @@ app.post("/login2", (req, res) => {
                             let token = getToken(user.dataValues);
                             res.json({jwt: token});
                         })
-                    }
-                    else {
+                    } else {
                         res.status(401);
                         res.json({error: "Not authorized"})
                     }
@@ -233,7 +232,7 @@ app.post("/login", async (req, res) => {
 
     console.log('login:' + ok1 + ' ' + ok2);
 
-    if(ok1) {
+    if (ok1) {
 
         return db.getUserByEmail(req.body.email).then(user => {
             console.log(user.dataValues);
@@ -241,7 +240,7 @@ app.post("/login", async (req, res) => {
             res.json({jwt: token});
         });
 
-    } else if(ok2) {
+    } else if (ok2) {
 
         let result = await db.deleteOneTimeLogin(req.body.email);
         return db.getUserByEmail(req.body.email).then(user => {
@@ -425,9 +424,6 @@ app.get("/auth/users/:userId", (req, res) => {
 /*
     EVENTS
  */
-
-
-
 
 
 app.post("/auth/events", (req, res) => {
@@ -687,7 +683,7 @@ app.put("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
 app.get("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
-    db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(400));
+    db.getRiderItems(eventId, artistId).then(riderItems => (riderItems.length !== 0) ? res.status(201).send(riderItems) : res.sendStatus(404));
 });
 
 /*

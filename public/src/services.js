@@ -337,7 +337,7 @@ class Services {
     /**
      * @param eventId: number
      * @param artistId: number
-     * @returns Promise<>: boolean
+     * @returns Promise<>: RiderItem[]
      */
     getRiderItems(eventId, artistId) {
         return axios.get(url + '/auth/events/' + eventId + '/gigs/' + artistId + '/rider', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
