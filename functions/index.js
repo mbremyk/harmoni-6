@@ -500,6 +500,8 @@ app.get("/auth/events/users/:userId", (req, res) => {
  * @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId', (req, res) => {
+	let userId = jwt.decode(req.headers['x-access-token']).userId;
+	if(req.body.organizerId !== userId) { res.status(401); return; }
 	return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
 });
 
