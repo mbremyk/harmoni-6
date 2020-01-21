@@ -1,12 +1,5 @@
 class DefaultMail {
-    user;
-    date;
-    text;
-    subject;
-    email;
-    password;
 
-    hilsen = `\nMed vennlig hilsen\nHarmoni team 6 support team`;
 
     set hilsen(hilsen) {
     }
@@ -28,9 +21,6 @@ class DefaultMail {
             this.hilsen;
     }
 
-    get subject() {
-        return this.subject;
-    }
 
     get contactText() {
         return `Hei, ${this.user}\n\n` +
@@ -46,7 +36,13 @@ class DefaultMail {
     }
 
     constructor() {
-
+        this.hilsen = `\nMed vennlig hilsen\nHarmoni team 6 support team`;
+        this.user;
+        this.date;
+        this.ext;
+        this.subject;
+        this.email;
+        this.password;
     }
 }
 
