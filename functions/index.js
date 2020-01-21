@@ -438,8 +438,18 @@ app.post("/events", (req, res) => {
 
 
 app.post("/auth/events", (req, res) => {
-    console.log("POST-request - /auth/events");
-    db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
+    console.log("POST-request - /events");
+    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
+        filehandler.uploadToCloud(req.body.imageUrl, "img.png" )
+            .then(url => {
+                console.log(url);
+                req.body.imageUrl = url;
+                console.log(req.body.imageUrl);
+                db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
+            });
+    }else{
+        db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
+    }
 });
 
 
