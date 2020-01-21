@@ -161,7 +161,7 @@ export class CreateUserForm extends Component {
 							</Button>
 
                             <Button
-                                href="/"
+                                href="/logg-inn"
                                 variant="secondary"
                                 type="button">
                                 Avbryt
