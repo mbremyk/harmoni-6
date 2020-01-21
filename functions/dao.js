@@ -317,15 +317,28 @@ class Dao {
 
 
     cancelEvent(eventId) {
-        return model.EventModel.update(
-            {
-                cancelled: true
-            },
-            {where: {eventId: eventId}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
-            .catch(error => {
-                console.error(error);
-                return false;
+        return model.EventModel.findAll({
+            where: {eventId: eventId},
+            include: [{
+                model: model.UserModel
+            }, {
+                model: model.GigModel
+            }, {
+                model: model.PersonnelModel
+            }]
+        })
+            .then(res => {
+                console.log(res);
+                model.EventModel.update(
+                    {
+                        cancelled: true
+                    },
+                    {where: {eventId: eventId}})
+                    .then(cancelled => cancelled[0] === 1 /*affected rows === 1*/)
+                    .catch(error => {
+                        console.error(error);
+                        return false;
+                    });
             });
     }
 
