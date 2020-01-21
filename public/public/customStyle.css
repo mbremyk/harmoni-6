@@ -6,10 +6,15 @@
 
 }*/
 
-body{
+body {
     background-image: url(/pictures/geometricPattern.png);
     background-repeat: repeat;
-    min-height: 100%;
+    min-height: 100vh;
+    top: 0;
+}
+
+root{
+    height: 100%;
 }
 
 .landingpage {
@@ -26,33 +31,33 @@ body{
     font-family: 'Lemonada', cursive;
 }
 
-#root {
-    height: 100%;
-}
-
 /*Styling for eventinfo*/
 .eventinfo
  {
      color: black;
      text-decoration: none;
+
  }
 
 .eventinfo a:hover
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:active
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:link
 {
     color: black;
     text-decoration: none;
+
 }
 
 .eventinfo a:visited
@@ -63,10 +68,8 @@ body{
 
 .footer {
     position: relative;
+    left: 0;
     bottom: 0;
-    right: 0;
     width: 100%;
+    text-align: center;
 }
-
-
-

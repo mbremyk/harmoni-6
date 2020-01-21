@@ -32,13 +32,12 @@ export class EventInfo extends Component {
      </div>
      {this.props.price}*/
 
-    getAgeLimitInfo(age_limit){
-        if(age_limit !== 0)
-        {
+    getAgeLimitInfo(age_limit) {
+        if (age_limit !== 0) {
             return <div>
                 <b>Aldersgrense:</b> {age_limit}
             </div>
-        }else{
+        } else {
             return <div className="font-weight-bold">
                 Tillat For Alle
             </div>
@@ -109,15 +108,14 @@ export class EventInfo extends Component {
     }
 }
 
-export class DownloadWidget extends Component  {
-    //TODO: Add event keys to fetch correct contract/rider
-    artist = 1;
-    event = 1;
-    type = "";
+export class DownloadWidget extends Component {
+    artist = '';
+    event = '';
+
     render() {
         return (
-            <Button onClick={this.download} variant="link" aria-label="Left Align" title="Last Ned">
-                last ned {this.type}
+            <Button onClick={this.download} variant="primary" title="Last Ned" size="sm">
+                Last ned kontrakt
             </Button>
         )
     }
@@ -125,62 +123,22 @@ export class DownloadWidget extends Component  {
     mounted() {
         this.artist = this.props.artist;
         this.event = this.props.event;
-        this.type = this.props.type;
     }
 
 
-    download () {
-        /*let eventId = this.e.eventId;
-        let artistId = this.artist.userId;*/
-        //let artistId = 1;
-        //console.log(this.artists[0].username);
-        console.log(this.artist);
-        if(this.type == "kontrakt") {
-            service.downloadContract(this.event, this.artist)
-                .then(response => {
-                    console.log("INNI Promise");
-                    console.log("response: "+response);
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }else if(this.type == "rider"){
-            service.downloadRider(this.event, this.artist)
-                .then(response => {
-                    console.log("INNI Promise");
-                    console.log("response: "+response);
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }else{
-            service.downloadOther(this.event, this.artist)
-                .then(response => {
-                    console.log("INNI Promise");
-                    console.log("response: "+response);
-                    let fileName = response.name;
-                    const link = document.createElement('a');
-                    link.download = response.name;
-                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
-                    //console.log(ret);
-                    link.href = response.data;
-                    link.click();
-                })
-        }
-
+    download() {
+        service
+            .downloadContract(this.event, this.artist)
+            .then(response => {
+                const link = document.createElement('a');
+                link.download = response.name;
+                link.href = response.data;
+                link.click();
+            })
     };
 }
 
 export class UploadWidget extends Component {
-    //TODO: Make sexy
     render() {
         return (
             <div className="container">
@@ -193,147 +151,13 @@ export class UploadWidget extends Component {
         )
     }
 
-	fileHandler = (e) => {
-		let eventId = 2;
-		let artistId = 5;
-		e.preventDefault();
-		let selectedFile =  e.target.files[0];
-		let data = new FormData();
-		data.append("file", selectedFile);
-		console.log(data);
-		service.uploadContract(data, eventId, artistId)
-			.then(res => console.log(res));
-	};
-}
-
-export class MailForm extends Component{
-    constructor(props) {
-        super(props);
-        console.log(props.hasRecipients);
-        this.state = {
-            recipientString: this.getRecipentString(props) ? this.getRecipentString(props) : "",
-            description: props.description ? props.description : "",
-            text: "",
-            mails: this.getAllMails(props) ? this.getAllMails(props): [],
-            hasRecipients: props.hasRecipients ? true : false,
-            toggle: false,
-            toggleable: props.toggleable ? props.toggleable: false,
-            arrow: "▼",
-            error: "",
-            errorType: ""
-        };
-    }
-
-    getRecipentString(props){
-        console.log("getRes called");
-        let recipients = "";
-        if(props.artists){
-            props.artists.map(user => {
-                recipients = recipients += user.user.email + ", "
-            });
-        }
-        return recipients;
-    }
-
-    getAllMails(props){
-        console.log("getMails called");
-        let mails = [];
-        if(props.artists){
-            props.artists.map(user => {
-                mails.push(user.user.email);
-            });
-        }
-        return mails;
-    }
-
-    handleRecipientChange = (e) =>{
-        this.setState({recipientString: e.target.value});
-    }
-
-    setAlert(message, variant) {
-        this.setState({error: message, errorType: variant});
-        setTimeout( () => this.setState({error: '', errorType: 'primary'}), 5000);
-    }
-
-    handleTextChange = (e) =>{
-        this.setState({text: e.target.value});
-    }
-
-    handleDescriptionChange = (e) =>{
-        //this.setState({description: ""});
-        console.log(e.target.value);
-        this.setState({description: e.target.value});
-    }
-
-    render(){
-        if(this.state.toggleable){
-            return(
-                <div className={"container"} style={{marginTop: "10px"}}>
-                    {(this.state.error)?
-                        <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
-                        <div style={{height: '3em'}}/>}
-                    <Button className={"btn-info"} onClick={this.toggleMail}>
-                        Send epost {this.state.arrow}
-                    </Button>
-                    {(this.state.toggle) ? this.toggleForm(this.state.toggle): <div style={{height: "3em"}}/>}
-                </div>
-            )
-        }else{
-                return(
-                    <div className={"container"} style={{marginTop: "10px"}}>
-                        {(this.state.error)?
-                            <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
-                            <div style={{height: '3em'}}/>}
-                        {this.toggleForm(true)}
-                    </div>
-                )
-
-        }
-    }
-    /*{(this.state.error)?
-                            <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
-                            <div style={{height: '3em'}}/>}
-                        {this.toggleForm(true)}*/
-
-    toggleMail(){
-        if(this.state.toggle){
-            //this.state.toggle = false;
-            this.setState({toggle: false });
-            this.setState({arrow: "▼"});
-            //this.state.arrow = "▼";
-        }else{
-            //this.state.toggle = true;
-            this.setState({toggle: true});
-            /*if(this.props.description){
-                this.setState({description : this.props.description});
-            }else if(this.props.hasRecipients){
-                console.log("in Mounted"+this.props.hasRecipients);
-                this.setState({hasRecipients: this.props.hasRecipients })
-                if(!this.state.recipientString){
-                    this.props.artists.map(user => {
-                        this.setState({recipientString: this.state.recipientString+=user.user.email+", " });
-                        this.mails.push(user.user.email);
-                    });
-                }
-            }*/
-            this.setState({arrow: "▲"});
-        }
-    }
-
-    /*mounted() {
-        if(this.props.description){
-            this.setState({description : this.props.description});
-        }else if(this.props.hasRecipients){
-            console.log("in Mounted"+this.props.hasRecipients);
-            this.setState({hasRecipients: this.props.hasRecipients });
-            if(!this.state.recipientString){
-                this.props.artists.map(user => {
-                    this.setState({recipientString: this.state.recipientString+=user.user.email+", " });
-                    this.mails.push(user.user.email);
-                });
-            }
-        }
-    }*/
+    fileHandler = (e) => {
+        e.preventDefault();
+        let selectedFile = e.target.files[0];
+        let data = new FormData();
+        data.append("file", selectedFile);
+        console.log(data);
+    };
 
     /*recipients(){
         if(this.props.hasRecipients){
