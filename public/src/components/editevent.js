@@ -282,6 +282,8 @@ export class EditEvent extends Component {
     }
 
     handleTicketsAdd() {
+
+
         let errmsg = "";
         if ((this.state.tickets.some(t => t.type.trim() === this.state.ticketType.trim()) && !(this.state.deletedTickets.some(t => t.type.trim() === this.state.ticketType.trim())))) {
             errmsg += "Denne billett-typen finnes allerede!";
@@ -378,6 +380,7 @@ export class EditEvent extends Component {
     }
 
     handleSubmit() {
+
         let errmsg = "";
         // check empty fields
         if (!this.state.eventName.trim() || !this.state.eventAddress.trim() || !this.state.eventDescription.trim() || !this.state.city.trim()) {
@@ -420,8 +423,6 @@ export class EditEvent extends Component {
 
 
     render() {
-
-        if (!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
 
         return (
             <div>
