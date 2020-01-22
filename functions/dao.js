@@ -8,6 +8,7 @@ const mail = require("./mail.js");
 const isCI = require('is-ci');
 const props = isCI ? "" : require("./properties.js");
 const test = (process.env.NODE_ENV === 'test');
+const filehandler = require("./filehandler.js");
 
 let mailProps = isCI ? "" : new props.MailProperties();
 
@@ -337,6 +338,7 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     deleteEvent(eventId) {
+        console.log("Deleteevent called");
 
         if (!isCI && !test) {
             return this.getEventByEventId(eventId)
@@ -360,7 +362,7 @@ class Dao {
                                                         subject: `Arrangement slettet: ${event.eventName}`,
                                                         text: `Arrangementet ${event.eventName}, som du var artist eller personell på, har blitt slettet.\nHvis du lurer på hvorfor, kan du ta kontakt med organisator ${user.username} på mail: ${user.email}\n\nMed vennlig hilsen\nHarmoni team 6`
                                                     };
-                                                    return model.GigModel.destroy({where: {eventId: eventId}})
+                                                    return this.deleteGigs(eventId)
                                                         .then(() => {
                                                             return model.TicketModel.destroy({where: {eventId: eventId}})
                                                                 .then(() => {
@@ -384,7 +386,7 @@ class Dao {
                 });
 
         } else {
-            return model.GigModel.destroy({where: {eventId: eventId}})
+            return this.deleteGigs(eventId)
                 .then(() => {
                     return model.TicketModel.destroy({where: {eventId: eventId}})
                         .then(() => {
@@ -398,7 +400,7 @@ class Dao {
                         });
                 }).catch(error => {
                     console.error(error);
-                    return false;
+                    return null;
                 })
         }
     }
@@ -747,6 +749,23 @@ class Dao {
             .catch(error => {
                 console.error(error);
                 return [];
+            });
+    }
+
+    deleteGigs(eventId) {
+        console.log("Delete gigs called");
+        return model.GigModel.findAll({
+            where: {eventId: eventId}
+        })
+            .then(gigs => {
+                let toDelete = [];
+                gigs.map(gig => {
+                    model.FileModel.findByPk(gig.contract)
+                        .then(result => {
+                            //toDelete.push(result.name);
+                            filehandler.deleteFromCloud(result.name, false);
+                        })
+                });
             });
     }
 

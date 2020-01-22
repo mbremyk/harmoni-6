@@ -1,3 +1,4 @@
+
 Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
@@ -530,7 +531,20 @@ app.get("/auth/events/users/:userId/myevents", (req, res) => {
 app.put('/auth/events/:eventId', (req, res) => {
     let userId = jwt.decode(req.headers['x-access-token']).userId;
 	if(req.body.organizerId !== userId) { res.status(401); console.log('Not authorized to update event'); return; }
-	return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    db.getEventByEventId(req.params.eventId)
+        .then(item => {
+                console.log("deleting old");
+                filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                console.log("uploading  new");
+                filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
+                    .then(data => {
+                        console.log(data.url);
+                        req.body.imageUrl = data.url;
+                        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+                    })
+                    .catch(err => res.status(400));
+            }
+        )
 });
 
 
@@ -544,7 +558,14 @@ app.put('/auth/events/:eventId', (req, res) => {
 
 app.delete('/auth/events/:eventId', (req, res) => {
     console.log("DELETE-request - /events/" + req.params.eventId);
-    return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.sendStatus(201) : res.status(400))
+    db.getEventByEventId(req.params.eventId)
+        .then(item => {
+                filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                console.log("Deleted event image");
+                return db.deleteEvent(req.params.eventId).then(deleteOk => deleteOk ? res.sendStatus(201) : res.status(400))
+                    .catch(err => res.status(400));
+            }
+        )
 });
 
 
@@ -648,7 +669,6 @@ app.get("/events/:eventId/tickets", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/gigs", (req, res) => {
-    console.log(req.body);
     if (req.body.contract.data && req.body.contract.data.includes("base64")) {
         filehandler.uploadToCloud(req.body.contract.data, req.body.contract.name, false)
             .then(file => {
@@ -683,9 +703,7 @@ app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
     db.getContract(eventId, artistId).then(contract => {
         filehandler.downloadFromCloud(contract.name)
             .then(dataString => {
-                console.log("Før: " + contract.data);
                 contract.data = dataString;
-                console.log("Etter: " + contract.data);
                 res.status(201).send(contract);
             })
             .catch(err => {
