@@ -50,7 +50,6 @@ export default function EditEvent() {
     const [personnelAdd, setPersonnelAdd] = useState([]);
     const [personnelUpdate, setPersonnelUpdate] = useState([]);
     const [personnelRemove, setPersonnelRemove] = useState([]);
-    const [personnelRole, setPersonnelRole] = useState("");
     const [maxTime, setMaxTime] = useState(moment('23:59', 'HH:mm').format('HH:mm'));
     const [minTime, setMinTime] = useState(moment('00:00', 'HH:mm').format('HH:mm'));
     const [gigsOld, setGigsOld] = useState([]);
@@ -186,15 +185,12 @@ export default function EditEvent() {
             p.user = user;
             setPersonnelAdd([...personnelAdd, p]);
             setPersonnel([...personnel, p]);
-
-            this.setState({personnelAdd: [...this.state.personnelAdd, personnel]});
-            this.setState({personnel: [...this.state.personnel, personnel]});
         });
     }
 
-    function handlePersonnelRoleChange(event, personnel) {
-        personnel.role = event.target.value;
-        setPersonnel(personnel);
+    function handlePersonnelRoleChange(event, p) {
+        p.role = event.target.value;
+        setPersonnel([...personnel]);
     }
 
     function handlePersonnelRemoval(p) {
@@ -217,7 +213,7 @@ export default function EditEvent() {
      Ticket
     */
 
-    function setError(message, variant) {
+    function handleSetError(message, variant) {
         setError(message);
         setErrorType(variant);
         setTimeout(() => {
@@ -230,12 +226,12 @@ export default function EditEvent() {
         let errmsg = "";
         if ((tickets.some(t => t.type.trim() === ticketType.trim()) && !(deletedTickets.some(t => t.type.trim() === ticketType.trim())))) {
             errmsg += "Denne billett-typen finnes allerede!";
-            setError(errmsg, 'danger');
+            handleSetError(errmsg, 'danger');
             setTicketType('');
             return;
         } else if (!ticketType.trim()) {
             errmsg += "Vennligst skriv inn en billett-type";
-            setError(errmsg, 'danger');
+            handleSetError(errmsg, 'danger');
             return;
         }
         let newTicket = new Ticket(eventId, ticketType, ticketPrice, ticketAmount);
@@ -322,7 +318,7 @@ export default function EditEvent() {
             if (!eventAddress.trim()) errmsg += "  [ Addresse ] ";
             if (!eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
             if (!city.trim()) errmsg += "  [ By ] ";
-            setError(errmsg, 'danger');
+            handleSetError(errmsg, 'danger');
             return;
         }
 
@@ -353,395 +349,396 @@ export default function EditEvent() {
                 })
             })
         });
+    }
 
 
-        async function updatePersonnel() {
-            return new Promise((resolve, reject) => {
-                let promises = [];
+    async function updatePersonnel() {
+        return new Promise((resolve, reject) => {
+            let promises = [];
 
-                //if user has chosen to remove personnel, then remove them from the database
-                if (Array.isArray(personnelRemove) && personnelRemove.length > 0) {
-                    console.log('remove', personnelRemove);
-                    promises.push(personnelRemove.map(personnel => service.deletePersonnel(eventId, personnel.personnelId).catch(error => reject(error))))
-                }
+            //if user has chosen to remove personnel, then remove them from the database
+            if (Array.isArray(personnelRemove) && personnelRemove.length > 0) {
+                console.log('remove', personnelRemove);
+                promises.push(personnelRemove.map(personnel => service.deletePersonnel(eventId, personnel.personnelId).catch(error => reject(error))))
+            }
 
-                //if there are any old personnel left, update their role in the database
-                if (Array.isArray(personnelUpdate) && personnelUpdate.length > 0) {
-                    console.log('update', personnelUpdate);
-                    promises.push(service.updatePersonnel(personnelUpdate).catch(error => reject(error)))
-                }
+            //if there are any old personnel left, update their role in the database
+            if (Array.isArray(personnelUpdate) && personnelUpdate.length > 0) {
+                console.log('update', personnelUpdate);
+                promises.push(service.updatePersonnel(personnelUpdate).catch(error => reject(error)))
+            }
 
-                //if there are new personnel added, then add them to database
-                if (Array.isArray(personnelAdd) && personnelAdd.length > 0) {
-                    console.log('add', personnelAdd);
-                    promises.push(service.addPersonnel(personnelAdd).catch(error => reject(error)))
-                }
+            //if there are new personnel added, then add them to database
+            if (Array.isArray(personnelAdd) && personnelAdd.length > 0) {
+                console.log('add', personnelAdd);
+                promises.push(service.addPersonnel(personnelAdd).catch(error => reject(error)))
+            }
 
-                Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
-            });
-        }
+            Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
+        });
+    }
 
-        return (
-            <div>
-                <HarmoniNavbar/>
-                <Container>
-                    <Card className={"p-5"}>
-                        <Form>
-                            <Form.Row>
-                                <Form.Group as={Col} sm={"12"}>
-                                    <h1 className="font-weight-bold text-center">Endre arrangement</h1>
-                                </Form.Group>
+    return (
+        <div>
+            <HarmoniNavbar/>
+            <Container>
+                <Card className={"p-5"}>
+                    <Form>
+                        <Form.Row>
+                            <Form.Group as={Col} sm={"12"}>
+                                <h1 className="font-weight-bold text-center">Endre arrangement</h1>
+                            </Form.Group>
 
-                                {inputField("12", "Arragementsnavn", "Navn på arragement", eventName, setEventName)}
-                                {inputField("6", "Adresse", "Adresse der arrangementet skal holdes", eventAddress, setEventAddress)}
-                                {inputField("6", "By", "By der arrangementet skal holdes", city, setCity)}
-                                {textField("12", "Plass beskrivelse", "For eksempel 3. etajse", placeDescription, setPlaceDescription)}
-                                {textField("12", "Beskrivelse", "Her kan du skrive en beskrivelse av arrangementet", eventDescription, setEventDescription)}
-                                {dateInput("3", "Fra dato", fDate, setFDate)}
-                                {timeInput("3", "Fra klokkeslett", fTime, setFTime)}
-                                {dateInput("3", "Til dato", tDate, setTDate)}
-                                {timeInput("3", "Til klokkeslett", tTime, setTTime)}
+                            {inputField("12", "Arragementsnavn", "Navn på arragement", eventName, setEventName)}
+                            {inputField("6", "Adresse", "Adresse der arrangementet skal holdes", eventAddress, setEventAddress)}
+                            {inputField("6", "By", "By der arrangementet skal holdes", city, setCity)}
+                            {textField("12", "Plass beskrivelse", "For eksempel 3. etajse", placeDescription, setPlaceDescription)}
+                            {textField("12", "Beskrivelse", "Her kan du skrive en beskrivelse av arrangementet", eventDescription, setEventDescription)}
+                            {dateInput("3", "Fra dato", fDate, setFDate)}
+                            {timeInput("3", "Fra klokkeslett", fTime, setFTime)}
+                            {dateInput("3", "Til dato", tDate, setTDate)}
+                            {timeInput("3", "Til klokkeslett", tTime, setTTime)}
 
-                                <Form.Group as={Col} sm={"12"}>
-                                    <Row>
-                                        <Col>
-                                            <Button type="button" variant={"success"}
-                                                    onClick={() => {
-                                                        setAddArtistByMail(addArtistByMail.concat(new Artist(null, null, null, "")))
-                                                    }
-                                                    }>Legg til med mail</Button>
-                                        </Col>
+                            <Form.Group as={Col} sm={"12"}>
+                                <Row>
+                                    <Col>
+                                        <Button type="button" variant={"success"}
+                                                onClick={() => {
+                                                    setAddArtistByMail(addArtistByMail.concat(new Artist(null, null, null, "")))
+                                                }
+                                                }>Legg til med mail</Button>
+                                    </Col>
 
-                                        <Col>
+                                    <Col>
 
-                                            <Dropdown onSelect={event => handleGigAdd(event)}>
-                                                <Dropdown.Toggle variant={"success"} id="dropdown">
-                                                    Velg artist
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                               as={CustomMenu}>
-                                                    {users.filter(user => {
-                                                        if (gigsOld.some(e => e.userId === user.userId)) return true;
-                                                        return !gigsOld.some(e => e.userId === user.userId);
-                                                    }).map(user => (
-                                                        <Dropdown.Item eventKey={user.userId}>
-                                                            {user.username}
-                                                        </Dropdown.Item>
-                                                    ))}
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </Col>
-                                        <Col>
-                                            <Dropdown onSelect={event => handlePersonnelAdd(event)}>
-                                                <Dropdown.Toggle variant={"success"} id="dropdown">
-                                                    Velg personell
-                                                </Dropdown.Toggle>
+                                        <Dropdown onSelect={event => handleGigAdd(event)}>
+                                            <Dropdown.Toggle variant={"success"} id="dropdown">
+                                                Velg artist
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                           as={CustomMenu}>
+                                                {users.filter(user => {
+                                                    if (gigsOld.some(e => e.userId === user.userId)) return true;
+                                                    return !gigsOld.some(e => e.userId === user.userId);
+                                                }).map(user => (
+                                                    <Dropdown.Item eventKey={user.userId}>
+                                                        {user.username}
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    </Col>
+                                    <Col>
+                                        <Dropdown onSelect={event => handlePersonnelAdd(event)}>
+                                            <Dropdown.Toggle variant={"success"} id="dropdown">
+                                                Velg personell
+                                            </Dropdown.Toggle>
 
-                                                <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                               as={CustomMenu}>
-                                                    {users.filter(user => !personnel.some(e => e.userId === user.userId)).map(user => (
-                                                        <Dropdown.Item eventKey={user.userId}>
-                                                            {user.username}
-                                                        </Dropdown.Item>
-                                                    ))}
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </Col>
-                                    </Row>
-                                </Form.Group>
+                                            <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                           as={CustomMenu}>
+                                                {users.filter(user => !personnel.some(e => e.userId === user.userId)).map(user => (
+                                                    <Dropdown.Item eventKey={user.userId}>
+                                                        {user.username}
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
 
-                                <Form.Group as={Col} sm={"12"}>
-                                    <Card>
-                                        <Card.Title>
-                                            <h2 className="text-center">Artister</h2>
-                                        </Card.Title>
+                            <Form.Group as={Col} sm={"12"}>
+                                <Card>
+                                    <Card.Title>
+                                        <h2 className="text-center">Artister</h2>
+                                    </Card.Title>
 
-                                        <ListGroup title={"Valgt personell"} className={"p-3"}>
-                                            {addArtistByMail.map(artist => (
-                                                <ListGroup.Item>
-                                                    <Row>
-                                                        <Form.Group as={Col} controlId="formBasicEmail">
-                                                            <Form.Control
-                                                                type="email"
-                                                                placeholder="Skriv inn email"
-                                                                value={artist.email}
-                                                                onChange={event => {
-                                                                    artist.artistEmail = event.target.value;
-                                                                    setArtistEmail(event.target.value)
-                                                                }}/>
-                                                        </Form.Group>
-
-                                                        <Col sm={""}>
-                                                            <DownloadWidget artist={artist.userId}
-                                                                            event={this.state.eventId}/>
-                                                        </Col>
-                                                        <Col>
-                                                            <Button type="button" variant={"danger"}
-                                                                    onClick={() => {
-                                                                        let copy = [...addArtistByMail]
-                                                                        copy.splice(addArtistByMail.indexOf(artist), 1)
-                                                                        setAddArtistByMail(copy)
-                                                                    }}>
-                                                                Fjern
-                                                            </Button>
-                                                        </Col>
-                                                    </Row>
-                                                </ListGroup.Item>
-                                            ))}
-                                            {gigsOld.map(gig => (
-                                                <React.Fragment key={gig.user.userId}>
-                                                    <ListGroup.Item>
-                                                        <Row>
-                                                            <Col sm={"2"}>
-                                                                <label>{gig.user.username}</label>
-                                                            </Col>
-                                                            <Col sm={"2"}>
-                                                                <Button type="button" variant={"danger"}
-                                                                        onClick={() => handleGigRemoval(gig)}>X</Button>
-                                                            </Col>
-                                                        </Row>
-                                                    </ListGroup.Item>
-                                                </React.Fragment>
-                                            ))}
-                                            {gigsNew.map(gig => (
-                                                <React.Fragment key={gig.user.userId}>
-                                                    <ListGroup.Item>
-                                                        <Row>
-                                                            <Col sm={"2"}>
-                                                                <label>{gig.user.username}</label>
-                                                            </Col>
-                                                            <Col sm={"2"}>
-                                                                <label>Last opp kontrakt:</label>
-                                                            </Col>
-                                                            <Form.Group as={Col} sm={"6"}>
-                                                                <input type="file" className="form-control"
-                                                                       encType="multipart/form-data" name="file"
-                                                                       onChange={event => handleContractUpload(event, gig)}/>
-                                                            </Form.Group>
-                                                            <Col sm={"2"}>
-                                                                <Button type="button" variant={"danger"}
-                                                                        onClick={() => handleGigRemoval(gig)}>X</Button>
-                                                            </Col>
-                                                        </Row>
-                                                    </ListGroup.Item>
-                                                </React.Fragment>
-                                            ))}
-                                        </ListGroup>
-                                    </Card>
-
-                                </Form.Group>
-
-                                <Form.Group as={Col} sm={"12"}>
-
-                                    <Card>
-                                        <Card.Title>
-                                            <h2 className="text-center">Personell</h2>
-                                        </Card.Title>
-
-                                        <ListGroup title={"Valgt personell"} className={"p-3"}>
-                                            {personnel.map(p => (
-                                                <React.Fragment key={p.userId}>
-                                                    <ListGroup.Item>
-                                                        <Row>
-                                                            <Col>
-                                                                {p.user.username}
-                                                            </Col>
-                                                            <Col>
-                                                                <Form.Control
-                                                                    placeholder="Rollen til personen"
-                                                                    value={p.role}
-                                                                    onChange={event => handlePersonnelRoleChange(event, p)}/>
-                                                            </Col>
-                                                            <Col>
-                                                                <Button type="button" variant={"danger"}
-                                                                        onClick={() => handlePersonnelRemoval(p)}>X</Button>
-                                                            </Col>
-                                                        </Row>
-                                                    </ListGroup.Item>
-                                                </React.Fragment>
-                                            ))}
-                                        </ListGroup>
-                                    </Card>
-
-                                </Form.Group>
-
-
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
-                                    <input type="file" className="form-control" encType="multipart/form-data"
-                                           name="file"
-                                           onChange={event => setImage(event.target.files[0])}/>
-                                </Form.Group>
-
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>Eller legg inn en bilde-url</Form.Label>
-                                    <Form.Control
-                                        placeholder="Bilde-url"
-                                        value={imageUrl}
-                                        onChange={event => setImageUrl(event.target.value)}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group as={Col} sm={"6"}>
-
-                                    <Form.Label>Aldersgrense</Form.Label>
-                                    <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
-                                        <ButtonGroup className="mr-2" aria-label="button-group">
-                                            <Button onClick={decrementAge}>-</Button>
-                                            <Button onClick={IncrementAge}>+</Button>
-                                        </ButtonGroup>
-
-                                        <InputGroup>
-                                            <FormControl
-                                                type="input"
-                                                value={ageLimit}
-                                                onChange={event => setAgeLimit(event.target.value)}
-                                                aria-label="btn-age"
-                                                aria-describedby="btnGroupAddon"
-                                            />
-                                            <InputGroup.Append>
-                                                <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
-                                            </InputGroup.Append>
-                                        </InputGroup>
-
-                                    </ButtonToolbar>
-                                </Form.Group>
-                            </Form.Row>
-
-                            <Row>
-                                <Form.Row>
-                                    <Form.Group as={Col} sm={"3"}>
-                                        <Form.Label>Billett-type</Form.Label>
-                                        <Form.Control
-                                            placeholder="Navn på billettype . . ."
-                                            onChange={event => setTicketType(event.target.value)}
-                                        />
-                                    </Form.Group>
-
-                                    <Form.Group as={Col} sm={"3"}>
-                                        <Form.Label>Billettpris</Form.Label>
-                                        <InputGroup>
-                                            <Form.Control
-                                                type="number"
-                                                placeholder="Billettpris . . ."
-                                                onChange={event => setTicketPrice(event.target.value)}
-                                            />
-                                            <InputGroup.Append>
-                                                <InputGroup.Text>kr</InputGroup.Text>
-                                            </InputGroup.Append>
-                                        </InputGroup>
-                                    </Form.Group>
-
-                                    <Form.Group as={Col} sm={"3"}>
-                                        <Form.Label>Antall billetter</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            placeholder="Antall billetter . . ."
-                                            onChange={event => setTicketAmount(event.target.value)}
-                                        />
-
-                                    </Form.Group>
-
-                                    <Form.Group as={Col} sm={"3"}>
-                                        <Button onClick={handleTicketsAdd}>Legg til billett-typen</Button>
-                                    </Form.Group>
-
-                                </Form.Row>
-                                <ListGroup title={"Billett-typer på dette arrangementet"}>
-                                    {tickets.map(ticket =>
-                                        <React.Fragment>
-                                            <ListGroupItem>
+                                    <ListGroup title={"Valgt personell"} className={"p-3"}>
+                                        {addArtistByMail.map(artist => (
+                                            <ListGroup.Item>
                                                 <Row>
-                                                    <Col>
-                                                        <Form.Label>Billett-type</Form.Label>
+                                                    <Form.Group as={Col} controlId="formBasicEmail">
                                                         <Form.Control
-                                                            placeholder="Billett-type"
-                                                            value={ticket.type}
-                                                            onChange={event => handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
-                                                        />
-                                                    </Col>
-                                                    <Col>
-                                                        <Form.Label>Billett-pris</Form.Label>
-                                                        <Form.Control
-                                                            type="number"
-                                                            placeholder="Billett-pris"
-                                                            value={ticket.price}
-                                                            onChange={event => handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
-                                                        />
-                                                    </Col>
-                                                    <Col>
-                                                        <Form.Label>Antall billetter</Form.Label>
-                                                        <Form.Control
-                                                            type="number"
-                                                            placeholder="Antall billetter"
-                                                            value={ticket.amount}
-                                                            onChange={event => handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
-                                                        />
+                                                            type="email"
+                                                            placeholder="Skriv inn email"
+                                                            value={artist.email}
+                                                            onChange={event => {
+                                                                artist.artistEmail = event.target.value;
+                                                                setArtistEmail(event.target.value)
+                                                            }}/>
+                                                    </Form.Group>
+
+                                                    <Col sm={""}>
+                                                        <DownloadWidget artist={artist.userId}
+                                                                        event={this.state.eventId}/>
                                                     </Col>
                                                     <Col>
                                                         <Button type="button" variant={"danger"}
-                                                                onClick={event => handleTicketsRemoval(event, ticket)}>X</Button>
+                                                                onClick={() => {
+                                                                    let copy = [...addArtistByMail]
+                                                                    copy.splice(addArtistByMail.indexOf(artist), 1)
+                                                                    setAddArtistByMail(copy)
+                                                                }}>
+                                                            Fjern
+                                                        </Button>
                                                     </Col>
                                                 </Row>
-                                            </ListGroupItem>
-                                        </React.Fragment>
-                                    )}
-                                </ListGroup>
-                                <Row>
-                                    <Col>
-                                        <Button type="button" variant={"success"} onClick={handleSubmit}>Endre
-                                            arragament</Button>
-                                    </Col>
-                                    <Col>
-                                        <Button variant={"danger"} type="button" onClick={handleEventCancel}>Avlys
-                                            arrangement</Button>
-                                    </Col>
+                                            </ListGroup.Item>
+                                        ))}
+                                        {gigsOld.map(gig => (
+                                            <React.Fragment key={gig.user.userId}>
+                                                <ListGroup.Item>
+                                                    <Row>
+                                                        <Col sm={"2"}>
+                                                            <label>{gig.user.username}</label>
+                                                        </Col>
+                                                        <Col sm={"2"}>
+                                                            <Button type="button" variant={"danger"}
+                                                                    onClick={() => handleGigRemoval(gig)}>X</Button>
+                                                        </Col>
+                                                    </Row>
+                                                </ListGroup.Item>
+                                            </React.Fragment>
+                                        ))}
+                                        {gigsNew.map(gig => (
+                                            <React.Fragment key={gig.user.userId}>
+                                                <ListGroup.Item>
+                                                    <Row>
+                                                        <Col sm={"2"}>
+                                                            <label>{gig.user.username}</label>
+                                                        </Col>
+                                                        <Col sm={"2"}>
+                                                            <label>Last opp kontrakt:</label>
+                                                        </Col>
+                                                        <Form.Group as={Col} sm={"6"}>
+                                                            <input type="file" className="form-control"
+                                                                   encType="multipart/form-data" name="file"
+                                                                   onChange={event => handleContractUpload(event, gig)}/>
+                                                        </Form.Group>
+                                                        <Col sm={"2"}>
+                                                            <Button type="button" variant={"danger"}
+                                                                    onClick={() => handleGigRemoval(gig)}>X</Button>
+                                                        </Col>
+                                                    </Row>
+                                                </ListGroup.Item>
+                                            </React.Fragment>
+                                        ))}
+                                    </ListGroup>
+                                </Card>
 
-                                    {(error) ?
-                                        <Alert style={{
-                                            height: '9em',
-                                            top: '50%',
-                                            left: '50%',
-                                            position: 'fixed',
-                                            transform: 'translate(-50%, -50%)'
-                                        }} variant={errorType}><Alert.Heading>Vent nå litt!</Alert.Heading>
-                                            <p>{error}</p></Alert> :
-                                        <div style={{height: '3em'}}/>}
-                                    <Col>
-                                        <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
-                                    </Col>
-                                </Row>
+                            </Form.Group>
+
+                            <Form.Group as={Col} sm={"12"}>
+
+                                <Card>
+                                    <Card.Title>
+                                        <h2 className="text-center">Personell</h2>
+                                    </Card.Title>
+
+                                    <ListGroup title={"Valgt personell"} className={"p-3"}>
+                                        {personnel.map(p => (
+                                            <React.Fragment key={p.userId}>
+                                                <ListGroup.Item>
+                                                    <Row>
+                                                        <Col>
+                                                            {p.user.username}
+                                                        </Col>
+                                                        <Col>
+                                                            <Form.Control
+                                                                placeholder="Rollen til personen"
+                                                                value={p.role}
+                                                                onChange={event => handlePersonnelRoleChange(event, p)}/>
+                                                        </Col>
+                                                        <Col>
+                                                            <Button type="button" variant={"danger"}
+                                                                    onClick={() => handlePersonnelRemoval(p)}>X</Button>
+                                                        </Col>
+                                                    </Row>
+                                                </ListGroup.Item>
+                                            </React.Fragment>
+                                        ))}
+                                    </ListGroup>
+                                </Card>
+
+                            </Form.Group>
+
+
+                            <Form.Group as={Col} sm={"6"}>
+                                <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                                <input type="file" className="form-control" encType="multipart/form-data"
+                                       name="file"
+                                       onChange={event => setImage(event.target.files[0])}/>
+                            </Form.Group>
+
+                            <Form.Group as={Col} sm={"6"}>
+                                <Form.Label>Eller legg inn en bilde-url</Form.Label>
+                                <Form.Control
+                                    placeholder="Bilde-url"
+                                    value={imageUrl}
+                                    onChange={event => setImageUrl(event.target.value)}
+                                />
+                            </Form.Group>
+
+                            <Form.Group as={Col} sm={"6"}>
+
+                                <Form.Label>Aldersgrense</Form.Label>
+                                <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
+                                    <ButtonGroup className="mr-2" aria-label="button-group">
+                                        <Button onClick={decrementAge}>-</Button>
+                                        <Button onClick={IncrementAge}>+</Button>
+                                    </ButtonGroup>
+
+                                    <InputGroup>
+                                        <FormControl
+                                            type="input"
+                                            value={ageLimit}
+                                            onChange={event => setAgeLimit(event.target.value)}
+                                            aria-label="btn-age"
+                                            aria-describedby="btnGroupAddon"
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+
+                                </ButtonToolbar>
+                            </Form.Group>
+                        </Form.Row>
+
+                        <Row>
+                            <Form.Row>
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Billett-type</Form.Label>
+                                    <Form.Control
+                                        placeholder="Navn på billettype . . ."
+                                        onChange={event => setTicketType(event.target.value)}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Billettpris</Form.Label>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="Billettpris . . ."
+                                            onChange={event => setTicketPrice(event.target.value)}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Antall billetter</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Antall billetter . . ."
+                                        onChange={event => setTicketAmount(event.target.value)}
+                                    />
+
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Button onClick={handleTicketsAdd}>Legg til billett-typen</Button>
+                                </Form.Group>
+
+                            </Form.Row>
+                            <ListGroup title={"Billett-typer på dette arrangementet"}>
+                                {tickets.map(ticket =>
+                                    <React.Fragment>
+                                        <ListGroupItem>
+                                            <Row>
+                                                <Col>
+                                                    <Form.Label>Billett-type</Form.Label>
+                                                    <Form.Control
+                                                        placeholder="Billett-type"
+                                                        value={ticket.type}
+                                                        onChange={event => handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Form.Label>Billett-pris</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        placeholder="Billett-pris"
+                                                        value={ticket.price}
+                                                        onChange={event => handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Form.Label>Antall billetter</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        placeholder="Antall billetter"
+                                                        value={ticket.amount}
+                                                        onChange={event => handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Button type="button" variant={"danger"}
+                                                            onClick={event => handleTicketsRemoval(event, ticket)}>X</Button>
+                                                </Col>
+                                            </Row>
+                                        </ListGroupItem>
+                                    </React.Fragment>
+                                )}
+                            </ListGroup>
+                            <Row>
+                                <Col>
+                                    <Button type="button" variant={"success"} onClick={handleSubmit}>Endre
+                                        arragament</Button>
+                                </Col>
+                                <Col>
+                                    <Button variant={"danger"} type="button" onClick={handleEventCancel}>Avlys
+                                        arrangement</Button>
+                                </Col>
+
+                                {(error) ?
+                                    <Alert style={{
+                                        height: '9em',
+                                        top: '50%',
+                                        left: '50%',
+                                        position: 'fixed',
+                                        transform: 'translate(-50%, -50%)'
+                                    }} variant={errorType}><Alert.Heading>Vent nå litt!</Alert.Heading>
+                                        <p>{error}</p></Alert> :
+                                    <div style={{height: '3em'}}/>}
+                                <Col>
+                                    <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
+                                </Col>
                             </Row>
-                        </Form>
-                    </Card>
-                </Container>
-            </div>
-        );
+                        </Row>
+                    </Form>
+                </Card>
+            </Container>
+        </div>
+    );
 
-        function IncrementAge() {
-            setAgeLimit(ageLimit + 1)
+    function IncrementAge() {
+        setAgeLimit(ageLimit + 1)
+    }
+
+    function decrementAge() {
+        if (ageLimit > 0) {
+            setAgeLimit(ageLimit - 1)
         }
+    }
 
-        function decrementAge() {
-            if (ageLimit > 0) {
-                setAgeLimit(ageLimit - 1)
-            }
+    function handleDelete() {
+        if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
+            service.deleteEvent(eventId).then(() => {
+                history.push("/hjem");
+                alert("Arrangementet er nå slettet")
+            });
         }
+    }
 
-        function handleDelete() {
-            if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-                service.deleteEvent(eventId).then(() => {
-                    history.push("/hjem");
-                    alert("Arrangementet er nå slettet")
-                });
-            }
-        }
-
-        function handleEventCancel() {
-            if (window.confirm("Ønsker du å avlyse arrangementet?") === true) {
-                setCancelled(true);
-            }
+    function handleEventCancel() {
+        if (window.confirm("Ønsker du å avlyse arrangementet?") === true) {
+            setCancelled(true);
         }
     }
 }
+
 
