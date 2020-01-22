@@ -1,17 +1,17 @@
+import * as React from 'react';
 import {Component} from "react-simplified";
 import {Button, Col, Container, Image, Row} from "react-bootstrap";
-import {DownloadWidget} from '../widgets.js';
-import * as React from 'react';
-import {Event, service, User} from '../services';
-import {authService} from "../AuthService";
-import {HarmoniNavbar} from "./navbar";
 import NavLink from "react-bootstrap/NavLink";
-import {MailForm} from "../widgets";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 
-const jwt = require("jsonwebtoken");
+import {DownloadWidget} from '../widgets.js';
+import {Event, service, User} from '../services';
+import {authService} from "../AuthService";
+import {HarmoniNavbar} from "./navbar";
+import {MailForm} from "../widgets";
 
+const jwt = require("jsonwebtoken");
 
 export class EventPage extends Component {
     currentEvent = new Event();
@@ -32,40 +32,39 @@ export class EventPage extends Component {
                     {this.RenderNavbar()}
                     <Container>
                         <Card className='p-2'>
-                            <div style={{overflow: 'hidden', height: '620px'}}>
-                                <Image src={this.currentEvent.imageUrl}/>
-                            </div>
+                            <Image height='620px' src={this.currentEvent.imageUrl}/>
 
                             <div className="p-4">
-                            <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
+                                <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
 
-                            <Row>
-                                <Col lg={8}>
-                                    {this.RenderArtist()}
+                                {this.RenderArtist()}
 
-                                    <div className="ml-3">
-                                        {this.currentEvent.description}
-                                    </div>
+                                <Row>
+                                    <Col lg={8}>
 
-                                </Col>
-                                <Col>
-                                    <ListGroup>
-                                        <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
-                                        <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
-                                    </ListGroup>
-                                </Col>
-                            </Row>
+                                        <div className="ml-3">
+                                            {this.currentEvent.description}
+                                        </div>
 
-                            <div className='mt-5'>
-                                {this.ShowArtist()}
-                                {this.ShowPersonnel()}
-                                {this.EditButton()}
-                                {this.isOrganizer? <MailForm/> : <div/>}
-                            </div>
+                                    </Col>
+                                    <Col>
+                                        <ListGroup variant="flush" className="">
+                                            <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
+                                            <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6></ListGroup.Item>
+                                            <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
+                                            <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
+                                            <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
+                                            <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
+                                        </ListGroup>
+                                    </Col>
+                                </Row>
+
+                                <div className='mt-5'>
+                                    {this.ShowArtist()}
+                                    {this.ShowPersonnel()}
+                                    <div className="text-center mt-4">{this.EditButton()}</div>
+                                    {this.isOrganizer? <MailForm/> : <div/>}
+                                </div>
                             </div>
                         </Card>
                     </Container>
@@ -92,7 +91,7 @@ export class EventPage extends Component {
         return day + '.' + month + '/' + year + ' klokka: '+ time;
     }
 
-//checks if the person viewing the event is the organizer
+    //checks if the person viewing the event is the organizer
     mounted() {
 
         service
@@ -110,7 +109,7 @@ export class EventPage extends Component {
         this.getArtistsForEvent();
     }
 
-//gets all the people working on that event and checks if the person viewing it is a part of the personnel
+    //gets all the people working on that event and checks if the person viewing it is a part of the personnel
     getPersonnelForEvent() {
         service
             .getPersonnel(this.props.match.params.id)
@@ -128,7 +127,7 @@ export class EventPage extends Component {
 
     }
 
-//gets all the artist working on that event and checks if the person viewing it is a an artist
+    //gets all the artist working on that event and checks if the person viewing it is a an artist
     getArtistsForEvent() {
         service
             .getGigs(this.props.match.params.id)
@@ -171,21 +170,20 @@ export class EventPage extends Component {
         }
     }
 
-//returns a list over artist and their contact info if there is any artist on the event
+    //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
         if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
             let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <div>
-                <Row>
+                <Row className="mb-2">
 
                     <Col className="border-bottom border-top"><b>{'' + artist}</b></Col>
                     <Col className="border-bottom border-top"><b>Epost</b></Col>
                     <Col className="border-bottom border-top"> </Col>
 
-
                 </Row>
                 {this.artists.map(person => (
-                    <Row>
+                    <Row className="mb-2">
                         <Col>{person.user.username}</Col>
                         <Col>{person.user.email} </Col>
                         <Col>{this.RenderButtons(person.artistId)}</Col>
@@ -197,13 +195,13 @@ export class EventPage extends Component {
 
     }
 
-//returns a list over personnel and their contact info if there is any personnel on the event
+    //returns a list over personnel and their contact info if there is any personnel on the event
     ShowPersonnel() {
         if ((this.personnel.length !== 0 && (this.isArtist || this.isPersonnel || this.isOrganizer))) {
 
 
             return <div>
-                <Row className="tableheader">
+                <Row className="tableheader" className="mb-2">
                     <Col className="border-bottom border-top"><b>Personell</b></Col>
                     <Col className="border-bottom border-top"><b> </b></Col>
                     <Col className="border-bottom border-top"><b>Oppgave</b></Col>
@@ -211,7 +209,7 @@ export class EventPage extends Component {
 
                 {this.personnel.map(person => (
 
-                    <Row>
+                    <Row className="mb-2">
                         <Col className>{person.user.username}</Col>
                         <Col className>{person.user.email}</Col>
                         <Col className>{person.role}</Col>
@@ -219,10 +217,7 @@ export class EventPage extends Component {
 
                 ))}
             </div>
-
-
         }
-
     }
 
     emailForm(){
@@ -271,6 +266,17 @@ export class EventPage extends Component {
 
     RenderArtist() {
         if (this.artists.length !== 0) {
+            return (
+                <Row className="m-3">
+                    <Col><h5>{(this.artists.length > 1) ? 'Artister' : 'Artist'}:</h5></Col>
+                    {this.artists.map(e => <Col><h5>{e.user.username}</h5></Col>)}
+                </Row>
+            )
+        }
+    }
+
+    RenderArtist2() {
+        if (this.artists.length !== 0) {
             let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <Col>
                 <h6>{artist}: {this.artists.map(artist => (
@@ -280,7 +286,6 @@ export class EventPage extends Component {
                 ))}</h6>
             </Col>
         }
-
     }
 
     RenderAgeLimit() {
