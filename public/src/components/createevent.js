@@ -65,7 +65,6 @@ export class AddEvent extends Component {
         this.fTime = this.handleFTime.bind(this);
         this.tDate = this.handleTDate.bind(this);
         this.tTime = this.handleTTime.bind(this);
-        this.contract = this.handleContractChange.bind(this);
         this.artistsAdd = this.handleArtistsAdd.bind(this);
         this.artists = this.handleArtists.bind(this);
         this.imageUrl = this.handleImageUrlChange.bind(this);
@@ -87,11 +86,12 @@ export class AddEvent extends Component {
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
-            contract: '',
             image: '',
             imageUrl: '',
+
             artistsAdd: [],
             artists: [],
+
             personnelAdd: [],
         };
     }
@@ -121,12 +121,17 @@ export class AddEvent extends Component {
     }
 
     handleContractChange(event, artist) {
-        artist.contract = event.target.files[0];
-        this.setState({contract: event.target.files[0]});
+        let file = event.target.files[0];
+        service.toBase64(file).then(contractData => {
+            artist.contract = new SimpleFile(contractData, file.name);
+        })
     }
 
     handleImageUpload(event) {
-        this.setState({image: event.target.files[0]})
+        let image = event.target.files[0];
+        service.toBase64(image).then(imageData => {
+            this.setState({imageUrl: imageData})
+        })
     }
 
     handleImageUrlChange(event) {
@@ -168,27 +173,13 @@ export class AddEvent extends Component {
         personnel.role = event.target.value;
     }
 
-    toBase64 = (file) => new Promise((resolve, reject) => {
-        if (file === "") {
-            resolve(null);
-            return;
-        }
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-
 
     sendGigs = (eventId) => new Promise((resolve, reject) => {
         if ((Array.isArray(this.state.artistsAdd) && this.state.artistsAdd.length)) {
             Promise.all(this.state.artistsAdd.map(artist => {
-                this.toBase64(artist.contract).then(contractData => {
-                    let contract = new SimpleFile(contractData, artist.contract.name);
-                    service
-                        .addGig(new Gig(eventId, artist.userId, contract))
-                        .catch(error => reject(error))
-                })
+                service
+                    .addGig(new Gig(eventId, artist.userId, artist.contract))
+                    .catch(error => reject(error))
             })).then(() => resolve(true));
         } else {
             resolve(true);
@@ -212,30 +203,27 @@ export class AddEvent extends Component {
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
 
-        this.toBase64(this.state.image).then(image => {
+        let newEvent = new Event(
+            null,
+            this.state.organizerId,
+            this.state.eventName,
+            this.state.city,
+            this.state.eventAddress,
+            this.state.placeDescription,
+            this.state.eventDescription,
+            this.state.ageLimit,
+            fDateTime,
+            tDateTime,
+            this.state.imageUrl,
+            this.state.cancelled);
 
-            let newEvent = new Event(
-                null,
-                this.state.organizerId,
-                this.state.eventName,
-                this.state.city,
-                this.state.eventAddress,
-                this.state.placeDescription,
-                this.state.eventDescription,
-                this.state.ageLimit,
-                fDateTime,
-                tDateTime,
-                (image ? image : this.state.imageUrl),
-                this.state.cancelled);
-
-            service.createEvent(newEvent).then(created => {
-                this.sendGigs(created.insertId).then(() => {
-                    this.sendPersonnel(created.insertId).then(() => {
-                        this.props.history.push("/arrangement/" + created.insertId)
-                    })
-                });
-            }).catch(err => console.error(err))
-        });
+        service.createEvent(newEvent).then(created => {
+            this.sendGigs(created.insertId).then(() => {
+                this.sendPersonnel(created.insertId).then(() => {
+                    this.props.history.push("/arrangement/" + created.insertId)
+                })
+            });
+        }).catch(err => console.error(err))
     }
 
     render() {
