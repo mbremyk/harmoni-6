@@ -285,7 +285,7 @@ export class EventPage extends Component {
         if (authService.loggedIn()) {
             return <HarmoniNavbar/>
         } else {
-            return <NavLink href="/"><h1 className="HarmoniLogo display-3 text-center m-5 text-body">Harmoni</h1></NavLink>
+            return <NavLink href="/"><h1 className="HarmoniLogo display-sm-3 text-center m-5 text-body">Harmoni</h1></NavLink>
         }
     }
 

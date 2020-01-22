@@ -6,8 +6,6 @@ import moment from "moment";
 import Alert from "react-bootstrap/Alert";
 import {BugMail, Mail, service} from "./services";
 import {authService} from "./AuthService";
-import {HarmoniNavbar} from "./components/navbar";
-import NavLink from "react-bootstrap/NavLink";
 
 const jwt = require("jsonwebtoken");
 
