@@ -50,23 +50,44 @@ export class EventPage extends Component {
                                     <Col>
                                         <ListGroup variant="flush" className="">
                                             <ListGroup.Item>
+
 	                                            <h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6>
+
                                             </ListGroup.Item>
                                             <ListGroup.Item>
+
 	                                            <h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6>
+
                                             </ListGroup.Item>
                                             <ListGroup.Item>
-	                                            <h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
-	                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne kart</Button>
+
+                                                <h6><b>By:</b> {this.currentEvent.city}</h6>
+
+                                            </ListGroup.Item>
+                                            <ListGroup.Item>
+
+	                                            <h6><b>Adresse:</b> {this.currentEvent.address}</h6>
+
+                                            </ListGroup.Item>
+	                                        <ListGroup.Item>
+
+                                                <Button type="button" onClick={this.addressClicked}>Åpne kart</Button>
+
 	                                        </ListGroup.Item>
 	                                        <ListGroup.Item>
+
 		                                        {this.RenderAgeLimit()}
+
 	                                        </ListGroup.Item>
                                             <ListGroup.Item>
+
 	                                            <h6><b>Arrangør:</b> {this.user.username}</h6>
+
                                             </ListGroup.Item>
                                             <ListGroup.Item>
+
 	                                            <h6><b>Email:</b> {this.user.email}</h6>
+
                                             </ListGroup.Item>
                                         </ListGroup>
                                     </Col>
@@ -113,13 +134,17 @@ export class EventPage extends Component {
                 this.currentEvent = e;
                 let token = jwt.decode(authService.getToken());
                 this.getInfoAboutOrganizer(this.currentEvent.organizerId);
-                if (this.currentEvent.organizerId == token.userId) {
-                    this.isOrganizer = true;
+                if(!!token) {
+                    if (this.currentEvent.organizerId == token.userId) {
+                        this.isOrganizer = true;
+                        this.getPersonnelForEvent();
+                        this.getArtistsForEvent();
+                    }
+                } else {
+                    this.getPublicArtistsForEvent();
                 }
             })
             .catch((error) => console.log(error));
-        this.getPersonnelForEvent();
-        this.getArtistsForEvent();
     }
 
     //gets all the people working on that event and checks if the person viewing it is a part of the personnel
@@ -150,6 +175,15 @@ export class EventPage extends Component {
                         this.isArtist = true;
                     }
                 });
+            })
+            .catch((error) => console.log(error));
+    }
+
+    getPublicArtistsForEvent() {
+        service
+            .getPublicGigs(this.props.match.params.id)
+            .then(artists => {
+                this.artists = artists;
             })
             .catch((error) => console.log(error));
     }
