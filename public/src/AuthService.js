@@ -25,7 +25,13 @@ export class AuthService {
 
 	loggedIn() {
 		const token = this.getToken();
-		return !!token && !this.isTokenExpired(token);
+		if(!!token && !this.isTokenExpired(token))
+		{
+			return true;
+		} else {
+			this.deleteToken();
+			return false;
+		}
 	}
 
 	isTokenExpired(token) {
@@ -41,7 +47,11 @@ export class AuthService {
 	}
 
 	getToken() {
-		return localStorage.getItem('token')
+		if(this.loggedIn()){
+			return localStorage.getItem('token')
+		} else {
+			this.deleteToken();
+		}
 	}
 
 	deleteToken() {

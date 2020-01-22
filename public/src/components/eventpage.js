@@ -45,7 +45,7 @@ export class EventPage extends Component {
                                         <div className="ml-3">
                                             {this.currentEvent.description}
                                         </div>
-
+	                                    
                                     </Col>
                                     <Col>
                                         <ListGroup variant="flush" className="">
