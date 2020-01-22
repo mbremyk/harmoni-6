@@ -10,6 +10,7 @@ const props = isCI ? "" : require("./properties.js");
 const test = (process.env.NODE_ENV === 'test');
 
 let mailProps = isCI ? "" : new props.MailProperties();
+let url = "https://harmoni-6.firebaseapp.com/";
 
 
 class Dao {
@@ -56,6 +57,12 @@ class Dao {
             });
     }
 
+    /**
+     * Creates a temporary user without password or salt and sends an email to the given email address
+     *
+     * @param email
+     * @returns {Promise<User>}
+     */
     createTempUser(email) {
         return model.UserModel.create({email: email, username: ''})
             .then(response => response.dataValues)
@@ -63,6 +70,13 @@ class Dao {
                 return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
                     .then(response => {
                         user.username = 'guest' + user.userId;
+                        let post = {
+                            to: email,
+                            from: mailProps.username,
+                            subject: 'Anmodning om kontakt på Harmoni',
+                            text: `Hei\n\nHarmoni er en nettside for planlegging av konserter og andre arrangementer som skal gjøre det enklere for arrangører, artister og personell å samarbeide.\nNoen har lagt deg til artist eller personell på et arrangement, og oppgitt din epost-adresse.\nHvis du ønsker å se informasjon om arrangementet kan du opprette en bruker her ${url}ny-bruker/\n\nVi håper å se deg snart\n\nMed vennlig hilsen\nHarmoni team 6`
+                        };
+                        mail.sendMail(post);
                         return user;
                     })
             })
@@ -564,7 +578,7 @@ class Dao {
                                         from: mailProps.username,
                                         to: users,
                                         subject: `Personellprivilegier for ${event.eventName}`,
-                                        text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                        text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på ${url}\nDu kan finne arrangementet på ${url}arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
                                     };
                                     mail.sendMail(email);
                                 });
@@ -737,7 +751,7 @@ class Dao {
                                                 to: user.email,
                                                 from: mailProps.username,
                                                 subject: "Artistprivilegier for " + event.eventName,
-                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\nFor å laste ned kontrakt eller legge til en rider må du logge inn på siden\n\nMed vennlig hilsen\nHarmoni team 6`
+                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på ${url}\nDu kan finne arrangementet på ${url}arrangement/${event.eventId}\nFor å laste ned kontrakt eller legge til en rider må du logge inn på siden\n\nMed vennlig hilsen\nHarmoni team 6`
                                             };
                                             mail.sendMail(email);
                                         })
