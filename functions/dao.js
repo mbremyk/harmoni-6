@@ -478,22 +478,18 @@ class Dao {
                 if (!isCI && !test) {
                     this.getEventByEventId(response[0].eventId)
                         .then(event => {
-                            let rep = response.map(r => r.dataValues.personnelId);
-                            model.UserModel.findAll({where: {userId: {[op.in]: rep}}, attributes: ['email']})
-                                .then(users => users.map(r => r.dataValues.email))
-                                .then(users => {
+                            this.getPersonnel(event.eventId)
+                                .then(pers => {
                                     let email = {
                                         from: mailProps.username,
-                                        to: users,
+                                        to: pers.user.email,
                                         subject: `Personellprivilegier for ${event.eventName}`,
                                         text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
                                     };
-                                    mail.sendMail(email);
+                                    mail.sendMail(mail);
                                 });
                         });
-
                 }
-
                 return response[0]._options.isNewRecord
             })
             .catch(error => {
