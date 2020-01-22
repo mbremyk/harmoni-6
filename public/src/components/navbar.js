@@ -28,7 +28,7 @@ export class HarmoniNavbar extends Component {
                         <Nav.Link href="/min-side">Min side</Nav.Link>
                         <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
                     </Nav>
-                    <Form inlineonSubmit={this.search}>
+                    <Form inline onSubmit={this.search}>
                         <FormControl type="text"
                                      placeholder="Søk"
                                      className="mr-sm-2"
