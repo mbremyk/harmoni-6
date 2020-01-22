@@ -175,7 +175,8 @@ addMailEndpoints = (app, db) => {
                     replyTo: dm.email,
                     to: to,
                     subject: "FW:" + defaultMail.subject,
-                    text: defaultMail.infoText
+                    text: defaultMail.infoText,
+                    bcc: [dm.email]
                 };
                 return sendMail(mail);
             }

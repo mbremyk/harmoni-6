@@ -322,27 +322,59 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
-        return model.EventModel.update(
-            {
-                organizerId: event.organizerId,
-                eventName: event.eventName,
-                address: event.address,
-                city: event.city,
-                placeDescription: event.placeDescription,
-                ageLimit: event.ageLimit,
-                startTime: event.startTime,
-                endTime: event.endTime,
-                image: event.image,
-                imageUrl: event.imageUrl,
-                description: event.description,
-                cancelled: event.cancelled,
-            },
-            {where: {eventId: event.eventId}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
-            .catch(error => {
-                console.error(error);
-                return false;
-            });
+        return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
+            .then(e => e.dataValues.cancelled)
+            .then(e => {
+                model.EventModel.update(
+                    {
+                        organizerId: event.organizerId,
+                        eventName: event.eventName,
+                        address: event.address,
+                        city: event.city,
+                        placeDescription: event.placeDescription,
+                        ageLimit: event.ageLimit,
+                        startTime: event.startTime,
+                        endTime: event.endTime,
+                        image: event.image,
+                        imageUrl: event.imageUrl,
+                        description: event.description,
+                        cancelled: event.cancelled,
+                    },
+                    {where: {eventId: event.eventId}})
+                    .then(response => {
+                        if (e !== event.cancelled && e) {
+                            this.getGigs(event.eventId)
+                                .then(gigs => gigs.map(gig => gig.dataValues.artistId))
+                                .then(gigs => {
+                                    this.getPersonnel(event.eventId)
+                                        .then(personnel => personnel.map(person => person.dataValues.personnelId))
+                                        .then(personnel => {
+                                            let set = new Set(gigs);
+                                            personnel.map(person => set.add(person));
+
+                                            model.UserModel.findAll({where: {userId: {[op.in]: Array.from(set)}}})
+                                                .then(users => users.map(user => user.dataValues.email))
+                                                .then(users => {
+                                                    let email = {
+                                                        from: mailProps.username,
+                                                        to: users,
+                                                        subject: `${event.eventName} avlyst`,
+                                                        text: `Arrangementet ${event.eventName} som du var artist og/eller personell ved har blitt avlyst.\nAll informasjon om arrangementet er fortsatt tilgjengelig i 90 dager etter at det skulle funnet sted\nDu kan finne arrangementet på ${url}${event.eventId}\n\nMed vennlig hilse\nHarmoni team 6`
+                                                    };
+                                                    mail.sendMail(email);
+                                                    return response[0] === 1; /*affected rows === 1*/
+                                                })
+                                        })
+                                })
+                        } else {
+                            return response[0] === 1; /*affected rows === 1*/
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        return false;
+                    })
+            })
     }
 
 
