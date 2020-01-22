@@ -69,14 +69,16 @@ class Dao {
             .then(user => {
                 return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
                     .then(response => {
-                        user.username = 'guest' + user.userId;
-                        let post = {
-                            to: email,
-                            from: mailProps.username,
-                            subject: 'Anmodning om kontakt på Harmoni',
-                            text: `Hei\n\nHarmoni er en nettside for planlegging av konserter og andre arrangementer som skal gjøre det enklere for arrangører, artister og personell å samarbeide.\nNoen har lagt deg til artist eller personell på et arrangement, og oppgitt din epost-adresse.\nHvis du ønsker å se informasjon om arrangementet kan du opprette en bruker her ${url}ny-bruker/\n\nVi håper å se deg snart\n\nMed vennlig hilsen\nHarmoni team 6`
-                        };
-                        mail.sendMail(post);
+                        if (!isCI && !test) {
+                            user.username = 'guest' + user.userId;
+                            let post = {
+                                to: email,
+                                from: mailProps.username,
+                                subject: 'Anmodning om kontakt på Harmoni',
+                                text: `Hei\n\nHarmoni er en nettside for planlegging av konserter og andre arrangementer som skal gjøre det enklere for arrangører, artister og personell å samarbeide.\nNoen har lagt deg til artist eller personell på et arrangement, og oppgitt din epost-adresse.\nHvis du ønsker å se informasjon om arrangementet kan du opprette en bruker her ${url}ny-bruker/\n\nVi håper å se deg snart\n\nMed vennlig hilsen\nHarmoni team 6`
+                            };
+                            mail.sendMail(post);
+                        }
                         return user;
                     })
             })
@@ -342,7 +344,7 @@ class Dao {
                     },
                     {where: {eventId: event.eventId}})
                     .then(response => {
-                        if (e !== event.cancelled && !e) {
+                        if (e !== event.cancelled && !e && !isCI && !test) {
                             this.getGigs(event.eventId)
                                 .then(gigs => gigs.map(gig => gig.dataValues.artistId))
                                 .then(gigs => {
@@ -898,7 +900,27 @@ class Dao {
                 return false
             })))
             .then(() => {
-                return true;
+                if (!isCI && !test) {
+                    return this.getUserById(riderItems[0].artistId)
+                        .then(user => {
+                            return model.EventModel.findOne({
+                                where: {eventId: riderItems[0].eventId},
+                                include: [{model: model.UserModel}]
+                            })
+                                .then(event => {
+                                    let email = {
+                                        to: user.dataValues.email,
+                                        from: mailProps.username,
+                                        subject: `Rider gjennomgått for ${event.dataValues.eventName}`,
+                                        text: `${event.user.dataValues.username} har gått gjennom din rider for arrangementet ${event.dataValues.eventName}\n\nDu kan se hva hvilke punkter arrangøren har godkjent eller ikke godkjent ved å gå inn på arrangementet: ${url}arrangement/${event.dataValues.eventId}\n\nDu kan ta kontakt med arrangøren på mail: ${event.user.dataValues.email}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                    };
+                                    mail.sendMail(email);
+                                    return true;
+                                });
+                        });
+                } else {
+                    return true;
+                }
             });
     }
 
