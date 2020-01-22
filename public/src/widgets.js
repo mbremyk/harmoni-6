@@ -138,6 +138,7 @@ export class DownloadWidget extends Component {
         service
             .downloadContract(this.event, this.artist)
             .then(response => {
+                console.log(response);
                 const link = document.createElement('a');
                 link.download = response.name;
                 link.href = response.data;
@@ -241,19 +242,20 @@ export class MailForm extends Component {
     }
 
     getRecipentString(props) {
-        let recipients = "";
-        if (props.artists) {
-            props.artists.map(user => {
-                recipients = recipients += user.user.email + ", "
+        let recipientsString = "";
+        console.log(props);
+        if (props.recipients) {
+            props.recipients.map(user => {
+                recipientsString = recipientsString += user.user.email + ", "
             });
         }
-        return recipients;
+        return recipientsString;
     }
 
     getAllMails(props) {
         let mails = [];
-        if (props.artists) {
-            props.artists.map(user => {
+        if (props.recipients) {
+            props.recipients.map(user => {
                 mails.push(user.user.email);
             });
         }
@@ -284,7 +286,8 @@ export class MailForm extends Component {
                     <div className={"container"}>
                         <Card className="m-5 p-4">
                             <div>
-                                <Button className={"btn-info"} onClick={this.toggleMail}>
+                                <Button style={{marginBottom: "10px"}} className={"btn-info"} onClick={this.toggleMail}
+                                        block>
                                     Send epost {this.state.arrow}
                                 </Button>
                                 {(this.state.toggle) ? this.toggleForm(this.state.toggle) : <div style={{height: "3em"}}/>}
@@ -341,7 +344,7 @@ export class MailForm extends Component {
                                   style={{display: 'flex'}}/>
                     <Button
                         className={"btn-primary mt-2 mr-2"}
-                        onClick={() => this.sendMail(true)}>
+                        onClick={() => this.sendMail(false)}>
                         Send Email
                     </Button>
                     <Button
@@ -382,28 +385,36 @@ export class MailForm extends Component {
         }
     }
 
-    getUserEmail() {
+    getUser() {
         let token = jwt.decode(authService.getToken());
-        if (!token.email) {
-            return token.email;
-        } else {
+        // console.log(token);
+        if (!token) {
             this.setAlert("ERROR", "danger");
-            return undefined
+            return undefined;
+        } else {
+            return token;
         }
     }
 
     sendMail(bug) {
-        let userMail = this.getUserEmail();
+        console.log("Sendmail called");
+        //let bug = false;
+        let user = this.getUser();
         if (bug) {
-            if (!userMail) {
-                let userMail = "anon UwU";
+            if (!user) {
+                let userMail = "anon@UwU.com";
+                let mail = new BugMail(userMail, "anonymous", this.state.description, this.state.text);
+                service.sendBug(mail)
+                    .then(res => (this.setAlert(res.toString(), "info")))
+                    .catch(err => this.setAlert(err.toString(), "danger"));
+            } else {
+                let mail = new BugMail(user.email, "anonymous", this.state.description, this.state.text);
+                service.sendBug(mail)
+                    .then(res => (this.setAlert(res.toString(), "info")))
+                    .catch(err => this.setAlert(err.toString(), "danger"));
             }
-            let mail = new BugMail(userMail, this.state.description, this.state.text);
-            service.sendBug(mail)
-                .then(res => (this.setAlert(res.toString(), "info")))
-                .catch(err => this.setAlert(err.toString(), "danger"));
         } else {
-            if (!userMail) {
+            if (!user) {
                 this.setAlert("NOT LOGGED IN", "danger");
             }
             let to = [];
@@ -412,8 +423,11 @@ export class MailForm extends Component {
                     to.push(address);
                 }
             });
-            let mail = new Mail(to, userMail, this.state.description, this.state.text);
-            service.sendMails()
+            let mail = new Mail(to, user.email, user.username, this.state.description, this.state.text);
+            console.log(this.state.mails);
+            console.log("Recipients");
+            console.log(mail);
+            service.sendMails(mail)
                 .then(res => (this.setAlert(res.toString(), "info")))
                 .catch(err => this.setAlert(err.toString(), "danger"))
         }
