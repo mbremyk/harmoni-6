@@ -1,4 +1,4 @@
-import {service, Event, Gig, Artist} from "../services";
+import {service, Event, Gig, Artist, Personnel} from "../services";
 import useReactRouter from 'use-react-router';
 import {authService} from "../AuthService";
 import {Component} from "react-simplified";
@@ -20,6 +20,7 @@ import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import {LoginForm} from "./login";
 import {CustomMenu, dateInput, inputField, textField, timeInput, toBase64} from "./editandcreatefunctions";
+import {DownloadWidget} from "../widgets";
 
 const jwt = require("jsonwebtoken");
 
@@ -99,6 +100,7 @@ export default function EditEvent() {
             service.updateEvent(ev).then(history.push("/arrangement/" + eventId));
         });
     }
+
 
 
     return (
@@ -356,7 +358,7 @@ export default function EditEvent() {
 
                             <Col>
                                 <Button type="button" variant={"success"} onClick={handleSubmit}>Endre
-                                    arragament</Button>
+                                    arrangament</Button>
                             </Col>
 
                             <Col>

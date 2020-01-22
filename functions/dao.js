@@ -484,10 +484,7 @@ class Dao {
      * @returns {number}
      */
     deleteOldEvents() {
-        let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
-        oldEvents.map(event => console.log(event.eventId));
-        if (oldEvents.length == null) return 0;
-        else return oldEvents.length
+        return model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
     }
 
 
@@ -543,30 +540,32 @@ class Dao {
      * @param userId
      * @returns {Promise<Events[]>}
      */
-    getMyEventsByUserId(userId) {
-        let eventsWhereUserIsArtist = model.GigModel.findAll({where: {artistId: userId}})
+    async getMyEventsByUserId(userId) {
+        let personnelEvents = await model.PersonnelModel.findAll({where: {personnelId: userId}})
             .catch(error => {
                 console.error(error);
                 return [];
-            });
-        let eventsWhereUserIsPersonnel = model.PersonnelModel.findAll({where: {personnelId: userId}})
+            }).then(e => e.map(e => e.eventId));
+
+        let artistEvents = await model.GigModel.findAll({where: {artistId: userId}})
             .catch(error => {
                 console.error(error);
                 return [];
-            });
+            }).then(e => e.map(e => e.eventId));
 
         return model.EventModel.findAll({
             where: {
                 [Op.or]: [
-                    {eventId: eventsWhereUserIsArtist.map(e => e.eventId)},
-                    {eventId: eventsWhereUserIsPersonnel.map(e => e.eventId)}
+                    {eventId: artistEvents},
+                    {eventId: personnelEvents}
                 ]
             }
         })
             .catch(error => {
                 console.error(error);
                 return [];
-            });
+            })
+
 
     }
 
@@ -602,22 +601,20 @@ class Dao {
                 if (!isCI && !test) {
                     this.getEventByEventId(response[0].eventId)
                         .then(event => {
-                            let rep = response.map(r => r.dataValues.personnelId);
-                            model.UserModel.findAll({where: {userId: {[op.in]: rep}}, attributes: ['email']})
-                                .then(users => users.map(r => r.dataValues.email))
-                                .then(users => {
-                                    let email = {
-                                        from: mailProps.username,
-                                        to: users,
-                                        subject: `Personellprivilegier for ${event.eventName}`,
-                                        text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på ${url}\nDu kan finne arrangementet på ${url}arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
-                                    };
-                                    mail.sendMail(email);
+                            this.getPersonnel(event.eventId)
+                                .then(person => {
+                                    person.map(pers => {
+                                        let email = {
+                                            from: mailProps.username,
+                                            to: pers.user.email,
+                                            subject: `Personellprivilegier for ${event.eventName}`,
+                                            text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på ${url}\nDu kan finne arrangementet på ${url}arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                        };
+                                        mail.sendMail(email);
+                                    })
                                 });
                         });
-
                 }
-
                 return response[0]._options.isNewRecord
             })
             .catch(error => {
@@ -629,20 +626,22 @@ class Dao {
     /**
      * Updates the role of personnel, cannot change event or person as these are the primary key
      *
-     * @param personnel
+     * @param personnel[]
      * @returns {Promise<boolean>}
      */
     updatePersonnel(personnel) {
-        return model.PersonnelModel.update(
+        return Promise.all(personnel.map(person => model.PersonnelModel.update(
             {
-                role: personnel.role
+                role: person.role
             },
-            {where: {eventId: personnel.eventId, personnelId: personnel.personnelId}})
-            .then(response => response[0] === 1)
+            {where: {eventId: person.eventId, personnelId: person.personnelId}})))
+            .then(() => {
+                return true
+            })
             .catch(error => {
-                console.error(error);
-                return false;
-            });
+                console.log(error);
+                return false
+            })
     }
 
     /**
@@ -702,20 +701,22 @@ class Dao {
     /**
      * Updates a new Ticket in the Database, returns false if something goes wrong
      *
-     * @param ticket
+     * @param tickets: Ticket[]
      * @returns {Promise<boolean>}
      */
-    updateTicket(ticket) {
-        return model.TicketModel.update(
+    updateTickets(tickets) {
+        return Promise.all(tickets.map(ticket => model.TicketModel.update(
             {
                 price: ticket.price,
                 amount: ticket.amount
             },
             {where: {eventId: ticket.eventId, type: ticket.type}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
             .catch(error => {
                 console.error(error);
-                return false;
+                return false
+            })))
+            .then(() => {
+                return true;
             });
     }
 
@@ -863,10 +864,9 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateRiderItems(riderItems) {
-        let allUpdatesOk = true;
         return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
             {
-                confirmed: (riderItem.confirmed ? true : false)
+                confirmed: riderItem.confirmed
             },
             {
                 where: {
@@ -880,7 +880,7 @@ class Dao {
                 return false
             })))
             .then(() => {
-                return allUpdatesOk;
+                return true;
             });
     }
 
