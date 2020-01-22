@@ -68,7 +68,7 @@ export class EventPage extends Component {
                                 {this.ShowArtist()}
                                 {this.ShowPersonnel()}
                                 {this.EditButton()}
-                                {this.isOrganizer? <MailForm/> : <div/>}
+                                {this.emailForm()}
                             </div>
                             </div>
                         </Card>
@@ -246,8 +246,13 @@ export class EventPage extends Component {
     }
 
     emailForm(){
-        if(this.artists.length != 0){
-            return <MailForm hasRecipients={true} description={"Info"} artists={this.artists} toggleable={true}/>
+        if (this.artists.length != 0 && this.isOrganizer) {
+            return <MailForm hasRecipients={true} description={"Info"} recipients={this.artists.concat(this.personnel)}
+                             toggleable={true}/>
+        } else if (this.currentEvent.eventName && (this.isPersonnel || this.isArtist) && !this.isOrganizer) {
+            return <MailForm hasRecipients={true} description={"Info"}
+                             recipients={[this.getInfoAboutOrganizer(this.currentEvent.organizerId).username]}
+                             toggleable={true}/>
         }else{
             return null;
         }
