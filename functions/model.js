@@ -314,6 +314,9 @@ let syncTestData = () => sequelize.sync({force: true}).then(() => {
     });
 });
 
+let query = (query, replacements) => {
+    return sequelize.query(query, replacements);
+};
 
 module.exports = {
     UserModel,
@@ -325,5 +328,6 @@ module.exports = {
     FileModel,
     syncModels,
     syncTestData,
-    BugModel
+    BugModel,
+    query
 };

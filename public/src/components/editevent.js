@@ -1,6 +1,8 @@
-import {service, Event, Gig, Ticket, SimpleFile, Personnel} from "../services";
+import {service, Event, Gig, Artist, SimpleFile, Ticket, Personnel} from "../services";
+import useReactRouter from 'use-react-router';
+import {authService} from "../AuthService";
 import {Component} from "react-simplified";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
@@ -13,165 +15,110 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {HarmoniNavbar} from "./navbar";
+//import {Event, service} from "../services";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
+import {LoginForm} from "./login";
 import Alert from "react-bootstrap/Alert";
 import moment from "moment";
 import {DownloadWidget} from "../widgets";
+import {CustomMenu, dateInput, inputField, textField, timeInput, toBase64} from "./editandcreatefunctions";
 
-export class EditEvent extends Component {
+const jwt = require("jsonwebtoken");
 
-    CustomMenu = React.forwardRef(
-        ({children, style, className, 'aria-labelledby': labeledBy}, ref) => {
-            const [value, setValue] = React.useState('');
+export default function EditEvent() {
 
-            return (
-                <div
-                    ref={ref}
-                    style={style}
-                    className={className}
-                    aria-labelledby={labeledBy}
-                >
-                    <FormControl
-                        autoFocus
-                        className="mx-3 my-2 w-auto"
-                        placeholder="Type to filter..."
-                        onChange={e => setValue(e.target.value)}
-                        value={value}
-                    />
-                    <ul className="list-unstyled">
-                        {React.Children.toArray(children).filter(
-                            child =>
-                                !value || child.props.children.toLowerCase().startsWith(value),
-                        )}
-                    </ul>
-                </div>
-            );
-        },
-    );
+    const {match, history} = useReactRouter();
+    this.state = {
+        maxTime: moment('23:59', 'HH:mm').format('HH:mm'),
+        minTime: moment('00:00', 'HH:mm').format('HH:mm'),
 
-    constructor(props) {
-        super(props);
+        gigsOld: [],
+        gigsNew: [],
+        gigsRemove: [],
 
-        this.eventName = this.handleEventNameChange.bind(this);
-        this.city = this.handleCityChange.bind(this);
-        this.eventAddress = this.handleEventAddressChange.bind(this);
-        this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
-        this.eventDescription = this.handleEventDescriptionChange.bind(this);
-        this.imageUrl = this.handleImageUrlChange.bind(this);
-        this.ageLimit = this.handleAgeLimitChange.bind(this);
-        this.fDate = this.handleFDate.bind(this);
-        this.fTime = this.handleFTime.bind(this);
-        this.tDate = this.handleTDate.bind(this);
-        this.tTime = this.handleTTime.bind(this);
+        personnel: [], //all personnel used to render them on the page
+        personnelUpdate: [], //personnel already registered
+        personnelAdd: [], //personnel added
+        personnelRemove: [], //personnel for removal
 
-        this.gigsOld = this.handleGigsFromDatabase.bind(this);
-        this.personnel = this.handlePersonnelFromDatabase.bind(this);
-        this.personnelAdd = this.handlePersonnelAdd.bind(this);
-        this.ticketType = this.handleTicketType.bind(this);
-        this.ticketPrice = this.handleTicketPrice.bind(this);
-        this.ticketAmount = this.handleTicketAmount.bind(this);
-        this.tickets = this.handleTicketsFromDB.bind(this);
-        this.tickets = this.handleTicketsAdd.bind(this);
-        this.updatedTickets = this.handleTicketsFromDB.bind(this);
+        ticketType: '',
+        ticketPrice: 0,
+        ticketAmount: 0,
 
-        this.state = {
-            eventId: 0,
-            organizerId: 0,
-            eventName: '',
-            city: '',
-            eventAddress: '',
-            placeDescription: '',
-            eventDescription: '',
-            imageUrl: '',
-            ageLimit: 0,
-            cancelled: 0,
-            fDate: require('moment')().format('YYYY-MM-DD'),
-            tDate: require('moment')().format('YYYY-MM-DD'),
-            fTime: require('moment')().format('HH:mm'),
-            tTime: require('moment')().format('HH:mm'),
-            maxTime: moment('23:59', 'HH:mm').format('HH:mm'),
-            minTime: moment('00:00', 'HH:mm').format('HH:mm'),
+        error: '',
+        errorType: 'success',
 
-            users: [],
+        tickets: [], //tickets got on mounted
+        updatedTickets: [], //tickets that are to be updated
+        addedTickets: [], // tickets that are to be added
+        deletedTickets: [], // tickets that are to be deleted
+    };
 
-            gigsOld: [],
-            gigsNew: [],
-            gigsRemove: [],
+    const [eventId, setEventId] = useState(0);
+    const [organizerId, setOrganizerId] = useState(0);
+    const [eventName, setEventName] = useState("");
+    const [eventAddress, setEventAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [placeDescription, setPlaceDescription] = useState("");
+    const [eventDescription, setEventDescription] = useState("");
+    const [ageLimit, setAgeLimit] = useState(0);
+    const [fDate, setFDate] = useState(require('moment')().format('YYYY-MM-DD'));
+    const [tDate, setTDate] = useState(require('moment')().format('YYYY-MM-DD'));
+    const [fTime, setFTime] = useState(require('moment')().format('HH:mm'));
+    const [tTime, setTTime] = useState(require('moment')().format('HH:mm'));
+    const [contract, setContract] = useState("");
+    const [image, setImage] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
+    const [artistsAdd, setArtistsAdd] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [personnelAdd, setPersonnelAdd] = useState([]);
+    const [cancelled, setCancelled] = useState("");
+    const [addArtistByMail, setAddArtistByMail] = useState([]);
+    const [artistEmail, setArtistEmail] = useState("");
+    const [personnel, setPersonnel] = useState([]);
+    const [personnelUpdate, setPersonnelUpdate] = useState([]);
+    const [personnelRemove, setPersonnelRemove] = useState([]);
+    const [personnelRole, setPersonnelRole] = useState("");
 
-            personnel: [], //all personnel used to render them on the page
-            personnelUpdate: [], //personnel already registered
-            personnelAdd: [], //personnel added
-            personnelRemove: [], //personnel for removal
+    useEffect(() => {
+        service.getEventByEventId(match.params.id).then(event => {
 
-            ticketType: '',
-            ticketPrice: 0,
-            ticketAmount: 0,
+            let fromDateTime = event.startTime.split(" ");
+            let toDateTime = event.endTime.split(" ");
+            let fromDate = fromDateTime[0];
+            let toDate = toDateTime[0];
+            let fromTime = fromDateTime[1];
+            let toTime = toDateTime[1];
 
-            error: '',
-            errorType: 'success',
+            setEventId(event.eventId);
+            setOrganizerId(event.organizerId);
+            setEventName(event.eventName);
+            setEventAddress(event.address);
+            setEventDescription(event.description);
+            setAgeLimit(event.ageLimit);
+            setImageUrl(event.imageUrl);
+            setFDate(fromDate);
+            setFTime(fromTime);
+            setTDate(toDate);
+            setTTime(toTime);
+            setCancelled(event.cancelled);
+            setCity(event.city);
+            setPlaceDescription(event.placeDescription);
 
-            tickets: [], //tickets got on mounted
-            updatedTickets: [], //tickets that are to be updated
-            addedTickets: [], // tickets that are to be added
-            deletedTickets: [], // tickets that are to be deleted
-        };
-    }
-
-    handleEventNameChange(event) {
-        this.setState({eventName: event.target.value});
-    }
-
-    handleCityChange(event) {
-        this.setState({city: event.target.value});
-    }
-
-    handlePlaceDescriptionChange(event) {
-        this.setState({placeDescription: event.target.value});
-    }
-
-    handleEventAddressChange(event) {
-        this.setState({eventAddress: event.target.value});
-    }
-
-    handleEventDescriptionChange(event) {
-        this.setState({eventDescription: event.target.value});
-    }
-
-    handleAgeLimitChange(event) {
-        this.setState({ageLimit: event.target.value});
-    }
-
-    handleImageUpload(event) {
-        let image = event.target.files[0];
-        service.toBase64(image).then(imageData => {
-            this.setState({imageUrl: imageData})
-        })
-    }
-
-    handleImageUrlChange(event) {
-        this.setState({imageUrl: event.target.value})
-    }
-
-    handleFDate(event) {
-        this.setState({fDate: event.target.value});
-        this.handleMaxMinTime();
-    }
-
-    handleFTime(event) {
-        this.setState({fTime: event.target.value});
-        this.handleMaxMinTime();
-    }
-
-    handleTDate(event) {
-        this.setState({tDate: event.target.value});
-        this.handleMaxMinTime();
-    }
-
-    handleTTime(event) {
-        this.setState({tTime: event.target.value});
-        this.handleMaxMinTime();
-    }
+            service.getUsers().then(users => setUsers(users)).catch((err) => console.log(err.message));
+            service.getPersonnel(match.params.id).then(p => {
+                setPersonnelUpdate(p);
+                setPersonnel(p);
+            }).catch((err) => console.log(err.message));
+            service.getGigs(match.params.id)
+                .then(g => {
+                    console.log(g);
+                    setArtistsAdd(g)
+                })
+                .catch((err) => console.log(err.message));
+        }).catch((error) => console.log(error.message));
+    }, [])
 
     handleMaxMinTime() {
         if (this.state.fDate === this.state.tDate) {
@@ -183,9 +130,18 @@ export class EditEvent extends Component {
         }
     }
 
-    handleUsers(event) {
-        this.setState({users: [...this.state.users, ...event]});
-    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /*
@@ -416,328 +372,349 @@ export class EditEvent extends Component {
         setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
-    handleSubmit() {
 
-        let errmsg = "";
-        // check empty fields
-        if (!this.state.eventName.trim() || !this.state.eventAddress.trim() || !this.state.eventDescription.trim() || !this.state.city.trim()) {
-            errmsg += 'Følgende felter mangler:';
-            if (!this.state.eventName.trim()) errmsg += " [ Arrangementsavn ] ";
-            if (!this.state.eventAddress.trim()) errmsg += "  [ Addresse ] ";
-            if (!this.state.eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
-            if (!this.state.city.trim()) errmsg += "  [ By ] ";
-            this.setError(errmsg, 'danger');
-            return;
-        }
 
-        let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
-        let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
 
-        let ev = new Event(
-            this.state.eventId,
-            this.state.organizerId,
-            this.state.eventName,
-            this.state.city,
-            this.state.eventAddress,
-            this.state.placeDescription,
-            this.state.eventDescription,
-            this.state.ageLimit,
-            fDateTime, tDateTime,
-            this.state.imageUrl,
-            this.state.cancelled);
 
-        service.updateEvent(ev).then(() => {
-            this.updateTickets().then(() => {
-                this.updatePersonnel().then(() => {
-                    this.updateGigs().then(() => {
-                        this.props.history.push("/arrangement/" + ev.eventId);
-                    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function handleSubmit() {
+
+        let fDateTime = fDate + " " + fTime + ":00";
+        let tDateTime = tDate + " " + tTime + ":00";
+
+        toBase64(image).then(i => {
+
+            let ev = new Event(eventId, organizerId, eventName, city, eventAddress,
+                placeDescription, eventDescription, ageLimit, fDateTime, tDateTime, (i ? image : imageUrl), cancelled);
+            console.log(ev)
+            service.updateEvent(ev).then(() => {
+                updatePersonnel().then(() => {
+                    addTickets
+                    addGigs
+                }
+                    history.push("/arrangement/" + eventId)
                 })
             });
         });
     }
 
+    async function updatePersonnel() {
+        return new Promise((resolve, reject) => {
+            let promises = [];
 
-    render() {
+            //if user has chosen to remove personnel, then remove them from the database
+            if (Array.isArray(personnelRemove) && personnelRemove.length > 0) {
+                console.log('remove', personnelRemove);
+                promises.push(personnelRemove.map(personnel => service.deletePersonnel(eventId, personnel.personnelId).catch(error => reject(error))))
+            }
 
-        return (
-            <div>
-                <HarmoniNavbar/>
-                <Container>
-                    <Card className={"p-5"}>
-                        <Form>
-                            <Form.Row>
+            //if there are any old personnel left, update their role in the database
+            if (Array.isArray(personnelUpdate) && personnelUpdate.length > 0) {
+                console.log('update', personnelUpdate);
+                promises.push(service.updatePersonnel(personnelUpdate).catch(error => reject(error)))
+            }
 
-                                <Form.Group as={Col} sm={"12"}>
-                                    <h1 className="font-weight-bold text-center">Endre arrangement</h1>
-                                </Form.Group>
+            //if there are new personnel added, then add them to database
+            if (Array.isArray(personnelAdd) && personnelAdd.length > 0) {
+                console.log('add', personnelAdd);
+                promises.push(service.addPersonnel(personnelAdd).catch(error => reject(error)))
+            }
 
-                                <Form.Group as={Col} sm={"12"}>
-                                    <Form.Label>Arrangementsnavn</Form.Label>
-                                    <Form.Control
-                                        placeholder="Navn på arrangement . . ."
-                                        value={this.state.eventName}
-                                        onChange={this.handleEventNameChange}
-                                    />
-                                </Form.Group>
+            Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
+        });
+    }
 
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>Adresse</Form.Label>
-                                    <Form.Control
-                                        placeholder="Adresse der arrangementet skal holdes . . ."
-                                        value={this.state.eventAddress}
-                                        onChange={this.handleEventAddressChange}
+    return (
+        <div>
+            <HarmoniNavbar/>
+            <Container>
+                <Card className={"p-5"}>
+                    <Form>
+                        <Form.Row>
 
-                                    />
-                                </Form.Group>
+                            <Form.Group as={Col} sm={"12"}>
+                                <h1 className="font-weight-bold text-center">Endre arrangement</h1>
+                            </Form.Group>
 
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>By</Form.Label>
-                                    <Form.Control
-                                        placeholder="By der arrangementet skal holdes . . ."
-                                        value={this.state.city}
-                                        onChange={this.handleCityChange}
-
-                                    />
-                                </Form.Group>
-
-
-                                <Form.Group as={Col} sm={12}>
-                                    <Form.Label>Stedsanvisning</Form.Label>
-                                    <Form.Control
-                                        placeholder="Her kan du f.eks skrive anvisning for hvordan man kan finne fram til der arrangementet holdes . . ."
-                                        as="textarea"
-                                        rows="8"
-                                        value={this.state.placeDescription}
-                                        onChange={this.handlePlaceDescriptionChange}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group as={Col} sm={12}>
-                                    <Form.Label>Beskrivelse</Form.Label>
-                                    <Form.Control
-                                        placeholder="Her kan du skrive en beskrivelse av arrangementet . . ."
-                                        as="textarea"
-                                        rows="8"
-                                        value={this.state.eventDescription}
-                                        onChange={this.handleEventDescriptionChange}
-                                    />
-                                </Form.Group>
+                            {inputField("12", "Arragementsnavn", "Navn på arragement", eventName, setEventName)}
+                            {inputField("6", "Adresse", "Adresse der arrangementet skal holdes", eventAddress, setEventAddress)}
+                            {inputField("6", "By", "By der arrangementet skal holdes", city, setCity)}
+                            {textField("12", "Plass beskrivelse", "For eksempel 3. etajse", placeDescription, setPlaceDescription)}
+                            {textField("12", "Beskrivelse", "Her kan du skrive en beskrivelse av arrangementet", eventDescription, setEventDescription)}
+                            {dateInput("3", "Fra dato", fDate, setFDate)}
+                            {timeInput("3", "Fra klokkeslett", fTime, setFTime)}
+                            {dateInput("3", "Til dato", tDate, setTDate)}
+                            {timeInput("3", "Til klokkeslett", tTime, setTTime)}
 
 
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label>Fra dato</Form.Label>
-                                    <Form.Control
-                                        max={this.state.tDate}
-                                        value={this.state.fDate}
-                                        onChange={this.handleFDate}
-                                        type={"date"}
+                            <Form.Group as={Col} sm={"12"}>
 
-                                    />
-                                </Form.Group>
+                                <Row>
+                                    <Col>
+                                        <Button type="button" variant={"success"}
+                                                onClick={() => {
+                                                    setAddArtistByMail(addArtistByMail.concat(new Artist(null, null, null, "")))
+                                                }
+                                                }>Legg til med mail</Button>
+                                    </Col>
 
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label>Fra klokkeslett</Form.Label>
-                                    <Form.Control
-                                        max={this.state.maxTime}
-                                        value={this.state.fTime}
-                                        onChange={this.handleFTime}
-                                        type={"time"}
-                            />
-                                    <span className="customStyle"/>
-                                </Form.Group>
+                                    <Col>
+
+                                        <Dropdown onSelect={event => {
+                                            service.getUser(event).then(user => setArtistsAdd(artistsAdd.concat(
+                                                new Artist(user.userId, user.username, user.email, "", "")
+                                            )))
+                                        }}>
+
+                                            <Dropdown.Toggle variant={"success"} id="dropdown">
+                                                Velg artist
+                                            </Dropdown.Toggle>
+
+                                            <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                           as={CustomMenu}>
+
+                                                {users.filter(user => !artistsAdd.some(e => e.userId === user.userId)).map(user => (
+                                                    <Dropdown.Item eventKey={user.userId}>
+                                                        {user.username}
+                                                    </Dropdown.Item>
+                                                ))}
+
+                                            </Dropdown.Menu>
+
+                                        </Dropdown>
+                                    </Col>
+
+                                    <Col>
+                                        <Dropdown onSelect={event => {
+
+                                            service.getUser(event).then((user) => {
+                                                let p = new Personnel(user.userId, eventId, '');
+                                                p.user = user;
+                                                setPersonnelAdd([...personnelAdd, p]);
+                                                setPersonnel([...personnel, p]);
+                                            })
 
 
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label>Til dato</Form.Label>
-                                    <Form.Control
-                                        min={this.state.fDate}
-                                        value={this.state.tDate}
-                                        onChange={this.handleTDate}
-                                        type={"date"}
-                            />
-                        </Form.Group>
+                                        }}>
 
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label>Til klokkeslett</Form.Label>
-                                    <Form.Control
-                                        min={this.state.minTime}
-                                        value={this.state.tTime}
-                                        onChange={this.handleTTime}
-                                        type={"time"}
-                            />
-                                    <span className="customStyle"/>
-                                </Form.Group>
+                                            <Dropdown.Toggle variant={"success"} id="dropdown">
+                                                Velg personell
+                                            </Dropdown.Toggle>
+
+                                            <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
+                                                           as={CustomMenu}>
+                                                {users.filter(user => !personnelAdd.some(e => e.userId === user.userId)).map(user => (
+                                                    <Dropdown.Item eventKey={user.userId}>
+                                                        {user.username}
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </Dropdown.Menu>
+
+                                        </Dropdown>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+
+                            <Form.Group as={Col} sm={"12"}>
+
+                                <Card>
+                                    <Card.Title>
+                                        <h2 className="text-center">Artister</h2>
+                                    </Card.Title>
+
+                                    <ListGroup title={"Valgt personell"} className={"p-3"}>
+                                        {addArtistByMail.map(artist => (
+                                            <ListGroup.Item>
 
 
-                                <Form.Group as={Col} sm={"2"}>
+                                                <Row>
 
-                                    <Form.Label>Artist</Form.Label>
+                                                    <Form.Group as={Col} controlId="formBasicEmail">
+                                                        <Form.Control
+                                                            type="email"
+                                                            placeholder="Skriv inn email"
+                                                            value={artist.email}
+                                                            onChange={event => {
+                                                                artist.artistEmail = event.target.value;
+                                                                setArtistEmail(event.target.value)
+                                                            }}/>
+                                                    </Form.Group>
 
-                                    <Dropdown onSelect={this.handleGigAdd}>
-
-                                        <Dropdown.Toggle variant={"success"} id="dropdown">
-                                            Velg artist
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                       as={this.CustomMenu}>
-                                            {this.state.users.filter(user => {
-                                                if (this.state.gigsOld.some(gig => user.userId === gig.artistId)) return false;
-                                                return !this.state.gigsNew.some(gig => user.userId === gig.artistId);
-                                            }).map(user => (
-                                                <Dropdown.Item eventKey={user.userId}>
-                                                    {user.username}
-                                                </Dropdown.Item>
-                                            ))}
-                                        </Dropdown.Menu>
-
-                                    </Dropdown>
-
-                                </Form.Group>
-
-                                <Form.Group as={Col} sm={"10"}>
-
-                                    <ListGroup title={"Valgte giger"}>
-                                        {this.state.gigsOld.map(gig => (
-                                            <React.Fragment key={gig.artistId}>
-                                                <Card>
-                                                    <Card.Title
-                                                        className="font-weight-bold text-center">{gig.user.username}</Card.Title>
-                                                    <ListGroupItem>
-                                                        <Row>
                                                             <Col sm={""}>
-                                                                <Button type="button" variant={"danger"}
-                                                                        onClick={() => this.handleGigRemoval(gig)}>X</Button>
+                                                                <DownloadWidget artist={artist.userId}
+                                                                                event={this.state.eventId}/>
                                                             </Col>
-                                                        </Row>
-                                                    </ListGroupItem>
-                                                </Card>
-                                            </React.Fragment>))}
+                                                    <Col>
+                                                        <Button type="button" variant={"danger"}
+                                                                onClick={() => {
+                                                                    let copy = [...addArtistByMail]
+                                                                    copy.splice(addArtistByMail.indexOf(artist), 1)
+                                                                    setAddArtistByMail(copy)
+                                                                }}
+                                                        >
+                                                            Fjern
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
+                                            </ListGroup.Item>
+                                        ))}
+
+                                        {artistsAdd.map(artist => (
+                                            <React.Fragment key={artist.userId}>
+                                                <ListGroup.Item>
+                                                    <Row>
+
+                                                        <Col sm={"2"}>
+                                                            <label>{artist.username}</label>
+                                                        </Col>
+
+                                                        <Col sm={"2"}>
+                                                            <label>Last opp kontrakt:</label>
+                                                        </Col>
+                                                        <Col>
+                                                            <label>Last ned kontrakt</label>
+                                                            <Button type="button" id={"contract"}
+                                                                    onClick={event => downloadC(event, artist)}>Last
+                                                                ned</Button>
+                                                        </Col>
+
+                                                        <Col sm={"2"}>
+                                                            <Button type="button" variant={"danger"}
+                                                                    onClick={() => {
+                                                                        let copy = [...artistsAdd]
+                                                                        copy.splice(artistsAdd.indexOf(artist), 1)
+                                                                        setArtistsAdd(copy)
+                                                                    }}
+                                                            >
+                                                                Fjern</Button>
+                                                        </Col>
+
+                                                    </Row>
+                                                </ListGroup.Item>
+                                            </React.Fragment>
+                                        ))}
                                     </ListGroup>
-                                    <ListGroup title={"nye giger"}>
-                                        {this.state.gigsNew.map(gig => (
-                                            <React.Fragment key={gig.artistId}>
-                                                <Card>
-                                                    <Card.Title
-                                                        className="font-weight-bold text-center">{gig.user.username}</Card.Title>
-                                                    <ListGroupItem>
-                                                        <Row>
-                                                            <Form.Group as={Col} sm={"5"}>
-                                                                <label>Last opp kontrakt</label>
-                                                                <input type="file" className="form-control"
-                                                                       encType="multipart/form-data" name="file"
-                                                                       onChange={event => this.handleContractUpload(event, gig)}/>
-                                                            </Form.Group>
-                                                            <Col sm={""}>
-                                                                <Button type="button" variant={"danger"}
-                                                                        onClick={() => this.handleGigRemoval(gig)}>X</Button>
-                                                            </Col>
-                                                        </Row>
-                                                    </ListGroupItem>
-                                                </Card>
-                                            </React.Fragment>))}
-                                    </ListGroup>
+                                </Card>
 
-                                </Form.Group>
+                            </Form.Group>
 
+                            <Form.Group as={Col} sm={"12"}>
 
-                                <Form.Group as={Col} sm={"2"}>
+                                <Card>
+                                    <Card.Title>
+                                        <h2 className="text-center">Personell</h2>
+                                    </Card.Title>
 
-                                    <Form.Label>Personell</Form.Label>
+                                    <ListGroup title={"Valgt personell"} className={"p-3"}>
+                                        {personnel.map(p => (
+                                            <React.Fragment key={p.userId}>
 
-                                    <Dropdown onSelect={this.handlePersonnelAdd}>
+                                                <ListGroup.Item>
 
-                                        <Dropdown.Toggle variant={"success"} id="dropdown">
-                                            Velg personell
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
-                                                       as={this.CustomMenu}>
-                                            {this.state.users.filter(user => !this.state.personnel.some(e => (e.personnelId === user.userId))).map(user => (
-                                                <Dropdown.Item eventKey={user.userId}>
-                                                    {user.username}
-                                                </Dropdown.Item>
-                                            ))}
-                                        </Dropdown.Menu>
-
-                                    </Dropdown>
-
-                                </Form.Group>
-
-                                <Form.Group as={Col} sm={"10"}>
-
-                                    <ListGroup title={"Valgt personell"}>
-                                        {this.state.personnel.map(personnel => (
-                                            <React.Fragment key={personnel.personnelId}>
-                                                <ListGroupItem>
                                                     <Row>
                                                         <Col>
-                                                            {personnel.user.username}
+                                                            {p.user.username}
                                                         </Col>
 
                                                         <Col>
                                                             <Form.Control
                                                                 placeholder="Rollen til personen"
-                                                                value={personnel.role}
-                                                                onChange={event => this.handlePersonnelRoleChange(event, personnel)}
+                                                                value={p.role}
+                                                                onChange={event => {
+                                                                    p.role = event.target.value;
+                                                                    setPersonnelRole(event.target.value)
+                                                                }}
                                                             />
                                                         </Col>
 
                                                         <Col>
-                                                            <Button type="button" variant={"danger"}
-                                                                    onClick={() => this.handlePersonnelRemoval(personnel)}>X</Button>
+                                                            <Button type="button" variant={"danger"} onClick={() => {
+                                                                let copy = [...personnelAdd];
+                                                                copy.splice(personnelAdd.indexOf(p), 1)
+                                                                setPersonnelAdd(copy);
+
+                                                                if (personnelUpdate.indexOf(p) >= 0) {
+                                                                    //if personnel is in database
+                                                                    personnelUpdate.splice(personnelUpdate.indexOf(p), 1);
+                                                                    setPersonnelRemove([...personnelRemove, p]);
+                                                                } else {
+                                                                    //if personnel isnt in database
+                                                                    personnelAdd.splice(personnelAdd.indexOf(p), 1);
+                                                                }
+
+                                                            }}
+                                                            >Fjern</Button>
                                                         </Col>
                                                     </Row>
-                                                </ListGroupItem>
+
+                                                </ListGroup.Item>
                                             </React.Fragment>
                                         ))}
                                     </ListGroup>
-                                </Form.Group>
+                                </Card>
+
+                            </Form.Group>
 
 
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
-                                    <input type="file" className="form-control" encType="multipart/form-data"
-                                           name="file"
-                                           onChange={this.handleImageUpload}/>
-                                </Form.Group>
+                            <Form.Group as={Col} sm={"6"}>
+                                <Form.Label>Last opp et forsidebilde til arrangementet</Form.Label>
+                                <input type="file" className="form-control" encType="multipart/form-data" name="file"
+                                       onChange={event => setImage(event.target.files[0])}/>
+                            </Form.Group>
 
-                                <Form.Group as={Col} sm={"6"}>
-                                    <Form.Label>Eller legg inn en bilde-url</Form.Label>
-                                    <Form.Control
-                                        placeholder="Bilde-url"
-                                        value={this.state.imageUrl}
-                                        onChange={this.handleImageUrlChange}
-                                    />
-                                </Form.Group>
+                            <Form.Group as={Col} sm={"6"}>
+                                <Form.Label>Eller legg inn en bilde-url</Form.Label>
+                                <Form.Control
+                                    placeholder="Bilde-url"
+                                    value={imageUrl}
+                                    onChange={event => setImageUrl(event.target.value)}
+                                />
+                            </Form.Group>
 
-                                <Form.Group as={Col} sm={"6"}>
+                            <Form.Group as={Col} sm={"6"}>
 
-                                    <Form.Label>Aldersgrense</Form.Label>
-                                    <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
-                                        <ButtonGroup className="mr-2" aria-label="button-group">
-                                            <Button onClick={this.decrementAge}>-</Button>
-                                            <Button onClick={this.IncrementAge}>+</Button>
-                                        </ButtonGroup>
+                                <Form.Label>Aldersgrense</Form.Label>
+                                <ButtonToolbar className="mb-3" aria-label="Toolbar with Button groups">
+                                    <ButtonGroup className="mr-2" aria-label="button-group">
+                                        <Button onClick={decrementAge}>-</Button>
+                                        <Button onClick={IncrementAge}>+</Button>
+                                    </ButtonGroup>
 
-                                        <InputGroup>
-                                            <FormControl
-                                                type="input"
-                                                value={this.state.ageLimit}
-                                                onChange={this.handleAgeLimitChange}
-                                                aria-label="btn-age"
-                                                aria-describedby="btnGroupAddon"
-                                            />
-                                            <InputGroup.Append>
-                                                <InputGroup.Text>år</InputGroup.Text>
-                                            </InputGroup.Append>
-                                        </InputGroup>
+                                    <InputGroup>
+                                        <FormControl
+                                            type="input"
+                                            value={ageLimit}
+                                            onChange={event => setAgeLimit(event.target.value)}
+                                            aria-label="btn-age"
+                                            aria-describedby="btnGroupAddon"
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
 
-                                    </ButtonToolbar>
-                                </Form.Group>
-                            </Form.Row>
+                                </ButtonToolbar>
+                            </Form.Group>
+                        </Form.Row>
 
+                        <Row>
                             <Form.Row>
 
                                 <Form.Group as={Col} sm={"3"}>
@@ -822,14 +799,15 @@ export class EditEvent extends Component {
                             </ListGroup>
                             <Row>
 
-                                <Col>
-                                    <Button type="button" variant={"success"} onClick={this.handleSubmit}>Lagre</Button>
-                                </Col>
+                            <Col>
+                                <Button type="button" variant={"success"} onClick={handleSubmit}>Endre
+                                    arragament</Button>
+                            </Col>
 
-                                <Col>
-                                    <Button variant={"danger"} type="button"
-                                            onClick={this.handleEventCancel}>Avlys</Button>
-                                </Col>
+                            <Col>
+                                <Button variant={"danger"} type="button" onClick={handleEventCancel}>Avlys
+                                    arrangement</Button>
+                            </Col>
 
                                 {(this.state.error) ?
                                     <Alert style={{
@@ -842,80 +820,62 @@ export class EditEvent extends Component {
                                         <p>{this.state.error}</p></Alert> :
                                 <div style={{height: '3em'}}/>}
 
-                                <Col>
-                                <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
-                                </Col>
+                            <Col>
+                                <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
+                            </Col>
 
-                            </Row>
-                        </Form>
-                    </Card>
-                </Container>
-            </div>
-        );
+                        </Row>
+                    </Form>
+                </Card>
+            </Container>
+        </div>
+    );
+
+    function IncrementAge() {
+        setAgeLimit(ageLimit + 1)
     }
 
-
-    mounted() {
-        service.getEventByEventId(this.props.match.params.id).then(event => {
-
-            let fromDateTime = event.startTime.split(" ");
-            let toDateTime = event.endTime.split(" ");
-            let fromDate = fromDateTime[0];
-            let toDate = toDateTime[0];
-            let fromTime = fromDateTime[1];
-            let toTime = toDateTime[1];
-
-            this.setState({eventId: event.eventId});
-            this.setState({organizerId: event.organizerId});
-            this.setState({eventName: event.eventName});
-            this.setState({eventAddress: event.address});
-            this.setState({eventDescription: event.description});
-            this.setState({ageLimit: event.ageLimit});
-            this.setState({imageUrl: event.imageUrl});
-            this.setState({fDate: fromDate});
-            this.setState({tDate: toDate});
-            this.setState({fTime: fromTime});
-            this.setState({tTime: toTime});
-            this.setState({cancelled: event.cancelled});
-            this.setState({city: event.city});
-            this.setState({placeDescription: event.placeDescription});
-
-            service.getUsers().then(this.handleUsers).catch((err) => console.log(err.message));
-            service.getTicketToEvent(this.props.match.params.id).then(this.handleTicketsFromDB).catch((err) => console.log(err.message));
-            service.getPersonnel(this.props.match.params.id).then(this.handlePersonnelFromDatabase).catch((err) => console.log(err.message));
-            service.getGigs(this.props.match.params.id).then(this.handleGigsFromDatabase).catch((err) => console.log(err.message));
-        }).catch((error) => console.error(error));
-    }
-
-
-
-    IncrementAge() {
-        this.state.ageLimit++;
-        this.setState({ageLimit: this.state.ageLimit});
-    }
-
-    decrementAge() {
-        if (this.state.ageLimit > 0) {
-            this.state.ageLimit--;
-            this.setState({ageLimit: this.state.ageLimit})
+    function decrementAge() {
+        if (ageLimit > 0) {
+            setAgeLimit(ageLimit - 1)
         }
     }
 
-    handleDelete = () => {
+    function downloadC(e, artist) {
+
+        console.log(artist)
+
+        if (e.target.id == "contract") {
+            service.downloadContract(eventId, artist.userId)
+                .then(response => {
+                    let fileName = response.name;
+                    const link = document.createElement('a');
+                    link.download = response.name;
+                    //let ret = response.data.replace('data:text/plain;base64,', 'data:application/octet-stream;base64,');
+                    //console.log(ret);
+                    link.href = response.data;
+                    link.click();
+                })
+        }
+
+    }
+
+    function handleDelete() {
         if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-            service.deleteEvent(this.state.eventId).then(() => {
-                this.props.history.push("/hjem")
+            service.deleteEvent(eventId).then(() => {
+                history.push("/hjem")
                 alert("Arrangementet er nå slettet")
             });
         }
-    };
+    }
 
-    handleEventCancel = () => {
+    function handleEventCancel() {
         if (window.confirm("Ønsker du å avlyse arrangementet?") === true) {
-            this.setState({cancelled: true});
+            setCancelled(true)
             console.log("Cancelled")
         } else {
             console.log("No change")
         }
-    };
+    }
 }
+

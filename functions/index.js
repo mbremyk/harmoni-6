@@ -109,6 +109,7 @@ function getToken(user) {
  * put      /auth/users/:userId
  * get      /users/:userId                  ?auth?  ????
  * get      /auth/users/:userId
+ * post     /auth/users/temp
  *
  *                      EVENTS
  * post     /auth/events
@@ -376,10 +377,17 @@ app.get("/users/:userId", (req, res) => {
  * }
  */
 app.get("/auth/users/:userId", (req, res) => {
-    console.log("GET-request - /user/:userId");
-    return db.getUserById(req.params.userId)
-        .then(user => res.send(user))
-        .catch(error => console.error(error));
+	console.log("GET-request - /users/:userId");
+	return db.getUserById(req.params.userId)
+		.then(user => res.send(user))
+		.catch(error => console.error(error));
+});
+
+app.post("/auth/users/temp", (req, res) => {
+	console.log("GET-request - /auth/users/temp");
+	return db.createTempUser(req.body.email)
+		.then(result => res.status(201).send(result))
+		.catch(error => console.error(error));
 });
 
 
@@ -542,17 +550,18 @@ app.put('/auth/events/:eventId', (req, res) => {
         return;
     }
     if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
-        db.getEventByEventId(req.params.eventId).then(item => {
-                console.log("deleting old");
-                filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
-                console.log("uploading  new");
-                return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
-                    .then(data => {
-                        console.log(data.url);
-                        req.body.imageUrl = data.url;
-                        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false));
-                    })
-                    .catch(err => res.status(400));
+        db.getEventByEventId(req.params.eventId)
+            .then(item => {
+                    console.log("deleting old");
+                    filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                    console.log("uploading  new");
+                    return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
+                        .then(data => {
+                            console.log(data.url);
+                            req.body.imageUrl = data.url;
+                            return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false))
+                        })
+                        .catch(err => res.status(400));
                 }
             )
     } else {

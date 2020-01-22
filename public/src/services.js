@@ -203,6 +203,10 @@ class Services {
         return axios.post(url + '/users', user).then(response => response.data);
     }
 
+    createTempUser(user) {
+        return axios.post(url + "/auth/users/temp", user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
+    }
+
     updateUser(user) {
         return axios.put(url + '/auth/users/' + user.userId, user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
