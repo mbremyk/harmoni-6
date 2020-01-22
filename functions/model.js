@@ -63,7 +63,7 @@ let UserModel = sequelize.define('user', {
     password: Sequelize.STRING.BINARY,
     tempPassword: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
-    email: {type: Sequelize.STRING, unique: true, allowNull: false}
+    email: {type: Sequelize.STRING, unique: true, allowNull: true}
 }, {
     timestamps: true,
     paranoid: true

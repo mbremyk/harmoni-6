@@ -221,7 +221,8 @@ app.post("/login", async (req, res) => {
 
 app.get("/validate/username/:username", (req, res) => {
     console.log("GET-request - /validate/username/:username");
-    return db.getUserByEmailOrUsername('', req.params.username).then(result => {
+    console.log(req.params.username);
+    return db.getUserByUsername(req.params.username).then(result => {
         console.log(result);
         res.send(result.length === 1)
     })
@@ -230,6 +231,7 @@ app.get("/validate/username/:username", (req, res) => {
 
 app.get("/validate/email/:email", (req, res) => {
     console.log("GET-request - /validate/email/:email");
+    console.log(req.params.email);
     return db.getUserByEmail(req.params.email).then(result => {
         console.log(result);
         res.send(result !== null)
@@ -341,7 +343,7 @@ app.put("/auth/users/:userId", (req, res) => {
  *
  */
 app.delete("/auth/users/:userId", (req, res) => {
-    console.log("GET-request - /auth/users/:userId");
+    console.log("DELETE-request - /auth/users/:userId");
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
 
