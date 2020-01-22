@@ -32,9 +32,7 @@ export class EventPage extends Component {
                     {this.RenderNavbar()}
                     <Container>
                         <Card className='p-2'>
-                            <div style={{overflow: 'hidden', height: '620px'}}>
-                                <Image src={this.currentEvent.imageUrl}/>
-                            </div>
+                            {this.renderImage()}
 
                             <div className="p-4">
                             <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
@@ -44,22 +42,27 @@ export class EventPage extends Component {
                                     {this.RenderArtist()}
 
                                     <div className="ml-3">
-                                        {this.currentEvent.description}
+                                        <div>
+                                            {this.currentEvent.description}
+                                        </div>
+                                        {this.renderPlaceDiscriptiion()}
+
+
                                     </div>
                                 </Col>
                                 <Col>
-                                    <ListGroup>
+                                    <ListGroup variant="flush">
                                         <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}
                                         </h6></ListGroup.Item>
                                         <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}
                                         </h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne
-                                            kart</Button></ListGroup.Item>
                                         <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6>
+                                            <h6><b>By:</b> {this.currentEvent.city}</h6>
+                                            <Button type="button" size="sm" onClick={this.addressClicked}>Åpne
+                                                kart</Button></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Kontakt Arrangør</b></h6><h6> {this.user.username}</h6>
+                                            <h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
                                     </ListGroup>
                                 </Col>
                             </Row>
@@ -319,7 +322,7 @@ export class EventPage extends Component {
     }
 
     addressClicked() {
-        let res = this.currentEvent.address.split(" ");
+        let res = (this.currentEvent.address + " " + this.currentEvent.city).split(" ");
         var url = "";
         res.map(i => {
             url += i + "-";
@@ -328,4 +331,28 @@ export class EventPage extends Component {
         url = url.replace(/[^\w\s-]/g,'');
         window.open('https://www.google.com/maps/search/' + url);
     }
+
+    renderImage() {
+        if (this.currentEvent.imageUrl !== "") {
+            return (
+                <div style={{overflow: 'hidden', height: '620px'}}>
+                    <Image src={this.currentEvent.imageUrl}/>
+                </div>
+            );
+        }
+    }
+
+    renderPlaceDiscriptiion() {
+        if (this.currentEvent.placeDescription !== "") {
+            return (
+                <div className="mt-3">
+
+                    <h6>Veibeskrivelse: </h6> {this.currentEvent.placeDescription}
+                </div>
+
+            );
+        }
+    }
+
+
 }
