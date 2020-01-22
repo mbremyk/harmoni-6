@@ -18,7 +18,6 @@ export class LandingPage extends Component {
         return (
             <div>
                 <div className={"landingpage"}>
-
                         <Row style={{padding: "5em"}}>
                             <Col>
                                 <h1 className="HarmoniLogo display-sm-3 text-center">Harmoni</h1>
