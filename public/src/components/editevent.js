@@ -74,9 +74,9 @@ export class EditEvent extends Component {
         this.ticketType = this.handleTicketType.bind(this);
         this.ticketPrice = this.handleTicketPrice.bind(this);
         this.ticketAmount = this.handleTicketAmount.bind(this);
-        this.tickets = this.handleTickets.bind(this);
+        this.tickets = this.handleTicketsFromDB.bind(this);
         this.tickets = this.handleTicketsAdd.bind(this);
-        this.updatedTickets = this.handleTicketsUpdate.bind(this);
+        this.updatedTickets = this.handleTicketsFromDB.bind(this);
 
         this.state = {
             eventId: 0,
@@ -87,16 +87,20 @@ export class EditEvent extends Component {
             placeDescription: '',
             eventDescription: '',
             ageLimit: 0,
+
             fDate: require('moment')().format('YYYY-MM-DD'),
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
             maxTime: moment('23:59', 'HH:mm').format('HH:mm'),
             minTime: moment('00:00', 'HH:mm').format('HH:mm'),
+
             rider: '',
             contract: '',
+
             image: '',
             imageUrl: '',
+
             artistsAdd: [],
             artists: [],
 
@@ -106,6 +110,7 @@ export class EditEvent extends Component {
             personnelRemove: [], //personnel for removal
 
             cancelled: 0,
+
             ticketType: '',
             ticketPrice: 0,
             ticketAmount: 0,
@@ -197,11 +202,6 @@ export class EditEvent extends Component {
             this.setState({maxTime: moment('23:59', 'HH:mm').format('HH:mm')});
         }
     }
-
-    handlePersonnelRole(event, personnel) {
-        personnel.role = event.target.value;
-        this.setState({personnelRole: event.target.value})
-
     /*
     Personnel
      */
@@ -235,7 +235,7 @@ export class EditEvent extends Component {
             this.state.personnelUpdate.splice(this.state.personnelUpdate.indexOf(personnel), 1);
             this.setState({personnelRemove: [...this.state.personnelRemove, personnel]});
         } else {
-            //if personnel isnt in database
+            //if personnel is'nt in database
             this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1);
         }
     }
@@ -266,8 +266,8 @@ export class EditEvent extends Component {
 
 
     /*
-    Submit
-     */
+     Ticket
+    */
 
     handleTicketType(event) {
         this.setState({ticketType: event.target.value})
@@ -281,44 +281,96 @@ export class EditEvent extends Component {
         this.setState({ticketAmount: event.target.value})
     }
 
-    handleTickets(event) {
-        this.setState({tickets: [...this.state.tickets, ...event]});
-    }
-
     handleTicketsAdd() {
-        this.setState({addedTickets: [this.state.addedTickets, new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
+        let errmsg = "";
+        if ((this.state.tickets.some(t => t.type.trim() === this.state.ticketType.trim()) && !(this.state.deletedTickets.some(t => t.type.trim() === this.state.ticketType.trim())))) {
+            errmsg += "Denne billett-typen finnes allerede!";
+            this.setError(errmsg, 'danger');
+            this.setState({ticketType: ""});
+            this.setState({ticketPrice: 0});
+            this.setState({ticketAmount: 0});
+            return;
+        } else if (!this.state.ticketType.trim()) {
+            errmsg += "Vennligst skriv inn en billett-type"
+            this.setError(errmsg, 'danger');
+            return;
+        }
+        let newTicket = new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)
+        this.setState({addedTickets: [...this.state.addedTickets, newTicket]});
+        this.setState({tickets: [...this.state.tickets, newTicket]});
     }
 
-    handleTicketsUpdate(event) {
-        this.setState({tickets: [...this.state.updatedTickets, event]})
+    handleTicketsFromDB(event_ticketsFromDB) {
+        let newTickets = event_ticketsFromDB.map(t => new Ticket(t.eventId, t.type, t.price, t.amount));
+        this.setState({updatedTickets: [...this.state.updatedTickets, ...newTickets]});
+        this.setState({tickets: [...this.state.tickets, ...newTickets]});
     }
 
     handleTicketsTypeChange(event, ticket) {
         ticket.type = event.target.value;
-        this.setState({tickets: [...this.state.tickets]})
+        this.setState({tickets: [...this.state.tickets]});
     }
 
     handleTicketsPriceChange(event, ticket) {
         ticket.price = event.target.value;
-        this.setState({tickets: [...this.state.tickets]})
+        this.setState({tickets: [...this.state.tickets]});
     }
 
     handleTicketsAmountChange(event, ticket) {
         ticket.amount = event.target.value;
-        this.setState({tickets: [...this.state.tickets]})
+        this.setState({tickets: [...this.state.tickets]});
     }
 
     handleTicketsRemoval(event, ticket) {
-        if (this.state.tickets.indexOf(ticket) >= 0) {
-            this.state.tickets.splice(this.state.tickets.indexOf(ticket), 1);
-            this.setState({deletedTickets: [...this.state.deletedTickets, ticket]})
-        } else if (this.state.addedTickets.indexOf(ticket) >= 0) {
+        this.state.tickets.splice(this.state.tickets.indexOf(ticket), 1);
+        this.setState({tickets: [...this.state.tickets]});
+
+        if (this.state.addedTickets.indexOf(ticket) >= 0) {
             this.state.addedTickets.splice(this.state.tickets.indexOf(ticket), 1);
-        } else if (this.state.updatedTickets.indexOf(ticket) >= 0) {
+
+        }
+        if (this.state.updatedTickets.indexOf(ticket) >= 0) {
             this.state.updatedTickets.splice(this.state.tickets.indexOf(ticket), 1);
+            this.setState({deletedTickets: [...this.state.deletedTickets, ticket]});
 
         }
     }
+
+    updateTickets = () => new Promise((resolve, reject) => {
+        let promises = [];
+
+        //If user has chosen to remove tickets, remove them from the database
+        if (Array.isArray(this.state.deletedTickets) && this.state.deletedTickets.length > 0) {
+            console.log('remove', this.state.deletedTickets);
+            promises.push(this.state.deletedTickets.map(ticket => service.deleteTicket(ticket).catch(error => {
+                reject(error);
+                console.log(error)
+            })))
+        }
+
+        //If user has chosen to edit ticket information, update in database
+        if (Array.isArray(this.state.updatedTickets) && this.state.updatedTickets.length > 0) {
+            console.log('update', this.state.updatedTickets);
+            promises.push(service.updateTicket(this.state.updatedTickets).catch(error => {
+                reject(error);
+                console.log(error)
+            }))
+        }
+
+        //If user has chosen to add tickets, post in database
+        if (Array.isArray(this.state.addedTickets) && this.state.addedTickets.length > 0) {
+            console.log('add', this.state.addedTickets);
+            promises.push(service.addTickets(this.state.addedTickets).catch(error => {
+                reject(error);
+                console.log(error)
+            }))
+        }
+
+        Promise.all(promises).then(() => resolve(true)).catch(error => {
+            reject(error);
+            console.log(error)
+        });
+    });
 
     setError(message, variant) {
         this.setState({error: message, errorType: variant});
@@ -328,16 +380,15 @@ export class EditEvent extends Component {
     handleSubmit() {
         let errmsg = "";
         // check empty fields
-        if (!this.state.eventName || !this.state.eventAddress || !this.state.eventDescription || !this.state.city) {
-            errmsg += 'Følgende mangler:';
-            if (!this.state.eventName) errmsg += " [ Arrangementsavn ] ";
-            if (!this.state.eventAddress) errmsg += "  [ Addresse ] ";
-            if (!this.state.eventDescription) errmsg += "  [ Beskrivelse ] ";
-            if (!this.state.city) errmsg += "  [ By ] ";
+        if (!this.state.eventName.trim() || !this.state.eventAddress.trim() || !this.state.eventDescription.trim() || !this.state.city.trim()) {
+            errmsg += 'Følgende felter mangler:';
+            if (!this.state.eventName.trim()) errmsg += " [ Arrangementsavn ] ";
+            if (!this.state.eventAddress.trim()) errmsg += "  [ Addresse ] ";
+            if (!this.state.eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
+            if (!this.state.city.trim()) errmsg += "  [ By ] ";
             this.setError(errmsg, 'danger');
             return;
         }
-
 
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
@@ -358,9 +409,11 @@ export class EditEvent extends Component {
                 this.state.cancelled);
 
             service.updateEvent(ev).then(() => {
-                this.updatePersonnel().then(() => {
-                    this.props.history.push("/arrangement/" + this.state.eventId);
-                })
+                this.updateTickets().then(() => {
+                    this.updatePersonnel().then(() => {
+                        this.props.history.push("/arrangement/" + this.state.eventId);
+                    })
+                });
             });
         });
     }
@@ -740,8 +793,8 @@ export class EditEvent extends Component {
                                         left: '50%',
                                         position: 'fixed',
                                         transform: 'translate(-50%, -50%)'
-                                    }} variant={this.state.errorType}><Alert.Heading>Påkrevde felter må fylles
-                                        inn!</Alert.Heading><p>{this.state.error}</p></Alert> :
+                                    }} variant={this.state.errorType}><Alert.Heading>Vent nå litt!</Alert.Heading>
+                                        <p>{this.state.error}</p></Alert> :
                                 <div style={{height: '3em'}}/>}
 
                                 <Col>
@@ -783,7 +836,7 @@ export class EditEvent extends Component {
             this.setState({placeDescription: event.placeDescription});
 
             service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
-            service.getTicketToEvent(this.props.match.params.id).then(this.handleTickets).catch((err) => console.log(err.message));
+            service.getTicketToEvent(this.props.match.params.id).then(this.handleTicketsFromDB).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnelFromDatabase).catch((err) => console.log(err.message));
             service.getGigs(this.props.match.params.id).then(g => {
                 g.map(u => this.handleArtistsAdd(u.artistId));
