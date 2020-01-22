@@ -595,7 +595,7 @@ app.post("/auth/events/:eventId/tickets", (req, res) => {
 
 /**
  *  @header  x-access-token: string
- *  @body {Ticket}
+ *  @body {Ticket[]}
  *  @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId/tickets', (req, res) => {
@@ -635,6 +635,18 @@ app.get("/events/:eventId/tickets", (req, res) => {
  */
 app.post("/auth/events/:eventId/gigs", (req, res) => {
     db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(503));
+});
+
+
+/**
+ *  @header  x-access-token: string
+ *  @body {Gig}
+ *  @return {json} {jwt: token}
+ */
+app.delete("/auth/events/:eventId/gigs/:artistId", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    let artistId = decodeURIComponent(req.params.artistId);
+    db.deleteGig(eventId, artistId).then((deleteOk) => deleteOk ? res.status(201).send(true) : res.sendStatus(503));
 });
 
 /**
