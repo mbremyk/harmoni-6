@@ -287,7 +287,8 @@ export class MailForm extends Component {
                     <div className={"container"}>
                         <Card className="m-5 p-4">
                             <div>
-                                <Button className={"btn-info"} onClick={this.toggleMail}>
+                                <Button style={{marginBottom: "10px"}} className={"btn-info"} onClick={this.toggleMail}
+                                        block>
                                     Send epost {this.state.arrow}
                                 </Button>
                                 {(this.state.toggle) ? this.toggleForm(this.state.toggle) : <div style={{height: "3em"}}/>}
