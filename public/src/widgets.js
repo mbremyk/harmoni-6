@@ -81,7 +81,7 @@ export class EventInfo extends Component {
                       className={this.state.hoverCss}
                       onClick={() => window.location = "/arrangement/" + this.props.link}
                 >
-                    <Card className="text-warning border-0">
+                    <Card className="border-0">
                         <div style={{height: "13em", overflow: "hidden"}}>
                             <Card.Img src={this.props.imageUrl} alt={this.title}/>
                             <Card.ImgOverlay>
