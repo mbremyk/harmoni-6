@@ -268,10 +268,15 @@ export class AddEvent extends Component {
     });
 
     handleSubmit() {
-
+        let errmsg = "";
         // check empty fields
         if (!this.state.eventName || !this.state.eventAddress || !this.state.eventDescription) {
-            this.setError('Alle felter må fylles ut', 'danger');
+            errmsg += 'Følgende mangler:';
+            if (!this.state.eventName) errmsg += " [ Arrangementsnavn ] ";
+            if (!this.state.eventAddress) errmsg += "  [ Addresse ] ";
+            if (!this.state.eventDescription) errmsg += "  [ Beskrivelse ] ";
+            if (!this.state.city) errmsg += "  [ By ] ";
+            this.setError(errmsg, 'danger');
             return;
         }
 
@@ -325,7 +330,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Arrangementsnavn</Form.Label>
                                     <Form.Control
-                                        placeholder="Navn på arrangement"
+                                        placeholder="Navn på arrangement . . ."
                                         value={this.state.eventName}
                                         onChange={this.handleEventNameChange}
                                     />
@@ -334,7 +339,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>Adresse</Form.Label>
                                     <Form.Control
-                                        placeholder="Adresse der arrangementet skal holdes"
+                                        placeholder="Adresse der arrangementet skal holdes . . ."
                                         value={this.state.eventAddress}
                                         onChange={this.handleEventAddressChange}
 
@@ -344,7 +349,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>By</Form.Label>
                                     <Form.Control
-                                        placeholder="By der arrangementet skal holdes"
+                                        placeholder="By der arrangementet skal holdes . . ."
                                         value={this.state.city}
                                         onChange={this.handleCityChange}
 
@@ -353,9 +358,9 @@ export class AddEvent extends Component {
 
 
                                 <Form.Group as={Col} sm={12}>
-                                    <Form.Label>Plass beskrivelse</Form.Label>
+                                    <Form.Label>Stedsanvisninger</Form.Label>
                                     <Form.Control
-                                        placeholder="For eksempel 3. etajse"
+                                        placeholder="Her kan du f.eks skrive anvisning om hvordan man kan finne fram til der arrangementet holdes . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.placeDescription}
@@ -366,7 +371,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={12}>
                                     <Form.Label>Beskrivelse</Form.Label>
                                     <Form.Control
-                                        placeholder="Her kan du skrive en beskrivelse av arrangementet"
+                                        placeholder="Her kan du skrive en beskrivelse av arrangementet . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.eventDescription}
@@ -523,7 +528,7 @@ export class AddEvent extends Component {
 
                                                         <Col>
                                                             <Form.Control
-                                                                placeholder="Rollen til personen"
+                                                                placeholder="Rollen til personen . . ."
                                                                 value={personnel.role}
                                                                 onChange={event => this.handlePersonnelRole(event, personnel)}
                                                             />
@@ -657,7 +662,14 @@ export class AddEvent extends Component {
                             </ListGroup>
 
                             {(this.state.error) ?
-                                <Alert style={{height: '3em', top: '50%', left: '50%', position: 'fixed', transform: 'translate(-50%, -50%)'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                                <Alert style={{
+                                    height: '9em',
+                                    top: '50%',
+                                    left: '50%',
+                                    position: 'fixed',
+                                    transform: 'translate(-50%, -50%)'
+                                }} variant={this.state.errorType}><Alert.Heading>Påkrevde felter må fylles
+                                    inn!</Alert.Heading><p>{this.state.error}</p></Alert> :
                                 <div style={{height: '3em'}}/>}
 
                         </Form.Row>
