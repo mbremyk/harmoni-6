@@ -36,7 +36,7 @@ export class NewPassword extends Component {
 
 	render() {
 		return(
-			<Container style={{top: '0'}}>
+			<Container className={"c-sm"} style={{top: '0'}}>
 
 				<h1 className="HarmoniLogo display-sm-3 text-center m-5">Harmoni</h1>
 
