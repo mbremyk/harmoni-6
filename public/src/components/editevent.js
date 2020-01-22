@@ -1,4 +1,4 @@
-import {Event, Personnel, service} from "../services";
+import {Event, Gig, Personnel, service, SimpleFile, ToBase64} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -16,7 +16,6 @@ import {HarmoniNavbar} from "./navbar";
 //import {Event, service} from "../services";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
-import {DownloadWidget} from "../widgets";
 
 export class EditEvent extends Component {
 
@@ -53,50 +52,46 @@ export class EditEvent extends Component {
         super(props);
 
         this.eventName = this.handleEventNameChange.bind(this);
+        this.city = this.handleCityChange.bind(this);
         this.eventAddress = this.handleEventAddressChange.bind(this);
+        this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
         this.eventDescription = this.handleEventDescriptionChange.bind(this);
+        this.imageUrl = this.handleImageUrlChange.bind(this);
         this.ageLimit = this.handleAgeLimitChange.bind(this);
         this.fDate = this.handleFDate.bind(this);
         this.fTime = this.handleFTime.bind(this);
         this.tDate = this.handleTDate.bind(this);
         this.tTime = this.handleTTime.bind(this);
-        this.rider = this.handleRiderChange.bind(this);
-        this.contract = this.handleContractChange.bind(this);
-        this.artistsAdd = this.handleArtistsAdd.bind(this);
-        this.artists = this.handleArtists.bind(this);
-        this.imageUrl = this.handleImageUrlChange.bind(this);
-        this.image = this.handleImageUpload.bind(this);
+
+        this.gigsOld = this.handleGigsFromDatabase.bind(this);
         this.personnel = this.handlePersonnelFromDatabase.bind(this);
-        this.personnelAdd = this.handlePersonnelAdd.bind(this);
-        this.city = this.handleCityChange.bind(this);
-        this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
 
         this.state = {
             eventId: 0,
             organizerId: 0,
             eventName: '',
-            eventAddress: '',
             city: '',
+            eventAddress: '',
             placeDescription: '',
             eventDescription: '',
+            imageUrl: '',
             ageLimit: 0,
             fDate: require('moment')().format('YYYY-MM-DD'),
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
-            rider: '',
-            contract: '',
-            image: '',
-            imageUrl: '',
-            artistsAdd: [],
-            artists: [],
+            cancelled: 0,
+
+            users: [],
+
+            gigsOld: [],
+            gigsNew: [],
+            gigsRemove: [],
 
             personnel: [], //all personnel used to render them on the page
             personnelUpdate: [], //personnel already registered
             personnelAdd: [], //personnel added
             personnelRemove: [], //personnel for removal
-
-            cancelled: 0
         };
     }
 
@@ -124,28 +119,15 @@ export class EditEvent extends Component {
         this.setState({ageLimit: event.target.value});
     }
 
-    handleRiderChange(event) {
-        this.setState({rider: event.target.value})
-    }
-
-    handleContractChange(event) {
-        this.setState({contract: event.target.value})
-    }
-
     handleImageUpload(event) {
-        this.setState({image: event.target.files[0]})
+        let image = event.target.files[0];
+        service.toBase64(image).then(imageData => {
+            this.setState({imageUrl: imageData})
+        })
     }
 
     handleImageUrlChange(event) {
         this.setState({imageUrl: event.target.value})
-    }
-
-    handleArtistsAdd(event) {
-        service.getUser(event).then((user) => this.setState({artistsAdd: [...this.state.artistsAdd, user]}));
-    }
-
-    handleArtists(event) {
-        this.setState({artists: [...this.state.artists, ...event]})
     }
 
     handleFDate(event) {
@@ -163,6 +145,60 @@ export class EditEvent extends Component {
     handleTTime(event) {
         this.setState({tTime: event.target.value})
     }
+
+    handleUsers(event) {
+        this.setState({users: [...this.state.users, ...event]});
+    }
+
+
+    /*
+     Gigs
+     */
+
+
+    handleGigsFromDatabase(event_gigsFromDatabase) {
+        this.setState({gigsOld: [...this.state.gigsOld, ...event_gigsFromDatabase]});
+    }
+
+    handleGigAdd(event_newUserId) {
+        service.getUser(event_newUserId).then((user) => {
+            let gig = new Gig(this.state.eventId, user.userId, null);
+            gig.user = user;
+            this.setState({gigsNew: [...this.state.gigsNew, gig]});
+        });
+    }
+
+    handleContractUpload(event, gig) {
+        let file = event.target.files[0];
+        service.toBase64(file).then(contractData => {
+            gig.contract = new SimpleFile(contractData, file.name);
+        })
+    }
+
+    handleGigRemoval(gig) {
+        if (this.state.gigsOld.indexOf(gig) >= 0) {
+            this.state.gigsOld.splice(this.state.gigsOld.indexOf(gig), 1);
+            this.setState({gigsRemove: [...this.state.gigsRemove, gig]});
+        } else {
+            this.state.gigsNew.splice(this.state.gigsNew.indexOf(gig), 1);
+        }
+    }
+
+    updateGigs = () => new Promise((resolve, reject) => {
+        let promises = [];
+
+        if (Array.isArray(this.state.gigsRemove) && this.state.gigsRemove.length > 0) {
+            console.log('remove GIGs', this.state.gigsRemove);
+            promises.push(this.state.gigsRemove.map(gig => service.deleteGig(gig).catch(error => reject(error))));
+        }
+
+        if (Array.isArray(this.state.gigsNew) && this.state.gigsNew.length > 0) {
+            console.log('add GIGs', this.state.gigsNew);
+            promises.push(this.state.gigsNew.map(gig => service.addGig(gig).catch(error => reject(error))));
+        }
+
+        Promise.all(promises).then(() => resolve(true));
+    });
 
 
     /*
@@ -208,19 +244,19 @@ export class EditEvent extends Component {
 
         //if user has chosen to remove personnel, then remove them from the database
         if (Array.isArray(this.state.personnelRemove) && this.state.personnelRemove.length > 0) {
-            console.log('remove', this.state.personnelRemove);
+            console.log('remove Personnel', this.state.personnelRemove);
             promises.push(this.state.personnelRemove.map(personnel => service.deletePersonnel(this.state.eventId, personnel.personnelId).catch(error => reject(error))))
         }
 
         //if there are any old personnel left, update their role in the database
         if (Array.isArray(this.state.personnelUpdate) && this.state.personnelUpdate.length > 0) {
-            console.log('update', this.state.personnelUpdate);
+            console.log('update Personnel', this.state.personnelUpdate);
             promises.push(service.updatePersonnel(this.state.personnelUpdate).catch(error => reject(error)))
         }
 
         //if there are new personnel added, then add them to database
         if (Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length > 0) {
-            console.log('add', this.state.personnelAdd);
+            console.log('add Personnel', this.state.personnelAdd);
             promises.push(service.addPersonnel(this.state.personnelAdd).catch(error => reject(error)))
         }
 
@@ -238,33 +274,32 @@ export class EditEvent extends Component {
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
 
-        this.toBase64(this.state.image).then(image => {
+        let ev = new Event(
+            this.state.eventId,
+            this.state.organizerId,
+            this.state.eventName,
+            this.state.city,
+            this.state.eventAddress,
+            this.state.placeDescription,
+            this.state.eventDescription,
+            this.state.ageLimit,
+            fDateTime, tDateTime,
+            this.state.imageUrl,
+            this.state.cancelled);
 
-            let ev = new Event(
-                this.state.eventId,
-                this.state.organizerId,
-                this.state.eventName,
-                this.state.city,
-                this.state.eventAddress,
-                this.state.placeDescription,
-                this.state.eventDescription,
-                this.state.ageLimit,
-                fDateTime, tDateTime,
-                (image ? image : this.state.imageUrl),
-                this.state.cancelled);
-
-            service.updateEvent(ev).then(() => {
-                this.updatePersonnel().then(() => {
-                    this.props.history.push("/arrangement/" + this.state.eventId);
+        service.updateEvent(ev).then(() => {
+            this.updatePersonnel().then(() => {
+                this.updateGigs().then(() => {
+                    this.props.history.push("/arrangement/" + ev.eventId);
                 })
-            });
+            })
         });
     }
 
 
     render() {
 
-        if (!(Array.isArray(this.state.artists) && this.state.artists.length)) return null;
+        if (!(Array.isArray(this.state.users) && this.state.users.length)) return null;
 
         return (
             <div>
@@ -377,7 +412,7 @@ export class EditEvent extends Component {
 
                                     <Form.Label>Artist</Form.Label>
 
-                                    <Dropdown onSelect={this.handleArtistsAdd}>
+                                    <Dropdown onSelect={this.handleGigAdd}>
 
                                         <Dropdown.Toggle variant={"success"} id="dropdown">
                                             Velg artist
@@ -385,9 +420,12 @@ export class EditEvent extends Component {
 
                                         <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
                                                        as={this.CustomMenu}>
-                                            {this.state.artists.filter(artist => !this.state.artistsAdd.some(e => e.userId === artist.userId)).map(artist => (
-                                                <Dropdown.Item eventKey={artist.userId}>
-                                                    {artist.username}
+                                            {this.state.users.filter(user => {
+                                                if (this.state.gigsOld.some(gig => user.userId === gig.artistId)) return false;
+                                                return !this.state.gigsNew.some(gig => user.userId === gig.artistId);
+                                            }).map(user => (
+                                                <Dropdown.Item eventKey={user.userId}>
+                                                    {user.username}
                                                 </Dropdown.Item>
                                             ))}
                                         </Dropdown.Menu>
@@ -398,35 +436,40 @@ export class EditEvent extends Component {
 
                                 <Form.Group as={Col} sm={"10"}>
 
-                                    <ListGroup title={"Valgte artister"}>
-                                        {this.state.artistsAdd.map(artist => (
-                                            <React.Fragment key={artist.userId}>
+                                    <ListGroup title={"Valgte giger"}>
+                                        {this.state.gigsOld.map(gig => (
+                                            <React.Fragment key={gig.artistId}>
                                                 <Card>
                                                     <Card.Title
-                                                        className="font-weight-bold text-center">{artist.username}</Card.Title>
+                                                        className="font-weight-bold text-center">{gig.user.username}</Card.Title>
                                                     <ListGroupItem>
                                                         <Row>
-
+                                                            <Col sm={""}>
+                                                                <Button type="button" variant={"danger"}
+                                                                        onClick={() => this.handleGigRemoval(gig)}>X</Button>
+                                                            </Col>
+                                                        </Row>
+                                                    </ListGroupItem>
+                                                </Card>
+                                            </React.Fragment>))}
+                                    </ListGroup>
+                                    <ListGroup title={"nye giger"}>
+                                        {this.state.gigsNew.map(gig => (
+                                            <React.Fragment key={gig.artistId}>
+                                                <Card>
+                                                    <Card.Title
+                                                        className="font-weight-bold text-center">{gig.user.username}</Card.Title>
+                                                    <ListGroupItem>
+                                                        <Row>
                                                             <Form.Group as={Col} sm={"5"}>
                                                                 <label>Last opp kontrakt</label>
                                                                 <input type="file" className="form-control"
                                                                        encType="multipart/form-data" name="file"
-                                                                       onChange={this.handleContractChange}/>
+                                                                       onChange={event => this.handleContractUpload(event, gig)}/>
                                                             </Form.Group>
-
                                                             <Col sm={""}>
-                                                                <DownloadWidget artist={artist.userId}
-                                                                                event={this.state.eventId}/>
-                                                            </Col>
-
-                                                            <Col sm={""}>
-                                                                <label>Fjern artist</label>
                                                                 <Button type="button" variant={"danger"}
-                                                                        onClick={() => {
-                                                                            this.state.artistsAdd.splice(this.state.artistsAdd.indexOf(artist), 1)
-                                                                            this.setState({artistsAdd: this.state.artistsAdd});
-                                                                        }
-                                                                        }>Fjern</Button>
+                                                                        onClick={() => this.handleGigRemoval(gig)}>X</Button>
                                                             </Col>
                                                         </Row>
                                                     </ListGroupItem>
@@ -449,7 +492,7 @@ export class EditEvent extends Component {
 
                                         <Dropdown.Menu style={{overflowY: 'scroll', maxHeight: "300px"}}
                                                        as={this.CustomMenu}>
-                                            {this.state.artists.filter(users => !this.state.personnel.some(e => (e.personnelId === users.userId))).map(user => (
+                                            {this.state.users.filter(user => !this.state.personnel.some(e => (e.personnelId === user.userId))).map(user => (
                                                 <Dropdown.Item eventKey={user.userId}>
                                                     {user.username}
                                                 </Dropdown.Item>
@@ -582,25 +625,12 @@ export class EditEvent extends Component {
             this.setState({city: event.city});
             this.setState({placeDescription: event.placeDescription});
 
-            service.getUsers().then(this.handleArtists).catch((err) => console.log(err.message));
+            service.getUsers().then(this.handleUsers).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnelFromDatabase).catch((err) => console.log(err.message));
-            service.getGigs(this.props.match.params.id).then(g => {
-                g.map(u => this.handleArtistsAdd(u.artistId));
-            })
-                .catch((err) => console.log(err.message));
-        }).catch((error) => console.log(error.message));
+            service.getGigs(this.props.match.params.id).then(this.handleGigsFromDatabase).catch((err) => console.log(err.message));
+        }).catch((error) => console.error(error));
     }
 
-    toBase64 = (file) => new Promise((resolve, reject) => {
-        if (file === "") {
-            resolve(null);
-            return;
-        }
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
 
 
     IncrementAge() {
