@@ -639,7 +639,7 @@ app.get("/auth/events/:eventId/personnel", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/tickets", (req, res) => {
-    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(503));
+    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201).send(true) : res.status(503).send(false));
 });
 
 
@@ -649,7 +649,7 @@ app.post("/auth/events/:eventId/tickets", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId/tickets', (req, res) => {
-    return db.updateTickets(req.body).then(updateOk => updateOk ? res.status(201) : res.status(404))
+    return db.updateTickets(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(404).send(false))
 });
 
 /**
@@ -659,7 +659,7 @@ app.put('/auth/events/:eventId/tickets', (req, res) => {
 app.delete('/auth/events/:eventId/tickets/:type', (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let type = decodeURIComponent(req.params.type);
-    return db.removeTicket(eventId, type).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+    return db.removeTicket(eventId, type).then(deleteOk => deleteOk ? res.status(201).send(true) : res.status(400).send(false))
 });
 
 
