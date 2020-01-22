@@ -189,12 +189,13 @@ export class EditEvent extends Component {
         this.setState({personnel: [...this.state.personnel]});
     }
 
-    handlePersonnelRemoval(event, personnel) {
+    handlePersonnelRemoval(personnel) {
         this.state.personnel.splice(this.state.personnel.indexOf(personnel), 1);
         this.setState({personnel: [...this.state.personnel]});
 
-        if (this.state.personnelUpdate.indexOf(personnel) > 0) {
+        if (this.state.personnelUpdate.indexOf(personnel) >= 0) {
             //if personnel is in database
+            this.state.personnelUpdate.splice(this.state.personnelUpdate.indexOf(personnel), 1);
             this.setState({personnelRemove: [...this.state.personnelRemove, personnel]});
         } else {
             //if personnel isnt in database
@@ -205,10 +206,10 @@ export class EditEvent extends Component {
     updatePersonnel = () => new Promise((resolve, reject) => {
         let promises = [];
 
-        //if there are new personnel added, then add them to database
-        if (Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length > 0) {
-            console.log('add', this.state.personnelAdd);
-            promises.push(service.addPersonnel(this.state.personnelAdd).catch(error => reject(error)))
+        //if user has chosen to remove personnel, then remove them from the database
+        if (Array.isArray(this.state.personnelRemove) && this.state.personnelRemove.length > 0) {
+            console.log('remove', this.state.personnelRemove);
+            promises.push(this.state.personnelRemove.map(personnel => service.deletePersonnel(this.state.eventId, personnel.personnelId).catch(error => reject(error))))
         }
 
         //if there are any old personnel left, update their role in the database
@@ -217,11 +218,12 @@ export class EditEvent extends Component {
             promises.push(service.updatePersonnel(this.state.personnelUpdate).catch(error => reject(error)))
         }
 
-        //if user has chosen to remove personnel, then remove them from the database
-        if (Array.isArray(this.state.personnelRemove) && this.state.personnelRemove.length > 0) {
-            console.log('remove', this.state.personnelRemove);
-            promises.push(this.state.personnelRemove.map(personnel => service.deletePersonnel(this.state.eventId, personnel.personnelId).catch(error => reject(error))))
+        //if there are new personnel added, then add them to database
+        if (Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length > 0) {
+            console.log('add', this.state.personnelAdd);
+            promises.push(service.addPersonnel(this.state.personnelAdd).catch(error => reject(error)))
         }
+
         Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
     });
 
@@ -232,8 +234,6 @@ export class EditEvent extends Component {
 
 
     handleSubmit() {
-
-        console.log('Lagre');
 
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
@@ -254,9 +254,7 @@ export class EditEvent extends Component {
                 this.state.cancelled);
 
             service.updateEvent(ev).then(() => {
-                console.log('updating', ev);
                 this.updatePersonnel().then(() => {
-                    console.log('done');
                     this.props.history.push("/arrangement/" + this.state.eventId);
                 })
             });
@@ -483,7 +481,7 @@ export class EditEvent extends Component {
 
                                                         <Col>
                                                             <Button type="button" variant={"danger"}
-                                                                    onClick={event => this.handlePersonnelRemoval(event, personnel)}>X</Button>
+                                                                    onClick={() => this.handlePersonnelRemoval(personnel)}>X</Button>
                                                         </Col>
                                                     </Row>
                                                 </ListGroupItem>
