@@ -167,6 +167,12 @@ app.use("/auth", (req, res, next) => {
             res.json({error: "Not authorized"});
         } else {
             console.log("Token OK");
+            console.log(decoded);
+            res.json.jwt = getToken({
+                userId: decoded.userId,
+                username: decoded.username,
+                email: decoded.email
+            });
             next();
         }
     })
@@ -257,6 +263,7 @@ app.post("/auth/logout", (req, res) => {
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
 
+    res.json.jwt = null;
     return res.sendStatus(201);
 });
 
@@ -287,7 +294,9 @@ app.put('/forgotPass/:email', (req, res) => {
     let email = decodeURIComponent(req.params.email);
     return db.forgotPassword(email)
         .then(success => success ? res.status(201) : res.status(400))
-        .catch(error => { res.send(error);});
+        .catch(error => {
+            res.send(error);
+        });
 });
 
 
@@ -416,7 +425,7 @@ app.post("/auth/users/temp", (req, res) => {
  */
 app.post("/auth/events", (req, res) => {
     console.log("POST-request - /events");
-    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
+    if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
         let name = "image.png";
         filehandler.uploadToCloud(req.body.imageUrl, name, true)
             .then(urldata => {
@@ -538,17 +547,21 @@ app.get("/myevents/users/:userId/", (req, res) => {
  */
 app.put('/auth/events/:eventId', (req, res) => {
     let userId = jwt.decode(req.headers['x-access-token']).userId;
-	if(req.body.organizerId !== userId) { res.status(401); console.log('Not authorized to update event'); return; }
+    if (req.body.organizerId !== userId) {
+        res.status(401);
+        console.log('Not authorized to update event');
+        return;
+    }
     if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
         db.getEventByEventId(req.params.eventId)
             .then(item => {
-                    console.log("deleting old");
-                    filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
-                    console.log("uploading  new");
-                    return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
-                        .then(data => {
-                            console.log(data.url);
-                            req.body.imageUrl = data.url;
+                console.log("deleting old");
+                filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                console.log("uploading  new");
+                return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
+                    .then(data => {
+                        console.log(data.url);
+                        req.body.imageUrl = data.url;
                             return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
                         })
                         .catch(err => res.status(400));
