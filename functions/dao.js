@@ -1,4 +1,3 @@
-const {Op} = require('sequelize');
 const {Op, QueryTypes} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");

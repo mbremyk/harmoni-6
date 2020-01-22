@@ -555,13 +555,13 @@ app.put('/auth/events/:eventId', (req, res) => {
                         .then(data => {
                             console.log(data.url);
                             req.body.imageUrl = data.url;
-                            return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+                            return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false))
                         })
                         .catch(err => res.status(400));
                 }
             )
     } else {
-        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400));
+        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false));
     }
 });
 

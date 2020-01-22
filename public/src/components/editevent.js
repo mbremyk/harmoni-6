@@ -46,13 +46,13 @@ export default function EditEvent() {
     const [artistsAdd, setArtistsAdd] = useState([]);
     const [users, setUsers] = useState([]);
     const [personnelAdd, setPersonnelAdd] = useState([]);
-    const [personnelRole, setPersonnelRole] = useState("");
     const [cancelled, setCancelled] = useState("");
     const [addArtistByMail, setAddArtistByMail] = useState([]);
     const [artistEmail, setArtistEmail] = useState("");
     const [personnel, setPersonnel] = useState([]);
     const [personnelUpdate, setPersonnelUpdate] = useState([]);
     const [personnelRemove, setPersonnelRemove] = useState([]);
+    const [personnelRole, setPersonnelRole] = useState("");
 
     useEffect(() => {
         service.getEventByEventId(match.params.id).then(event => {
@@ -77,10 +77,13 @@ export default function EditEvent() {
             setTTime(toTime);
             setCancelled(event.cancelled);
             setCity(event.city);
-            setPlaceDescription(event.placeDescription)
+            setPlaceDescription(event.placeDescription);
 
             service.getUsers().then(users => setUsers(users)).catch((err) => console.log(err.message));
-            service.getPersonnel(match.params.id).then(personnel => setPersonnelAdd(personnel)).catch((err) => console.log(err.message));
+            service.getPersonnel(match.params.id).then(p => {
+                setPersonnelUpdate(p);
+                setPersonnel(p);
+            }).catch((err) => console.log(err.message));
             service.getGigs(match.params.id)
                 .then(g => {
                     console.log(g);
@@ -100,35 +103,39 @@ export default function EditEvent() {
             let ev = new Event(eventId, organizerId, eventName, city, eventAddress,
                 placeDescription, eventDescription, ageLimit, fDateTime, tDateTime, (i ? image : imageUrl), cancelled);
             console.log(ev)
-            service.updateEvent(ev).then(history.push("/arrangement/" + eventId));
+            service.updateEvent(ev).then(() => {
+                updatePersonnel().then(() => {
+                    history.push("/arrangement/" + eventId)
+                })
+            });
         });
     }
 
-            updatePersonnel = () => new Promise((resolve, reject) => {
-                let promises = [];
+    async function updatePersonnel() {
+        return new Promise((resolve, reject) => {
+            let promises = [];
 
-                //if user has chosen to remove personnel, then remove them from the database
-                if (Array.isArray(this.state.personnelRemove) && this.state.personnelRemove.length > 0) {
-                    console.log('remove', this.state.personnelRemove);
-                    promises.push(this.state.personnelRemove.map(personnel => service.deletePersonnel(this.state.eventId, personnel.personnelId).catch(error => reject(error))))
-                }
+            //if user has chosen to remove personnel, then remove them from the database
+            if (Array.isArray(personnelRemove) && personnelRemove.length > 0) {
+                console.log('remove', personnelRemove);
+                promises.push(personnelRemove.map(personnel => service.deletePersonnel(eventId, personnel.personnelId).catch(error => reject(error))))
+            }
 
-                //if there are any old personnel left, update their role in the database
-                if (Array.isArray(this.state.personnelUpdate) && this.state.personnelUpdate.length > 0) {
-                    console.log('update', this.state.personnelUpdate);
-                    promises.push(service.updatePersonnel(this.state.personnelUpdate).catch(error => reject(error)))
-                }
+            //if there are any old personnel left, update their role in the database
+            if (Array.isArray(personnelUpdate) && personnelUpdate.length > 0) {
+                console.log('update', personnelUpdate);
+                promises.push(service.updatePersonnel(personnelUpdate).catch(error => reject(error)))
+            }
 
-                //if there are new personnel added, then add them to database
-                if (Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length > 0) {
-                    console.log('add', this.state.personnelAdd);
-                    promises.push(service.addPersonnel(this.state.personnelAdd).catch(error => reject(error)))
-                }
+            //if there are new personnel added, then add them to database
+            if (Array.isArray(personnelAdd) && personnelAdd.length > 0) {
+                console.log('add', personnelAdd);
+                promises.push(service.addPersonnel(personnelAdd).catch(error => reject(error)))
+            }
 
-                Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
-            });
-
-
+            Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
+        });
+    }
 
     return (
         <div>
@@ -192,7 +199,15 @@ export default function EditEvent() {
 
                                     <Col>
                                         <Dropdown onSelect={event => {
-                                            service.getUser(event).then((user) => setPersonnelAdd(personnelAdd.concat(user)))
+
+                                            service.getUser(event).then((user) => {
+                                                let p = new Personnel(user.userId, eventId, '');
+                                                p.user = user;
+                                                setPersonnelAdd([...personnelAdd, p]);
+                                                setPersonnel([...personnel, p]);
+                                            })
+
+
                                         }}>
 
                                             <Dropdown.Toggle variant={"success"} id="dropdown">
@@ -304,22 +319,22 @@ export default function EditEvent() {
                                     </Card.Title>
 
                                     <ListGroup title={"Valgt personell"} className={"p-3"}>
-                                        {personnelAdd.map(personnel => (
-                                            <React.Fragment key={personnel.userId}>
+                                        {personnel.map(p => (
+                                            <React.Fragment key={p.userId}>
 
                                                 <ListGroup.Item>
 
                                                     <Row>
                                                         <Col>
-                                                            {personnel.user.username}
+                                                            {p.user.username}
                                                         </Col>
 
                                                         <Col>
                                                             <Form.Control
                                                                 placeholder="Rollen til personen"
-                                                                value={personnel.role}
+                                                                value={p.role}
                                                                 onChange={event => {
-                                                                    personnel.role = event.target.value;
+                                                                    p.role = event.target.value;
                                                                     setPersonnelRole(event.target.value)
                                                                 }}
                                                             />
@@ -327,9 +342,19 @@ export default function EditEvent() {
 
                                                         <Col>
                                                             <Button type="button" variant={"danger"} onClick={() => {
-                                                                let copy = [...personnelAdd]
-                                                                copy.splice(personnelAdd.indexOf(personnel), 1)
-                                                                setPersonnelAdd(copy)
+                                                                let copy = [...personnelAdd];
+                                                                copy.splice(personnelAdd.indexOf(p), 1)
+                                                                setPersonnelAdd(copy);
+
+                                                                if (personnelUpdate.indexOf(p) >= 0) {
+                                                                    //if personnel is in database
+                                                                    personnelUpdate.splice(personnelUpdate.indexOf(p), 1);
+                                                                    setPersonnelRemove([...personnelRemove, p]);
+                                                                } else {
+                                                                    //if personnel isnt in database
+                                                                    personnelAdd.splice(personnelAdd.indexOf(p), 1);
+                                                                }
+
                                                             }}
                                                             >Fjern</Button>
                                                         </Col>
