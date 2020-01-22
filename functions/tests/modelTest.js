@@ -90,14 +90,14 @@ describe('Users', () => {
             expect({
                 userId: user.userId,
                 username: user.username,
-                password: user.password,
-                salt: user.salt,
+                /*password: user.password,
+                salt: user.salt,*/
                 email: user.email,
             }).toEqual({
                     userId: 1,
                     username: 'Steffen T',
-                    password: 'ST',
-                    salt: 'salt',
+                /*password: 'ST',
+                salt: 'salt',*/
                     email: 'steffen@mail.com'
                 }
             );
