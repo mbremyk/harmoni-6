@@ -1,9 +1,9 @@
 import {Component} from "react-simplified";
 import {Container, Row, Col, Button, Form, ListGroupItem, ListGroup, Card} from "react-bootstrap";
+import {HarmoniNavbar} from "./navbar";
 import * as React from 'react';
 import {Event, RiderItem, service} from '../services';
 import {authService} from "../AuthService";
-import {HarmoniNavbar} from "./navbar";
 const jwt = require("jsonwebtoken");
 
 
@@ -26,7 +26,7 @@ export class RiderPage extends Component {
 
         return <div>
             <HarmoniNavbar/>
-            {this.renderRiderForArtist()}
+            {this.renderRider()}
         </div>
 
 
@@ -50,6 +50,7 @@ export class RiderPage extends Component {
     }
 
 
+    //saves the new input from the artist in a new array that gets send to the database when saveRider() is used
     saveItems() {
 
         this.setState({newItems: [...this.state.newItems, new RiderItem(this.props.match.params.eventid, this.props.match.params.artistid, this.state.currentItem)]});
@@ -62,6 +63,7 @@ export class RiderPage extends Component {
         this.setState({currentItem: event.target.value})
     }
 
+    //sends the new items to the database
     saveRider() {
         service
             .addRiderItems(this.state.newItems)
@@ -69,8 +71,12 @@ export class RiderPage extends Component {
             .catch(error => console.log(error));
     }
 
-    renderRiderForArtist() {
+
+    renderRider() {
+        //only renders if a artist is viewing the page
         if (this.props.match.params.artistid == this.userId) {
+            //only if the organizer has confirmed/denied items the artist wont get the chance to edit the rider anymore.
+            //they will get a list of the items showing what they can expect when they come backstage
             if (this.state.isConfirmed) {
                 return (
                     <div>
@@ -121,6 +127,7 @@ export class RiderPage extends Component {
 
 
             } else {
+                //if the organizer hasnt looked at it they artist will have the chance to add more items to the list
                 return (
                     <div>
                         <Container>
@@ -179,7 +186,9 @@ export class RiderPage extends Component {
 
             }
 
+            //only renders if an organizer is viewing the page
         } else if (this.state.event.organizerId == this.userId) {
+            //renders if a organizer has not confirmed the items
             if (this.state.isConfirmed === false && this.state.oldItems.length !== 0) {
                 return (
                     <div>
@@ -208,6 +217,7 @@ export class RiderPage extends Component {
                     </div>
                 );
 
+                //if he has confirmed the items the page will render a list with accepted and declined items
             } else if (this.state.isConfirmed === true && this.state.oldItems.length !== 0) {
                 return (
                     <div>
@@ -283,6 +293,7 @@ export class RiderPage extends Component {
             .catch((error) => console.log(error));
     }
 
+    //sends the confirmed items to the database, everything unchecked will be marked false
     saveConfirmedItems() {
         service
             .confirmRiderItems(this.state.oldItems)
@@ -290,9 +301,21 @@ export class RiderPage extends Component {
             .catch(error => console.log(error));
     }
 
-    addConfirmedItem(item) {
-        item.confirmed = true;
 
+    addConfirmedItem(item) {
+
+        if (item.confirmed) {
+            item.confirmed = false;
+
+        } else if (!item.confirmed) {
+            item.confirmed = true;
+
+        } else if (item.confirmed == null) {
+
+            item.confirmed = true
+
+
+        }
     }
 
 
