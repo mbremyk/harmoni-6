@@ -18,12 +18,11 @@ export class Artist {
     contract;
     document;
 
-    constructor(userId, username, email, contract, document) {
+    constructor(userId, username, email, contract) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.contract = contract;
-        this.document = document
     }
 
 }
@@ -183,6 +182,10 @@ class Services {
     */
     createUser(user) {
         return axios.post(url + '/users', user).then(response => response.data);
+    }
+
+    createTempUser(user) {
+        return axios.post(url + "/auth/users/temp", user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
 
     updateUser(user) {
