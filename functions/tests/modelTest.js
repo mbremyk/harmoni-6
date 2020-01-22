@@ -362,14 +362,12 @@ describe('Personnel', () => {
             {
                 eventId: 1,
                 personnelId: 1,
-                rider: null,
-                contract: null
+                role: 'ADD'
             },
             {
                 eventId: 2,
                 personnelId: 2,
-                rider: null,
-                contract: null
+                role: 'ADD2'
             }];
         db.addPersonnel(personnel).then(response => {
             expect(response).toBeTruthy();
