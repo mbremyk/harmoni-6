@@ -44,6 +44,7 @@ addMailEndpoints = (app, db) => {
      */
     app.use("/mail", (req, res, next) => {
         console.log("Mail request received");
+        console.log(req.body);
         if (deployed) {
             defaultMail.user = req.body.username;
             defaultMail.date = moment().format('YYYY-MM-DD');
@@ -59,7 +60,7 @@ addMailEndpoints = (app, db) => {
             req.body.mailToUser = {
                 from: username,
                 to: req.body.email,
-                subject: defaultMail.subject,
+                subject: req.body.subject,
                 text: defaultMail.text
             };
             next();
@@ -163,8 +164,8 @@ addMailEndpoints = (app, db) => {
      */
     app.post("/mail/info", (req, res) => {
         console.log("POST-request received - /mail/info");
-        console.log(req.body);
         let to = req.body.to;
+        console.log(req.body);
 
         new Promise((resolve, reject) => {
 
@@ -174,8 +175,9 @@ addMailEndpoints = (app, db) => {
                     from: username,
                     replyTo: dm.email,
                     to: to,
-                    subject: "FW:" + defaultMail.subject,
-                    text: defaultMail.infoText
+                    subject: "FW:" + req.body.subject,
+                    text: defaultMail.infoText,
+                    bcc: [dm.email]
                 };
                 return sendMail(mail);
             }

@@ -71,7 +71,6 @@ export class AddEvent extends Component {
         this.imageUrl = this.handleImageUrlChange.bind(this);
         this.image = this.handleImageUpload.bind(this);
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
-        this.personnelRole = this.handlePersonnelRole.bind(this);
         this.city = this.handleCityChange.bind(this);
         this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
 
@@ -94,7 +93,6 @@ export class AddEvent extends Component {
             artistsAdd: [],
             artists: [],
             personnelAdd: [],
-            personnelRole: '',
         };
     }
 
@@ -168,7 +166,6 @@ export class AddEvent extends Component {
 
     handlePersonnelRole(event, personnel) {
         personnel.role = event.target.value;
-        this.setState({personnelRole: event.target.value})
     }
 
     toBase64 = (file) => new Promise((resolve, reject) => {
