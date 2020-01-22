@@ -49,10 +49,14 @@ export class EventPage extends Component {
                                 </Col>
                                 <Col>
                                     <ListGroup>
-                                        <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
-                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne kart</Button></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}
+                                        </h6></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}
+                                        </h6></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne
+                                            kart</Button></ListGroup.Item>
                                         <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
                                         <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
                                         <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
@@ -64,7 +68,7 @@ export class EventPage extends Component {
                                 {this.ShowArtist()}
                                 {this.ShowPersonnel()}
                                 {this.EditButton()}
-                                {this.isOrganizer? <MailForm/> : <div/>}
+                                {this.emailForm()}
                             </div>
                             </div>
                         </Card>
@@ -242,8 +246,13 @@ export class EventPage extends Component {
     }
 
     emailForm(){
-        if(this.artists.length != 0){
-            return <MailForm hasRecipients={true} description={"Info"} artists={this.artists} toggleable={true}/>
+        if (this.artists.length != 0 && this.isOrganizer) {
+            return <MailForm hasRecipients={true} description={"Info"} recipients={this.artists.concat(this.personnel)}
+                             toggleable={true}/>
+        } else if (this.currentEvent.eventName && (this.isPersonnel || this.isArtist) && !this.isOrganizer) {
+            return <MailForm hasRecipients={true} description={"Info"}
+                             recipients={[this.getInfoAboutOrganizer(this.currentEvent.organizerId).username]}
+                             toggleable={true}/>
         }else{
             return null;
         }

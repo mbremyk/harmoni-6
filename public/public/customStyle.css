@@ -100,4 +100,5 @@ input:valid + span:after {
     border-radius: 5px;
     width: fit-content;
     padding: 2px;
+    opacity: 0.9;
 }
