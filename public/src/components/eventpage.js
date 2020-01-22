@@ -46,7 +46,7 @@ export class EventPage extends Component {
                                     <div className="ml-3">
                                         {this.currentEvent.description}
                                     </div>
-
+                                </Col>
                                 <Col>
                                     <ListGroup>
                                         <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
