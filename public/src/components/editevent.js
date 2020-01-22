@@ -13,7 +13,6 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {HarmoniNavbar} from "./navbar";
-//import {Event, service} from "../services";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Alert from "react-bootstrap/Alert";
@@ -76,7 +75,7 @@ export class EditEvent extends Component{
         this.ticketAmount = this.handleTicketAmount.bind(this);
         this.tickets = this.handleTickets.bind(this);
         this.tickets = this.handleTicketsAdd.bind(this);
-        this.deletedTickets = this.handleTicketsDelete.bind(this);
+        this.updatedTickets = this.handleTicketsUpdate.bind(this);
 
         this.state = {
             eventId: 0,
@@ -104,11 +103,14 @@ export class EditEvent extends Component{
             ticketType: '',
             ticketPrice: 0,
             ticketAmount: 0,
-            tickets: [],
-            addedTickets: [],
-            deletedTickets: [],
+
             error: '',
             errorType: 'success',
+
+            tickets: [], //tickets got on mounted
+            updatedTickets: [], //tickets that are to be updated
+            addedTickets: [], // tickets that are to be added
+            deletedTickets: [], // tickets that are to be deleted
         };
     }
 
@@ -224,11 +226,38 @@ export class EditEvent extends Component{
     }
 
     handleTicketsAdd() {
-        this.setState({tickets: [this.state.addedTickets, new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
+        this.setState({addedTickets: [this.state.addedTickets, new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
     }
 
-    handleTicketsDelete(ticket) {
-        this.setState({deletedTickets: [...this.state.deletedTickets, ticket]})
+    handleTicketsUpdate(event) {
+        this.setState({tickets: [...this.state.updatedTickets, event]})
+    }
+
+    handleTicketsTypeChange(event, ticket) {
+        ticket.type = event.target.value;
+        this.setState({tickets: [...this.state.tickets]})
+    }
+
+    handleTicketsPriceChange(event, ticket) {
+        ticket.price = event.target.value;
+        this.setState({tickets: [...this.state.tickets]})
+    }
+
+    handleTicketsAmountChange(event, ticket) {
+        ticket.amount = event.target.value;
+        this.setState({tickets: [...this.state.tickets]})
+    }
+
+    handleTicketsRemoval(event, ticket) {
+        if (this.state.tickets.indexOf(ticket) >= 0) {
+            this.state.tickets.splice(this.state.tickets.indexOf(ticket), 1);
+            this.setState({deletedTickets: [...this.state.deletedTickets, ticket]})
+        } else if (this.state.addedTickets.indexOf(ticket) >= 0) {
+            this.state.addedTickets.splice(this.state.tickets.indexOf(ticket), 1);
+        } else if (this.state.updatedTickets.indexOf(ticket) >= 0) {
+            this.state.updatedTickets.splice(this.state.tickets.indexOf(ticket), 1);
+
+        }
     }
 
     setError(message, variant) {
@@ -237,10 +266,15 @@ export class EditEvent extends Component{
     }
 
     handleSubmit() {
-
+        let errmsg = "";
         // check empty fields
-        if (!this.state.eventName || !this.state.eventAddress || !this.state.eventDescription) {
-            this.setError('Alle felter må fylles', 'danger');
+        if (!this.state.eventName || !this.state.eventAddress || !this.state.eventDescription || !this.state.city) {
+            errmsg += 'Følgende mangler:';
+            if (!this.state.eventName) errmsg += " [ Arrangementsavn ] ";
+            if (!this.state.eventAddress) errmsg += "  [ Addresse ] ";
+            if (!this.state.eventDescription) errmsg += "  [ Beskrivelse ] ";
+            if (!this.state.city) errmsg += "  [ By ] ";
+            this.setError(errmsg, 'danger');
             return;
         }
 
@@ -276,7 +310,7 @@ export class EditEvent extends Component{
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Arrangementsnavn</Form.Label>
                                     <Form.Control
-                                        placeholder="Navn på arrangement"
+                                        placeholder="Navn på arrangement . . ."
                                         value={this.state.eventName}
                                         onChange={this.handleEventNameChange}
                                     />
@@ -285,7 +319,7 @@ export class EditEvent extends Component{
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>Adresse</Form.Label>
                                     <Form.Control
-                                        placeholder="Adresse der arrangementet skal holdes"
+                                        placeholder="Adresse der arrangementet skal holdes . . ."
                                         value={this.state.eventAddress}
                                         onChange={this.handleEventAddressChange}
 
@@ -295,7 +329,7 @@ export class EditEvent extends Component{
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>By</Form.Label>
                                     <Form.Control
-                                        placeholder="By der arrangementet skal holdes"
+                                        placeholder="By der arrangementet skal holdes . . ."
                                         value={this.state.city}
                                         onChange={this.handleCityChange}
 
@@ -304,9 +338,9 @@ export class EditEvent extends Component{
 
 
                                 <Form.Group as={Col} sm={12}>
-                                    <Form.Label>Plass beskrivelse</Form.Label>
+                                    <Form.Label>Stedsanvisning</Form.Label>
                                     <Form.Control
-                                        placeholder="For eksempel 3. etajse"
+                                        placeholder="Her kan du f.eks skrive anvisning for hvordan man kan finne fram til der arrangementet holdes . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.placeDescription}
@@ -317,7 +351,7 @@ export class EditEvent extends Component{
                                 <Form.Group as={Col} sm={12}>
                                     <Form.Label>Beskrivelse</Form.Label>
                                     <Form.Control
-                                        placeholder="Her kan du skrive en beskrivelse av arrangementet"
+                                        placeholder="Her kan du skrive en beskrivelse av arrangementet . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.eventDescription}
@@ -525,7 +559,7 @@ export class EditEvent extends Component{
                                                 aria-describedby="btnGroupAddon"
                                             />
                                             <InputGroup.Append>
-                                                <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
+                                                <InputGroup.Text>år</InputGroup.Text>
                                             </InputGroup.Append>
                                         </InputGroup>
 
@@ -578,39 +612,37 @@ export class EditEvent extends Component{
                             <ListGroup title={"Billett-typer på dette arrangementet"}>
                                 {this.state.tickets.map(ticket =>
                                     <React.Fragment>
-                                        <ListGroupItem key={ticket.type}>
+                                        <ListGroupItem>
                                             <Row>
                                                 <Col>
                                                     <Form.Label>Billett-type</Form.Label>
                                                     <Form.Control
                                                         placeholder="Billett-type"
                                                         value={ticket.type}
-                                                        onChange={this.handleTicketType}
+                                                        onChange={event => this.handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
                                                     />
                                                 </Col>
                                                 <Col>
                                                     <Form.Label>Billett-pris</Form.Label>
                                                     <Form.Control
+                                                        type="number"
                                                         placeholder="Billett-pris"
                                                         value={ticket.price}
-                                                        onChange={this.handleTicketPrice}
+                                                        onChange={event => this.handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
                                                     />
                                                 </Col>
                                                 <Col>
                                                     <Form.Label>Antall billetter</Form.Label>
                                                     <Form.Control
+                                                        type="number"
                                                         placeholder="Antall billetter"
                                                         value={ticket.amount}
-                                                        onChange={this.handleTicketAmount}
+                                                        onChange={event => this.handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
                                                     />
                                                 </Col>
                                                 <Col>
-                                                    <Button type="button" variant={"danger"} onClick={() => {
-                                                        this.state.tickets.splice(this.state.tickets.indexOf(ticket), 1);
-                                                        this.setState({tickets: this.state.tickets});
-                                                        this.handleTicketsDelete(ticket);
-                                                    }
-                                                    }>Fjern</Button>
+                                                    <Button type="button" variant={"danger"}
+                                                            onClick={event => this.handleTicketsRemoval(event, ticket)}>X</Button>
                                                 </Col>
                                             </Row>
                                         </ListGroupItem>
@@ -630,7 +662,14 @@ export class EditEvent extends Component{
                                 </Col>
 
                                 {(this.state.error) ?
-                                <Alert style={{height: '3em', top: '50%', left: '50%', position: 'fixed', transform: 'translate(-50%, -50%)'}} variant={this.state.errorType}>{this.state.error}</Alert> :
+                                    <Alert style={{
+                                        height: '9em',
+                                        top: '50%',
+                                        left: '50%',
+                                        position: 'fixed',
+                                        transform: 'translate(-50%, -50%)'
+                                    }} variant={this.state.errorType}><Alert.Heading>Påkrevde felter må fylles
+                                        inn!</Alert.Heading><p>{this.state.error}</p></Alert> :
                                 <div style={{height: '3em'}}/>}
 
                                 <Col>
