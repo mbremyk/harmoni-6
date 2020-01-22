@@ -751,6 +751,25 @@ class Dao {
             });
     }
 
+    /**
+     * deletes a Gig and the assosciated contract/file from the database
+     *
+     * @param eventId
+     * @param artistId
+     * @returns {Promise<boolean>}
+     */
+    deleteGig(eventId, artistId) {
+        return this.getContractId(eventId, artistId).then(contractId => {
+            model.FileModel.destroy({where: {fileId: contractId}}).then(() => {
+                return model.GigModel.destroy({where: {eventId: eventId, artistId: artistId}}).then(() => true)
+            })
+        })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
+
     getContractId(eventId, artistId) {
         return model.GigModel.findOne({
             where: {eventId: eventId, artistId: artistId},
