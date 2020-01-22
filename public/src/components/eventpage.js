@@ -63,7 +63,7 @@ export class EventPage extends Component {
                                     {this.ShowArtist()}
                                     {this.ShowPersonnel()}
                                     <div className="text-center mt-4">{this.EditButton()}</div>
-                                    {this.isOrganizer? <MailForm/> : <div/>}
+                                    {this.emailForm()}
                                 </div>
                             </div>
                         </Card>
