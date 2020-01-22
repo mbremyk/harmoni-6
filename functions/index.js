@@ -536,24 +536,27 @@ app.get("/myevents/users/:userId/", (req, res) => {
  */
 app.put('/auth/events/:eventId', (req, res) => {
     let userId = jwt.decode(req.headers['x-access-token']).userId;
-	if(req.body.organizerId !== userId) { res.status(401); console.log('Not authorized to update event'); return; }
+    if (req.body.organizerId != userId) {
+        res.status(401);
+        console.log('Not authorized to update event');
+        return;
+    }
     if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
-        db.getEventByEventId(req.params.eventId)
-            .then(item => {
-                    console.log("deleting old");
-                    filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
-                    console.log("uploading  new");
-                    return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
-                        .then(data => {
-                            console.log(data.url);
-                            req.body.imageUrl = data.url;
-                            return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
-                        })
-                        .catch(err => res.status(400));
+        db.getEventByEventId(req.params.eventId).then(item => {
+                console.log("deleting old");
+                filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                console.log("uploading  new");
+                return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
+                    .then(data => {
+                        console.log(data.url);
+                        req.body.imageUrl = data.url;
+                        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false));
+                    })
+                    .catch(err => res.status(400));
                 }
             )
     } else {
-        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400));
+        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false));
     }
 });
 
