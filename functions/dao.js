@@ -615,6 +615,7 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     addTickets(tickets) {
+        console.log(tickets);
         return model.TicketModel.bulkCreate(tickets)
             .then(response => response.id !== null)
             .catch(error => {
@@ -632,10 +633,11 @@ class Dao {
     updateTickets(tickets) {
         return Promise.all(tickets.map(ticket => model.TicketModel.update(
             {
+                type: ticket.type,
                 price: ticket.price,
                 amount: ticket.amount
             },
-            {where: {eventId: ticket.eventId, type: ticket.type}})
+            {where: {eventId: ticket.eventId, type: ticket.oldType}})
             .catch(error => {
                 console.error(error);
                 return false
