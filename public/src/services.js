@@ -134,12 +134,14 @@ export class Ticket {
     type;
     price;
     amount;
+    oldType;
 
     constructor(eventId, type, price, amount){
         this.eventId = eventId;
         this.type = type;
         this.price = price;
         this.amount = amount;
+        this.oldType = type;
     }
 }
 
@@ -300,11 +302,11 @@ class Services {
     }
 
     /**
-     * @param ticket: Ticket
+     * @param tickets: Tickets[]
      * @returns Promise<>: boolean
      */
-    updateTicket(ticket) {
-        return axios.put(url + '/auth/events/' + ticket.eventId + '/tickets', ticket, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    updateTicket(tickets) {
+        return axios.put(url + '/auth/events/' + tickets[0].eventId + '/tickets', tickets, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
