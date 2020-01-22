@@ -18,18 +18,18 @@ export class LandingPage extends Component {
         return (
             <div>
                 <div className={"landingpage"}>
-                        <Row style={{padding: "5em"}}>
+                        <Row className={"p-5"}>
                             <Col>
                                 <h1 className="HarmoniLogo display-sm-3 text-center">Harmoni</h1>
                             </Col>
                         </Row>
-                        <Row style={{padding: "5em "}}>
+                        <Row className={"p-5"}>
                             <Col className="text-center">
                                 <h2><NavLink href="/logg-inn"><u className="text-white">Logg inn</u></NavLink> for å se
                                     dine arrangementer</h2>
                             </Col>
                         </Row>
-                        <Row style={{padding: "5em"}}>
+                        <Row className={"p-5"}>
                             <Col className="text-center mt-5">
                                 <NavLink href='#scrollTo'>
                                     <h2 className="text-white"><u>Bla ned</u> for å se arrangementer</h2>
