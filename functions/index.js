@@ -119,13 +119,13 @@ function getToken(user) {
  *
  *                      PERSONNEL
  * post     /auth/events/:eventId/personnel
- * put      /auth/events/:eventId/personnel/:personnelId
+ * put      /auth/events/:eventId/personnel
  * delete   /auth/events/:eventId/personnel/:personnelId
  * get      /auth/events/:eventId/personnel
  *
  *                      TICKETS
  * post     /auth/events/:eventId/tickets
- * put      /auth/events/:eventId/tickets/:type
+ * put      /auth/events/:eventId/tickets
  * delete   /auth/events/:eventId/tickets/:type
  * get      /events/:eventId/tickets
  *
@@ -512,12 +512,9 @@ app.get("/myevents/users/:userId/", (req, res) => {
  */
 app.put('/auth/events/:eventId', (req, res) => {
     let userId = jwt.decode(req.headers['x-access-token']).userId;
-    if (req.body.organizerId !== userId) {
-        res.status(401);
-        console.log('Not authorized to update event');
-        return;
-    }
-    return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    if (req.body.organizerId == userId) return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(404).send(false));
+    res.sendStatus(401);
+    console.log('Not authorized to update event');
 });
 
 
@@ -546,17 +543,17 @@ app.delete('/auth/events/:eventId', (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/personnel", (req, res) => {
-    return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
+    return db.addPersonnel(req.body).then((insertOk) => insertOk ? res.status(201).send(true) : res.sendStatus(503).send(false));
 });
 
 
 /**
  *  @header  x-access-token: string
- *  @body {Personnel}
+ *  @body {Personnel[]}
  *  @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId/personnel', (req, res) => {
-    return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    return db.updatePersonnel(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(404).send(false))
 });
 
 
@@ -564,8 +561,10 @@ app.put('/auth/events/:eventId/personnel', (req, res) => {
  *  @header  x-access-token: string
  *  @return {json} {jwt: token}
  */
-app.delete('/auth/events/:eventId/personnel', (req, res) => {
-    return db.removePersonnel(req.body).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+app.delete('/auth/events/:eventId/personnel/:personnelId', (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    let personnelId = decodeURIComponent(req.params.personnelId);
+    return db.removePersonnel(eventId, personnelId).then(deleteOk => deleteOk ? res.sendStatus(201) : res.sendStatus(503))
 });
 
 
@@ -575,7 +574,7 @@ app.delete('/auth/events/:eventId/personnel', (req, res) => {
  */
 app.get("/auth/events/:eventId/personnel", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    return db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(400));
+    return db.getPersonnel(eventId).then(personnel => (personnel !== null) ? res.status(201).send(personnel) : res.sendStatus(404));
 });
 
 
@@ -590,7 +589,7 @@ app.get("/auth/events/:eventId/personnel", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/tickets", (req, res) => {
-    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(400));
+    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(503));
 });
 
 
@@ -600,7 +599,7 @@ app.post("/auth/events/:eventId/tickets", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId/tickets', (req, res) => {
-    return db.updateTicket(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    return db.updateTickets(req.body).then(updateOk => updateOk ? res.status(201) : res.status(404))
 });
 
 /**
@@ -620,7 +619,7 @@ app.delete('/auth/events/:eventId/tickets/:type', (req, res) => {
  */
 app.get("/events/:eventId/tickets", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    return db.getTickets(eventId).then(tickets => (tickets !== null) ? res.status(201).send(tickets) : res.sendStatus(400));
+    return db.getTickets(eventId).then(tickets => (tickets !== null) ? res.status(201).send(tickets) : res.sendStatus(404));
 });
 
 
