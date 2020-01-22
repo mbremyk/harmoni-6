@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const {Op, QueryTypes} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
@@ -47,6 +47,22 @@ class Dao {
             .catch(error => {
                 console.error(error);
                 return false;
+            });
+    }
+
+    createTempUser(email) {
+        return model.UserModel.create({email: email, username: ''})
+            .then(response => response.dataValues)
+            .then(user => {
+                return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
+                    .then(response => {
+                        user.username = 'guest' + user.userId;
+                        return user;
+                    })
+            })
+            .catch(error => {
+                console.error(error);
+                return null;
             });
     }
 
@@ -353,7 +369,7 @@ class Dao {
     deleteOldEvents() {
         let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
         oldEvents.map(event => console.log(event.eventId));
-        if(oldEvents.length == null) return 0;
+        if (oldEvents.length == null) return 0;
         else return oldEvents.length
     }
 
