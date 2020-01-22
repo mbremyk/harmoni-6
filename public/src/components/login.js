@@ -54,7 +54,7 @@ export class LoginForm extends Component {
 
     render() {
         return (
-            <Container style={{width: '40em', top: '0'}}>
+            <Container style={{width: '40em', paddingBottom: "2px"}}>
 
 				<h1 className="HarmoniLogo display-3 text-center m-5">Harmoni</h1>
 
