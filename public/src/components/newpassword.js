@@ -31,7 +31,16 @@ export class NewPassword extends Component {
 
 	handleNewPassword() {
 		console.log('REQUEST NEW PASS');
-		service.forgotPass(this.state.email).then(res => console.log('res ' + res));
+
+		if(!this.state.email) {
+			this.setError('Fyll ut email', 'danger');
+			return;
+		}
+
+		service.forgotPass(this.state.email)
+			.then(res => console.log('res ' + res))
+			.then(res => this.setError('Email sendt.', 'success'))
+			.catch(err => this.setError('Email sendt.', 'success'));
 	}
 
 	render() {
