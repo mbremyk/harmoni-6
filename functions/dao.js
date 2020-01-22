@@ -8,6 +8,7 @@ const mail = require("./mail.js");
 const isCI = require('is-ci');
 const props = isCI ? "" : require("./properties.js");
 const test = (process.env.NODE_ENV === 'test');
+const filehandler = require("./filehandler.js");
 
 let mailProps = isCI ? "" : new props.MailProperties();
 let url = "https://harmoni-6.firebaseapp.com/";
@@ -324,6 +325,7 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
+        console.log("Updating...");
         return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
             .then(e => e.dataValues.cancelled)
             .then(e => {
@@ -343,18 +345,19 @@ class Dao {
                         cancelled: event.cancelled,
                     },
                     {where: {eventId: event.eventId}})
-                    .then(response => {
+                    .then(response =>  {
+                        console.log("finished");
                         if (e !== event.cancelled && !e && !isCI && !test) {
-                            this.getGigs(event.eventId)
+                            return this.getGigs(event.eventId)
                                 .then(gigs => gigs.map(gig => gig.dataValues.artistId))
                                 .then(gigs => {
-                                    this.getPersonnel(event.eventId)
+                                    return this.getPersonnel(event.eventId)
                                         .then(personnel => personnel.map(person => person.dataValues.personnelId))
                                         .then(personnel => {
                                             let set = new Set(gigs);
                                             personnel.map(person => set.add(person));
 
-                                            model.UserModel.findAll({where: {userId: {[op.in]: Array.from(set)}}})
+                                            return model.UserModel.findAll({where: {userId: {[op.in]: Array.from(set)}}})
                                                 .then(users => users.map(user => user.dataValues.email))
                                                 .then(users => {
                                                     let email = {
@@ -375,7 +378,7 @@ class Dao {
                     .catch(error => {
                         console.error(error);
                         return false;
-                    })
+                    });
             })
     }
 
@@ -413,6 +416,7 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     deleteEvent(eventId) {
+        console.log("Deleteevent called");
 
         if (!isCI && !test) {
             return this.getEventByEventId(eventId)
@@ -436,7 +440,7 @@ class Dao {
                                                         subject: `Arrangement slettet: ${event.eventName}`,
                                                         text: `Arrangementet ${event.eventName}, som du var artist eller personell på, har blitt slettet.\nHvis du lurer på hvorfor, kan du ta kontakt med organisator ${user.username} på mail: ${user.email}\n\nMed vennlig hilsen\nHarmoni team 6`
                                                     };
-                                                    return model.GigModel.destroy({where: {eventId: eventId}})
+                                                    return this.deleteGigs(eventId)
                                                         .then(() => {
                                                             return model.TicketModel.destroy({where: {eventId: eventId}})
                                                                 .then(() => {
@@ -460,7 +464,7 @@ class Dao {
                 });
 
         } else {
-            return model.GigModel.destroy({where: {eventId: eventId}})
+            return this.deleteGigs(eventId)
                 .then(() => {
                     return model.TicketModel.destroy({where: {eventId: eventId}})
                         .then(() => {
@@ -474,7 +478,7 @@ class Dao {
                         });
                 }).catch(error => {
                     console.error(error);
-                    return false;
+                    return null;
                 })
         }
     }
@@ -815,6 +819,42 @@ class Dao {
      * @returns {Promise<Gig[]>}
      */
     getGigs(eventId) {
+        return model.GigModel.findAll({
+            include: [
+                {model: model.UserModel, attributes: ['username', 'email']},
+            ],
+            where: {eventId: eventId}
+        })
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+    }
+
+    deleteGigs(eventId) {
+        console.log("Delete gigs called");
+        return model.GigModel.findAll({
+            where: {eventId: eventId}
+        })
+            .then(gigs => {
+                let toDelete = [];
+                gigs.map(gig => {
+                    model.FileModel.findByPk(gig.contract)
+                        .then(result => {
+                            //toDelete.push(result.name);
+                            filehandler.deleteFromCloud(result.name, false);
+                        })
+                });
+            });
+    }
+
+    /**
+     * retrieves the gig assosciated with an event, NOT INCLUDING contract data and username/email of artist
+     *
+     * @param eventId
+     * @returns {Promise<Gig[]>}
+     */
+    getPublicGigs(eventId) {
         return model.GigModel.findAll({
             include: [
                 {model: model.UserModel, attributes: ['username', 'email']},

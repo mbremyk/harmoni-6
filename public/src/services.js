@@ -43,21 +43,24 @@ export class User {
 }
 
 export class BugMail {
-    from;
-    description;
+    email;
+    subject;
     text;
+    username;
 
-    constructor(from, description, text){
-        this.from = from;
-        this.description = description;
+    constructor(from, name, description, text) {
+        this.username = name;
+        this.email = from;
+        this.subject = description;
         this.text = text;
     }
 }
 export class Mail extends BugMail{
     to;
-    constructor(to, from, description, text){
-        super(from, description, text);
-        this.to = text;
+
+    constructor(to, from, name, description, text) {
+        super(from, name, description, text);
+        this.to = to;
     }
 }
 
@@ -338,6 +341,14 @@ class Services {
 
     /**
      * @param eventId: number
+     * @returns Promise<>: Gig[]
+     */
+    getPublicGigs(eventId) {
+        return axios.get(url + '/events/' + eventId + '/gigs', ).then(response => response.data);
+    }
+
+    /**
+     * @param eventId: number
      * @param artistId: number
      * @returns Promise<>: Contract
      */
@@ -379,8 +390,6 @@ class Services {
     sendMails(mail){
         return axios.post(url+"/mail/info", mail).then(response => response.data);
     }
-
-
 }
 
 export let service = new Services();

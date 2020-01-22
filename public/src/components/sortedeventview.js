@@ -1,5 +1,5 @@
 import {Component} from "react-simplified";
-import {Container, Row} from "react-bootstrap";
+import {Container, NavItem, Row} from "react-bootstrap";
 import * as React from 'react';
 import {service} from '../services';
 import Dropdown from "react-bootstrap/Dropdown";
@@ -8,11 +8,17 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import moment from "moment";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import Form from "react-bootstrap/Form";
+import FormControl from "react-bootstrap/FormControl";
 
 export class SortedEventView extends Component {
     state = {
         events: [],
         eventsBackup: [],
+        filteredEvents: [],
         order: "asc",
         sortingOption: "startTime",
         ascDescription: "Eldst først", //  ↑
@@ -23,8 +29,21 @@ export class SortedEventView extends Component {
         free: "",
         hideCancelled: "",
         showOld: "",
-        filterActive: ""
+        filterActive: "",
+        filterTxt: "",
     };
+
+    handleFilterTxt = (event) =>{
+        this.setState({filterTxt: event.target.value});
+        //let regex = new RegExp( event.target.value, 'i');
+        //this.setState({events: this.state.events.filter(event => event.eventName.match(regex) || event.description.match(regex))})
+    };
+
+    getFilteredEvents = (events) =>{
+        let regex = new RegExp( this.state.filterTxt, 'i');
+        return events.filter(event => event.eventName.match(regex) || event.description.match(regex))
+    };
+
 
     getActiveState = (option) => {
         if (option === "asc" || option === "desc") return (option === this.state.order) ? "active" : "";
@@ -33,7 +52,6 @@ export class SortedEventView extends Component {
 
     sortEvents = (sortingOption, order) => {
         this.setState({events: this.state.events.sort(this.compareValues(sortingOption, order))});
-        //this.setState({order: "asc"})
     };
 
     handleOrderDescription = (option) => {
@@ -60,6 +78,7 @@ export class SortedEventView extends Component {
     }
 
     handleFilterOption(filter) {
+        console.log("filter option: " + filter);
         this.setState({filterActive: "active"});
         switch (filter) {
             case 'ChildFriendly':
@@ -83,7 +102,6 @@ export class SortedEventView extends Component {
 
     handleReset() {
         this.handleEvents(this.state.eventsBackup);
-
         this.setState({childFriendly: ""});
         this.setState({free: ""});
         this.setState({hideCancelled: ""});
@@ -92,7 +110,8 @@ export class SortedEventView extends Component {
         this.setState({filterActive: ""});
         this.setState({order: "asc"});
         this.setState({ascDescription: "Eldst først"});
-        this.setState({descDescription: "Nyest først"})
+        this.setState({descDescription: "Nyest først"});
+        this.setState({filterTxt: ""});
 
     }
 
@@ -105,6 +124,7 @@ export class SortedEventView extends Component {
         let now = moment().format('YYYY-MM-DD HH:MM');
         this.setState({
             events: events.filter(event => moment(now).isBefore(event.endTime)),
+            filteredEvents: events.filter(event => moment(now).isBefore(event.endTime)),
             eventsBackup: events
         });
     };
@@ -138,71 +158,60 @@ export class SortedEventView extends Component {
         if (this.state.events !== []) {
             return (
                 <Container id="scrollTo">
-                    <Card bg={"light"}>
-                        <Row>
-                            <Col>
-                                <Dropdown>
-                                    <Dropdown.Toggle className={"active"} variant="light" id="dropdown-basic">
-                                        Sorter arrangementer
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item className={this.getActiveState("price")}
-                                                       onClick={() => this.handleSortingOption('price')}>Pris
-                                            TODO</Dropdown.Item>
-                                        <Dropdown.Item className={this.getActiveState("ageLimit")}
-                                                       onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </Dropdown.Item>
-                                        <Dropdown.Item className={this.getActiveState("createdAt")}
-                                                       onClick={() => this.handleSortingOption('createdAt')}>Publisert</Dropdown.Item>
-                                        <Dropdown.Item className={this.getActiveState("address")}
-                                                       onClick={() => this.handleSortingOption('address')}>Adresse</Dropdown.Item>
-                                        <Dropdown.Item className={this.getActiveState("startTime")}
-                                                       onClick={() => this.handleSortingOption('startTime')}>Dato</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-
-                            </Col>
-                            <Col>
-                                <Dropdown>
-                                    <Dropdown.Toggle className={this.state.filterActive} variant="light"
-                                                     id="dropdown-basic">
-                                        Filtere
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item className={this.state.childFriendly}
-                                                       onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
-                                            (6 år) </Dropdown.Item>
-                                        <Dropdown.Item className={this.state.free}
-                                                       onClick={() => this.handleFilterOption('Free')}>Gratis
-                                            Arrangementer TODO </Dropdown.Item>
-                                        <Dropdown.Item className={this.state.hideCancelled}
-                                                       onClick={() => this.handleFilterOption('HideCancelled')}>
-                                            Skjul kansellerte arrangementer
-                                        </Dropdown.Item>
-                                        <Dropdown.Item className={this.state.showOld}
-                                                       onClick={() => this.handleFilterOption('ShowOld')}>
-                                            Vis gamle arrangementer
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </Col>
-                            <Col>
-                                <Button className={this.getActiveState("asc")} onClick={() => this.handleOrder("asc")}
-                                        variant={"light"}>{this.state.ascDescription}</Button>
-                            </Col>
-                            <Col>
-                                <Button className={this.getActiveState("desc")} onClick={() => this.handleOrder("desc")}
-                                        variant={"light"}>{this.state.descDescription}</Button>
-                            </Col>
-                            <Col>
-                                <Button variant={"light"} onClick={this.handleReset}>Nullstill</Button>
-                            </Col>
-
-
-                        </Row>
-                    </Card>
+                    <Navbar className={"shadow-sm mt-2"} bg="light" expand="lg">
+                        <Navbar.Brand>Filtrer og sorter</Navbar.Brand>
+                        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+                        <Navbar.Collapse id="basic-navbar-nav">
+                            <Nav className="mr-auto">
+                                <NavDropdown className={"active"} title="Sorter" id="basic-nav-dropdown">
+                                    <NavDropdown.Item className={this.getActiveState("price")}
+                                                      onClick={() => this.handleSortingOption('price')}>Pris
+                                        TODO</NavDropdown.Item>
+                                    <NavDropdown.Item className={this.getActiveState("ageLimit")}
+                                                      onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </NavDropdown.Item>
+                                    <NavDropdown.Item className={this.getActiveState("createdAt")}
+                                                      onClick={() => this.handleSortingOption('createdAt')}>Publisert</NavDropdown.Item>
+                                    <NavDropdown.Item className={this.getActiveState("address")}
+                                                      onClick={() => this.handleSortingOption('address')}>Adresse</NavDropdown.Item>
+                                    <NavDropdown.Item className={this.getActiveState("startTime")}
+                                                      onClick={() => this.handleSortingOption('startTime')}>Dato</NavDropdown.Item>
+                                </NavDropdown>
+                                <NavDropdown className={this.state.filterActive} title="Filtere" id="basic-nav-dropdown">
+                                    <Dropdown.Item className={this.state.childFriendly}
+                                                   onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
+                                        (6 år) </Dropdown.Item>
+                                    <Dropdown.Item className={this.state.free}
+                                                   onClick={() => this.handleFilterOption('Free')}>Gratis
+                                        Arrangementer TODO </Dropdown.Item>
+                                    <Dropdown.Item className={this.state.hideCancelled}
+                                                   onClick={() => this.handleFilterOption('HideCancelled')}>
+                                        Skjul kansellerte arrangementer
+                                    </Dropdown.Item>
+                                    <Dropdown.Item className={this.state.showOld}
+                                                   onClick={() => this.handleFilterOption('ShowOld')}>
+                                        Vis gamle arrangementer
+                                    </Dropdown.Item>
+                                </NavDropdown>
+                                <NavItem>
+                                    <Button className={this.getActiveState("asc")} onClick={() => this.handleOrder("asc")}
+                                            variant={"light"}>{this.state.ascDescription}</Button>
+                                </NavItem>
+                                <NavItem>
+                                    <Button className={this.getActiveState("desc")} onClick={() => this.handleOrder("desc")}
+                                            variant={"light"}>{this.state.descDescription}</Button>
+                                </NavItem>
+                                <NavItem>
+                                    <Button className={"ml-sm-5"} variant={"light"} onClick={this.handleReset}>Nullstill</Button>
+                                </NavItem>
+                            </Nav>
+                            <Form inline onSubmit={e => {e.preventDefault()}}>
+                                <FormControl value={this.state.filterTxt} onChange={this.handleFilterTxt} type="text" placeholder="Skriv for å filtrere ..." className="mr-sm-2"/>
+                            </Form>
+                        </Navbar.Collapse>
+                    </Navbar>
                     <Row>
 
-                        {this.state.events.map(event => (
+                        {this.getFilteredEvents(this.state.events).map(event => (
                             <EventInfo
                                 event={event}
                                 link={event.eventId}

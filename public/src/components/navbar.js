@@ -6,6 +6,7 @@ import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
 import NavLink from "react-bootstrap/NavLink";
+import NavDropdown from "react-bootstrap/NavDropdown";
 
 export class HarmoniNavbar extends Component {
     state = {
@@ -24,6 +25,11 @@ export class HarmoniNavbar extends Component {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
                         <Nav.Link href="/hjem">Hjem</Nav.Link>
+                        <NavDropdown title="Arrangementer" id="basic-nav-dropdown">
+                            <NavDropdown.Item href="/hjem/#arrangementer-jeg-organiserer">Arrangementer jeg organiserer</NavDropdown.Item>
+                            <NavDropdown.Item href="/hjem/#arrangementer-jeg-er-artist-eller-er-personell-for">Arrangementer jeg er artist eller er personell for</NavDropdown.Item>
+                            <NavDropdown.Item href="/hjem/#andre-arrangementer">Andre arrangementer</NavDropdown.Item>
+                        </NavDropdown>
                         <Nav.Link href="/opprett-arrangement">Opprett arrangement</Nav.Link>
                         <Nav.Link href="/min-side">Min side</Nav.Link>
                         <Nav.Link href="/logg-ut">Logg ut</Nav.Link>
