@@ -408,7 +408,7 @@ class Dao {
      *
      * @returns {number}
      */
-     deleteOldEvents() {
+    deleteOldEvents() {
         return model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
     }
 
@@ -527,14 +527,16 @@ class Dao {
                     this.getEventByEventId(response[0].eventId)
                         .then(event => {
                             this.getPersonnel(event.eventId)
-                                .then(pers => {
-                                    let email = {
-                                        from: mailProps.username,
-                                        to: pers.user.email,
-                                        subject: `Personellprivilegier for ${event.eventName}`,
-                                        text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
-                                    };
-                                    mail.sendMail(mail);
+                                .then(person => {
+                                    person.map(pers => {
+                                        let email = {
+                                            from: mailProps.username,
+                                            to: pers.user.email,
+                                            subject: `Personellprivilegier for ${event.eventName}`,
+                                            text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                        };
+                                        mail.sendMail(email);
+                                    })
                                 });
                         });
                 }
