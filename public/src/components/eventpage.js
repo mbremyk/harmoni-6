@@ -46,15 +46,28 @@ export class EventPage extends Component {
                                             {this.currentEvent.description}
                                         </div>
 
+                                    </Col>
                                     <Col>
                                         <ListGroup variant="flush" className="">
-                                            <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6></ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
-	                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne kart</Button></ListGroup.Item>
-	                                        <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
+                                            <ListGroup.Item>
+	                                            <h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6>
+                                            </ListGroup.Item>
+                                            <ListGroup.Item>
+	                                            <h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6>
+                                            </ListGroup.Item>
+                                            <ListGroup.Item>
+	                                            <h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
+	                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne kart</Button>
+	                                        </ListGroup.Item>
+	                                        <ListGroup.Item>
+		                                        {this.RenderAgeLimit()}
+	                                        </ListGroup.Item>
+                                            <ListGroup.Item>
+	                                            <h6><b>Arrangør:</b> {this.user.username}</h6>
+                                            </ListGroup.Item>
+                                            <ListGroup.Item>
+	                                            <h6><b>Email:</b> {this.user.email}</h6>
+                                            </ListGroup.Item>
                                         </ListGroup>
                                     </Col>
                                 </Row>
