@@ -25,6 +25,7 @@ export class HomePage extends Component {
                 <HarmoniNavbar/>
                 <Row className={"pt-5 pb-2"}>
                     <Col>
+                        <a name="Arrangementer-jeg-organiserer"></a>
                         <h1 className="text-center">Arrangementer jeg organiserer</h1>
                     </Col>
                 </Row>
@@ -33,6 +34,7 @@ export class HomePage extends Component {
                 </Row>
                 <Row className={"pt-5 pb-2"}>
                     <Col>
+                        <a name="arrangementer-jeg-er-artist-eller-er-personell-for"></a>
                         <h1 className="text-center">Arrangementer jeg er artist eller er personell for</h1>
                     </Col>
                 </Row>
@@ -41,7 +43,8 @@ export class HomePage extends Component {
                 </Row>
                 <Row className={"pt-5 pb-2"}>
                     <Col>
-                        <h1 className="text-center">Andre Arrangementer</h1>
+                        <a name="andre-arrangementer"></a>
+                        <h1 className="text-center">Andre arrangementer</h1>
                     </Col>
                 </Row>
                 <SortedEventView events={this.getOtherEvents()}/>
