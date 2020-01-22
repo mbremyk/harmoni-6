@@ -245,8 +245,8 @@ export class MailForm extends Component {
 
     getRecipentString(props) {
         let recipients = "";
-        if (props.artists) {
-            props.artists.map(user => {
+        if (props.recipients) {
+            props.recipients.map(user => {
                 recipients = recipients += user.user.email + ", "
             });
         }
