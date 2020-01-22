@@ -34,7 +34,7 @@ export class EventPage extends Component {
                         <Card className='p-2'>
                             <Image height='620px' src={this.currentEvent.imageUrl}/>
 
-                            <div className="p-4">
+                            <div className="p-sm-4">
                                 <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
 
                                 {this.RenderArtist()}
