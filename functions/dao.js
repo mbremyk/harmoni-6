@@ -342,7 +342,7 @@ class Dao {
                     },
                     {where: {eventId: event.eventId}})
                     .then(response => {
-                        if (e !== event.cancelled && e) {
+                        if (e !== event.cancelled && !e) {
                             this.getGigs(event.eventId)
                                 .then(gigs => gigs.map(gig => gig.dataValues.artistId))
                                 .then(gigs => {
@@ -390,7 +390,6 @@ class Dao {
             }]
         })
             .then(res => {
-                console.log(res);
                 model.EventModel.update(
                     {
                         cancelled: true
@@ -639,7 +638,7 @@ class Dao {
                 return true
             })
             .catch(error => {
-                console.log(error);
+                console.error(error);
                 return false
             })
     }
@@ -849,7 +848,26 @@ class Dao {
      */
     addRiderItems(riderItems) {
         return model.RiderModel.bulkCreate(riderItems)
-            .then(response => response[0].item !== null)
+            .then(response => {
+                if (!isCI && !test) {
+                    return model.EventModel.findOne({
+                        where: {eventId: riderItems[0].eventId},
+                        include: [{model: model.UserModel}]
+                    })
+                        .then(res => {
+                            let email = {
+                                to: res.user.dataValues.email,
+                                from: mailProps.username,
+                                subject: `Rider oppdatert for ${res.dataValues.eventName}`,
+                                text: `En artist har oppdatert sin rider for ${res.dataValues.eventName}.\nGå inn på ${url}arrangement/${res.dataValues.eventId} for å se og godkjenne rider\n\n Med vennlig hilsen\nHarmoni team 6`
+                            };
+                            mail.sendMail(email);
+                            return response[0].dataValues.item !== null
+                        });
+                } else {
+                    return response[0].dataValues.item !== null;
+                }
+            })
             .catch(error => {
                 console.error(error);
                 return false;

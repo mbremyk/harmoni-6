@@ -688,7 +688,10 @@ app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
-    db.addRiderItems(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
+    db.addRiderItems(req.body).then((insertOk) => {
+        console.log(insertOk);
+        return insertOk ? res.status(201).send(insertOk) : res.sendStatus(400)
+    });
 });
 
 
