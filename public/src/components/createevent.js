@@ -195,7 +195,7 @@ export default function AddEvent() {
                                                         <Dropdown.Item eventKey={user.userId}>
                                                             {user.username}
                                                         </Dropdown.Item>
-                                                    ))})
+                                                    ))}
 
                                                 </Dropdown.Menu>
 

@@ -80,7 +80,7 @@ export default function EditEvent() {
             service.getGigs(match.params.id)
                 .then(g => {
                     console.log(g);
-                    g.map(u => setArtistsAdd(artistsAdd.concat(u.artistId)));
+                    setArtistsAdd(g)
                 })
                 .catch((err) => console.log(err.message));
         }).catch((error) => console.log(error.message));
@@ -154,7 +154,7 @@ export default function EditEvent() {
                                                     <Dropdown.Item eventKey={user.userId}>
                                                         {user.username}
                                                     </Dropdown.Item>
-                                                ))})
+                                                ))}
 
                                             </Dropdown.Menu>
 
