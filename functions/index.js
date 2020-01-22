@@ -421,9 +421,18 @@ app.post("/auth/events", (req, res) => {
 app.get("/events", (req, res) => {
     console.log("GET-request - /events");
     console.log("Deleting events older than 90 days");
-    console.log("Quantity: " + db.deleteOldEvents());
-
-    return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
+    console.log("Quantity: ");
+    db.deleteOldEvents()
+        .then(e => {
+            console.log(e.length);
+            e.map(e => db.deleteEvent(e.eventId));
+        })
+        .then(() => {
+                return db.getAllEvents()
+                    .then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
+            }
+        )
+        .catch(error => console.error(error));
 });
 
 
@@ -481,17 +490,14 @@ app.get("/auth/events/users/:userId", (req, res) => {
  *          x-access-token: string
  *      }
  */
-app.get("/auth/events/users/:userId/myevents", (req, res) => {
-    console.log("GET-request - /events/user/:userId/myevents");
-    let token = req.headers['x-access-token'];
+app.get("/myevents/users/:userId/", (req, res) => {
+    console.log("GET-request - /myevents/user/:userId/");
+    /*let token = req.headers['x-access-token'];
     let decoded = jwt.decode(token);
-    if (decoded.userId == req.params.userId) {
-        return db.getMyEventsByUserId(decoded.userId)
-            .then(events => res.send(events))
-            .catch(error => console.error(error));
-    } else {
-        res.sendStatus(403);
-    }
+    if (decoded.userId === req.params.userId) {*/
+    return db.getMyEventsByUserId(req.params.userId)
+        .then(events => res.send(events))
+        .catch(error => console.error(error));
 });
 
 

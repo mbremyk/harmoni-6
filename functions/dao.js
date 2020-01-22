@@ -192,7 +192,7 @@ class Dao {
      * @returns {Promise<User[]>}
      */
     getAllUsers() {
-        return model.UserModel.findAll()
+        return model.UserModel.findAll({attributes: ['userId', 'username', 'email']})
             .catch(error => {
                 console.error(error);
                 return [];
@@ -203,10 +203,10 @@ class Dao {
      * Return the user by their email address
      *
      * @param email
-     * @returns {Promise<User>}
+     * @returns {Promise<{}>}
      */
     getUserByEmail(email) {
-        return model.UserModel.findOne({where: {[op.and]: [{email: email}]}})
+        return model.UserModel.findOne({where: {email: email}, attributes: ['userId', 'username', 'email']})
             .catch(error => {
                 console.error(error);
                 return {};
@@ -217,7 +217,7 @@ class Dao {
      * Return the salt assosciated to a user by their email address
      *
      * @param email
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     getSaltByEmail(email) {
         return model.UserModel.findAll({where: {email: email}, attributes: ['salt']})
@@ -234,7 +234,7 @@ class Dao {
      * @returns {Promise<{}>}
      */
     getUserById(userId) {
-        return model.UserModel.findOne({where: {userId: userId}})
+        return model.UserModel.findOne({where: {userId: userId}, attributes: ['userId', 'username', 'email']})
             .then(user => user ? user : {})
             .catch(error => {
                 console.error(error);
@@ -244,7 +244,7 @@ class Dao {
 
     getUserByEmailOrUsername(email, username) {
         let where = {[op.or]: [{email: email}, {username: username}]};
-        return model.UserModel.findAll({where: where})
+        return model.UserModel.findAll({where: where, attributes: ['userId', 'username', 'email']})
             .then(users => users)
             .error(error => {
                 console.error(error);
@@ -338,20 +338,69 @@ class Dao {
      */
     deleteEvent(eventId) {
 
-        return model.GigModel.destroy({where: {eventId: eventId}})
-            .then(() => {
-                return model.TicketModel.destroy({where: {eventId: eventId}})
-                    .then(() => {
-                        return model.PersonnelModel.destroy({where: {eventId: eventId}})
-                            .then(() => {
-                                return model.EventModel.destroy({where: {eventId: eventId}})
-                                    .then(res => res)
-                            })
-                    })
-            }).catch(error => {
-                console.error(error);
-                return false;
-            })
+        if (!isCI && !test) {
+            return this.getEventByEventId(eventId)
+                .then(event => {
+                    return this.getUserById(event.organizerId)
+                        .then(user => {
+                            return this.getGigs(eventId)
+                                .then(gigs => gigs.map(gig => gig.dataValues.artistId))
+                                .then(artistIds => {
+                                    return this.getPersonnel(eventId)
+                                        .then(personnel => personnel.map(person => person.dataValues.personnelId))
+                                        .then(personnelIds => {
+                                            let set = new Set(artistIds);
+                                            personnelIds.map(person => set.add(person));
+                                            return model.UserModel.findAll({where: {userId: {[op.in]: Array.from(set)}}})
+                                                .then(users => users.map(user => user.dataValues.email))
+                                                .then(users => {
+                                                    let email = {
+                                                        to: users,
+                                                        from: mailProps.username,
+                                                        subject: `Arrangement slettet: ${event.eventName}`,
+                                                        text: `Arrangementet ${event.eventName}, som du var artist eller personell på, har blitt slettet.\nHvis du lurer på hvorfor, kan du ta kontakt med organisator ${user.username} på mail: ${user.email}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                                    };
+                                                    return model.GigModel.destroy({where: {eventId: eventId}})
+                                                        .then(() => {
+                                                            return model.TicketModel.destroy({where: {eventId: eventId}})
+                                                                .then(() => {
+                                                                    return model.PersonnelModel.destroy({where: {eventId: eventId}})
+                                                                        .then(() => {
+                                                                            return model.EventModel.destroy({where: {eventId: eventId}})
+                                                                                .then(res => {
+                                                                                    mail.sendMail(email);
+                                                                                    return res;
+                                                                                });
+                                                                        });
+                                                                });
+                                                        }).catch(error => {
+                                                            console.error(error);
+                                                            return false;
+                                                        });
+                                                });
+                                        });
+                                });
+                        });
+                });
+
+        } else {
+            return model.GigModel.destroy({where: {eventId: eventId}})
+                .then(() => {
+                    return model.TicketModel.destroy({where: {eventId: eventId}})
+                        .then(() => {
+                            return model.PersonnelModel.destroy({where: {eventId: eventId}})
+                                .then(() => {
+                                    return model.EventModel.destroy({where: {eventId: eventId}})
+                                        .then(res => {
+                                            return res;
+                                        });
+                                });
+                        });
+                }).catch(error => {
+                    console.error(error);
+                    return false;
+                })
+        }
     }
 
     /**
@@ -359,11 +408,8 @@ class Dao {
      *
      * @returns {number}
      */
-    deleteOldEvents() {
-        let oldEvents = model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
-        oldEvents.map(event => console.log(event.eventId));
-        if (oldEvents.length == null) return 0;
-        else return oldEvents.length
+     deleteOldEvents() {
+        return model.EventModel.findAll({where: {endTime: {[Op.lt]: moment().subtract(90, 'days').toDate()}}});
     }
 
 
@@ -419,30 +465,32 @@ class Dao {
      * @param userId
      * @returns {Promise<Events[]>}
      */
-    getMyEventsByUserId(userId) {
-        let eventsWhereUserIsArtist = model.GigModel.findAll({where: {artistId: userId}})
+    async getMyEventsByUserId(userId) {
+        let personnelEvents = await model.PersonnelModel.findAll({where: {personnelId: userId}})
             .catch(error => {
                 console.error(error);
                 return [];
-            });
-        let eventsWhereUserIsPersonnel = model.PersonnelModel.findAll({where: {personnelId: userId}})
+            }).then(e => e.map(e => e.eventId));
+
+        let artistEvents = await model.GigModel.findAll({where: {artistId: userId}})
             .catch(error => {
                 console.error(error);
                 return [];
-            });
+            }).then(e => e.map(e => e.eventId));
 
         return model.EventModel.findAll({
             where: {
                 [Op.or]: [
-                    {eventId: eventsWhereUserIsArtist.map(e => e.eventId)},
-                    {eventId: eventsWhereUserIsPersonnel.map(e => e.eventId)}
+                    {eventId: artistEvents},
+                    {eventId: personnelEvents}
                 ]
             }
         })
             .catch(error => {
                 console.error(error);
                 return [];
-            });
+            })
+
 
     }
 
@@ -741,7 +789,7 @@ class Dao {
     updateRiderItems(riderItems) {
         return Promise.all(riderItems.map(riderItem => model.RiderModel.update(
             {
-                confirmed: (riderItem.confirmed ? true : false)
+                confirmed: riderItem.confirmed
             },
             {
                 where: {
