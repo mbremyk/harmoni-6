@@ -341,6 +341,14 @@ class Services {
 
     /**
      * @param eventId: number
+     * @returns Promise<>: Gig[]
+     */
+    getPublicGigs(eventId) {
+        return axios.get(url + '/events/' + eventId + '/gigs', ).then(response => response.data);
+    }
+
+    /**
+     * @param eventId: number
      * @param artistId: number
      * @returns Promise<>: Contract
      */
@@ -382,8 +390,6 @@ class Services {
     sendMails(mail){
         return axios.post(url+"/mail/info", mail).then(response => response.data);
     }
-
-
 }
 
 export let service = new Services();
