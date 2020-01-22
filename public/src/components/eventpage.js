@@ -136,7 +136,6 @@ export class EventPage extends Component {
                 });
             })
             .catch((error) => console.log(error));
-
     }
 
     //gets all the artist working on that event and checks if the person viewing it is a an artist
