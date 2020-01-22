@@ -1,4 +1,4 @@
-import {service, Event, Gig, Artist} from "../services";
+import {service, Event, Gig, Artist, Personnel} from "../services";
 import useReactRouter from 'use-react-router';
 import {authService} from "../AuthService";
 import {Component} from "react-simplified";
@@ -19,6 +19,7 @@ import {HarmoniNavbar} from "./navbar";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import {LoginForm} from "./login";
+import {DownloadWidget} from "../widgets";
 import {CustomMenu, dateInput, inputField, textField, timeInput, toBase64} from "./editandcreatefunctions";
 
 const jwt = require("jsonwebtoken");
@@ -49,6 +50,9 @@ export default function EditEvent() {
     const [cancelled, setCancelled] = useState("");
     const [addArtistByMail, setAddArtistByMail] = useState([]);
     const [artistEmail, setArtistEmail] = useState("");
+    const [personnel, setPersonnel] = useState([]);
+    const [personnelUpdate, setPersonnelUpdate] = useState([]);
+    const [personnelRemove, setPersonnelRemove] = useState([]);
 
     useEffect(() => {
         service.getEventByEventId(match.params.id).then(event => {
@@ -99,6 +103,31 @@ export default function EditEvent() {
             service.updateEvent(ev).then(history.push("/arrangement/" + eventId));
         });
     }
+
+            updatePersonnel = () => new Promise((resolve, reject) => {
+                let promises = [];
+
+                //if user has chosen to remove personnel, then remove them from the database
+                if (Array.isArray(this.state.personnelRemove) && this.state.personnelRemove.length > 0) {
+                    console.log('remove', this.state.personnelRemove);
+                    promises.push(this.state.personnelRemove.map(personnel => service.deletePersonnel(this.state.eventId, personnel.personnelId).catch(error => reject(error))))
+                }
+
+                //if there are any old personnel left, update their role in the database
+                if (Array.isArray(this.state.personnelUpdate) && this.state.personnelUpdate.length > 0) {
+                    console.log('update', this.state.personnelUpdate);
+                    promises.push(service.updatePersonnel(this.state.personnelUpdate).catch(error => reject(error)))
+                }
+
+                //if there are new personnel added, then add them to database
+                if (Array.isArray(this.state.personnelAdd) && this.state.personnelAdd.length > 0) {
+                    console.log('add', this.state.personnelAdd);
+                    promises.push(service.addPersonnel(this.state.personnelAdd).catch(error => reject(error)))
+                }
+
+                Promise.all(promises).then(() => resolve(true)).catch(error => reject(error));
+            });
+
 
 
     return (
@@ -209,6 +238,10 @@ export default function EditEvent() {
                                                             }}/>
                                                     </Form.Group>
 
+                                                            <Col sm={""}>
+                                                                <DownloadWidget artist={artist.userId}
+                                                                                event={this.state.eventId}/>
+                                                            </Col>
                                                     <Col>
                                                         <Button type="button" variant={"danger"}
                                                                 onClick={() => {

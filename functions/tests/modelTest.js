@@ -3,7 +3,6 @@ const dao = require('../dao.js');
 
 let db = new dao();
 
-
 beforeEach(done => Models.syncTestData().then(() => done()));
 
 /*
@@ -90,14 +89,10 @@ describe('Users', () => {
             expect({
                 userId: user.userId,
                 username: user.username,
-                password: user.password,
-                salt: user.salt,
                 email: user.email,
             }).toEqual({
                     userId: 1,
                     username: 'Steffen T',
-                    password: 'ST',
-                    salt: 'salt',
                     email: 'steffen@mail.com'
                 }
             );
@@ -119,14 +114,10 @@ describe('Users', () => {
             expect({
                 userId: user.userId,
                 username: user.username,
-                password: user.password,
-                salt: user.salt,
                 email: user.email,
             }).toEqual({
                     userId: 1,
                     username: 'Steffen T',
-                    password: 'ST',
-                    salt: 'salt',
                     email: 'steffen@mail.com'
                 }
             );
@@ -362,14 +353,12 @@ describe('Personnel', () => {
             {
                 eventId: 1,
                 personnelId: 1,
-                rider: null,
-                contract: null
+                role: 'ADD'
             },
             {
                 eventId: 2,
                 personnelId: 2,
-                rider: null,
-                contract: null
+                role: 'ADD2'
             }];
         db.addPersonnel(personnel).then(response => {
             expect(response).toBeTruthy();
@@ -378,11 +367,11 @@ describe('Personnel', () => {
     });
 
     it('update personnel', done => {
-        let personnel = {
+        let personnel = [{
             eventId: 2,
             personnelId: 4,
             role: 'UPDATED'
-        };
+        }];
         db.updatePersonnel(personnel).then(response => {
             expect(response).toBeTruthy();
             done();
@@ -452,13 +441,13 @@ describe('Tickets', () => {
     });
 
     it('update Ticket', done => {
-        let ticket = {
+        let tickets = [{
             eventId: 4,
             type: 'Golden Circle',
             price: 1234,
             amount: 56,
-        };
-        db.updateTicket(ticket).then(response => {
+        }];
+        db.updateTickets(tickets).then(response => {
             expect(response).toBeTruthy();
             done();
         });
