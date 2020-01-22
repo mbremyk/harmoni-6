@@ -46,7 +46,6 @@ export class HomePage extends Component {
                 <SortedEventView events={this.getOtherEvents()}/>
             </div>
         );
-
     }
 
      mounted() {
