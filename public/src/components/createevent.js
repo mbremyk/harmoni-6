@@ -79,48 +79,30 @@ export default function AddEvent() {
 
     async function sendGigs2(eventId) {
 
-        await artistByMailToArtistAdd()
-
-        console.log(addArtistByMail);
-        console.log(artistsAdd);
-
         return new Promise((resolve, reject) => {
 
             if ((Array.isArray(addArtistByMail) && addArtistByMail.length)) {
+
                 Promise.all(addArtistByMail.map(artist => {
-                    console.log(artist, "hhiohoho")
-                    console.log(artist.userId)
+
+                    let u = new User();
+                    u.email = artist.email;
+                    u.password = "";
+                    u.username = "";
+
+                    service.createTempUser(u).then(createdUser => {
+
                     toBase64(artist.contract).then(contractData => {
                         let contract = new SimpleFile(contractData, artist.contract.name);
                         service
-                            .addGig(new Gig(eventId, artist.userId, contract))
+                            .addGig(new Gig(eventId, createdUser.userId, contract))
                             .catch(error => reject(error))
+                    })
                     })
                 })).then(() => resolve(true));
             } else {
                 resolve(true);
             }
-        });
-    }
-
-    async function artistByMailToArtistAdd() {
-        return new Promise((resolve, reject) => {
-
-            console.log(addArtistByMail, "hallo?")
-
-            addArtistByMail.map(artist => {
-                let u = new User();
-                u.email = artist.email;
-                u.password = "";
-                u.username = "";
-                service.createTempUser(u).then(createdUser => {
-                    artist.userId = createdUser.userId
-
-                }).catch(error => console.log(error))
-            });
-            console.log(addArtistByMail)
-            addArtistByMail.map(a => console.log(a))
-            resolve()
         });
     }
 
@@ -162,7 +144,7 @@ export default function AddEvent() {
                 sendGigs(created.insertId).then(() => {
                     sendGigs2(created.insertId).then(() => {
                         sendPersonnel(created.insertId).then(() => {
-                            //history.push("/arrangement/" + created.insertId)
+                            history.push("/arrangement/" + created.insertId)
                         })
                     })
                 });
@@ -277,6 +259,19 @@ export default function AddEvent() {
                                                                     artist.email = event.target.value;
                                                                     setArtistEmail(event.target.value)
                                                                 }}/>
+                                                        </Form.Group>
+
+                                                        <Col sm={"2"}>
+                                                            <label>Last opp kontrakt:</label>
+                                                        </Col>
+
+                                                        <Form.Group as={Col} sm={"6"}>
+                                                            <input type="file" className="form-control"
+                                                                   encType="multipart/form-data" name="file"
+                                                                   onChange={event => {
+                                                                       artist.contract = event.target.files[0];
+                                                                       setContract(event.target.files[0]);
+                                                                   }}/>
                                                         </Form.Group>
 
                                                         <Col>

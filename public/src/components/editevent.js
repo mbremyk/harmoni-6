@@ -384,14 +384,13 @@ export default function EditEvent() {
             setAgeLimit(ageLimit - 1)
         }
     }
-}
 
-function downloadC(e, artist) {
+    function downloadC(e, artist) {
 
         console.log(artist)
 
-        if(e.target.id == "contract") {
-            service.downloadContract(this.state.eventId, artist.userId)
+        if (e.target.id == "contract") {
+            service.downloadContract(eventId, artist.userId)
                 .then(response => {
                     let fileName = response.name;
                     const link = document.createElement('a');
@@ -405,21 +404,22 @@ function downloadC(e, artist) {
 
     }
 
-function handleDelete() {
+    function handleDelete() {
         if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
-            service.deleteEvent(this.state.eventId).then(() => {
-                this.props.history.push("/hjem")
+            service.deleteEvent(eventId).then(() => {
+                history.push("/hjem")
                 alert("Arrangementet er nå slettet")
             });
         }
-}
+    }
 
-function handleEventCancel() {
+    function handleEventCancel() {
         if (window.confirm("Ønsker du å avlyse arrangementet?") === true) {
-            this.setState({cancelled: true});
+            setCancelled(true)
             console.log("Cancelled")
         } else {
             console.log("No change")
         }
+    }
 }
 
