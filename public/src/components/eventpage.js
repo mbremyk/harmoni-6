@@ -4,7 +4,6 @@ import {Button, Col, Container, Image, Row} from "react-bootstrap";
 import NavLink from "react-bootstrap/NavLink";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
-
 import {DownloadWidget} from '../widgets.js';
 import {Event, service, User} from '../services';
 import {authService} from "../AuthService";
@@ -32,7 +31,7 @@ export class EventPage extends Component {
                     {this.RenderNavbar()}
                     <Container>
                         <Card className='p-2'>
-                            <Image height='620px' src={this.currentEvent.imageUrl}/>
+                            {this.renderImage()}
 
                             <div className="p-4">
                                 <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
@@ -46,7 +45,7 @@ export class EventPage extends Component {
                                         <div>
                                             {this.currentEvent.description}
                                         </div>
-                                        {this.renderPlaceDiscriptiion()}
+                                        {this.renderPlaceDescription()}
 
 
                                     </div>
@@ -338,14 +337,13 @@ export class EventPage extends Component {
     renderImage() {
         if (this.currentEvent.imageUrl !== "") {
             return (
-                <div style={{overflow: 'hidden', height: '620px'}}>
-                    <Image src={this.currentEvent.imageUrl}/>
-                </div>
+                <Image height='620px' src={this.currentEvent.imageUrl}/>
+
             );
         }
     }
 
-    renderPlaceDiscriptiion() {
+    renderPlaceDescription() {
         if (this.currentEvent.placeDescription !== "") {
             return (
                 <div className="mt-3">
