@@ -244,19 +244,20 @@ export class MailForm extends Component {
     }
 
     getRecipentString(props) {
-        let recipients = "";
+        let recipientsString = "";
+        console.log(props);
         if (props.recipients) {
             props.recipients.map(user => {
-                recipients = recipients += user.user.email + ", "
+                recipientsString = recipientsString += user.user.email + ", "
             });
         }
-        return recipients;
+        return recipientsString;
     }
 
     getAllMails(props) {
         let mails = [];
-        if (props.artists) {
-            props.artists.map(user => {
+        if (props.recipients) {
+            props.recipients.map(user => {
                 mails.push(user.user.email);
             });
         }
@@ -345,7 +346,7 @@ export class MailForm extends Component {
                                   style={{display: 'flex'}}/>
                     <Button
                         className={"btn-primary mt-2 mr-2"}
-                        onClick={() => this.sendMail(true)}>
+                        onClick={() => this.sendMail(false)}>
                         Send Email
                     </Button>
                     <Button
@@ -425,6 +426,7 @@ export class MailForm extends Component {
                 }
             });
             let mail = new Mail(to, user.email, user.username, this.state.description, this.state.text);
+            console.log(this.state.mails);
             console.log("Recipients");
             console.log(mail);
             service.sendMails(mail)

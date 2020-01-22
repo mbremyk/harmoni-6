@@ -293,6 +293,7 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
+        console.log("Updating...");
         return model.EventModel.update(
             {
                 organizerId: event.organizerId,
@@ -309,7 +310,10 @@ class Dao {
                 cancelled: event.cancelled,
             },
             {where: {eventId: event.eventId}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
+            .then(response => {
+                console.log("finished");
+                return response[0] === 1 /*affected rows === 1*/
+            })
             .catch(error => {
                 console.error(error);
                 return false;
