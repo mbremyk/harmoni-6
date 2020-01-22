@@ -1,4 +1,4 @@
-import {Event, Gig, Personnel, service, SimpleFile, ToBase64} from "../services";
+import {service, Event, Gig, Ticket, SimpleFile, Personnel} from "../services";
 import {Component} from "react-simplified";
 import React from "react";
 import Container from "react-bootstrap/Container";
@@ -13,9 +13,11 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {HarmoniNavbar} from "./navbar";
-//import {Event, service} from "../services";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
+import Alert from "react-bootstrap/Alert";
+import moment from "moment";
+import {DownloadWidget} from "../widgets";
 
 export class EditEvent extends Component {
 
@@ -65,6 +67,13 @@ export class EditEvent extends Component {
 
         this.gigsOld = this.handleGigsFromDatabase.bind(this);
         this.personnel = this.handlePersonnelFromDatabase.bind(this);
+        this.personnelAdd = this.handlePersonnelAdd.bind(this);
+        this.ticketType = this.handleTicketType.bind(this);
+        this.ticketPrice = this.handleTicketPrice.bind(this);
+        this.ticketAmount = this.handleTicketAmount.bind(this);
+        this.tickets = this.handleTicketsFromDB.bind(this);
+        this.tickets = this.handleTicketsAdd.bind(this);
+        this.updatedTickets = this.handleTicketsFromDB.bind(this);
 
         this.state = {
             eventId: 0,
@@ -76,11 +85,13 @@ export class EditEvent extends Component {
             eventDescription: '',
             imageUrl: '',
             ageLimit: 0,
+            cancelled: 0,
             fDate: require('moment')().format('YYYY-MM-DD'),
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
-            cancelled: 0,
+            maxTime: moment('23:59', 'HH:mm').format('HH:mm'),
+            minTime: moment('00:00', 'HH:mm').format('HH:mm'),
 
             users: [],
 
@@ -92,6 +103,18 @@ export class EditEvent extends Component {
             personnelUpdate: [], //personnel already registered
             personnelAdd: [], //personnel added
             personnelRemove: [], //personnel for removal
+
+            ticketType: '',
+            ticketPrice: 0,
+            ticketAmount: 0,
+
+            error: '',
+            errorType: 'success',
+
+            tickets: [], //tickets got on mounted
+            updatedTickets: [], //tickets that are to be updated
+            addedTickets: [], // tickets that are to be added
+            deletedTickets: [], // tickets that are to be deleted
         };
     }
 
@@ -131,19 +154,33 @@ export class EditEvent extends Component {
     }
 
     handleFDate(event) {
-        this.setState({fDate: event.target.value})
+        this.setState({fDate: event.target.value});
+        this.handleMaxMinTime();
     }
 
     handleFTime(event) {
-        this.setState({fTime: event.target.value})
+        this.setState({fTime: event.target.value});
+        this.handleMaxMinTime();
     }
 
     handleTDate(event) {
-        this.setState({tDate: event.target.value})
+        this.setState({tDate: event.target.value});
+        this.handleMaxMinTime();
     }
 
     handleTTime(event) {
-        this.setState({tTime: event.target.value})
+        this.setState({tTime: event.target.value});
+        this.handleMaxMinTime();
+    }
+
+    handleMaxMinTime() {
+        if (this.state.fDate === this.state.tDate) {
+            this.setState({maxTime: this.state.tTime});
+            this.setState({minTime: this.state.fTime});
+        } else {
+            this.setState({minTime: moment('00:00', 'HH:mm').format('HH:mm')});
+            this.setState({maxTime: moment('23:59', 'HH:mm').format('HH:mm')});
+        }
     }
 
     handleUsers(event) {
@@ -201,6 +238,7 @@ export class EditEvent extends Component {
     });
 
 
+
     /*
     Personnel
      */
@@ -234,7 +272,7 @@ export class EditEvent extends Component {
             this.state.personnelUpdate.splice(this.state.personnelUpdate.indexOf(personnel), 1);
             this.setState({personnelRemove: [...this.state.personnelRemove, personnel]});
         } else {
-            //if personnel isnt in database
+            //if personnel is'nt in database
             this.state.personnelAdd.splice(this.state.personnelAdd.indexOf(personnel), 1);
         }
     }
@@ -265,11 +303,132 @@ export class EditEvent extends Component {
 
 
     /*
-    Submit
-     */
+     Ticket
+    */
 
+    handleTicketType(event) {
+        this.setState({ticketType: event.target.value})
+    }
+
+    handleTicketPrice(event) {
+        this.setState({ticketPrice: event.target.value})
+    }
+
+    handleTicketAmount(event) {
+        this.setState({ticketAmount: event.target.value})
+    }
+
+    handleTicketsAdd() {
+
+
+        let errmsg = "";
+        if ((this.state.tickets.some(t => t.type.trim() === this.state.ticketType.trim()) && !(this.state.deletedTickets.some(t => t.type.trim() === this.state.ticketType.trim())))) {
+            errmsg += "Denne billett-typen finnes allerede!";
+            this.setError(errmsg, 'danger');
+            this.setState({ticketType: ""});
+            this.setState({ticketPrice: 0});
+            this.setState({ticketAmount: 0});
+            return;
+        } else if (!this.state.ticketType.trim()) {
+            errmsg += "Vennligst skriv inn en billett-type";
+            this.setError(errmsg, 'danger');
+            return;
+        }
+        let newTicket = new Ticket(this.state.eventId, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)
+        this.setState({addedTickets: [...this.state.addedTickets, newTicket]});
+        this.setState({tickets: [...this.state.tickets, newTicket]});
+    }
+
+    handleTicketsFromDB(event_ticketsFromDB) {
+        let newTickets = event_ticketsFromDB.map(t => new Ticket(t.eventId, t.type, t.price, t.amount));
+        this.setState({updatedTickets: [...this.state.updatedTickets, ...newTickets]});
+        this.setState({tickets: [...this.state.tickets, ...newTickets]});
+    }
+
+    handleTicketsTypeChange(event, ticket) {
+        ticket.type = event.target.value;
+        this.setState({tickets: [...this.state.tickets]});
+    }
+
+    handleTicketsPriceChange(event, ticket) {
+        ticket.price = event.target.value;
+        this.setState({tickets: [...this.state.tickets]});
+    }
+
+    handleTicketsAmountChange(event, ticket) {
+        ticket.amount = event.target.value;
+        this.setState({tickets: [...this.state.tickets]});
+    }
+
+    handleTicketsRemoval(event, ticket) {
+        this.state.tickets.splice(this.state.tickets.indexOf(ticket), 1);
+        this.setState({tickets: [...this.state.tickets]});
+
+        if (this.state.addedTickets.indexOf(ticket) >= 0) {
+            this.state.addedTickets.splice(this.state.tickets.indexOf(ticket), 1);
+
+        }
+        if (this.state.updatedTickets.indexOf(ticket) >= 0) {
+            this.state.updatedTickets.splice(this.state.tickets.indexOf(ticket), 1);
+            this.setState({deletedTickets: [...this.state.deletedTickets, ticket]});
+
+        }
+    }
+
+    updateTickets = () => new Promise((resolve, reject) => {
+        let promises = [];
+
+        //If user has chosen to remove tickets, remove them from the database
+        if (Array.isArray(this.state.deletedTickets) && this.state.deletedTickets.length > 0) {
+            console.log('remove', this.state.deletedTickets);
+            promises.push(this.state.deletedTickets.map(ticket => service.deleteTicket(ticket).catch(error => {
+                reject(error);
+                console.log(error);
+            })))
+        }
+
+        //If user has chosen to edit ticket information, update in database
+        if (Array.isArray(this.state.updatedTickets) && this.state.updatedTickets.length > 0) {
+            console.log('update', this.state.updatedTickets);
+            promises.push(service.updateTicket(this.state.updatedTickets).catch(error => {
+                reject(error);
+                console.log(error);
+            }))
+        }
+
+        //If user has chosen to add tickets, post in database
+        if (Array.isArray(this.state.addedTickets) && this.state.addedTickets.length > 0) {
+            console.log('add', this.state.addedTickets);
+            promises.push(service.addTickets(this.state.addedTickets).catch(error => {
+                reject(error);
+                console.log(error);
+            }))
+        }
+
+        Promise.all(promises).then(() => resolve(true)).catch(error => {
+            reject(error);
+            console.log(error);
+        });
+    });
+
+    setError(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
+    }
 
     handleSubmit() {
+
+        let errmsg = "";
+        // check empty fields
+        if (!this.state.eventName.trim() || !this.state.eventAddress.trim() || !this.state.eventDescription.trim() || !this.state.city.trim()) {
+            errmsg += 'Følgende felter mangler:';
+            if (!this.state.eventName.trim()) errmsg += " [ Arrangementsavn ] ";
+            if (!this.state.eventAddress.trim()) errmsg += "  [ Addresse ] ";
+            if (!this.state.eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
+            if (!this.state.city.trim()) errmsg += "  [ By ] ";
+            this.setError(errmsg, 'danger');
+            return;
+        }
 
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
@@ -288,18 +447,18 @@ export class EditEvent extends Component {
             this.state.cancelled);
 
         service.updateEvent(ev).then(() => {
-            this.updatePersonnel().then(() => {
-                this.updateGigs().then(() => {
-                    this.props.history.push("/arrangement/" + ev.eventId);
+            this.updateTickets().then(() => {
+                this.updatePersonnel().then(() => {
+                    this.updateGigs().then(() => {
+                        this.props.history.push("/arrangement/" + ev.eventId);
+                    })
                 })
-            })
+            });
         });
     }
 
 
     render() {
-
-        if (!(Array.isArray(this.state.users) && this.state.users.length)) return null;
 
         return (
             <div>
@@ -316,7 +475,7 @@ export class EditEvent extends Component {
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Arrangementsnavn</Form.Label>
                                     <Form.Control
-                                        placeholder="Navn på arrangement"
+                                        placeholder="Navn på arrangement . . ."
                                         value={this.state.eventName}
                                         onChange={this.handleEventNameChange}
                                     />
@@ -325,7 +484,7 @@ export class EditEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>Adresse</Form.Label>
                                     <Form.Control
-                                        placeholder="Adresse der arrangementet skal holdes"
+                                        placeholder="Adresse der arrangementet skal holdes . . ."
                                         value={this.state.eventAddress}
                                         onChange={this.handleEventAddressChange}
 
@@ -335,7 +494,7 @@ export class EditEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>By</Form.Label>
                                     <Form.Control
-                                        placeholder="By der arrangementet skal holdes"
+                                        placeholder="By der arrangementet skal holdes . . ."
                                         value={this.state.city}
                                         onChange={this.handleCityChange}
 
@@ -344,9 +503,9 @@ export class EditEvent extends Component {
 
 
                                 <Form.Group as={Col} sm={12}>
-                                    <Form.Label>Plass beskrivelse</Form.Label>
+                                    <Form.Label>Stedsanvisning</Form.Label>
                                     <Form.Control
-                                        placeholder="For eksempel 3. etajse"
+                                        placeholder="Her kan du f.eks skrive anvisning for hvordan man kan finne fram til der arrangementet holdes . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.placeDescription}
@@ -357,7 +516,7 @@ export class EditEvent extends Component {
                                 <Form.Group as={Col} sm={12}>
                                     <Form.Label>Beskrivelse</Form.Label>
                                     <Form.Control
-                                        placeholder="Her kan du skrive en beskrivelse av arrangementet"
+                                        placeholder="Her kan du skrive en beskrivelse av arrangementet . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.eventDescription}
@@ -369,6 +528,7 @@ export class EditEvent extends Component {
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Fra dato</Form.Label>
                                     <Form.Control
+                                        max={this.state.tDate}
                                         value={this.state.fDate}
                                         onChange={this.handleFDate}
                                         type={"date"}
@@ -379,32 +539,34 @@ export class EditEvent extends Component {
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Fra klokkeslett</Form.Label>
                                     <Form.Control
+                                        max={this.state.maxTime}
                                         value={this.state.fTime}
                                         onChange={this.handleFTime}
                                         type={"time"}
-
-                                    />
+                            />
+                                    <span className="customStyle"/>
                                 </Form.Group>
 
 
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Til dato</Form.Label>
                                     <Form.Control
+                                        min={this.state.fDate}
                                         value={this.state.tDate}
                                         onChange={this.handleTDate}
                                         type={"date"}
-
-                                    />
-                                </Form.Group>
+                            />
+                        </Form.Group>
 
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Til klokkeslett</Form.Label>
                                     <Form.Control
+                                        min={this.state.minTime}
                                         value={this.state.tTime}
                                         onChange={this.handleTTime}
                                         type={"time"}
-
-                                    />
+                            />
+                                    <span className="customStyle"/>
                                 </Form.Group>
 
 
@@ -568,7 +730,7 @@ export class EditEvent extends Component {
                                                 aria-describedby="btnGroupAddon"
                                             />
                                             <InputGroup.Append>
-                                                <InputGroup.Text id="btnGroupAddon">år</InputGroup.Text>
+                                                <InputGroup.Text>år</InputGroup.Text>
                                             </InputGroup.Append>
                                         </InputGroup>
 
@@ -576,6 +738,88 @@ export class EditEvent extends Component {
                                 </Form.Group>
                             </Form.Row>
 
+                            <Form.Row>
+
+                                <Form.Group as={Col} sm={"3"}>
+
+                                    <Form.Label>Billett-type</Form.Label>
+                                    <Form.Control
+                                        placeholder="Navn på billettype . . ."
+                                        onChange={this.handleTicketType}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Billettpris</Form.Label>
+                                    <InputGroup>
+
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="Billettpris . . ."
+                                            onChange={this.handleTicketPrice}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Antall billetter</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Antall billetter . . ."
+                                        onChange={this.handleTicketAmount}
+                                    />
+
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Button onClick={this.handleTicketsAdd}>Legg til billett-typen</Button>
+                                </Form.Group>
+
+                            </Form.Row>
+
+                            <ListGroup title={"Billett-typer på dette arrangementet"}>
+                                {this.state.tickets.map(ticket =>
+                                    <React.Fragment>
+                                        <ListGroupItem>
+                                            <Row>
+                                                <Col>
+                                                    <Form.Label>Billett-type</Form.Label>
+                                                    <Form.Control
+                                                        placeholder="Billett-type"
+                                                        value={ticket.type}
+                                                        onChange={event => this.handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Form.Label>Billett-pris</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        placeholder="Billett-pris"
+                                                        value={ticket.price}
+                                                        onChange={event => this.handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Form.Label>Antall billetter</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        placeholder="Antall billetter"
+                                                        value={ticket.amount}
+                                                        onChange={event => this.handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Button type="button" variant={"danger"}
+                                                            onClick={event => this.handleTicketsRemoval(event, ticket)}>X</Button>
+                                                </Col>
+                                            </Row>
+                                        </ListGroupItem>
+                                    </React.Fragment>
+                                )}
+                            </ListGroup>
                             <Row>
 
                                 <Col>
@@ -587,8 +831,19 @@ export class EditEvent extends Component {
                                             onClick={this.handleEventCancel}>Avlys</Button>
                                 </Col>
 
+                                {(this.state.error) ?
+                                    <Alert style={{
+                                        height: '9em',
+                                        top: '50%',
+                                        left: '50%',
+                                        position: 'fixed',
+                                        transform: 'translate(-50%, -50%)'
+                                    }} variant={this.state.errorType}><Alert.Heading>Vent nå litt!</Alert.Heading>
+                                        <p>{this.state.error}</p></Alert> :
+                                <div style={{height: '3em'}}/>}
+
                                 <Col>
-                                    <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
+                                <Button variant={"danger"} onClick={this.handleDelete}>Slett</Button>
                                 </Col>
 
                             </Row>
@@ -626,6 +881,7 @@ export class EditEvent extends Component {
             this.setState({placeDescription: event.placeDescription});
 
             service.getUsers().then(this.handleUsers).catch((err) => console.log(err.message));
+            service.getTicketToEvent(this.props.match.params.id).then(this.handleTicketsFromDB).catch((err) => console.log(err.message));
             service.getPersonnel(this.props.match.params.id).then(this.handlePersonnelFromDatabase).catch((err) => console.log(err.message));
             service.getGigs(this.props.match.params.id).then(this.handleGigsFromDatabase).catch((err) => console.log(err.message));
         }).catch((error) => console.error(error));

@@ -1,4 +1,4 @@
-import {Artist, Event, Gig, Personnel, service, SimpleFile} from "../services";
+import {Gig, Event, Personnel, service, SimpleFile, Artist, Ticket} from "../services";
 import {Component} from "react-simplified";
 import {HarmoniNavbar} from "./navbar";
 import React from "react";
@@ -16,7 +16,8 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {authService} from "../AuthService";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
-
+import Alert from "react-bootstrap/Alert";
+import moment from "moment";
 const jwt = require("jsonwebtoken");
 
 //TODO: Sjekke om artist er allerede lagt inn
@@ -70,6 +71,9 @@ export class AddEvent extends Component {
         this.imageUrl = this.handleImageUrlChange.bind(this);
         this.image = this.handleImageUpload.bind(this);
         this.personnelAdd = this.handlePersonnelAdd.bind(this);
+        this.ticketType = this.handleTicketType.bind(this);
+        this.ticketPrice = this.handleTicketPrice.bind(this);
+        this.ticketAmount = this.handleTicketAmount.bind(this);
         this.city = this.handleCityChange.bind(this);
         this.placeDescription = this.handlePlaceDescriptionChange.bind(this);
 
@@ -86,13 +90,20 @@ export class AddEvent extends Component {
             tDate: require('moment')().format('YYYY-MM-DD'),
             fTime: require('moment')().format('HH:mm'),
             tTime: require('moment')().format('HH:mm'),
+            maxTime: moment('23:59', 'HH:mm').format('HH:mm'),
+            minTime: moment('00:00', 'HH:mm').format('HH:mm'),
             image: '',
             imageUrl: '',
-
             artistsAdd: [],
             artists: [],
-
             personnelAdd: [],
+            personnelRole: '',
+            ticketType: '',
+            ticketPrice: 0,
+            ticketAmount: 0,
+            tickets: [],
+            error: '',
+            errorType: 'success',
         };
     }
 
@@ -155,22 +166,54 @@ export class AddEvent extends Component {
 
     handleFDate(event) {
         this.setState({fDate: event.target.value})
+        this.handleMaxMinTime();
     }
 
     handleFTime(event) {
-        this.setState({fTime: event.target.value})
+        this.setState({fTime: event.target.value});
+        this.handleMaxMinTime();
     }
 
     handleTDate(event) {
         this.setState({tDate: event.target.value})
+        this.handleMaxMinTime();
     }
 
     handleTTime(event) {
-        this.setState({tTime: event.target.value})
+        this.setState({tTime: event.target.value});
+        this.handleMaxMinTime();
+    }
+
+    handleMaxMinTime() {
+        if (this.state.fDate === this.state.tDate) {
+            this.setState({maxTime: this.state.tTime});
+            this.setState({minTime: this.state.fTime});
+        }
     }
 
     handlePersonnelRole(event, personnel) {
         personnel.role = event.target.value;
+    }
+
+    handleTicketType(event){
+        this.setState({ticketType: event.target.value});
+    }
+
+    handleTicketPrice(event){
+        this.setState({ticketPrice: event.target.value});
+    }
+
+    handleTicketAmount(event){
+        this.setState({ticketAmount: event.target.value});
+    }
+
+    handleTicket(){
+        this.setState({tickets: [...this.state.tickets, new Ticket(null, this.state.ticketType, this.state.ticketPrice, this.state.ticketAmount)]})
+    }
+
+    setError(message, variant) {
+        this.setState({error: message, errorType: variant});
+        setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
 
@@ -199,7 +242,31 @@ export class AddEvent extends Component {
         }
     });
 
+    sendTickets = (eventId) => new Promise((resolve, reject) => {
+        if ((Array.isArray(this.state.tickets) && this.state.tickets.length)) {
+            this.state.tickets = this.state.tickets.map(ticket => new Ticket(eventId, ticket.type, ticket.price, ticket.amount));
+            service
+                .addTickets(this.state.tickets)
+                .then(() => resolve(true))
+                .catch(error => reject(error));
+        }else{
+            resolve(true);
+        }
+    });
+
     handleSubmit() {
+        let errmsg = "";
+        // check empty fields
+        if (!this.state.eventName || !this.state.eventAddress || !this.state.eventDescription) {
+            errmsg += 'Følgende mangler:';
+            if (!this.state.eventName) errmsg += " [ Arrangementsnavn ] ";
+            if (!this.state.eventAddress) errmsg += "  [ Addresse ] ";
+            if (!this.state.eventDescription) errmsg += "  [ Beskrivelse ] ";
+            if (!this.state.city) errmsg += "  [ By ] ";
+            this.setError(errmsg, 'danger');
+            return;
+        }
+
         let fDateTime = this.state.fDate + " " + this.state.fTime + ":00";
         let tDateTime = this.state.tDate + " " + this.state.tTime + ":00";
 
@@ -220,7 +287,9 @@ export class AddEvent extends Component {
         service.createEvent(newEvent).then(created => {
             this.sendGigs(created.insertId).then(() => {
                 this.sendPersonnel(created.insertId).then(() => {
-                    this.props.history.push("/arrangement/" + created.insertId)
+                    this.sendTickets(created.insertId).then(() => {
+                            this.props.history.push("/arrangement/" + created.insertId)
+                        })
                 })
             });
         }).catch(err => console.error(err))
@@ -245,7 +314,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Arrangementsnavn</Form.Label>
                                     <Form.Control
-                                        placeholder="Navn på arrangement"
+                                        placeholder="Navn på arrangement . . ."
                                         value={this.state.eventName}
                                         onChange={this.handleEventNameChange}
                                     />
@@ -254,7 +323,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>Adresse</Form.Label>
                                     <Form.Control
-                                        placeholder="Adresse der arrangementet skal holdes"
+                                        placeholder="Adresse der arrangementet skal holdes . . ."
                                         value={this.state.eventAddress}
                                         onChange={this.handleEventAddressChange}
 
@@ -264,7 +333,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"6"}>
                                     <Form.Label>By</Form.Label>
                                     <Form.Control
-                                        placeholder="By der arrangementet skal holdes"
+                                        placeholder="By der arrangementet skal holdes . . ."
                                         value={this.state.city}
                                         onChange={this.handleCityChange}
 
@@ -273,9 +342,9 @@ export class AddEvent extends Component {
 
 
                                 <Form.Group as={Col} sm={12}>
-                                    <Form.Label>Plass beskrivelse</Form.Label>
+                                    <Form.Label>Stedsanvisninger</Form.Label>
                                     <Form.Control
-                                        placeholder="For eksempel 3. etajse"
+                                        placeholder="Her kan du f.eks skrive anvisning om hvordan man kan finne fram til der arrangementet holdes . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.placeDescription}
@@ -286,7 +355,7 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={12}>
                                     <Form.Label>Beskrivelse</Form.Label>
                                     <Form.Control
-                                        placeholder="Her kan du skrive en beskrivelse av arrangementet"
+                                        placeholder="Her kan du skrive en beskrivelse av arrangementet . . ."
                                         as="textarea"
                                         rows="8"
                                         value={this.state.eventDescription}
@@ -297,6 +366,8 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Fra dato</Form.Label>
                                     <Form.Control
+                                        min={require('moment')().format('YYYY-MM-DD')}
+                                        max={this.state.tDate}
                                         value={this.state.fDate}
                                         onChange={this.handleFDate}
                                         type={"date"}
@@ -307,17 +378,20 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Fra klokkeslett</Form.Label>
                                     <Form.Control
+                                        max={this.state.maxTime}
                                         value={this.state.fTime}
                                         onChange={this.handleFTime}
                                         type={"time"}
 
                                     />
+                                    <span className="customStyle"/>
                                 </Form.Group>
 
 
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Til dato</Form.Label>
                                     <Form.Control
+                                        min={this.state.fDate}
                                         value={this.state.tDate}
                                         onChange={this.handleTDate}
                                         type={"date"}
@@ -328,11 +402,13 @@ export class AddEvent extends Component {
                                 <Form.Group as={Col} sm={"3"}>
                                     <Form.Label>Til klokkeslett</Form.Label>
                                     <Form.Control
+                                        min={this.state.minTime}
                                         value={this.state.tTime}
                                         onChange={this.handleTTime}
                                         type={"time"}
 
                                     />
+                                    <span className="customStyle"/>
                                 </Form.Group>
 
                                 <Form.Group as={Col} sm={"2"}>
@@ -436,7 +512,7 @@ export class AddEvent extends Component {
 
                                                         <Col>
                                                             <Form.Control
-                                                                placeholder="Rollen til personen"
+                                                                placeholder="Rollen til personen . . ."
                                                                 value={personnel.role}
                                                                 onChange={event => this.handlePersonnelRole(event, personnel)}
                                                             />
@@ -497,13 +573,98 @@ export class AddEvent extends Component {
                                     </ButtonToolbar>
                                 </Form.Group>
 
-                                <Form.Group as={Col} md={{span: 3, offset: 5}}>
-                                    <Button type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                                <Form.Row >
+
+                                <Form.Group as={Col} sm={"3"}>
+
+                                    <Form.Label>Billett-type</Form.Label>
+                                    <Form.Control
+                                        placeholder="Navn på billettype . . ."
+                                        value={this.state.ticketType}
+                                        onChange={this.handleTicketType}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Billettpris</Form.Label>
+                                    <InputGroup>
+
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="Billettpris . . ."
+                                            value={this.state.ticketPrice}
+                                            onChange={this.handleTicketPrice}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Form.Label>Antall billetter</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Antall billetter . . ."
+                                        value={this.state.ticketAmount}
+                                        onChange={this.handleTicketAmount}
+                                    />
+
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"3"}>
+                                    <Button onClick={this.handleTicket}>Legg til billett-typen</Button>
                                 </Form.Group>
 
                             </Form.Row>
-                        </Form>
-                    </Card>
+
+                            <ListGroup>
+                                {this.state.tickets.map( t =>
+                                <React.Fragment>
+                                    <ListGroupItem>
+                                        <Row>
+                                            <Col>
+                                            {"Billett-type: " + t.type}
+                                            </Col>
+                                            <Col>
+                                            {"Billettpris:  " + t.price}
+                                            </Col>
+                                            <Col>
+                                            {"Antall billetter: " + t.amount}
+                                            </Col>
+                                            <Col>
+                                                <Button type="button" variant={"danger"} onClick={() => {
+                                                    this.state.tickets.splice(this.state.tickets.indexOf(t), 1);
+                                                    this.setState({tickets: this.state.tickets});
+                                                }
+                                                }>Fjern</Button>
+                                            </Col>
+                                        </Row>
+                                    </ListGroupItem>
+                                </React.Fragment>
+                                )}
+                            </ListGroup>
+
+                            {(this.state.error) ?
+                                <Alert style={{
+                                    height: '9em',
+                                    top: '50%',
+                                    left: '50%',
+                                    position: 'fixed',
+                                    transform: 'translate(-50%, -50%)'
+                                }} variant={this.state.errorType}><Alert.Heading>Påkrevde felter må fylles
+                                    inn!</Alert.Heading><p>{this.state.error}</p></Alert> :
+                                <div style={{height: '3em'}}/>}
+
+                        </Form.Row>
+
+                        <Form.Row>
+                        <Form.Group as={Col} md={{span: 3, offset: 5}}>
+                            <Button  type="button" onClick={this.handleSubmit}>Opprett arrangementet</Button>
+                        </Form.Group>
+                        </Form.Row>
+
+                    </Form></Card>
                 </Container>
             </div>
         );

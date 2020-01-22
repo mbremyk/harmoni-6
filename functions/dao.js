@@ -633,10 +633,11 @@ class Dao {
     updateTickets(tickets) {
         return Promise.all(tickets.map(ticket => model.TicketModel.update(
             {
+                type: ticket.type,
                 price: ticket.price,
                 amount: ticket.amount
             },
-            {where: {eventId: ticket.eventId, type: ticket.type}})
+            {where: {eventId: ticket.eventId, type: ticket.oldType}})
             .catch(error => {
                 console.error(error);
                 return false
@@ -785,6 +786,25 @@ class Dao {
             .catch(error => {
                 console.error(error);
                 return false;
+            });
+    }
+
+    /**
+     * retrieves the gig assosciated with an event, NOT INCLUDING contract data and username/email of artist
+     *
+     * @param eventId
+     * @returns {Promise<Gig[]>}
+     */
+    getPublicGigs(eventId) {
+        return model.GigModel.findAll({
+            include: [
+                {model: model.UserModel, attributes: ['username', 'email']},
+            ],
+            where: {eventId: eventId}
+        })
+            .catch(error => {
+                console.error(error);
+                return [];
             });
     }
 

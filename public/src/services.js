@@ -137,6 +137,15 @@ export class Ticket {
     type;
     price;
     amount;
+    oldType;
+
+    constructor(eventId, type, price, amount){
+        this.eventId = eventId;
+        this.type = type;
+        this.price = price;
+        this.amount = amount;
+        this.oldType = type;
+    }
 }
 
 export class Personnel {
@@ -345,6 +354,14 @@ class Services {
      */
     getGigs(eventId) {
         return axios.get(url + '/auth/events/' + eventId + '/gigs', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
+    /**
+     * @param eventId: number
+     * @returns Promise<>: Gig[]
+     */
+    getPublicGigs(eventId) {
+        return axios.get(url + '/events/' + eventId + '/gigs', ).then(response => response.data);
     }
 
     /**

@@ -280,7 +280,7 @@ app.put('/forgotPass/:email', (req, res) => {
     let email = req.params.email;
     return db.forgotPassword(email)
         .then(success => success ? res.status(201) : res.status(400))
-        .catch(error => console.error(error));
+        .catch(error => { res.send(error);});
 });
 
 
@@ -716,6 +716,16 @@ app.delete("/auth/events/:eventId/gigs/:artistId", (req, res) => {
 app.get("/auth/events/:eventId/gigs", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+});
+
+/**
+ * For public events, where we dont want contracts
+ *
+ *  @return {json} {jwt: token, RiderItem[]}
+ */
+app.get("/events/:eventId/gigs", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    return db.getPublicGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
 /**
