@@ -291,7 +291,7 @@ export class EditEvent extends Component {
             this.setState({ticketAmount: 0});
             return;
         } else if (!this.state.ticketType.trim()) {
-            errmsg += "Vennligst skriv inn en billett-type"
+            errmsg += "Vennligst skriv inn en billett-type";
             this.setError(errmsg, 'danger');
             return;
         }
@@ -344,7 +344,7 @@ export class EditEvent extends Component {
             console.log('remove', this.state.deletedTickets);
             promises.push(this.state.deletedTickets.map(ticket => service.deleteTicket(ticket).catch(error => {
                 reject(error);
-                console.log(error)
+                console.log(error);
             })))
         }
 
@@ -353,7 +353,7 @@ export class EditEvent extends Component {
             console.log('update', this.state.updatedTickets);
             promises.push(service.updateTicket(this.state.updatedTickets).catch(error => {
                 reject(error);
-                console.log(error)
+                console.log(error);
             }))
         }
 
@@ -362,13 +362,13 @@ export class EditEvent extends Component {
             console.log('add', this.state.addedTickets);
             promises.push(service.addTickets(this.state.addedTickets).catch(error => {
                 reject(error);
-                console.log(error)
+                console.log(error);
             }))
         }
 
         Promise.all(promises).then(() => resolve(true)).catch(error => {
             reject(error);
-            console.log(error)
+            console.log(error);
         });
     });
 
@@ -409,9 +409,9 @@ export class EditEvent extends Component {
                 this.state.cancelled);
 
             service.updateEvent(ev).then(() => {
-                this.updateTickets().then(() => {
                     this.updatePersonnel().then(() => {
-                        this.props.history.push("/arrangement/" + this.state.eventId);
+                        this.updateTickets().then(() => {
+                            this.props.history.push("/arrangement/" + this.state.eventId);
                     })
                 });
             });

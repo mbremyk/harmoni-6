@@ -637,6 +637,7 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateTickets(tickets) {
+        console.log("changed? ", tickets);
         return Promise.all(tickets.map(ticket => model.TicketModel.update(
             {
                 type: ticket.type,
