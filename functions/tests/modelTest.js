@@ -3,7 +3,6 @@ const dao = require('../dao.js');
 
 let db = new dao();
 
-
 beforeEach(done => Models.syncTestData().then(() => done()));
 
 /*
@@ -90,14 +89,10 @@ describe('Users', () => {
             expect({
                 userId: user.userId,
                 username: user.username,
-                /*password: user.password,
-                salt: user.salt,*/
                 email: user.email,
             }).toEqual({
                     userId: 1,
                     username: 'Steffen T',
-                /*password: 'ST',
-                salt: 'salt',*/
                     email: 'steffen@mail.com'
                 }
             );
@@ -119,14 +114,10 @@ describe('Users', () => {
             expect({
                 userId: user.userId,
                 username: user.username,
-                /*password: user.password,
-                salt: user.salt,*/
                 email: user.email,
             }).toEqual({
                     userId: 1,
                     username: 'Steffen T',
-                /*password: 'ST',
-                salt: 'salt',*/
                     email: 'steffen@mail.com'
                 }
             );
