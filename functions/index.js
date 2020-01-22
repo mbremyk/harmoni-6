@@ -193,7 +193,7 @@ app.post("/login", async (req, res) => {
 
     console.log('login:' + ok1 + ' ' + ok2);
 
-    if(ok1) {
+    if (ok1) {
 
         return db.getUserByEmail(req.body.email).then(user => {
             console.log(user.dataValues);
@@ -201,7 +201,7 @@ app.post("/login", async (req, res) => {
             res.json({jwt: token});
         });
 
-    } else if(ok2) {
+    } else if (ok2) {
 
         let result = await db.deleteOneTimeLogin(req.body.email);
         return db.getUserByEmail(req.body.email).then(user => {
@@ -389,15 +389,15 @@ app.get("/auth/users/:userId", (req, res) => {
 
 app.post("/auth/events", (req, res) => {
     console.log("POST-request - /events");
-    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
-        filehandler.uploadToCloud(req.body.imageUrl, "img.png" )
+    if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
+        filehandler.uploadToCloud(req.body.imageUrl, "img.png")
             .then(url => {
                 console.log(url);
                 req.body.imageUrl = url;
                 console.log(req.body.imageUrl);
                 db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
             });
-    }else{
+    } else {
         db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
     }
 });
@@ -506,8 +506,9 @@ app.get("/auth/events/users/:userId/myevents", (req, res) => {
  */
 app.put('/auth/events/:eventId', (req, res) => {
     let userId = jwt.decode(req.headers['x-access-token']).userId;
-	if(req.body.organizerId !== userId) { res.status(401); console.log('Not authorized to update event'); return; }
-	return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+    if (req.body.organizerId == userId) return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(404).send(false));
+    res.sendStatus(401);
+    console.log('Not authorized to update event');
 });
 
 
@@ -602,7 +603,7 @@ app.put('/auth/events/:eventId/tickets', (req, res) => {
 app.delete('/auth/events/:eventId/tickets/:type', (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let type = decodeURIComponent(req.params.type);
-	return db.removeTicket(eventId, type).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+    return db.removeTicket(eventId, type).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
 });
 
 
@@ -635,8 +636,8 @@ app.post("/auth/events/:eventId/gigs", (req, res) => {
  *  @return {json} {jwt: token, RiderItem[]}
  */
 app.get("/auth/events/:eventId/gigs", (req, res) => {
-	let eventId = decodeURIComponent(req.params.eventId);
-	return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+    let eventId = decodeURIComponent(req.params.eventId);
+    return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
 /**
