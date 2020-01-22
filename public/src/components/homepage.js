@@ -9,17 +9,13 @@ import NavLink from "react-bootstrap/NavLink";
 
 const jwt = require("jsonwebtoken");
 
-
 export class HomePage extends Component {
     eventsUserOrganizes = [];
     eventsUserIsArtistOrPersonnel = [];
     allEvents = [];
 
-
-
     render() {
         if(!this.eventsUserOrganizes) return null;
-        console.log(this.eventsUserOrganizes)
         return (
             <div>
                 <HarmoniNavbar/>
