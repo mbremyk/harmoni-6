@@ -108,6 +108,7 @@ function getToken(user) {
  * put      /auth/users/:userId
  * get      /users/:userId                  ?auth?  ????
  * get      /auth/users/:userId
+ * post     /auth/users/temp
  *
  *                      EVENTS
  * post     /auth/events
@@ -375,33 +376,36 @@ app.get("/users/:userId", (req, res) => {
  * }
  */
 app.get("/auth/users/:userId", (req, res) => {
-    console.log("GET-request - /user/:userId");
+    console.log("GET-request - /users/:userId");
     return db.getUserById(req.params.userId)
         .then(user => res.send(user))
         .catch(error => console.error(error));
 });
 
+app.post("/auth/users/temp", (req, res) => {
+	console.log("GET-request - /auth/users/temp");
+	return db.createTempUser(req.body.email)
+		.then(result => res.status(201).send(result))
+		.catch(error => console.error(error));
+});
 
 /*
     EVENTS
  */
-
-
 app.post("/auth/events", (req, res) => {
-    console.log("POST-request - /events");
-    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
-        filehandler.uploadToCloud(req.body.imageUrl, "img.png" )
-            .then(url => {
-                console.log(url);
-                req.body.imageUrl = url;
-                console.log(req.body.imageUrl);
-                db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
-            });
-    }else{
-        db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
-    }
+	console.log("POST-request - /events");
+	if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
+		filehandler.uploadToCloud(req.body.imageUrl, "img.png")
+			.then(url => {
+				console.log(url);
+				req.body.imageUrl = url;
+				console.log(req.body.imageUrl);
+				db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
+			});
+	} else {
+		db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
+	}
 });
-
 
 /**
  * Get all events in database as an array + checks and deletes old entries
@@ -425,7 +429,6 @@ app.get("/events", (req, res) => {
 
     return db.getAllEvents().then(events => (events !== null) ? res.status(201).send(events) : res.sendStatus(400));
 });
-
 
 /**
  * Get all events where eventName or description contains searchText

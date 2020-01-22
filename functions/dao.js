@@ -1,4 +1,4 @@
-const {Op} = require('sequelize');
+const {Op, QueryTypes} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
@@ -53,6 +53,22 @@ class Dao {
             .catch(error => {
                 console.error(error);
                 return false;
+            });
+    }
+
+    createTempUser(email) {
+        return model.UserModel.create({email: email, username: ''})
+            .then(response => response.dataValues)
+            .then(user => {
+                return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
+                    .then(response => {
+                        user.username = 'guest' + user.userId;
+                        return user;
+                    })
+            })
+            .catch(error => {
+                console.error(error);
+                return null;
             });
     }
 
