@@ -206,7 +206,7 @@ let RiderModel = sequelize.define('riderItem', {
         type: Sequelize.BOOLEAN,
         default: null
     }
-}, {paranoid: true});
+});
 
 
 /*class Personnel {
@@ -235,7 +235,6 @@ let PersonnelModel = sequelize.define('personnel', {
     role: Sequelize.STRING
 }, {
     tableName: 'personnel',
-    paranoid: true
 });
 
 /*class Ticket {
@@ -255,7 +254,7 @@ let TicketModel = sequelize.define('ticket', {
     type: {type: Sequelize.STRING, primaryKey: true},
     price: Sequelize.INTEGER,
     amount: Sequelize.INTEGER
-}, {paranoid: true});
+});
 
 let BugModel = sequelize.define('bug', {
     bugId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
