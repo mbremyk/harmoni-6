@@ -7,6 +7,8 @@ import {authService} from "../AuthService";
 import {HarmoniNavbar} from "./navbar";
 import NavLink from "react-bootstrap/NavLink";
 import {MailForm} from "../widgets";
+import Card from "react-bootstrap/Card";
+import ListGroup from "react-bootstrap/ListGroup";
 
 const jwt = require("jsonwebtoken");
 
@@ -29,55 +31,65 @@ export class EventPage extends Component {
                 <div>
                     {this.RenderNavbar()}
                     <Container>
+                        <Card className='p-2'>
+                            <div style={{overflow: 'hidden', height: '620px'}}>
+                                <Image src={this.currentEvent.imageUrl}/>
+                            </div>
 
-                        <Image src={this.currentEvent.imageUrl} height="auto" width="100%"/>
+                            <div className="p-4">
+                            <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
 
-                        <Row>
-                            <Col>
-                                <h1>{this.currentEvent.eventName}</h1>
-                            </Col>
-                        </Row>
-                        <Row>
+                            <Row>
+                                <Col lg={8}>
+                                    {this.RenderArtist()}
 
-                            <Col>
-                                <Row>
-                                    <h6>Fra: {this.currentEvent.startTime}<br/>Til : {this.currentEvent.endTime}</h6>
-                                </Row>
-                            </Col>
+                                    <div className="ml-3">
+                                        {this.currentEvent.description}
+                                    </div>
 
-                            {this.RenderAgeLimit()}
-                            <Col>
-                                <h6>Adresse: {this.currentEvent.address}</h6>
-                            </Col>
-                            {this.RenderArtist()}
-                            <Col>
-                                <Row>
-                                    <Col><h6>Arrangør: {this.user.username}</h6></Col>
-                                    <Col><h6>Email: {this.user.email}</h6></Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <p>{this.currentEvent.description}</p>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
+                                <Col>
+                                    <ListGroup>
+                                        <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
+                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne kart</Button></ListGroup.Item>
+                                        <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
+                                    </ListGroup>
+                                </Col>
+                            </Row>
+
+                            <div className='mt-5'>
                                 {this.ShowArtist()}
                                 {this.ShowPersonnel()}
-                            </Col>
-                        </Row>
-                        {this.EditButton()}
-                        {this.emailForm()}
+                                {this.EditButton()}
+                                {this.isOrganizer? <MailForm/> : <div/>}
+                            </div>
+                            </div>
+                        </Card>
                     </Container>
                 </div>
-
-
             );
-
-
         }
+    }
+
+    formatTime(input) {
+        if(input == undefined){
+            return 'ø';
+        }
+
+        let arr = input.split(' ');
+        let date = arr[0];
+        let time = arr[1];
+
+        let dateArr = date.split('-');
+
+        let year = dateArr[0];
+        let month = dateArr[1];
+        let day = dateArr[2];
+
+        return day + '.' + month + '/' + year + ' klokka: '+ time;
     }
 
 //checks if the person viewing the event is the organizer
@@ -92,14 +104,10 @@ export class EventPage extends Component {
                 if (this.currentEvent.organizerId == token.userId) {
                     this.isOrganizer = true;
                 }
-
-
             })
             .catch((error) => console.log(error));
         this.getPersonnelForEvent();
         this.getArtistsForEvent();
-
-
     }
 
 //gets all the people working on that event and checks if the person viewing it is a part of the personnel
@@ -114,7 +122,7 @@ export class EventPage extends Component {
                         this.isPersonnel = true;
                     }
                 });
-                console.log("Er jeg personnel? " + this.isPersonnel)
+
             })
             .catch((error) => console.log(error));
 
@@ -128,11 +136,10 @@ export class EventPage extends Component {
                 this.artists = artists;
                 let token = jwt.decode(authService.getToken());
                 this.artists.map(person => {
-                    if (person.artistId == token.userId) {
+                    if (person.artistId === token.userId) {
                         this.isArtist = true;
                     }
                 });
-                console.log("Er jeg artist? " + this.isArtist);
 
             })
             .catch((error) => console.log(error));
@@ -150,18 +157,35 @@ export class EventPage extends Component {
         if (artistId === token.userId) {
             return (
                 <div>
-
-                    <Button variant="primary"
-                            size="sm"
-                            href={"/arrangement/" + this.currentEvent.eventId + "/legg-til-rider"}>
-                        Legg til Rider
+                    <Button
+                        className="m-2"
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
                     </Button>
                     <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
+
         } else if (this.isOrganizer) {
-            return <Col><DownloadWidget artist={artistId} event={this.currentEvent.eventId}/></Col>;
+            return (
+                <div>
+                    <Button
+                        className="m-2"
+
+                        variant="primary"
+                        size="sm"
+                        href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
+                        Vis Rider
+                    </Button>
+
+                    <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
+                </div>
+            );
+
         }
     }
+
 
 //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
@@ -188,7 +212,6 @@ export class EventPage extends Component {
         }
 
     }
-
 
 //returns a list over personnel and their contact info if there is any personnel on the event
     ShowPersonnel() {
@@ -224,11 +247,7 @@ export class EventPage extends Component {
         }else{
             return null;
         }
-
     }
-
-
-
 
     //the button will render if the user is an artist or an organizer
     DownloadContract() {
@@ -244,45 +263,6 @@ export class EventPage extends Component {
             </Row>
         }
     }
-
-    /*DownloadContract() {
-        if (!this.artists) {
-            return null;
-        } else {
-            if (this.isOrganizer) {
-                return (
-                    <div>
-                        {this.artists.map(artist => (
-                            <Row>
-                                <Col>
-                                    <DownloadWidget event={this.currentEvent.eventId} type={"kontrakt"}
-                                                    artist={this.artist}/>
-                                </Col>
-                            </Row>
-                        ))};
-                        <Col>
-                            <DownloadWidget event={this.currentEvent.eventId} type={"annent"} artist={this.artist}/>
-                        </Col>
-                    </div>
-                )
-            } else if (this.isArtist) {
-                return (
-                    <div>
-                        <Row>
-                            <Col>
-                                <DownloadWidget event={this.currentEvent.eventId} type={"kontract"}
-                                                artist={this.user.userId}/>
-                            </Col>
-                            <Col>
-                                <DownloadWidget event={this.currentEvent.eventId} type={"rider"}
-                                                artist={this.user.userId}/>
-                            </Col>
-                        </Row>
-                    </div>
-                )
-            }
-        }
-    }*/
 
     //only organizers get to edit the event so this button will only render when the user is the organizer
     EditButton() {
@@ -321,16 +301,22 @@ export class EventPage extends Component {
 
     RenderAgeLimit() {
         if (this.currentEvent.ageLimit !== 0) {
-            return <Col>
-                <h6>Aldersgrense {this.currentEvent.ageLimit}</h6>
-            </Col>
+            return <h6><b>Aldersgrense:</b> {this.currentEvent.ageLimit}</h6>
 
         } else {
-            return <Col>
-                <h6>Tillat for alle</h6>
-            </Col>
+            return <h6><b>Aldersgrense:</b> Tillat for alle</h6>
+
         }
+    }
 
-
+    addressClicked() {
+        let res = this.currentEvent.address.split(" ");
+        var url = "";
+        res.map(i => {
+            url += i + "-";
+        });
+        url = url.substring(0, url.length - 1);
+        url = url.replace(/[^\w\s-]/g,'');
+        window.open('https://www.google.com/maps/search/' + url);
     }
 }

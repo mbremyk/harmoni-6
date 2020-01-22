@@ -191,7 +191,6 @@ export class AddEvent extends Component {
 
     handlePersonnelRole(event, personnel) {
         personnel.role = event.target.value;
-        this.setState({personnelRole: event.target.value})
     }
 
     handleTicketType(event){
