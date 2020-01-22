@@ -774,6 +774,25 @@ class Dao {
             });
     }
 
+    /**
+     * retrieves the gig assosciated with an event, NOT INCLUDING contract data and username/email of artist
+     *
+     * @param eventId
+     * @returns {Promise<Gig[]>}
+     */
+    getPublicGigs(eventId) {
+        return model.GigModel.findAll({
+            include: [
+                {model: model.UserModel, attributes: ['username', 'email']},
+            ],
+            where: {eventId: eventId}
+        })
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+    }
+
     getContractId(eventId, artistId) {
         return model.GigModel.findOne({
             where: {eventId: eventId, artistId: artistId},
