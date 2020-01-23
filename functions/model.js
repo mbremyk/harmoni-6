@@ -28,6 +28,7 @@ function initCloud() {
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
         dialect: pr.dialect,
         host: pr.databaseURL,
+        logging: false,
         // port: pr.port,
         timestamps: false
         /*dialectOptions: {

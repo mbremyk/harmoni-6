@@ -304,9 +304,11 @@ app.post("/users", (req, res) => {
     console.log('POST-request - /user');
     return db.getUserByEmailOrUsername(req.body.email, req.body.username)
         .then(user => {
+            console.log(req.body);
             if (user.length !== 0) {
                 res.sendStatus(409);
             } else {
+                console.log(req.body);
                 return hashPassword.hashPassword(req.body.password).then(credentials => {
                     db.createUser({
                         username: req.body.username,
