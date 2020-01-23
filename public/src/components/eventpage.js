@@ -4,7 +4,6 @@ import {Button, Col, Container, Image, Row} from "react-bootstrap";
 import NavLink from "react-bootstrap/NavLink";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
-
 import {DownloadWidget} from '../widgets.js';
 import {Event, service, User} from '../services';
 import {authService} from "../AuthService";
@@ -32,7 +31,7 @@ export class EventPage extends Component {
                     {this.RenderNavbar()}
                     <Container>
                         <Card className='p-2'>
-                            <Image height='620px' src={this.currentEvent.imageUrl}/>
+                            {this.renderImage()}
 
                             <div className="p-4">
                                 <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
@@ -42,22 +41,31 @@ export class EventPage extends Component {
                                 <Row>
                                     <Col lg={8}>
 
-                                        <div className="ml-3"> {this.currentEvent.description}</div>
+                                    <div className="ml-3">
+                                        <div>
+                                            {this.currentEvent.description}
+                                        </div>
+                                        {this.renderPlaceDescription()}
 
-                                    </Col>
-                                    <Col>
-                                        <ListGroup variant="flush" className="">
-                                            <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}</h6></ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}</h6></ListGroup.Item>
-                                            <ListGroup.Item><h6><b>By:</b> {this.currentEvent.city}</h6></ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6></ListGroup.Item>
-	                                        <ListGroup.Item><Button type="button" onClick={this.addressClicked}>Åpne kart</Button></ListGroup.Item>
-	                                        <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Arrangør:</b> {this.user.username}</h6></ListGroup.Item>
-                                            <ListGroup.Item><h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
-                                        </ListGroup>
-                                    </Col>
-                                </Row>
+
+                                    </div>
+                                </Col>
+                                <Col>
+                                    <ListGroup variant="flush">
+                                        <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}
+                                        </h6></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}
+                                        </h6></ListGroup.Item>
+                                        <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6>
+                                            <h6><b>By:</b> {this.currentEvent.city}</h6>
+                                            <Button type="button" size="sm" onClick={this.addressClicked}>Åpne
+                                                kart</Button></ListGroup.Item>
+                                        <ListGroup.Item><h6><b>Kontakt Arrangør</b></h6><h6> {this.user.username}</h6>
+                                            <h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
+                                    </ListGroup>
+                                </Col>
+                            </Row>
 
                                 <div className='mt-5'>
                                     {this.ShowArtist()}
@@ -197,7 +205,7 @@ export class EventPage extends Component {
 
     //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
-        if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
+        if ((this.artists.length !== 0 && (this.isPersonnel || this.isArtist || this.isOrganizer))) {
             let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <div>
                 <Row className="mb-2">
@@ -316,7 +324,7 @@ export class EventPage extends Component {
     }
 
     addressClicked() {
-        let res = this.currentEvent.address.split(" ");
+        let res = (this.currentEvent.address + " " + this.currentEvent.city).split(" ");
         var url = "";
         res.map(i => {
             url += i + "-";
@@ -325,4 +333,27 @@ export class EventPage extends Component {
         url = url.replace(/[^\w\s-]/g,'');
         window.open('https://www.google.com/maps/search/' + url);
     }
+
+    renderImage() {
+        if (this.currentEvent.imageUrl !== "") {
+            return (
+                <Image height='620px' src={this.currentEvent.imageUrl}/>
+
+            );
+        }
+    }
+
+    renderPlaceDescription() {
+        if (this.currentEvent.placeDescription !== "") {
+            return (
+                <div className="mt-3">
+
+                    <h6>Veibeskrivelse: </h6> {this.currentEvent.placeDescription}
+                </div>
+
+            );
+        }
+    }
+
+
 }

@@ -234,7 +234,7 @@ app.post("/login", async (req, res) => {
 
 app.get("/validate/username/:username", (req, res) => {
     console.log("GET-request - /validate/username/:username");
-    return db.getUserByEmailOrUsername('', req.params.username).then(result => {
+    return db.getUserByUsername(req.params.username).then(result => {
         console.log(result);
         res.send(result.length === 1)
     })
@@ -372,7 +372,7 @@ app.put("/auth/users/:userId", (req, res) => {
  *
  */
 app.delete("/auth/users/:userId", (req, res) => {
-    console.log("GET-request - /auth/users/:userId");
+    console.log("DELETE-request - /auth/users/:userId");
     return db.deleteUser(req.params.userId).then(updateOk => updateOk ? res.sendStatus(200) : res.sendStatus(400))
 });
 
@@ -701,7 +701,7 @@ app.post("/auth/events/:eventId/gigs", (req, res) => {
             .then(file => {
                 req.body.contract.data = file.url;
                 req.body.contract.name = file.name;
-                console.log("Req body in gigs" + req.body);
+                console.log("File stored under: " + file.url);
                 db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(503));
             });
     } else {
@@ -737,17 +737,36 @@ app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
     //db.getContract(eventId, artistId).then(contract => (contract !== null) ? res.status(201).send(contract) : res.sendStatus(400));
-    db.getContract(eventId, artistId).then(contract => {
-        filehandler.downloadFromCloud(contract.name)
-            .then(dataString => {
-                contract.data = dataString;
-                res.status(201).send(contract);
-            })
-            .catch(err => {
-                console.log(err);
-                res.sendStatus(400);
-            })
-    });
+    db.getEventByEventId(eventId)
+        .then(event => {
+            db.getContract(eventId, artistId).then(contract => {
+                // Check if the user is a valid organizer or artist
+                if ((event.organizerId === jwt.decode(req.headers["x-access-token"]).userId) || (artistId === jwt.decode(req.headers["x-access-token"]).userId)) {
+                    filehandler.downloadFromCloud(contract.name)
+                        .then(dataString => {
+                            contract.data = dataString;
+                            res.status(201).send(contract);
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            res.sendStatus(400);
+                        })
+                } else {
+                    res.sendStatus(401);
+                }
+            });
+        })
+    /* db.getContract(eventId, artistId).then(contract => {
+         filehandler.downloadFromCloud(contract.name)
+             .then(dataString => {
+                 contract.data = dataString;
+                 res.status(201).send(contract);
+             })
+             .catch(err => {
+                 console.log(err);
+                 res.sendStatus(400);
+             })
+     });*/
 });
 
 
