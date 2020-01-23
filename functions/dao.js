@@ -1,4 +1,4 @@
-const {Op} = require('sequelize');
+const {Op, QueryTypes} = require('sequelize');
 const moment = require("moment");
 const hashPassword = require("./userhandling");
 const sequelize = require("sequelize");
@@ -54,6 +54,22 @@ class Dao {
             .catch(error => {
                 console.error(error);
                 return false;
+            });
+    }
+
+    createTempUser(email) {
+        return model.UserModel.create({email: email, username: ''})
+            .then(response => response.dataValues)
+            .then(user => {
+                return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
+                    .then(response => {
+                        user.username = 'guest' + user.userId;
+                        return user;
+                    })
+            })
+            .catch(error => {
+                console.error(error);
+                return null;
             });
     }
 
@@ -319,7 +335,6 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
-        console.log("Updating...");
         return model.EventModel.update(
             {
                 organizerId: event.organizerId,
@@ -336,10 +351,7 @@ class Dao {
                 cancelled: event.cancelled,
             },
             {where: {eventId: event.eventId}})
-            .then(response => {
-                console.log("finished");
-                return response[0] === 1 /*affected rows === 1*/
-            })
+            .then(response => response[0] === 1 /*affected rows === 1*/)
             .catch(error => {
                 console.error(error);
                 return false;
@@ -368,7 +380,6 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     deleteEvent(eventId) {
-        console.log("Deleteevent called");
 
         if (!isCI && !test) {
             return this.getEventByEventId(eventId)
@@ -664,10 +675,11 @@ class Dao {
     updateTickets(tickets) {
         return Promise.all(tickets.map(ticket => model.TicketModel.update(
             {
+                type: ticket.type,
                 price: ticket.price,
                 amount: ticket.amount
             },
-            {where: {eventId: ticket.eventId, type: ticket.type}})
+            {where: {eventId: ticket.eventId, type: ticket.oldType}})
             .catch(error => {
                 console.error(error);
                 return false
@@ -811,6 +823,25 @@ class Dao {
             });
 
     }*/
+
+    /**
+     * deletes a Gig and the assosciated contract/file from the database
+     *
+     * @param eventId
+     * @param artistId
+     * @returns {Promise<boolean>}
+     */
+    deleteGig(eventId, artistId) {
+        return this.getContractId(eventId, artistId).then(contractId => {
+            model.FileModel.destroy({where: {fileId: contractId}}).then(() => {
+                return model.GigModel.destroy({where: {eventId: eventId, artistId: artistId}}).then(() => true)
+            })
+        })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
 
     /**
      * retrieves the gig assosciated with an event, NOT INCLUDING contract data and username/email of artist
