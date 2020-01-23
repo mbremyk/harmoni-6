@@ -58,7 +58,6 @@ export class LoginForm extends Component {
             this.setState({loading: false});
 	        this.setError('Innlogging feilet', 'danger');
         }
-        this.setError('Innlogging feilet', 'danger');
         this.setState({loading: false});
     }
 
