@@ -13,6 +13,7 @@ import {Card} from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {ModalPopup} from "../widgets";
+import Spinner from "react-bootstrap/Spinner";
 
 /*
 * My page container for "/min-side". Ability to change name, email and password for a logged in user.
@@ -30,11 +31,13 @@ export class myPage extends Component {
             oldEmail: '',
             error: '',
             errorType: 'success',
+            loading: false,
         }
     }
 
     setError(message, variant) {
         this.setState({error: message, errorType: variant});
+        if(!message) {return;}
         setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
@@ -87,6 +90,16 @@ export class myPage extends Component {
                                     variant="primary"
                                     type="button"
                                     onClick={this.save}>
+
+                                    {this.state.loading?
+                                        <Spinner
+                                            className="mr-2"
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"/> : <div/>}
+
                                     Lagre
                                 </Button>
                                 <Button
@@ -132,19 +145,24 @@ export class myPage extends Component {
     }
 
     async save() {
+        this.setError('', 'primary');
+        this.setState({loading: true});
 
         if (!this.state.email || !this.state.username) {
+            this.setState({loading: false});
             this.setError('Alle felter må fylles', 'danger');
             return;
         }
 
         if (this.state.password1 !== this.state.password2) {
+            this.setState({loading: false});
             this.setError('Passordene må være like', 'danger');
             return;
         }
 
         if (!!this.state.password1) {
             if (this.state.password1.length < 5) {
+                this.setState({loading: false});
                 this.setError('Passord må inneholde minst 5 tegn', 'danger');
                 return;
             }
@@ -154,6 +172,7 @@ export class myPage extends Component {
             let taken1 = await service.validateEmail(this.state.email);
 
             if (taken1) {
+                this.setState({loading: false});
                 this.setError('Epost ikke tilgjengelig', 'danger');
                 return;
             }
@@ -163,6 +182,7 @@ export class myPage extends Component {
             let taken2 = await service.validateUsername(this.state.username);
 
             if (taken2) {
+                this.setState({loading: false});
                 this.setError('Brukernavn ikke tilgjengelig', 'danger');
                 return;
             }
@@ -179,11 +199,14 @@ export class myPage extends Component {
             this.setError('Bruker oppdatert!', 'success');
             this.setState({password1: '', password2: ''});
             this.setState({oldUsername: user.username, oldEmail: user.email});
+            this.setState({loading: false});
         }).catch(err => {
             console.log(err);
             this.setError('Kunne ikke oppdatere bruker', 'danger');
             this.setState({username: this.state.oldUsername, email: this.state.oldEmail});
+            this.setState({loading: false});
         });
+        this.setState({loading: false});
     }
 
     handleUsernameChange(event) {
@@ -218,10 +241,5 @@ export class myPage extends Component {
         }else{
             this.setError("Feil passord!", "danger")
         }
-
-
-
-
     }
-
 }

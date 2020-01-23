@@ -223,9 +223,7 @@ export class EventPage extends Component {
                     </Row>
                 ))}
             </div>
-
         }
-
     }
 
     //returns a list over personnel and their contact info if there is any personnel on the event
