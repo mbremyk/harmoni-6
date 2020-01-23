@@ -174,7 +174,7 @@ export default function EditEvent() {
                                             <FormControl
                                                 type="input"
                                                 value={ageLimit}
-                                                onChange={event => setAgeLimit(event.target.value >= 0 ? event.target.value : (event.target.value * -1))}
+                                                onChange={event => setAgeLimit(event.target.value >= 0 ? (1 * event.target.value) : ((-1) * event.target.value) >= 0 ? ((-1) * event.target.value) : 0)}
                                                 aria-label="btn-age"
                                                 aria-describedby="btnGroupAddon"/>
                                             <InputGroup.Append>
@@ -186,6 +186,7 @@ export default function EditEvent() {
                             </Row>
                             <Row>
                                 <label>Forsidebilde:</label>
+
                                 {renderImagePreview()}
 
                                 <Form.Group as={Col} sm={"4"}>
