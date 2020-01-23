@@ -558,7 +558,9 @@ app.put('/auth/events/:eventId', (req, res) => {
         db.getEventByEventId(req.params.eventId)
             .then(item => {
                     console.log("deleting old");
-                    filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                    if (item.imageUrl) {
+                        filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true)
+                    }
                     console.log("uploading  new");
                     return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
                         .then(data => {
