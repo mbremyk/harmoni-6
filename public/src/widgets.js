@@ -144,11 +144,14 @@ export class DownloadWidget extends Component {
                 link.href = response.data;
                 link.click();
             })
+            .catch(err => {
+                alert(err.toString());
+            })
     };
 }
 
 export class UploadWidget extends Component {
-    //TODO: Make sexy
+
     render() {
         return (
             <div className="container">

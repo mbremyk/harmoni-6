@@ -28,11 +28,12 @@ function initCloud() {
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
         dialect: pr.dialect,
         host: pr.databaseURL,
+        logging: false,
         // port: pr.port,
-        timestamps: false,
-        dialectOptions: {
+        timestamps: false
+        /*dialectOptions: {
             socketPath: '/cloudsql/kkdatabase'
-        },
+        },*/
     });
     return sequelize;
 }
@@ -63,7 +64,7 @@ let UserModel = sequelize.define('user', {
     password: Sequelize.STRING.BINARY,
     tempPassword: Sequelize.STRING.BINARY,
     salt: Sequelize.STRING.BINARY,
-    email: {type: Sequelize.STRING, unique: true, allowNull: false}
+    email: {type: Sequelize.STRING, unique: true, allowNull: true}
 }, {
     timestamps: true,
     paranoid: true
