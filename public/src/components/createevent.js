@@ -323,8 +323,9 @@ export default function EditEvent() {
 
                                         <Form.Group as={Col} sm={"3"}>
 
-                                            <Button onClick={handleTicketsAdd} variant={"success"}>Legg til
-                                                bilett</Button>
+                                            <Button onClick={handleTicketsAdd} variant={"success"} type={'reset'}>Legg
+                                                til
+                                                billett</Button>
                                         </Form.Group>
                                     </Form.Row>
                                 </ListGroup.Item>
