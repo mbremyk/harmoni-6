@@ -37,8 +37,8 @@ function initCloud() {
     return sequelize;
 }
 
-//let sequelize = init();
-let sequelize = initCloud();
+let sequelize = init();
+//let sequelize = initCloud();
 
 
 sequelize.authenticate()
