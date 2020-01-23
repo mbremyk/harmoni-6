@@ -17,7 +17,7 @@ import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Alert from "react-bootstrap/Alert";
 import moment from "moment";
-import {CustomMenu, dateInput, inputField, textField, timeInput} from "./editandcreatefunctions";
+import {CustomMenu, minDateInput, maxDateInput, inputField, textField, timeInput} from "./editandcreatefunctions";
 import {authService} from '../AuthService';
 
 const jwt = require("jsonwebtoken");
@@ -158,9 +158,9 @@ export default function EditEvent() {
                                 {inputField("8", "Adresse", "Adresse der arrangementet skal holdes", eventAddress, setEventAddress)}
                                 {textField("12", "Informasjon om stedet", "For eksempel 3. etajse", placeDescription, setPlaceDescription)}
                                 {textField("12", "Beskrivelse av arrangement", "...", eventDescription, setEventDescription)}
-                                {dateInput("4", "Fra:  dd/mm/yyyy", fDate, setFDate)}
+                                {minDateInput("4", "Fra:  dd/mm/yyyy", fDate, require('moment')().format('HH:mm'), tDate, setFDate)}
                                 {timeInput("2", "HH:mm", fTime, setFTime)}
-                                {dateInput("4", "Til:  dd/mm/yyyy", tDate, setTDate)}
+                                {maxDateInput("4", "Til:  dd/mm/yyyy", tDate, fDate, setTDate)}
                                 {timeInput("2", "HH:mm", tTime, setTTime)}
 
                                 <Form.Group as={Col} sm={"12"}>
@@ -174,7 +174,7 @@ export default function EditEvent() {
                                             <FormControl
                                                 type="input"
                                                 value={ageLimit}
-                                                onChange={event => setAgeLimit(event.target.value >= 0 ? event.target.value : (event.target.value * -1))}
+                                                onChange={event => setAgeLimit(event.target.value >= 0 ? (1 * event.target.value) : ((-1) * event.target.value) >= 0 ? ((-1) * event.target.value) : 0)}
                                                 aria-label="btn-age"
                                                 aria-describedby="btnGroupAddon"/>
                                             <InputGroup.Append>
@@ -186,6 +186,7 @@ export default function EditEvent() {
                             </Row>
                             <Row>
                                 <label>Forsidebilde:</label>
+
                                 {renderImagePreview()}
 
                                 <Form.Group as={Col} sm={"4"}>

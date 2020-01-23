@@ -30,11 +30,26 @@ export function textField(size, name, placeholder, value, setter) {
         </Form.Group>);
 }
 
-export function dateInput(size, name, value, setter) {
+export function minDateInput(size, name, value, minDate, maxDate, setter) {
     return (
         <Form.Group as={Col} sm={size}>
             <Form.Label>{name}</Form.Label>
             <Form.Control
+                max={maxDate}
+                min={minDate}
+                value={value}
+                onChange={event => setter(event.target.value)}
+                type={"date"}
+            />
+        </Form.Group>);
+}
+
+export function maxDateInput(size, name, value, minDate, setter) {
+    return (
+        <Form.Group as={Col} sm={size}>
+            <Form.Label>{name}</Form.Label>
+            <Form.Control
+                min={minDate}
                 value={value}
                 onChange={event => setter(event.target.value)}
                 type={"date"}
