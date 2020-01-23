@@ -126,14 +126,22 @@ class Dao {
         return (model.UserModel.update(
             {
                 username: 'this user no longer exists',
-                email: '',
+                email: null,
                 password: null,
                 salt: null,
 
             },
             {where: {userId: userId}}))
             .then(() => {
-                return model.UserModel.destroy({where: {userId: userId}})
+                return this.getEventsByOrganizerId(userId)
+                    .then(events => {
+                        console.log("Trying to settle");
+                        return Promise.all(
+                            events.map(event => {
+                                this.cancelEvent(event.eventId);
+                            }))
+                    });
+                // return model.UserModel.destroy({where: {userId: userId}})
             })
             .catch(error => {
                 console.error(error);
@@ -257,6 +265,24 @@ class Dao {
                 console.error(error);
                 return {};
             });
+    }
+
+    getUserByUsername(username) {
+        return model.UserModel.findAll({where: {username: username}})
+            .then(users => users)
+            .error(error => {
+                console.error(error);
+                return {};
+            });
+        //email = "Why was this empty?";
+        /*let where = {[op.or]: [{email: email}, {username: username}]};
+        console.log(username);
+        return model.UserModel.findAll({where: where, attributes: ['userId', 'username', 'email']})
+            .then(users => users)
+            .error(error => {
+                console.error(error);
+                return {};
+            });*/
     }
 
     getUserByEmailOrUsername(email, username) {
@@ -786,6 +812,18 @@ class Dao {
             });
     }
 
+    /*deleteGig(gigId) {
+        console.log("Delete gig called");
+        return model.GigModel.findByPk(gigId)
+            .then(gig => {
+                model.FileModel.findByPk(gig.contract)
+                    .then(result => {
+                        filehandler.deleteFromCloud(result.name, false);
+                    })
+            });
+
+    }*/
+
     /**
      * deletes a Gig and the assosciated contract/file from the database
      *
@@ -916,7 +954,7 @@ class Dao {
     }
 }
 
-
+//model.dropTables();
 //model.syncTestData();
 //model.syncModels();
 module.exports = Dao;

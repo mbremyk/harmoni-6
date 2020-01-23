@@ -170,13 +170,13 @@ export default function EditEvent() {
     return (
         <div>
             <HarmoniNavbar/>
-            <Container>
+            <Container className={"c-lg"}>
                 <Card className={"p-5"}>
                     <Form>
                         <Form.Row>
 
                             <Form.Group as={Col} sm={"12"}>
-                                <h1 className="font-weight-bold text-center">Endre arrangement</h1>
+                                <h1 className="display-sm-3">Endre arrangement</h1>
                             </Form.Group>
                             <Row>
 
