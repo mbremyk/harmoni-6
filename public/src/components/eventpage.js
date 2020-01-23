@@ -340,7 +340,7 @@ export class EventPage extends Component {
     renderImage() {
         if (this.currentEvent.imageUrl !== "") {
             return (
-                <Image height='620px' src={this.currentEvent.imageUrl}/>
+                <Image style={{height: 'auto', width: '100%'}} src={this.currentEvent.imageUrl}/>
 
             );
         }
@@ -357,6 +357,4 @@ export class EventPage extends Component {
             );
         }
     }
-
-
 }
