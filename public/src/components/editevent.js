@@ -100,7 +100,7 @@ export default function EditEvent() {
             service.getUsers().then(users => setUsers(users)).catch((err) => console.error(err));
             service.getPersonnel(event.eventId).then(p => handlePersonnelFromDatabase(p)).catch((err) => console.error(err));
             service.getTicketToEvent(event.eventId).then(t => handleTicketsFromDB(t)).catch(err => console.error(err));
-            service.getGigs(event.eventId).then(g => handleGigsFromDatabase(g)).catch((err) => console.log(err));
+            service.getGigs(event.eventId).then(g => handleGigsFromDatabase(g)).catch((err) => console.error(err));
 
         }).catch(err => console.error(err));
     }, []);
@@ -613,15 +613,12 @@ export default function EditEvent() {
         return new Promise((resolve, reject) => {
             let promises = [];
             if (Array.isArray(gigsRemove) && gigsRemove.length > 0) {
-                console.log('remove GIGs', gigsRemove);
                 promises.push(gigsRemove.map(gig => service.deleteGig(gig).catch(error => reject(error))));
             }
             if (Array.isArray(gigsNew) && gigsNew.length > 0) {
-                console.log('add GIGs', gigsNew);
                 promises.push(gigsNew.map(gig => service.addGig(gig).catch(error => reject(error))));
             }
             if ((Array.isArray(gigsNewByEmail) && gigsNewByEmail.length)) {
-                console.log('add GIGS by Email', gigsNewByEmail);
                 promises.push(sendGigsByEmail());
             }
 
@@ -641,7 +638,6 @@ export default function EditEvent() {
                 } else {
                     u = new User(null, "", gig.user.email);
                     return service.createTempUser(u).then(createdUser => {
-                        console.log(createdUser);
                         return service.addGig(new Gig(eventId, createdUser.userId, gig.contract))
                             .catch(error => reject(error))
                     }).catch(error => reject(error))
@@ -730,19 +726,16 @@ export default function EditEvent() {
 
             //if user has chosen to remove personnel, then remove them from the database
             if (Array.isArray(personnelRemove) && personnelRemove.length > 0) {
-                console.log('remove', personnelRemove);
                 promises.push(personnelRemove.map(personnel => service.deletePersonnel(eventId, personnel.personnelId).catch(error => reject(error))))
             }
 
             //if there are any old personnel left, update their role in the database
             if (Array.isArray(personnelUpdate) && personnelUpdate.length > 0) {
-                console.log('update', personnelUpdate);
                 promises.push(service.updatePersonnel(personnelUpdate).catch(error => reject(error)))
             }
 
             //if there are new personnel added, then add them to database
             if (Array.isArray(personnelAdd) && personnelAdd.length > 0) {
-                console.log('add', personnelAdd);
                 promises.push(service.addPersonnel(personnelAdd).catch(error => reject(error)))
             }
 
@@ -835,20 +828,17 @@ export default function EditEvent() {
 
             //If user has chosen to remove tickets, remove them from the database
             if (Array.isArray(deletedTickets) && deletedTickets.length > 0) {
-                console.log('remove', deletedTickets);
                 promises.push(deletedTickets.map(ticket => service.deleteTicket(ticket).catch(error => reject(error))));
             }
 
             //If user has chosen to edit ticket information, update in database
             if (Array.isArray(updatedTickets) && updatedTickets.length > 0) {
-                console.log('update', updatedTickets);
                 promises.push(service.updateTicket(updatedTickets).catch(error => reject(error)))
 
             }
 
             //If user has chosen to add tickets, post in database
             if (Array.isArray(addedTickets) && addedTickets.length > 0) {
-                console.log('add', addedTickets);
                 promises.push(service.addTickets(addedTickets).catch(error => reject(error)))
             }
 

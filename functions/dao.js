@@ -150,7 +150,6 @@ class Dao {
             .then(() => {
                 return this.getEventsByOrganizerId(userId)
                     .then(events => {
-                        console.log("Trying to settle");
                         return Promise.all(
                             events.map(event => {
                                 this.cancelEvent(event.eventId);
@@ -167,15 +166,12 @@ class Dao {
     async forgotPassword(email) {
         let result = await this.getUserByEmail(email);
         if (result === null) {
-            console.log('No email found for temp pass.');
             return;
         }
 
         let newPass = Math.random().toString(36).substring(7);
         let salt = await this.getSaltByEmail(email);
         let credentials = await hashPassword.hashPassword(newPass, salt[0].dataValues.salt);
-
-        console.log('!!! nytt passord: \'' + newPass + '\' for ' + email);
 
         return model.UserModel.update(
             {
@@ -289,15 +285,6 @@ class Dao {
                 console.error(error);
                 return {};
             });
-        //email = "Why was this empty?";
-        /*let where = {[op.or]: [{email: email}, {username: username}]};
-        console.log(username);
-        return model.UserModel.findAll({where: where, attributes: ['userId', 'username', 'email']})
-            .then(users => users)
-            .error(error => {
-                console.error(error);
-                return {};
-            });*/
     }
 
     getUserByEmailOrUsername(email, username) {
@@ -350,7 +337,6 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
-        console.log("Updating...");
         return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
             .then(e => e ? e.dataValues.cancelled : null)
             .then(e => {
@@ -373,7 +359,6 @@ class Dao {
                         },
                         {where: {eventId: event.eventId}})
                         .then(response => {
-                            console.log("finished");
                             if (e !== event.cancelled && !e && !isCI && !test) {
                                 return this.getGigs(event.eventId)
                                     .then(gigs => gigs.map(gig => gig.dataValues.artistId))
@@ -860,7 +845,6 @@ class Dao {
     }
 
     deleteGigs(eventId) {
-        console.log("Delete gigs called");
         return model.GigModel.findAll({
             where: {eventId: eventId}
         })
@@ -876,18 +860,6 @@ class Dao {
             });
     }
 
-    /*deleteGig(gigId) {
-        console.log("Delete gig called");
-        return model.GigModel.findByPk(gigId)
-            .then(gig => {
-                model.FileModel.findByPk(gig.contract)
-                    .then(result => {
-                        filehandler.deleteFromCloud(result.name, false);
-                    })
-            });
-
-    }*/
-
     /**
      * deletes a Gig and the assosciated contract/file from the database
      *
@@ -897,7 +869,6 @@ class Dao {
      */
     deleteGig(eventId, artistId) {
         return this.getContractId(eventId, artistId).then(contractId => {
-            console.log(contractId);
             return model.FileModel.findByPk(contractId.dataValues.contract)
                 .then(contract => {
                     filehandler.deleteFromCloud(contract.name, false);
@@ -1027,6 +998,24 @@ class Dao {
                 }
             });
     }
+
+    /**
+     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
+     *
+     * @param eventId
+     * @param artistId
+     * @param item
+     * @returns {Promise<boolean>}
+     */
+    deleteRiderItem(eventId, artistId, item) {
+        return model.RiderModel.destroy({where: {eventId: eventId, artistId: artistId, item: item}})
+            .then(() => true)
+            .catch(error => {
+                console.error(error);
+                return false;
+            })
+    }
+
 
     /**
      * retrieves the rideritems assosciated with a gig
