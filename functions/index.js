@@ -167,7 +167,6 @@ app.use("/auth", (req, res, next) => {
             res.json({error: "Not authorized"});
         } else {
             console.log("Token OK");
-            console.log(decoded);
             res.json.jwt = getToken({
                 userId: decoded.userId,
                 username: decoded.username,
@@ -211,7 +210,6 @@ app.post("/login", async (req, res) => {
     if (ok1) {
 
         return db.getUserByEmail(req.body.email).then(user => {
-            console.log(user.dataValues);
             let token = getToken(user.dataValues);
             res.json({jwt: token});
         });
@@ -220,7 +218,6 @@ app.post("/login", async (req, res) => {
 
         let result = await db.deleteOneTimeLogin(req.body.email);
         return db.getUserByEmail(req.body.email).then(user => {
-            console.log(user.dataValues);
             let token = getToken(user.dataValues);
             res.json({jwt: token});
         });
@@ -235,7 +232,6 @@ app.post("/login", async (req, res) => {
 app.get("/validate/username/:username", (req, res) => {
     console.log("GET-request - /validate/username/:username");
     return db.getUserByUsername(req.params.username).then(result => {
-        console.log(result);
         res.send(result.length === 1)
     })
 });
@@ -243,10 +239,11 @@ app.get("/validate/username/:username", (req, res) => {
 
 app.get("/validate/email/:email", (req, res) => {
     console.log("GET-request - /validate/email/:email");
-    return db.getUserByEmail(req.params.email).then(result => {
-        console.log(result);
-        res.send(result !== null)
-    })
+    return db.getUserByEmail(req.params.email)
+        .then(user => {
+            user !== null ? db.getSaltByEmail(user.email)
+                .then(salt => res.send(salt[0].dataValues.salt !== null)) : res.send(false)
+        })
 });
 
 
@@ -320,10 +317,15 @@ app.post("/users", (req, res) => {
         .then(users => users.map(user => user.dataValues))
         .then(async users => {
             if (users.length !== 0) {
+                console.log(users);
                 users = await users.filter(async user => {
                     await db.getSaltByEmail(user.email)
-                        .then(salt => salt[0].dataValues.salt == null);
+                        .then(salt => {
+                            console.log(salt);
+                            return salt[0].dataValues.salt == null;
+                        });
                 });
+                console.log(users);
                 if (users.length === 1 && users[0].email === req.body.email) {
                     await db.updateUser({
                         userId: users[0].userId,
@@ -555,13 +557,13 @@ app.put('/auth/events/:eventId', (req, res) => {
     if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
         db.getEventByEventId(req.params.eventId)
             .then(item => {
-                console.log("deleting old");
-                filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
-                console.log("uploading  new");
-                return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
-                    .then(data => {
-                        console.log(data.url);
-                        req.body.imageUrl = data.url;
+                    console.log("deleting old");
+                    filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                    console.log("uploading  new");
+                    return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
+                        .then(data => {
+                            console.log(data.url);
+                            req.body.imageUrl = data.url;
                             return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false))
                         })
                         .catch(err => res.status(400));

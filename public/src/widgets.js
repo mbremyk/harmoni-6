@@ -282,6 +282,10 @@ export class MailForm extends Component {
         this.setState({description: e.target.value});
     }
 
+    handleEmailChange = (e) => {
+        this.setState({email: e.target.value});
+    }
+
     render() {
         if (this.state.toggleable) {
             return (
@@ -293,7 +297,8 @@ export class MailForm extends Component {
                                         block>
                                     Send epost {this.state.arrow}
                                 </Button>
-                                {(this.state.toggle) ? this.toggleForm(this.state.toggle) : <div style={{height: "3em"}}/>}
+                                {(this.state.toggle) ? this.toggleForm(this.state.toggle) :
+                                    <div style={{height: "3em"}}/>}
                             </div>
                         </Card>
                     </div>
@@ -314,13 +319,13 @@ export class MailForm extends Component {
         }
     }
 
-    toggleMail(){
-        if(this.state.toggle){
+    toggleMail() {
+        if (this.state.toggle) {
             //this.state.toggle = false;
-            this.setState({toggle: false });
+            this.setState({toggle: false});
             this.setState({arrow: "▼"});
             //this.state.arrow = "▼";
-        }else{
+        } else {
             //this.state.toggle = true;
             this.setState({toggle: true});
 
@@ -328,7 +333,7 @@ export class MailForm extends Component {
         }
     }
 
-    toggleForm(on){
+    toggleForm(on) {
         if (on && this.state.hasRecipients) {
             return (
                 <Form>
@@ -365,11 +370,15 @@ export class MailForm extends Component {
                 {(this.state.error) ?
                     <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
                     <div style={{height: '3em'}}/>}
+                <Form.Label>Mail-adresse</Form.Label>
+                <Form.Control required as="textarea" value={this.state.email} onChange={this.handleEmailChange}
+                              placeholder={"email"} rows="1" style={{display: 'flex'}}/>
                 <Form.Label>Tittel:</Form.Label>
-                <Form.Control as="textarea" value={this.state.description} onChange={this.handleDescriptionChange}
+                <Form.Control required as="textarea" value={this.state.description}
+                              onChange={this.handleDescriptionChange}
                               placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
                 <Form.Label>Innhold:</Form.Label>
-                <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
+                <Form.Control required as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
                               style={{display: 'flex'}}/>
                 <Button
                     className={"btn-primary mt-2 mr-2"}
@@ -379,7 +388,7 @@ export class MailForm extends Component {
                 <Button
                     className={"btn-secondary mt-2"}
                     onClick={() => {
-                        let path = authService.loggedIn()? '/hjem' : '/';
+                        let path = authService.loggedIn() ? '/hjem' : '/';
                         window.location = path;
                     }}>
                     Avbryt
@@ -405,7 +414,7 @@ export class MailForm extends Component {
         let user = this.getUser();
         if (bug) {
             if (!user) {
-                let userMail = "anon@UwU.com";
+                let userMail = this.state.email;
                 let mail = new BugMail(userMail, "anonymous", this.state.description, this.state.text);
                 service.sendBug(mail)
                     .then(res => (this.setAlert(res.toString(), "info")))
