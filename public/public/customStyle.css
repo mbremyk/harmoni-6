@@ -138,4 +138,9 @@ input:valid + span:after {
         width: 95%;
     }
 
+    .HarmoniLogo{
+        font-size: 5em;
+
+    }
+
 }
