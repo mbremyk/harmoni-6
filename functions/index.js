@@ -188,6 +188,11 @@ app.post("/login", async (req, res) => {
     console.log("POST-request - /login");
 
     let salt = await db.getSaltByEmail(req.body.email);
+    if(salt.length === 0)
+    {
+        res.sendStatus(401);
+        return;
+    }
     let credentials = await hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt);
 
     let ok1 = await db.loginOk(req.body.email, credentials[0]);

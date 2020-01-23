@@ -7,6 +7,7 @@ import {service, User} from "../services";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import {Card} from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
 
 export class CreateUserForm extends Component {
 	constructor(props) {
@@ -20,6 +21,7 @@ export class CreateUserForm extends Component {
 			hash: '',
             error: '',
             errorType: 'success',
+			loading: false,
 		};
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.handleUsernameChange = this.handleUsernameChange.bind(this);
@@ -45,27 +47,33 @@ export class CreateUserForm extends Component {
 
     setError(message, variant) {
         this.setState({error: message, errorType: variant});
+	    if(!message) {return;}
         setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
 
 	handleSubmit() {
 		console.log('handle Submit user');
+		this.setError('', 'primary');
+		this.setState({loading: true});
 
 		// check empty fields
         if (!this.state.username || !this.state.email) {
+	        this.setState({loading: false});
             this.setError('Alle felter må fylles', 'danger');
 			return;
 		}
 
 		// check password mismatch
         if (this.state.password1 !== this.state.password2) {
+	        this.setState({loading: false});
             this.setError('Passordene må være like', 'danger');
             return;
         }
 
         // check password strength
         if (this.state.password1.length < 5) {
+	        this.setState({loading: false});
             this.setError('Passord må inneholde minst 5 tegn', 'danger');
 			return;
 		}
@@ -79,6 +87,7 @@ export class CreateUserForm extends Component {
 		service.validateUsername(user.username).then(taken1 => {
 			console.log('Check username, taken: ' + taken1);
             if (taken1) {
+	            this.setState({loading: false});
                 this.setError('Brukernavn ikke tilgjengelig', 'danger');
             } else {
 
@@ -86,17 +95,22 @@ export class CreateUserForm extends Component {
 				service.validateEmail(user.email).then(taken2 => {
 					console.log('Check email, taken: ' + taken2);
                     if (taken2) {
+	                    this.setState({loading: false});
                         this.setError('Epost ikke tilgjengelig', 'danger');
                     } else {
 
 						service.createUser(user)
 							.then(res => console.log('Submit user status: ' + res))
 							.then(this.props.history.push("/logg-inn"))
-                            .catch(err => this.setError('Bruker ikke opprettet', 'danger'));
+                            .catch(err => {
+	                            this.setState({loading: false});
+                            	this.setError('Bruker ikke opprettet', 'danger')
+                            })
 					}
 				})
 			}
 		});
+		this.setState({loading: false});
 	}
 
 	render() {
@@ -157,6 +171,16 @@ export class CreateUserForm extends Component {
 								onClick={this.handleSubmit}
 								variant="primary"
 								type="button">
+
+	                            {this.state.loading?
+		                            <Spinner
+			                            className="mr-2"
+			                            as="span"
+			                            animation="border"
+			                            size="sm"
+			                            role="status"
+			                            aria-hidden="true"/> : <div/>}
+
 								Opprett bruker
 							</Button>
 
