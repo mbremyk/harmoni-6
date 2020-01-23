@@ -197,7 +197,7 @@ export class EventPage extends Component {
 
     //returns a list over artist and their contact info if there is any artist on the event
     ShowArtist() {
-        if ((this.artists.length !== 0 && (this.isArtist || this.isOrganizer))) {
+        if ((this.artists.length !== 0 && (this.isPersonnel || this.isArtist || this.isOrganizer))) {
             let artist = (this.artists.length > 1) ? 'Artister' : 'Artist';
             return <div>
                 <Row className="mb-2">
