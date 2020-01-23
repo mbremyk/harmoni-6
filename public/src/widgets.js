@@ -414,7 +414,7 @@ export class MailForm extends Component {
         let user = this.getUser();
         if (bug) {
             if (!user) {
-                let userMail = this.state.email;
+                let userMail = this.state.email ? this.state.email : "no email";
                 let mail = new BugMail(userMail, "anonymous", this.state.description, this.state.text);
                 service.sendBug(mail)
                     .then(res => (this.setAlert(res.toString(), "info")))

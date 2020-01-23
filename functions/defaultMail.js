@@ -1,10 +1,12 @@
 class DefaultMail {
-
-
-    set hilsen(hilsen) {
-    }
-
-    set subject(subject) {
+    constructor() {
+        this.hilsen = `\nMed vennlig hilsen\nHarmoni team 6 support team`;
+        this.user;
+        this.date;
+        this.text;
+        this.subject;
+        this.email;
+        this.password;
     }
 
     get bugText() {
@@ -36,16 +38,6 @@ class DefaultMail {
 
     get infoText() {
         return `Den ${this.date} skrev ${this.user}:\n\n${this.text}\n\n${this.user} kan nåes på ${this.email}`;
-    }
-
-    constructor() {
-        this.hilsen = `\nMed vennlig hilsen\nHarmoni team 6 support team`;
-        this.user;
-        this.date;
-        this.text;
-        this.subject;
-        this.email;
-        this.password;
     }
 }
 
