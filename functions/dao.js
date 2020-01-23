@@ -351,11 +351,9 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
-        console.log("Finding");
         return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
             .then(e => e.cancelled)
             .then(e => {
-                console.log("updating");
                 return model.EventModel.update(
                     {
                         organizerId: event.organizerId,
