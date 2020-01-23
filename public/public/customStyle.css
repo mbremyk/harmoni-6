@@ -124,3 +124,18 @@ input:valid + span:after {
     padding: 2px;
     opacity: 0.9;
 }
+
+@media only screen and (min-width: 600px) {
+    .container {
+        width: 50em;
+    }
+
+    .c-sm {
+        width: 40em;
+    }
+
+    .c-lg {
+        width: 95%;
+    }
+
+}

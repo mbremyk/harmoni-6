@@ -45,11 +45,11 @@ export class NewPassword extends Component {
 
 	render() {
 		return(
-			<Container style={{width: '40em', top: '0'}}>
+			<Container className={"c-sm"} style={{top: '0'}}>
 
-				<h1 className="HarmoniLogo display-3 text-center m-5">Harmoni</h1>
+				<h1 className="HarmoniLogo display-sm-3 text-center m-5">Harmoni</h1>
 
-				<Card className="m-5" style={{padding: '10px',}}>
+				<Card className="m-sm-5" style={{padding: '10px'}}>
 					<div style={{padding: '5%'}}>
 
 						<h1 className='h1 text-center'>Glemt passord</h1>

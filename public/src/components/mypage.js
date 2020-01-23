@@ -43,7 +43,7 @@ export class myPage extends Component {
             <div>
                 <HarmoniNavbar/>
 
-                <Container style={{width: '40em'}}>
+                <Container className={"c-sm"}>
                     <Card style={{padding: '10px', marginTop: '10%'}}>
                         <div style={{padding: '5%'}}>
                             <label className='h1'>Min side</label>

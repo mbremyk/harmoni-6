@@ -1,33 +1,30 @@
-# Security
 **Tokens:**
 
-All user-related api-calls require the _x-access-token_ to be set
-in the request header. Token-related api calls  are routed through the
-_/auth_ middleware server-side, that verfies said token.
+Alle brukerrelaterte api-kall krever en _x-access-token_
+i forespørsels-headeren. Token-relaterte api-kall sendes gjennom
+_/auth_ mellomvareserver-side, som verfies tokenen.
 
 
-**Router Guards:**
+**Router guards:**
 
-Checks if the user has a valid token, and if so lets the user access
-the pages reserved for logged-in users. In a sense, in works similarly to
-_/auth_ only clientside.
+Sjekker om brukeren har en gyldig token, og om dette er tilfellet får brukeren tilgang til
+sidene som er reservert for påloggede brukere. På en måte fungerer det på samme måte som i
+_/ auth_ bare på klientsiden.
 
-**Clientside Hashing/Salting:**
+**Serverside Hashing / Salting:**
 
-The system utilises the _bcrypt_ module to hash/salt password. As an additional 
-security feature, all of this is done client-side. Because of this, 
-the only person that ever handles the plaintext password is the user himself.
-The hash and its salt is then stored in databse.
+Systemet bruker _bcrypt_-modulen for å hash / salt passord. Dette gjøres på serversiden. Passordet sendes til serveren med og HTTPS-tilkobling.
+Hashen og saltet blir deretter lagret i databasen.
 
-**Password Checking:**
+**Passordkontroll:**
 
-When a user registers for the system he/she is required to provide 
-a substantially difficult password (5 symbols minimum, needs more than just numbers).
-This is done with the _zxcvbn_ library to check strength on registration. This also 
-provides the user with a strength meter, indicating the password strength.
+Når en bruker registrerer seg for systemet må han / hun oppgi
+et vesentlig vanskelig passord (minimum 5 symboler, trenger mer enn bare tall).
+Dette gjøres med _zxcvbn_-biblioteket for å sjekke styrken ved registrering. Denne gir også
+brukeren en styrkmåler, som indikerer passordets styrke.
 
-**Built-in Security features:**
+**Innebygde sikkerhetsfunksjoner:**
 
-_React_: Javascript injection blocking 
+_React_: Blokkering av Javascript-injeksjon
 
-_Sequelize_: SQL injection blocking
+_Sequelize_: SQL-injeksjonsblokkering
