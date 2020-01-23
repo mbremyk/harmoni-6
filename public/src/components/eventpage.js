@@ -41,31 +41,33 @@ export class EventPage extends Component {
                                 <Row>
                                     <Col lg={8}>
 
-                                    <div className="ml-3">
-                                        <div>
-                                            {this.currentEvent.description}
+                                        <div className="ml-3">
+                                            <div>
+                                                {this.currentEvent.description}
+                                            </div>
+                                            {this.renderPlaceDescription()}
+
+
                                         </div>
-                                        {this.renderPlaceDescription()}
-
-
-                                    </div>
-                                </Col>
-                                <Col>
-                                    <ListGroup variant="flush">
-                                        <ListGroup.Item><h6><b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}
-                                        </h6></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}
-                                        </h6></ListGroup.Item>
-                                        <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6>
-                                            <h6><b>By:</b> {this.currentEvent.city}</h6>
-                                            <Button type="button" size="sm" onClick={this.addressClicked}>Åpne
-                                                kart</Button></ListGroup.Item>
-                                        <ListGroup.Item><h6><b>Kontakt Arrangør</b></h6><h6> {this.user.username}</h6>
-                                            <h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
-                                    </ListGroup>
-                                </Col>
-                            </Row>
+                                    </Col>
+                                    <Col>
+                                        <ListGroup variant="flush">
+                                            <ListGroup.Item><h6>
+                                                <b>Fra:</b> {this.formatTime(this.currentEvent.startTime)}
+                                            </h6></ListGroup.Item>
+                                            <ListGroup.Item><h6><b>Til:</b> {this.formatTime(this.currentEvent.endTime)}
+                                            </h6></ListGroup.Item>
+                                            <ListGroup.Item>{this.RenderAgeLimit()}</ListGroup.Item>
+                                            <ListGroup.Item><h6><b>Adresse:</b> {this.currentEvent.address}</h6>
+                                                <h6><b>By:</b> {this.currentEvent.city}</h6>
+                                                <Button type="button" size="sm" onClick={this.addressClicked}>Åpne
+                                                    kart</Button></ListGroup.Item>
+                                            <ListGroup.Item><h6><b>Kontakt Arrangør</b></h6>
+                                                <h6> {this.user.username}</h6>
+                                                <h6><b>Email:</b> {this.user.email}</h6></ListGroup.Item>
+                                        </ListGroup>
+                                    </Col>
+                                </Row>
 
                                 <div className='mt-5'>
                                     {this.ShowArtist()}
@@ -82,7 +84,7 @@ export class EventPage extends Component {
     }
 
     formatTime(input) {
-        if(input == undefined){
+        if (input == undefined) {
             return 'ø';
         }
 
@@ -96,7 +98,7 @@ export class EventPage extends Component {
         let month = dateArr[1];
         let day = dateArr[2];
 
-        return day + '.' + month + '/' + year + ' klokka: '+ time;
+        return day + '.' + month + '/' + year + ' klokka: ' + time;
     }
 
     //checks if the person viewing the event is the organizer
@@ -104,16 +106,16 @@ export class EventPage extends Component {
 
         service
             .getEventByEventId(this.props.match.params.id)
-            .then(e => {
+            .then(async e => {
                 this.currentEvent = e;
                 let token = jwt.decode(authService.getToken());
                 this.getInfoAboutOrganizer(this.currentEvent.organizerId);
-                if(!!token) {
+                if (!!token) {
                     if (this.currentEvent.organizerId == token.userId) {
                         this.isOrganizer = true;
-                        this.getPersonnelForEvent();
-                        this.getArtistsForEvent();
                     }
+                    this.getPersonnelForEvent();
+                    this.getArtistsForEvent();
                 } else {
                     this.getPublicArtistsForEvent();
                 }
@@ -123,7 +125,7 @@ export class EventPage extends Component {
 
     //gets all the people working on that event and checks if the person viewing it is a part of the personnel
     getPersonnelForEvent() {
-        service
+        return service
             .getPersonnel(this.props.match.params.id)
             .then(personnel => {
                 this.personnel = personnel;
@@ -139,7 +141,7 @@ export class EventPage extends Component {
 
     //gets all the artist working on that event and checks if the person viewing it is a an artist
     getArtistsForEvent() {
-        service
+        return service
             .getGigs(this.props.match.params.id)
             .then(artists => {
                 this.artists = artists;
@@ -251,15 +253,15 @@ export class EventPage extends Component {
         }
     }
 
-    emailForm(){
+    emailForm() {
         if (this.artists.length != 0 && this.isOrganizer) {
             return <MailForm hasRecipients={true} description={"Info"} recipients={this.artists.concat(this.personnel)}
                              toggleable={true}/>
         } else if (this.currentEvent.eventName && (this.isPersonnel || this.isArtist) && !this.isOrganizer) {
             return <MailForm hasRecipients={true} description={"Info"}
-                             recipients={[this.getInfoAboutOrganizer(this.currentEvent.organizerId).username]}
+                             recipients={[{user: this.user}]}
                              toggleable={true}/>
-        }else{
+        } else {
             return null;
         }
     }
@@ -296,7 +298,8 @@ export class EventPage extends Component {
         if (authService.loggedIn()) {
             return <HarmoniNavbar/>
         } else {
-            return <NavLink href="/"><h1 className="HarmoniLogo display-sm-3 text-center m-5 text-body">Harmoni</h1></NavLink>
+            return <NavLink href="/"><h1 className="HarmoniLogo display-sm-3 text-center m-5 text-body">Harmoni</h1>
+            </NavLink>
         }
     }
 
@@ -328,7 +331,7 @@ export class EventPage extends Component {
             url += i + "-";
         });
         url = url.substring(0, url.length - 1);
-        url = url.replace(/[^\w\s-]/g,'');
+        url = url.replace(/[^\w\s-]/g, '');
         window.open('https://www.google.com/maps/search/' + url);
     }
 

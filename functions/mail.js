@@ -73,11 +73,14 @@ addMailEndpoints = (app, db) => {
      */
     app.post("/mail/bug", (req, res) => {
         console.log("POST-request received - /mail/bug");
-        req.body.mailToDev.subject = `Feilrapport: ${req.body.mailToDev.subject}`;
+        req.body.mailToDev.subject = `Feilrapport: ${defaultMail.subject}`;
         req.body.mailToDev.text = `Feilrapport fra ${defaultMail.user}, mailadresse: ${defaultMail.email}\n\n${defaultMail.text}`;
 
         req.body.mailToUser.subject = `RE: Feilrapport: ${req.body.mailToUser.subject}`;
         req.body.mailToUser.text = defaultMail.bugText;
+
+        console.log(req.body.mailToDev);
+        console.log(req.body.mailToUser);
 
         return Promise.allSettled([
             sendMail(req.body.mailToDev),
@@ -94,9 +97,9 @@ addMailEndpoints = (app, db) => {
             .then(results => {
                 results.forEach(res => {
                     if (res.status == 'fulfilled') {
-                        console.log(res.value);
+                        console.log(res);
                     } else if (res.status == 'rejected') {
-                        console.log(res.reason);
+                        console.log(res);
                     } else {
                         console.log(res);
                     }
