@@ -112,7 +112,7 @@ export default function EditEvent() {
                         <Form.Row>
 
                             <Form.Group as={Col} sm={"12"}>
-                                <h1 className="font-weight-bold text-center">Endre arrangement</h1>
+                                <h1 className="display-sm-3">Endre arrangement</h1>
                             </Form.Group>
 
                             {inputField("12", "Arragementsnavn", "Navn på arragement", eventName, setEventName)}
