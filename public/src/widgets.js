@@ -29,12 +29,6 @@ export class EventInfo extends Component {
         hoverCss: "shadow-sm"
     };
 
-
-    /*<div className="font-weight-bold">
-     Pris fra
-     </div>
-     {this.props.price}*/
-
     getAgeLimitInfo(age_limit) {
         if (age_limit !== 0) {
             return <div>
@@ -140,7 +134,6 @@ export class DownloadWidget extends Component {
         service
             .downloadContract(this.event, this.artist)
             .then(response => {
-                console.log(response);
                 const link = document.createElement('a');
                 link.download = response.name;
                 link.href = response.data;
@@ -231,7 +224,6 @@ export class MailForm extends Component {
 
     getRecipentString(props) {
         let recipientsString = "";
-        console.log(props);
         if (props.recipients) {
             props.recipients.map(user => {
                 recipientsString = recipientsString += user.user.email + ", "
@@ -384,7 +376,6 @@ export class MailForm extends Component {
 
     getUser() {
         let token = jwt.decode(authService.getToken());
-        // console.log(token);
         if (!token) {
             this.setAlert("ERROR", "danger");
             return undefined;
@@ -395,7 +386,6 @@ export class MailForm extends Component {
 
     sendMail(bug) {
         console.log("Sendmail called");
-        //let bug = false;
         let user = this.getUser();
         if (bug) {
             if (!user) {
@@ -421,9 +411,6 @@ export class MailForm extends Component {
                 }
             });
             let mail = new Mail(to, user.email, user.username, this.state.description, this.state.text);
-            console.log(this.state.mails);
-            console.log("Recipients");
-            console.log(mail);
             service.sendMails(mail)
                 .then(res => (this.setAlert(res.toString(), "info")))
                 .catch(err => this.setAlert(err.toString(), "danger"))
