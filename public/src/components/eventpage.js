@@ -29,7 +29,7 @@ export class EventPage extends Component {
 
                 <div>
                     {this.RenderNavbar()}
-                    <Container>
+                    <Container className={"c-md"}>
                         <Card className='p-2'>
                             {this.renderImage()}
 

@@ -125,9 +125,13 @@ input:valid + span:after {
     opacity: 0.9;
 }
 
+.container{
+    max-width: 100%;
+}
+
 @media only screen and (min-width: 600px) {
-    .container {
-        width: 60em;
+    .c-md {
+        width: 70em;
     }
 
     .c-sm {
