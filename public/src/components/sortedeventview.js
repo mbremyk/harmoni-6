@@ -164,9 +164,6 @@ export class SortedEventView extends Component {
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="mr-auto">
                                 <NavDropdown className={"active"} title="Sorter" id="basic-nav-dropdown">
-                                    <NavDropdown.Item className={this.getActiveState("price")}
-                                                      onClick={() => this.handleSortingOption('price')}>Pris
-                                        TODO</NavDropdown.Item>
                                     <NavDropdown.Item className={this.getActiveState("ageLimit")}
                                                       onClick={() => this.handleSortingOption('ageLimit')}>Aldersgrense </NavDropdown.Item>
                                     <NavDropdown.Item className={this.getActiveState("createdAt")}
@@ -180,9 +177,6 @@ export class SortedEventView extends Component {
                                     <Dropdown.Item className={this.state.childFriendly}
                                                    onClick={() => this.handleFilterOption('ChildFriendly')}>Barnevennelig
                                         (6 år) </Dropdown.Item>
-                                    <Dropdown.Item className={this.state.free}
-                                                   onClick={() => this.handleFilterOption('Free')}>Gratis
-                                        Arrangementer TODO </Dropdown.Item>
                                     <Dropdown.Item className={this.state.hideCancelled}
                                                    onClick={() => this.handleFilterOption('HideCancelled')}>
                                         Skjul kansellerte arrangementer
