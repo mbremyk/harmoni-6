@@ -74,7 +74,7 @@ export default function EditEvent() {
         let decoded = jwt.decode(token);
         let uId = decoded.userId;
         setOrganizerId(uId);
-        service.getUsers().then(users => setUsers(users)).catch((err) => console.log(err.message)).catch(err => console.error(err));
+        service.getUsers().then(users => setUsers(users));
     }, []);
 
 
@@ -85,8 +85,6 @@ export default function EditEvent() {
             !eventDescription.trim() ||
             !city.trim() ||
             ageLimit < 0 ||
-            ticketPrice < 0 ||
-            ticketAmount < 0 ||
             gigsNew.some(gig => gig.contract === null) ||
             gigsNewByEmail.some(gig => gig.contract === null)) {
 
@@ -105,8 +103,6 @@ export default function EditEvent() {
                     errmsg += "  [ Kontrakt for " + (gig.user.email ? gig.user.email : "ny artist") + " mangler ] "
                 }
             });
-            if (ticketPrice < 0) errmsg = "Billetpris må være større enn null";
-            if (ticketAmount < 0) errmsg = "Antall billetter må være større enn null";
             if (ageLimit < 0) errmsg = "Aldersgrense må være større enn null";
             handleSetError(errmsg, 'danger');
             return;
@@ -267,7 +263,7 @@ export default function EditEvent() {
                         <Card>
 
                             <Card.Title>
-                                <h2 className="text-center">Biletter</h2>
+                                <h2 className="text-center">Billetter</h2>
                             </Card.Title>
 
                             <ListGroup className={"p-3"}>
@@ -275,17 +271,17 @@ export default function EditEvent() {
 
                                     <Row>
                                         <Col sm={3}>
-                                            <label>Bilett type</label>
+                                            <label>Billett type</label>
                                         </Col>
 
 
                                         <Col sm={3}>
-                                            <label>Bilett pris</label>
+                                            <label>Billett pris</label>
                                         </Col>
 
 
                                         <Col sm={3}>
-                                            <label>Bilett mengde</label>
+                                            <label>Billett mengde</label>
                                         </Col>
                                     </Row>
 
@@ -294,7 +290,7 @@ export default function EditEvent() {
 
                                         <Form.Group as={Col} sm={"3"}>
                                             <Form.Control
-                                                placeholder="Navn på billettype . . ."
+                                                placeholder="Type . . ."
                                                 onChange={event => setTicketType(event.target.value)}
                                             />
                                         </Form.Group>
@@ -303,7 +299,7 @@ export default function EditEvent() {
                                             <InputGroup>
                                                 <Form.Control
                                                     type="number"
-                                                    placeholder="Billettpris . . ."
+                                                    placeholder="Pris . . ."
                                                     onChange={event => setTicketPrice(event.target.value)}
                                                 />
                                                 <InputGroup.Append>
@@ -315,7 +311,7 @@ export default function EditEvent() {
                                         <Form.Group as={Col} sm={"3"}>
                                             <Form.Control
                                                 type="number"
-                                                placeholder="Antall billetter . . ."
+                                                placeholder="Antall . . ."
                                                 onChange={event => setTicketAmount(event.target.value)}
                                             />
 
@@ -547,11 +543,9 @@ export default function EditEvent() {
         return new Promise((resolve, reject) => {
             let promises = [];
             if (Array.isArray(gigsNew) && gigsNew.length > 0) {
-                console.log('add GIGs', gigsNew);
                 promises.push(gigsNew.map(gig => service.addGig(new Gig(eventId, gig.artistId, gig.contract)).catch(error => reject(error))));
             }
             if ((Array.isArray(gigsNewByEmail) && gigsNewByEmail.length)) {
-                console.log('add GIGS by Email', gigsNewByEmail);
                 promises.push(sendGigsByEmail(eventId));
             }
 
@@ -572,7 +566,6 @@ export default function EditEvent() {
                 } else {
                     u = new User(null, "", gig.user.email);
                     return service.createTempUser(u).then(createdUser => {
-                        console.log(createdUser);
                         return service.addGig(new Gig(eventId, createdUser.userId, gig.contract))
                             .catch(error => reject(error))
                     }).catch(error => reject(error))
@@ -646,7 +639,6 @@ export default function EditEvent() {
 
             //if there are new personnel added, then add them to database
             if (Array.isArray(personnel) && personnel.length > 0) {
-                console.log('add', personnel);
                 promises.push(service.addPersonnel(personnel.map(p => new Personnel(p.personnelId, eventId, p.role))).catch(error => reject(error)))
             }
 
@@ -670,13 +662,19 @@ export default function EditEvent() {
 
     function handleTicketsAdd() {
         let errmsg = "";
+        if (!ticketType.trim()) {
+            errmsg += "Vennligst skriv inn en billett-type";
+            handleSetError(errmsg, 'danger');
+            return;
+        }
         if ((tickets.some(t => t.type.trim() === ticketType.trim()))) {
             errmsg += "Denne billett-typen finnes allerede!";
             handleSetError(errmsg, 'danger');
             setTicketType('');
             return;
-        } else if (!ticketType.trim()) {
-            errmsg += "Vennligst skriv inn en billett-type";
+        }
+        if (ticketPrice < 0 || ticketAmount < 0) {
+            if (ticketPrice < 0) errmsg += "Billetpris og Antall kan ikke være negativt";
             handleSetError(errmsg, 'danger');
             return;
         }
@@ -718,7 +716,6 @@ export default function EditEvent() {
 
             //If user has chosen to add tickets, post in database
             if (Array.isArray(tickets) && tickets.length > 0) {
-                console.log('add Tickets', tickets);
                 promises.push(service.addTickets(tickets.map(t => new Ticket(eventId, t.type, t.price, t.amount))).catch(error => reject(error)))
             }
 
