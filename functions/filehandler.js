@@ -16,6 +16,37 @@ const storage = new Storage({
 const util = require('util');
 let bucket = storage.bucket('harmoni-6.appspot.com');
 
+/*
+* exported functions in this document
+*
+* uploadToCloud(base64String, fileName, isPublic, overwrite)
+*
+* upload(buffer, name, isPublic, type, overwrite)
+*
+* downloadFromCloud(filename), only works for private files
+*
+* getNameFromUrl(url, isPublic)
+*
+* deleteFromCloud(filename, isPublic)
+*
+ */
+
+
+/**
+ * Takes in a base64String, then seperates the data from the content-type,
+ * before creating a buffer object to be utilized by the upload function.
+ * The is public and overwrite attributes set whether you will
+ * upload to the public GCS-bucket or the private one.
+ * returns the file-url on resolved promise.
+ *
+ * @param: {string} base64String
+ * @param: {string} filename
+ * @param: {boolean} isPublic
+ * @param: {boolean} overwrite
+ *
+ * @return Promise (url: string)
+ */
+
 const uploadToCloud = (base64String, filename, isPublic, overwrite) => {
     let data = base64String.split(",", 2 );
     let type = data[0].split(";")[0];
@@ -27,6 +58,20 @@ const uploadToCloud = (base64String, filename, isPublic, overwrite) => {
     })
         .catch(err => console.log(err));
 };
+
+/**
+ * Takes in a buffer and generates a unique name,
+ * then resolves the bucket url once finished.
+ * Mainly used as a helper method for uploadToCloud
+ *
+ * @param: {Buffer} buffer
+ * @param: {string} filename
+ * @param: {boolean} isPublic - specifies the bucket to upload to
+ * @param: {string} type - the content-type of the data in the buffer
+ * @param: {boolean} overwrite
+ *
+ * @return Promise (url: string)
+ */
 
 const upload = (buffer, name, isPublic, type, overwrite) => new Promise((resolve, reject) => {
     //const { originalname, buffer } = file;
@@ -68,6 +113,21 @@ const upload = (buffer, name, isPublic, type, overwrite) => new Promise((resolve
         .end(buffer)
 })
 
+
+/**
+ * Downloads the file specifed by the name paramater
+ * from the private bucket, and returns a promise that resolves to the
+ * complete base64 string (content-type + representation specifier + data)
+ *
+ * @param: {Buffer} buffer
+ * @param: {string} filename
+ * @param: {boolean} isPublic - specifies the bucket to upload to
+ * @param: {string} type - the content-type of the data in the buffer
+ * @param: {boolean} overwrite
+ *
+ * @return Promise (url: string)
+ */
+
 function downloadFromCloud(name) {
     let bucket = storage.bucket('staging.harmoni-6.appspot.com');
     let file = bucket.file(name);
@@ -100,6 +160,15 @@ function getNameFromUrl(url, pub) {
     return contents[1]
 
 }
+
+/**
+ * Attempts to delete the file specified by the name parameter.
+ *
+ * @param: {string} filename
+ * @param: {isPublic} boolean
+ *
+ * @return undefined
+ */
 
 function deleteFromCloud(filename, isPublic) {
     let blob = null;
