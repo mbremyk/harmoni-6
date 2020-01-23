@@ -66,10 +66,9 @@ class Dao {
      */
     createTempUser(email) {
         return model.UserModel.create({email: email, username: ''})
-            .then(response => response.dataValues)
             .then(user => {
                 return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
-                    .then(response => {
+                    .then(() => {
                         if (!isCI && !test) {
                             user.username = 'guest' + user.userId;
                             let post = {
@@ -368,7 +367,6 @@ class Dao {
                             ageLimit: event.ageLimit,
                             startTime: event.startTime,
                             endTime: event.endTime,
-                            image: event.image,
                             imageUrl: event.imageUrl,
                             description: event.description,
                             cancelled: event.cancelled,
@@ -424,7 +422,7 @@ class Dao {
                 model: model.PersonnelModel
             }]
         })
-            .then(res => {
+            .then(() => {
                 return model.EventModel.update(
                     {
                         cancelled: true

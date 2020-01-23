@@ -30,6 +30,7 @@ export function textField(size, name, placeholder, value, setter) {
         </Form.Group>);
 }
 
+// dateinput for from-date
 export function minDateInput(size, name, value, minDate, maxDate, setter) {
     return (
         <Form.Group as={Col} sm={size}>
@@ -41,9 +42,11 @@ export function minDateInput(size, name, value, minDate, maxDate, setter) {
                 onChange={event => setter(event.target.value)}
                 type={"date"}
             />
+            <span className="customStyle"/>
         </Form.Group>);
 }
 
+// dateinput for to-date
 export function maxDateInput(size, name, value, minDate, setter) {
     return (
         <Form.Group as={Col} sm={size}>
@@ -54,19 +57,39 @@ export function maxDateInput(size, name, value, minDate, setter) {
                 onChange={event => setter(event.target.value)}
                 type={"date"}
             />
+            <span className="customStyle"/>
         </Form.Group>);
 }
 
-export function timeInput(size, name, value, setter) {
+// timeinput for from-time
+export function fromTimeInput(size, name, value, maxTime, setter) {
     return (
         <Form.Group as={Col} sm={size}>
             <Form.Label>{name}</Form.Label>
             <Form.Control
+                max={maxTime}
                 value={value}
                 onChange={event => setter(event.target.value)}
                 type={"time"}
 
             />
+            <span className="customStyle"/>
+        </Form.Group>);
+}
+
+// time input for to-time
+export function toTimeInput(size, name, value, minTime, setter) {
+    return (
+        <Form.Group as={Col} sm={size}>
+            <Form.Label>{name}</Form.Label>
+            <Form.Control
+                min={minTime}
+                value={value}
+                onChange={event => setter(event.target.value)}
+                type={"time"}
+
+            />
+            <span className="customStyle"/>
         </Form.Group>);
 }
 
