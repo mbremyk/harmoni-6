@@ -2,7 +2,7 @@ import {Component} from "react-simplified";
 import {Button, Card, Col, Container, Form, ListGroup, ListGroupItem, Row} from "react-bootstrap";
 import {HarmoniNavbar} from "./navbar";
 import * as React from 'react';
-import {Event, RiderItem, service} from '../services';
+import {Event, RiderItem, service, User} from '../services';
 import {authService} from "../AuthService";
 import Alert from "react-bootstrap/Alert";
 
@@ -21,6 +21,7 @@ export class RiderPage extends Component {
         newItems: [],
         deleteItems: [],
         event: new Event(),
+        artist: new User(),
         error: ''
     };
 
@@ -37,18 +38,17 @@ export class RiderPage extends Component {
     }
 
     mounted() {
-        service
-            .getRiderItems(this.props.match.params.eventid, this.props.match.params.artistid)
-            .then(riderItems => {
-                this.setState({oldItems: riderItems});
-                this.getEvent();
-                this.state.oldItems.map(item => {
-                    if (item.confirmed !== null) {
-                        this.setState({isConfirmed: true});
-                    }
-                });
+        service.getRiderItems(this.props.match.params.eventid, this.props.match.params.artistid).then(riderItems => {
+            this.setState({oldItems: riderItems});
+            this.getEvent();
+            this.getArtist();
+            this.state.oldItems.map(item => {
+                if (item.confirmed !== null) {
+                    this.setState({isConfirmed: true});
+                }
+            });
 
-            })
+        })
             .catch(error => console.error(error));
     }
 
@@ -57,6 +57,15 @@ export class RiderPage extends Component {
             .getEventByEventId(this.props.match.params.eventid)
             .then(event => {
                 this.setState({event: event});
+            })
+            .catch((error) => console.error(error));
+    }
+
+    getArtist() {
+        service
+            .getUser(this.props.match.params.artistid)
+            .then(artist => {
+                this.setState({artist: artist});
             })
             .catch((error) => console.error(error));
     }
@@ -228,53 +237,7 @@ export class RiderPage extends Component {
         } else {
             //only if the organizer has confirmed/denied items the artist wont get the chance to edit the rider anymore.
             //they will get a list of the items showing what they can expect when they come backstage
-            return (
-                <div>
-                    <Container>
-                        <Card className="p-5">
-                            <h1 className="font-weight-bold text-center">Din Rider</h1>
-                            <Form.Group>
-                                <ListGroup>
-                                    <React.Fragment>
-
-                                        {this.state.oldItems.filter(item => item.confirmed).map(item =>
-                                            <ListGroupItem>
-                                                <Row>
-                                                    <Col>{item.item}</Col>
-                                                    <Col sm={4}><h6 className="text-success">
-                                                        Godkjent av arrangør</h6></Col>
-                                                </Row>
-                                            </ListGroupItem>
-                                        )}
-
-                                    </React.Fragment>
-                                    <React.Fragment>
-
-                                        {this.state.oldItems.filter(item => !item.confirmed).map(item =>
-                                            <ListGroupItem>
-                                                <Row>
-                                                    <Col>{item.item}</Col>
-                                                    <Col sm={4}><h6 className="text-danger">
-                                                        Avslått av arrangør</h6>
-                                                    </Col>
-                                                </Row>
-                                            </ListGroupItem>
-                                        )}
-
-                                    </React.Fragment>
-                                </ListGroup>
-                                <Form.Group>
-                                    <div className="text-center mt-3">
-                                        <Button variant={'primary'}
-                                                onClick={() => this.returnToEvent()}>
-                                            Tilbake til arrangement</Button>
-                                    </div>
-                                </Form.Group>
-                            </Form.Group>
-                        </Card>
-                    </Container>
-                </div>
-            );
+            return this.renderConfirmed();
         }
     }
 
@@ -285,9 +248,10 @@ export class RiderPage extends Component {
                 <div>
                     <Container>
                         <Card className={"m-4"}>
-                            <h1 className="font-weight-bold text-center">Artisten har ikke lastet opp en rider</h1>
+                            <h1 className="font-weight-bold text-center mt-4">{this.state.artist.username + ' har ikke lastet opp en rider enda'}</h1>
                             <div className="text-center">
                                 <Button variant={'primary'}
+                                        className={"m-4"}
                                         onClick={() => this.returnToEvent()}>
                                     Tilbake til arrangement</Button>
                             </div>
@@ -330,58 +294,57 @@ export class RiderPage extends Component {
             )
         } else {
             //if organizer has confirmed the items the page will render a list with accepted and declined items
-            return (
-                <div>
-                    <Container>
-                        <Card className="p-5">
-                            <h1 className="font-weight-bold text-center">Rider</h1>
-                            <Form.Group>
-                                <ListGroup>
-                                    <React.Fragment>
-                                        {this.state.oldItems.filter(item => item.confirmed).map(item =>
-
-                                            <ListGroupItem>
-                                                <Row>
-                                                    <Col>
-                                                        {item.item}
-                                                    </Col>
-                                                    <Col sm={4}>
-                                                        <h6 className="text-success">Godkjent</h6>
-                                                    </Col>
-
-                                                </Row>
-                                            </ListGroupItem>
-                                        )}
-                                    </React.Fragment>
-                                    <React.Fragment>
-                                        {this.state.oldItems.filter(item => !item.confirmed).map(item =>
-                                            <ListGroupItem>
-                                                <Row>
-                                                    <Col>
-                                                        {item.item}
-                                                    </Col>
-                                                    <Col sm={4}>
-                                                        <h6 className="text-danger">Avslått</h6>
-                                                    </Col>
-                                                </Row>
-                                            </ListGroupItem>
-                                        )}
-                                    </React.Fragment>
-                                </ListGroup>
-                                <Form.Group>
-                                    <div className="text-center mt-3">
-                                        <Button
-                                            variant={'primary'}
-                                            onClick={() => this.returnToEvent()}>Tilbake til arrangement</Button>
-                                    </div>
-                                </Form.Group>
-
-                            </Form.Group>
-                        </Card>
-                    </Container>
-                </div>
-            )
+            return this.renderConfirmed();
         }
+    }
 
+    renderConfirmed() {
+        return (
+            <div>
+                <Container>
+                    <Card className="p-5">
+                        <h1 className="font-weight-bold text-center">{'Rider for ' + this.state.artist.username}</h1>
+                        <Form.Group>
+                            <ListGroup>
+                                <React.Fragment>
+
+                                    {this.state.oldItems.filter(item => item.confirmed).map(item =>
+                                        <ListGroupItem>
+                                            <Row>
+                                                <Col sm={2}><h6 className="text-success">
+                                                    Godkjent</h6></Col>
+                                                <Col>{item.item}</Col>
+                                            </Row>
+                                        </ListGroupItem>
+                                    )}
+
+                                </React.Fragment>
+                                <React.Fragment>
+
+                                    {this.state.oldItems.filter(item => !item.confirmed).map(item =>
+                                        <ListGroupItem>
+                                            <Row>
+                                                <Col sm={2}><h6 className="text-danger">
+                                                    Avslått</h6>
+                                                </Col>
+                                                <Col>{item.item}</Col>
+                                            </Row>
+                                        </ListGroupItem>
+                                    )}
+
+                                </React.Fragment>
+                            </ListGroup>
+                            <Form.Group>
+                                <div className="text-center mt-3">
+                                    <Button variant={'primary'}
+                                            onClick={() => this.returnToEvent()}>
+                                        Tilbake til arrangement</Button>
+                                </div>
+                            </Form.Group>
+                        </Form.Group>
+                    </Card>
+                </Container>
+            </div>
+        );
     }
 }
