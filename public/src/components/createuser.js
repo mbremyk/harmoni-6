@@ -102,7 +102,6 @@ export class CreateUserForm extends Component {
 				})
 			}
 		});
-		this.setState({loading: false});
 	}
 
 	render() {
