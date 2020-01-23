@@ -17,7 +17,15 @@ import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Alert from "react-bootstrap/Alert";
 import moment from "moment";
-import {CustomMenu, minDateInput, maxDateInput, inputField, textField, timeInput} from "./editandcreatefunctions";
+import {
+    CustomMenu,
+    minDateInput,
+    maxDateInput,
+    inputField,
+    textField,
+    fromTimeInput,
+    toTimeInput
+} from "./editandcreatefunctions";
 import {authService} from '../AuthService';
 
 const jwt = require("jsonwebtoken");
@@ -107,9 +115,28 @@ export default function EditEvent() {
             if (!eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
             if (!city.trim()) errmsg += "  [ By ] ";
             if (gigsNew.some(gig => gig.contract === null)) errmsg += "  [ Kontrakt for en Artist ] ";
+            if (ticketPrice < 0) errmsg = "Billetpris må være større enn null";
+            if (ticketAmount < 0) errmsg = "Antall billetter må være større enn null";
+            if (ageLimit < 0) errmsg = "Aldersgrense må være større enn null";
             handleSetError(errmsg, 'danger');
             return;
         }
+        if (fDate > tDate) {
+            let errmsg = "Fra-dato må være mindre enn eller lik til-dato";
+            handleSetError(errmsg, 'danger');
+            return;
+        }
+        if (fDate === tDate) {
+            setMaxTime(tTime);
+            setMinTime(fTime);
+            if (fTime >= tTime) {
+                let errmsg = "Fra-tid må være mindre enn til-tid på samme dag";
+                handleSetError(errmsg, 'danger');
+                return;
+            }
+        }
+        setMaxTime(moment('23:59', 'HH:mm').format('HH:mm'));
+        setMinTime(moment('00:00', 'HH:mm').format('HH:mm'));
 
         let fDateTime = fDate + " " + fTime + ":00";
         let tDateTime = tDate + " " + tTime + ":00";
@@ -159,9 +186,9 @@ export default function EditEvent() {
                                 {textField("12", "Informasjon om stedet", "For eksempel 3. etajse", placeDescription, setPlaceDescription)}
                                 {textField("12", "Beskrivelse av arrangement", "...", eventDescription, setEventDescription)}
                                 {minDateInput("4", "Fra:  dd/mm/yyyy", fDate, require('moment')().format('HH:mm'), tDate, setFDate)}
-                                {timeInput("2", "HH:mm", fTime, setFTime)}
+                                {fromTimeInput("2", "HH:mm", fTime, maxTime, setFTime)}
                                 {maxDateInput("4", "Til:  dd/mm/yyyy", tDate, fDate, setTDate)}
-                                {timeInput("2", "HH:mm", tTime, setTTime)}
+                                {toTimeInput("2", "HH:mm", tTime, minTime, setTTime)}
 
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Aldersgrense</Form.Label>
