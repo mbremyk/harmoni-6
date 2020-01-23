@@ -54,11 +54,11 @@ export class LoginForm extends Component {
 
     render() {
         return (
-            <Container style={{width: '40em'}}>
+            <Container className={"c-sm"} style={{top: '0'}}>
 
-				<h1 className="HarmoniLogo display-3 text-center m-5">Harmoni</h1>
+				<h1 className="HarmoniLogo display-sm-3 text-center m-5" >Harmoni</h1>
 
-                <Card className="m-5" style={{padding: '10px',}}>
+                <Card className="login m-sm-5 mw-25">
                     <div style={{padding: '5%'}}>
 
                         <h1 className='h1 text-center'>Logg inn</h1>
