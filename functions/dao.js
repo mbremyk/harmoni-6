@@ -351,10 +351,11 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
-        console.log("Updating...");
+        console.log("Finding");
         return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
-            .then(e => e.dataValues.cancelled)
+            .then(e => e.cancelled)
             .then(e => {
+                console.log("updating");
                 return model.EventModel.update(
                     {
                         organizerId: event.organizerId,
@@ -372,7 +373,6 @@ class Dao {
                     },
                     {where: {eventId: event.eventId}})
                     .then(response =>  {
-                        console.log("finished");
                         if (e !== event.cancelled && !e && !isCI && !test) {
                             return this.getGigs(event.eventId)
                                 .then(gigs => gigs.map(gig => gig.dataValues.artistId))
@@ -421,12 +421,14 @@ class Dao {
             }]
         })
             .then(res => {
-                model.EventModel.update(
+                return model.EventModel.update(
                     {
                         cancelled: true
                     },
                     {where: {eventId: eventId}})
-                    .then(cancelled => cancelled[0] === 1 /*affected rows === 1*/)
+                    .then(cancelled => {
+                        return cancelled[0] === 1
+                    }/*affected rows === 1*/)
                     .catch(error => {
                         console.error(error);
                         return false;

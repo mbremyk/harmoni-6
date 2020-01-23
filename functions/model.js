@@ -23,17 +23,17 @@ function init() {
     }
 }
 
+/**
+ * Connect to GC-SQL,
+ * Practical when deploying
+ */
 function initCloud() {
     let pr = new properties.CloudProperties();
     const sequelize = new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword, {
         dialect: pr.dialect,
         host: pr.databaseURL,
         logging: false,
-        // port: pr.port,
         timestamps: false
-        /*dialectOptions: {
-            socketPath: '/cloudsql/kkdatabase'
-        },*/
     });
     return sequelize;
 }
