@@ -32,6 +32,8 @@ const jwt = require("jsonwebtoken");
 
 export default function EditEvent() {
 
+    const [disabled, setDisabled] = useState(false);
+
     const {match, history} = useReactRouter();
     const [error, setError] = useState('');
     const [errorType, setErrorType] = useState('success');
@@ -125,6 +127,11 @@ export default function EditEvent() {
                 return;
             }
         }
+        if (disabled) {
+            return;
+        }
+        setDisabled(true);
+
         setMaxTime(moment('23:59', 'HH:mm').format('HH:mm'));
         setMinTime(moment('00:00', 'HH:mm').format('HH:mm'));
 
@@ -267,7 +274,7 @@ export default function EditEvent() {
                         <Card>
 
                             <Card.Title>
-                                <h2 className="text-center">Biletter</h2>
+                                <h2 className="text-center">Billetter</h2>
                             </Card.Title>
 
                             <ListGroup className={"p-3"}>
@@ -275,17 +282,17 @@ export default function EditEvent() {
 
                                     <Row>
                                         <Col sm={3}>
-                                            <label>Bilett type</label>
+                                            <label>Billett-type</label>
                                         </Col>
 
 
                                         <Col sm={3}>
-                                            <label>Bilett pris</label>
+                                            <label>Billett-pris</label>
                                         </Col>
 
 
                                         <Col sm={3}>
-                                            <label>Bilett mengde</label>
+                                            <label>Billett-mengde</label>
                                         </Col>
                                     </Row>
 
@@ -372,7 +379,8 @@ export default function EditEvent() {
 
                         <Row>
                             <Col>
-                                <Button type="button" variant={"success"} onClick={handleSubmit}>Lagre</Button>
+                                <Button type="button" variant={"success"}
+                                        onClick={handleSubmit}>{disabled ? 'Sender...' : 'Send'}</Button>
                             </Col>
 
                             {(error) ?
