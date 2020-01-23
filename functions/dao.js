@@ -269,9 +269,8 @@ class Dao {
             });*/
     }
 
-    getUserByEmailOrUsername(username, email) {
+    getUserByEmailOrUsername(email, username) {
         let where = {[op.or]: [{email: email}, {username: username}]};
-        console.log(username);
         return model.UserModel.findAll({where: where, attributes: ['userId', 'username', 'email']})
             .then(users => users)
             .error(error => {
