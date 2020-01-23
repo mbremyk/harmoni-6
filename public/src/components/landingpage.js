@@ -17,7 +17,7 @@ export class LandingPage extends Component {
     render() {
         return (
             <div>
-                <div className={"landingpage"}>
+                <div className={"landingpage container"}>
                         <Row className={"p-4"}>
                             <Col>
                                 <h1 className="HarmoniLogo logo-big text-center">Harmoni</h1>
