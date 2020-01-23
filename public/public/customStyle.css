@@ -87,6 +87,11 @@ input:valid + span:after {
     padding-left: 5px;
 }
 
+.p-5,
+.p-2 {
+    margin-top: 1rem;
+}
+
 .imgPreviewFrame {
     height: 250px; /* Equals maximum image height */
     width: 100%;
