@@ -6,8 +6,6 @@ import moment from "moment";
 import Alert from "react-bootstrap/Alert";
 import {BugMail, Mail, service} from "./services";
 import {authService} from "./AuthService";
-import {HarmoniNavbar} from "./components/navbar";
-import NavLink from "react-bootstrap/NavLink";
 
 const jwt = require("jsonwebtoken");
 
@@ -288,8 +286,8 @@ export class MailForm extends Component {
         if (this.state.toggleable) {
             return (
                 <div>
-                    <div className={"container"}>
-                        <Card className="m-5 p-4">
+                    <div className={"c-sm "}>
+                        <Card className="border-0 m-sm-5 mt-4 p-sm-4">
                             <div>
                                 <Button style={{marginBottom: "10px"}} className={"btn-info"} onClick={this.toggleMail}
                                         block>
@@ -305,7 +303,7 @@ export class MailForm extends Component {
             return (
                 <div>
                     <div className={"container"}>
-                        <Card className="m-5 p-4">
+                        <Card className="m-sm-5 p-sm-4">
                             <div>
                                 {this.toggleForm(true)}
                             </div>

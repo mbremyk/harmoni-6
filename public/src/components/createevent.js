@@ -251,7 +251,7 @@ export class AddEvent extends Component {
                             <Form.Row>
 
                                 <Form.Group as={Col} sm={"12"}>
-                                    <h1 className="font-weight-bold text-center">Opprett arrangement</h1>
+                                    <h1 className="display-sm-3">Opprett arrangement</h1>
                                 </Form.Group>
 
                                 <Form.Group as={Col} sm={"12"}>

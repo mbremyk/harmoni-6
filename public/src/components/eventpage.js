@@ -33,7 +33,7 @@ export class EventPage extends Component {
                         <Card className='p-2'>
                             {this.renderImage()}
 
-                            <div className="p-4">
+                            <div className="p-sm-4">
                                 <h1 className="display-4 text-center m-4 text-body">{this.currentEvent.eventName}</h1>
 
                                 {this.RenderArtist()}
@@ -298,7 +298,7 @@ export class EventPage extends Component {
         if (authService.loggedIn()) {
             return <HarmoniNavbar/>
         } else {
-            return <NavLink href="/"><h1 className="HarmoniLogo display-3 text-center m-5 text-body">Harmoni</h1></NavLink>
+            return <NavLink href="/"><h1 className="HarmoniLogo display-sm-3 text-center m-5 text-body">Harmoni</h1></NavLink>
         }
     }
 

@@ -157,7 +157,7 @@ export class SortedEventView extends Component {
     render() {
         if (this.state.events !== []) {
             return (
-                <Container id="scrollTo">
+                <Container className={"c-lg"} id="scrollTo">
                     <Navbar className={"shadow-sm mt-2"} bg="light" expand="lg">
                         <Navbar.Brand>Filtrer og sorter</Navbar.Brand>
                         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
