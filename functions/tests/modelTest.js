@@ -272,7 +272,6 @@ describe('Events', () => {
     it('cancels event', done => {
         db.cancelEvent(1)
             .then(res => {
-                console.log(res);
                 expect(res).toBeTruthy();
                 done();
             });
