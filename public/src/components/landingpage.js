@@ -20,7 +20,7 @@ export class LandingPage extends Component {
                 <div className={"landingpage"}>
                         <Row className={"p-4"}>
                             <Col>
-                                <h1 className="HarmoniLogo display-sm-3 text-center">Harmoni</h1>
+                                <h1 className="HarmoniLogo logo-big text-center">Harmoni</h1>
                             </Col>
                         </Row>
                         <Row className={"p-5"}>
