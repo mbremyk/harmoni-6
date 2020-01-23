@@ -13,7 +13,7 @@ _/ auth_ bare på klientsiden.
 
 **Serverside Hashing / Salting:**
 
-Systemet bruker _bcrypt_-modulen for å hash / salt passord. Dette gjøres på serversiden. Passordet sendes til serveren med og HTTPS-tilkobling.
+Systemet bruker _bcr****ypt_-modulen for å hash / salt passord. Dette gjøres på serversiden. Passordet sendes til serveren med og HTTPS-tilkobling.
 Hashen og saltet blir deretter lagret i databasen.
 
 **Passordkontroll:**
