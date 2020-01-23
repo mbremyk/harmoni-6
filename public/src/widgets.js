@@ -150,29 +150,15 @@ export class DownloadWidget extends Component {
 }
 
 export class UploadWidget extends Component {
-    //TODO: Make sexy
     render() {
         return (
-            <div className="container">
-                <div className="form-group files color">
-                    <label>Upload Your File </label>
-                    <input type="file" className="form-control" encType="multipart/form-data" name="file"
-                           onChange={this.fileHandler}/>
-                </div>
+            <div className="upload-btn-wrapper">
+                <input type="file" className="form-control" encType="multipart/form-data" name="file"
+                       onChange={this.props.onChange}/>
+                <Button variant="primary">{this.props.title}</Button>
             </div>
         )
     }
-
-    fileHandler = (e) => {
-        e.preventDefault();
-        let selectedFile = e.target.files[0];
-        let data = new FormData();
-        data.append("file", selectedFile);
-        console.log(data);
-        // service.uploadContract(data, eventId, artistId)
-        // 	.then(res => console.log(res));
-    };
-
 }
 
 export class ModalPopup extends Component {
