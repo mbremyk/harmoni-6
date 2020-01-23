@@ -801,6 +801,18 @@ class Dao {
             });
     }
 
+    /*deleteGig(gigId) {
+        console.log("Delete gig called");
+        return model.GigModel.findByPk(gigId)
+            .then(gig => {
+                model.FileModel.findByPk(gig.contract)
+                    .then(result => {
+                        filehandler.deleteFromCloud(result.name, false);
+                    })
+            });
+
+    }*/
+
     /**
      * retrieves the gig assosciated with an event, NOT INCLUDING contract data and username/email of artist
      *
@@ -912,7 +924,7 @@ class Dao {
     }
 }
 
-
+//model.dropTables();
 //model.syncTestData();
 //model.syncModels();
 module.exports = Dao;

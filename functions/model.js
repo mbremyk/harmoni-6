@@ -29,16 +29,16 @@ function initCloud() {
         dialect: pr.dialect,
         host: pr.databaseURL,
         // port: pr.port,
-        timestamps: false,
-        dialectOptions: {
+        timestamps: false
+        /*dialectOptions: {
             socketPath: '/cloudsql/kkdatabase'
-        },
+        },*/
     });
     return sequelize;
 }
 
-let sequelize = init();
-//let sequelize = initCloud();
+//let sequelize = init();
+let sequelize = initCloud();
 
 
 sequelize.authenticate()
