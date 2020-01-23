@@ -21,7 +21,7 @@ export class Footer extends Component {
                     <Col>
                         <p className="text-dark font-italic">Harmoni
                             <NavLink
-                                href="https://docs.google.com/forms/d/1k6uyICHchKFE3x1OeACKjGNj64rAQeXRTNgCXFdQpIw/edit">
+                                href="https://forms.gle/BvKEVF8dqktYsQcaA">
                                 <u className="text-dark">Gjennomfør brukertest</u>
                             </NavLink>
                         </p>
