@@ -261,8 +261,6 @@ describe('Events', () => {
             eventName: 'UpdateEventFailTest',
             address: 'event.address',
             ageLimit: '20',
-            startTime: null,
-            endTime: null,
             description: 'EVENT UPDATED'
         };
         db.updateEvent(event).then(response => {

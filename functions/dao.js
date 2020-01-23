@@ -66,10 +66,9 @@ class Dao {
      */
     createTempUser(email) {
         return model.UserModel.create({email: email, username: ''})
-            .then(response => response.dataValues)
             .then(user => {
                 return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
-                    .then(response => {
+                    .then(() => {
                         if (!isCI && !test) {
                             user.username = 'guest' + user.userId;
                             let post = {
@@ -351,9 +350,13 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
+        console.log("Updating...");
         return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
-            .then(e => e.cancelled)
+            .then(e => e ? e.dataValues.cancelled : null)
             .then(e => {
+                if (e === null) {
+                    return false;
+                }
                 return model.EventModel.update(
                     {
                         organizerId: event.organizerId,
@@ -364,13 +367,12 @@ class Dao {
                         ageLimit: event.ageLimit,
                         startTime: event.startTime,
                         endTime: event.endTime,
-                        image: event.image,
                         imageUrl: event.imageUrl,
                         description: event.description,
                         cancelled: event.cancelled,
                     },
                     {where: {eventId: event.eventId}})
-                    .then(response =>  {
+                    .then(response => {
                         if (e !== event.cancelled && !e && !isCI && !test) {
                             return this.getGigs(event.eventId)
                                 .then(gigs => gigs.map(gig => gig.dataValues.artistId))
@@ -418,15 +420,13 @@ class Dao {
                 model: model.PersonnelModel
             }]
         })
-            .then(res => {
+            .then(() => {
                 return model.EventModel.update(
                     {
                         cancelled: true
                     },
                     {where: {eventId: eventId}})
-                    .then(cancelled => {
-                        return cancelled[0] === 1
-                    }/*affected rows === 1*/)
+                    .then(cancelled => cancelled[0] === 1 /*affected rows === 1*/)
                     .catch(error => {
                         console.error(error);
                         return false;
