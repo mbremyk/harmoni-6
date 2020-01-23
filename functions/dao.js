@@ -355,7 +355,7 @@ class Dao {
         return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
             .then(e => e.dataValues.cancelled)
             .then(e => {
-                model.EventModel.update(
+                return model.EventModel.update(
                     {
                         organizerId: event.organizerId,
                         eventName: event.eventName,
