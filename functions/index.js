@@ -22,6 +22,7 @@ if (!process.env.FIREBASE_CONFIG) {
     console.log("running firebase server");
     const main = express();
     main.use('/api/v1', app);
+    functions.region('europe-west1');
     /*main.use(bodyParser.json());
     main.use(bodyParser.urlencoded({extended: true}));*/
     exports.webApi = functions.https.onRequest(main);
