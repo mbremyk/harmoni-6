@@ -562,13 +562,13 @@ app.put('/auth/events/:eventId', (req, res) => {
                     .then(data => {
                         console.log(data.url);
                         req.body.imageUrl = data.url;
-                            return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400))
+                            return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false))
                         })
                         .catch(err => res.status(400));
                 }
             )
     } else {
-        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201) : res.status(400));
+        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false));
     }
 });
 
@@ -651,17 +651,17 @@ app.get("/auth/events/:eventId/personnel", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/tickets", (req, res) => {
-    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201) : res.status(503));
+    return db.addTickets(req.body).then(insertOk => (insertOk) ? res.status(201).send(true) : res.status(503).send(false));
 });
 
 
 /**
  *  @header  x-access-token: string
- *  @body {Ticket}
+ *  @body {Ticket[]}
  *  @return {json} {jwt: token}
  */
 app.put('/auth/events/:eventId/tickets', (req, res) => {
-    return db.updateTickets(req.body).then(updateOk => updateOk ? res.status(201) : res.status(404))
+    return db.updateTickets(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(404).send(false))
 });
 
 /**
@@ -671,7 +671,7 @@ app.put('/auth/events/:eventId/tickets', (req, res) => {
 app.delete('/auth/events/:eventId/tickets/:type', (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let type = decodeURIComponent(req.params.type);
-    return db.removeTicket(eventId, type).then(deleteOk => deleteOk ? res.status(201) : res.status(400))
+    return db.removeTicket(eventId, type).then(deleteOk => deleteOk ? res.status(201).send(true) : res.status(400).send(false))
 });
 
 
@@ -707,6 +707,18 @@ app.post("/auth/events/:eventId/gigs", (req, res) => {
     } else {
         db.addGig(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(503));
     }
+});
+
+
+/**
+ *  @header  x-access-token: string
+ *  @body {Gig}
+ *  @return {json} {jwt: token}
+ */
+app.delete("/auth/events/:eventId/gigs/:artistId", (req, res) => {
+    let eventId = decodeURIComponent(req.params.eventId);
+    let artistId = decodeURIComponent(req.params.artistId);
+    db.deleteGig(eventId, artistId).then((deleteOk) => deleteOk ? res.status(201).send(true) : res.sendStatus(503));
 });
 
 /**
@@ -777,7 +789,6 @@ app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
  */
 app.post("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
     db.addRiderItems(req.body).then((insertOk) => {
-        console.log(insertOk);
         return insertOk ? res.status(201).send(insertOk) : res.sendStatus(400)
     });
 });

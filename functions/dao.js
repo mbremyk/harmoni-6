@@ -442,7 +442,6 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     deleteEvent(eventId) {
-        console.log("Deleteevent called");
 
         if (!isCI && !test) {
             return this.getEventByEventId(eventId)
@@ -738,10 +737,11 @@ class Dao {
     updateTickets(tickets) {
         return Promise.all(tickets.map(ticket => model.TicketModel.update(
             {
+                type: ticket.type,
                 price: ticket.price,
                 amount: ticket.amount
             },
-            {where: {eventId: ticket.eventId, type: ticket.type}})
+            {where: {eventId: ticket.eventId, type: ticket.oldType}})
             .catch(error => {
                 console.error(error);
                 return false
@@ -885,6 +885,25 @@ class Dao {
             });
 
     }*/
+
+    /**
+     * deletes a Gig and the assosciated contract/file from the database
+     *
+     * @param eventId
+     * @param artistId
+     * @returns {Promise<boolean>}
+     */
+    deleteGig(eventId, artistId) {
+        return this.getContractId(eventId, artistId).then(contractId => {
+            model.FileModel.destroy({where: {fileId: contractId}}).then(() => {
+                return model.GigModel.destroy({where: {eventId: eventId, artistId: artistId}}).then(() => true)
+            })
+        })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
+    }
 
     /**
      * retrieves the gig assosciated with an event, NOT INCLUDING contract data and username/email of artist

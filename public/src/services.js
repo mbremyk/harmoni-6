@@ -10,20 +10,19 @@ if (window.location.href.includes('localhost:5000')) {
     url = 'https://us-central1-harmoni-6.cloudfunctions.net/webApi/api/v1';
 }
 
+
 export class Artist {
 
     userId;
     username;
     email;
     contract;
-    document;
 
-    constructor(userId, username, email, contract, document) {
+    constructor(userId, username, email, contract) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.contract = contract;
-        this.document = document
     }
 
 }
@@ -55,7 +54,8 @@ export class BugMail {
         this.text = text;
     }
 }
-export class Mail extends BugMail{
+
+export class Mail extends BugMail {
     to;
 
     constructor(to, from, name, description, text) {
@@ -137,6 +137,15 @@ export class Ticket {
     type;
     price;
     amount;
+    oldType;
+
+    constructor(eventId, type, price, amount){
+        this.eventId = eventId;
+        this.type = type;
+        this.price = price;
+        this.amount = amount;
+        this.oldType = type;
+    }
 }
 
 export class Personnel {
@@ -192,6 +201,10 @@ class Services {
     */
     createUser(user) {
         return axios.post(url + '/users', user).then(response => response.data);
+    }
+
+    createTempUser(user) {
+        return axios.post(url + "/auth/users/temp", user, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
 
     updateUser(user) {
@@ -296,11 +309,11 @@ class Services {
     }
 
     /**
-     * @param ticket: Ticket
+     * @param tickets: Ticket[]
      * @returns Promise<>: boolean
      */
-    updateTicket(ticket) {
-        return axios.put(url + '/auth/events/' + ticket.eventId + '/tickets', ticket, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    updateTicket(tickets) {
+        return axios.put(url + '/auth/events/' + tickets[0].eventId + '/tickets', tickets, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
 
     /**
@@ -332,6 +345,14 @@ class Services {
     }
 
     /**
+     * @param gig: Gig with file
+     * @returns Promise<>: boolean
+     */
+    deleteGig(gig) {
+        return axios.delete(url + '/auth/events/' + gig.eventId + '/gigs/' + gig.artistId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
+    }
+
+    /**
      * @param eventId: number
      * @returns Promise<>: Gig[]
      */
@@ -355,6 +376,7 @@ class Services {
     downloadContract(eventId, artistId) {
         return axios.get(url + "/auth/events/" + eventId + "/gigs/" + artistId, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data);
     }
+
 
     /**
      * @param riderItems: RiderItem[]
@@ -380,16 +402,29 @@ class Services {
     getRiderItems(eventId, artistId) {
         return axios.get(url + '/auth/events/' + eventId + '/gigs/' + artistId + '/rider', {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
+
     /*
         EMAIL
      */
-    sendBug(mail){
-        return axios.post(url+"/mail/bug", mail).then(response => response.data);
+    sendBug(mail) {
+        return axios.post(url + "/mail/bug", mail).then(response => response.data);
     }
 
-    sendMails(mail){
-        return axios.post(url+"/mail/info", mail).then(response => response.data);
+    sendMails(mail) {
+        return axios.post(url + "/mail/info", mail).then(response => response.data);
     }
+
+
+    toBase64 = (file) => new Promise((resolve, reject) => {
+        if (file === "" || file === null) {
+            resolve(null);
+            return;
+        }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 }
 
 export let service = new Services();

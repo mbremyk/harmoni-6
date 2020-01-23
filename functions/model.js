@@ -141,7 +141,7 @@ let FileModel = sequelize.define('file', {
         type: Sequelize.TEXT
     }
 
-}, {paranoid: true});
+});
 
 
 /*class Gig {
@@ -171,7 +171,7 @@ let GigModel = sequelize.define('gig', {
             key: 'fileId'
         }
     }
-}, {paranoid: true});
+});
 
 
 /*
