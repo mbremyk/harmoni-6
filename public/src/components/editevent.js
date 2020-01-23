@@ -143,7 +143,7 @@ export default function EditEvent() {
     return (
         <div>
             <HarmoniNavbar/>
-            <Container>
+            <Container className={"c-lg"}>
                 <Card className={"p-5"}>
                     <Form>
                         <Form.Row>
