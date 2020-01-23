@@ -11,6 +11,7 @@ const test = (process.env.NODE_ENV === 'test');
 const filehandler = require("./filehandler.js");
 
 let mailProps = isCI ? "" : new props.MailProperties();
+let url = "https://harmoni-6.firebaseapp.com/";
 
 
 class Dao {
@@ -57,11 +58,29 @@ class Dao {
             });
     }
 
+    /**
+     * Creates a temporary user without password or salt and sends an email to the given email address
+     *
+     * @param email
+     * @returns {Promise<User>}
+     */
     createTempUser(email) {
         return model.UserModel.create({email: email, username: ''})
-            .then(created => {
-                return model.UserModel.update({username: 'guest' + created.userId}, {where: {userId: created.userId}})
-                    .then(response => (response[0] === 1) ? created : null);
+            .then(user => {
+                return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
+                    .then(() => {
+                        if (!isCI && !test) {
+                            user.username = 'guest' + user.userId;
+                            let post = {
+                                to: email,
+                                from: mailProps.username,
+                                subject: 'Anmodning om kontakt på Harmoni',
+                                text: `Hei\n\nHarmoni er en nettside for planlegging av konserter og andre arrangementer som skal gjøre det enklere for arrangører, artister og personell å samarbeide.\nNoen har lagt deg til artist eller personell på et arrangement, og oppgitt din epost-adresse.\nHvis du ønsker å se informasjon om arrangementet kan du opprette en bruker her ${url}ny-bruker/\n\nVi håper å se deg snart\n\nMed vennlig hilsen\nHarmoni team 6`
+                            };
+                            mail.sendMail(post);
+                        }
+                        return user;
+                    })
             })
             .catch(error => {
                 console.error(error);
@@ -331,40 +350,86 @@ class Dao {
      * @returns {Promise<boolean>}
      */
     updateEvent(event) {
-        return model.EventModel.update(
-            {
-                organizerId: event.organizerId,
-                eventName: event.eventName,
-                address: event.address,
-                city: event.city,
-                placeDescription: event.placeDescription,
-                ageLimit: event.ageLimit,
-                startTime: event.startTime,
-                endTime: event.endTime,
-                image: event.image,
-                imageUrl: event.imageUrl,
-                description: event.description,
-                cancelled: event.cancelled,
-            },
-            {where: {eventId: event.eventId}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
-            .catch(error => {
-                console.error(error);
-                return false;
-            });
+        console.log("Updating...");
+        return model.EventModel.findOne({where: {eventId: event.eventId}, attributes: ['cancelled']})
+            .then(e => e.dataValues.cancelled)
+            .then(e => {
+                return model.EventModel.update(
+                    {
+                        organizerId: event.organizerId,
+                        eventName: event.eventName,
+                        address: event.address,
+                        city: event.city,
+                        placeDescription: event.placeDescription,
+                        ageLimit: event.ageLimit,
+                        startTime: event.startTime,
+                        endTime: event.endTime,
+                        image: event.image,
+                        imageUrl: event.imageUrl,
+                        description: event.description,
+                        cancelled: event.cancelled,
+                    },
+                    {where: {eventId: event.eventId}})
+                    .then(response =>  {
+                        console.log("finished");
+                        if (e !== event.cancelled && !e && !isCI && !test) {
+                            return this.getGigs(event.eventId)
+                                .then(gigs => gigs.map(gig => gig.dataValues.artistId))
+                                .then(gigs => {
+                                    return this.getPersonnel(event.eventId)
+                                        .then(personnel => personnel.map(person => person.dataValues.personnelId))
+                                        .then(personnel => {
+                                            let set = new Set(gigs);
+                                            personnel.map(person => set.add(person));
+
+                                            return model.UserModel.findAll({where: {userId: {[op.in]: Array.from(set)}}})
+                                                .then(users => users.map(user => user.dataValues.email))
+                                                .then(users => {
+                                                    let email = {
+                                                        from: mailProps.username,
+                                                        to: users,
+                                                        subject: `${event.eventName} avlyst`,
+                                                        text: `Arrangementet ${event.eventName} som du var artist og/eller personell ved har blitt avlyst.\nAll informasjon om arrangementet er fortsatt tilgjengelig i 90 dager etter at det skulle funnet sted\nDu kan finne arrangementet på ${url}${event.eventId}\n\nMed vennlig hilse\nHarmoni team 6`
+                                                    };
+                                                    mail.sendMail(email);
+                                                    return response[0] === 1; /*affected rows === 1*/
+                                                })
+                                        })
+                                })
+                        } else {
+                            return response[0] === 1; /*affected rows === 1*/
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        return false;
+                    });
+            })
     }
 
 
     cancelEvent(eventId) {
-        return model.EventModel.update(
-            {
-                cancelled: true
-            },
-            {where: {eventId: eventId}})
-            .then(response => response[0] === 1 /*affected rows === 1*/)
-            .catch(error => {
-                console.error(error);
-                return false;
+        return model.EventModel.findAll({
+            where: {eventId: eventId},
+            include: [{
+                model: model.UserModel
+            }, {
+                model: model.GigModel
+            }, {
+                model: model.PersonnelModel
+            }]
+        })
+            .then(res => {
+                model.EventModel.update(
+                    {
+                        cancelled: true
+                    },
+                    {where: {eventId: eventId}})
+                    .then(cancelled => cancelled[0] === 1 /*affected rows === 1*/)
+                    .catch(error => {
+                        console.error(error);
+                        return false;
+                    });
             });
     }
 
@@ -572,7 +637,7 @@ class Dao {
                                             from: mailProps.username,
                                             to: pers.user.email,
                                             subject: `Personellprivilegier for ${event.eventName}`,
-                                            text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                            text: `Du har blitt lagt til som personell i arrangementet ${event.eventName} på ${url}\nDu kan finne arrangementet på ${url}arrangement/${event.eventId}\n\nMed vennlig hilsen\nHarmoni team 6`
                                         };
                                         mail.sendMail(email);
                                     })
@@ -603,7 +668,7 @@ class Dao {
                 return true
             })
             .catch(error => {
-                console.log(error);
+                console.error(error);
                 return false
             })
     }
@@ -749,7 +814,7 @@ class Dao {
                                                 to: user.email,
                                                 from: mailProps.username,
                                                 subject: "Artistprivilegier for " + event.eventName,
-                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på https://harmoni-6.firebaseapp.com/\nDu kan finne arrangementet på https://harmoni-6.firebaseapp.com/arrangement/${event.eventId}\nFor å laste ned kontrakt eller legge til en rider må du logge inn på siden\n\nMed vennlig hilsen\nHarmoni team 6`
+                                                text: `Du har blitt lagt til som artist i arrangementet ${event.eventName} på ${url}\nDu kan finne arrangementet på ${url}arrangement/${event.eventId}\nFor å laste ned kontrakt eller legge til en rider må du logge inn på siden\n\nMed vennlig hilsen\nHarmoni team 6`
                                             };
                                             mail.sendMail(email);
                                         })
@@ -881,7 +946,26 @@ class Dao {
      */
     addRiderItems(riderItems) {
         return model.RiderModel.bulkCreate(riderItems)
-            .then(response => response[0].item !== null)
+            .then(response => {
+                if (!isCI && !test) {
+                    return model.EventModel.findOne({
+                        where: {eventId: riderItems[0].eventId},
+                        include: [{model: model.UserModel}]
+                    })
+                        .then(res => {
+                            let email = {
+                                to: res.user.dataValues.email,
+                                from: mailProps.username,
+                                subject: `Rider oppdatert for ${res.dataValues.eventName}`,
+                                text: `En artist har oppdatert sin rider for ${res.dataValues.eventName}.\nGå inn på ${url}arrangement/${res.dataValues.eventId} for å se og godkjenne rider\n\n Med vennlig hilsen\nHarmoni team 6`
+                            };
+                            mail.sendMail(email);
+                            return response[0].dataValues.item !== null
+                        });
+                } else {
+                    return response[0].dataValues.item !== null;
+                }
+            })
             .catch(error => {
                 console.error(error);
                 return false;
@@ -912,7 +996,27 @@ class Dao {
                 return false
             })))
             .then(() => {
-                return true;
+                if (!isCI && !test) {
+                    return this.getUserById(riderItems[0].artistId)
+                        .then(user => {
+                            return model.EventModel.findOne({
+                                where: {eventId: riderItems[0].eventId},
+                                include: [{model: model.UserModel}]
+                            })
+                                .then(event => {
+                                    let email = {
+                                        to: user.dataValues.email,
+                                        from: mailProps.username,
+                                        subject: `Rider gjennomgått for ${event.dataValues.eventName}`,
+                                        text: `${event.user.dataValues.username} har gått gjennom din rider for arrangementet ${event.dataValues.eventName}\n\nDu kan se hva hvilke punkter arrangøren har godkjent eller ikke godkjent ved å gå inn på arrangementet: ${url}arrangement/${event.dataValues.eventId}\n\nDu kan ta kontakt med arrangøren på mail: ${event.user.dataValues.email}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                    };
+                                    mail.sendMail(email);
+                                    return true;
+                                });
+                        });
+                } else {
+                    return true;
+                }
             });
     }
 

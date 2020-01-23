@@ -170,15 +170,23 @@ input:valid + span:after {
 
 @media only screen and (min-width: 600px) {
     .container {
-        width: 50em;
+        width: 60em;
     }
 
     .c-sm {
-        width: 40em;
+        width: 50em;
     }
 
     .c-lg {
-        width: 95%;
+        width: 80em;
+    }
+
+    .logo-big{
+        font-size: 7rem;
+    }
+
+    .h1 .HarmoniLogo {
+        font-size: 0.9rem;
     }
 
 }

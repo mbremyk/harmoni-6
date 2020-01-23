@@ -1,4 +1,3 @@
-
 Object.defineProperty(exports, "__esModule", {value: true});
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
@@ -168,6 +167,12 @@ app.use("/auth", (req, res, next) => {
             res.json({error: "Not authorized"});
         } else {
             console.log("Token OK");
+            console.log(decoded);
+            res.json.jwt = getToken({
+                userId: decoded.userId,
+                username: decoded.username,
+                email: decoded.email
+            });
             next();
         }
     })
@@ -188,6 +193,14 @@ app.post("/login", async (req, res) => {
     console.log("POST-request - /login");
 
     let salt = await db.getSaltByEmail(req.body.email);
+
+    if (salt.length !== 1) {
+        console.log('No email found');
+        res.status(401);
+        res.json({error: "Not authorized"});
+        return;
+    }
+
     let credentials = await hashPassword.hashPassword(req.body.password, salt[0].dataValues.salt);
 
     let ok1 = await db.loginOk(req.body.email, credentials[0]);
@@ -217,12 +230,10 @@ app.post("/login", async (req, res) => {
         res.status(401);
         res.json({error: "Not authorized"})
     }
-
 });
 
 app.get("/validate/username/:username", (req, res) => {
     console.log("GET-request - /validate/username/:username");
-    console.log(req.params.username);
     return db.getUserByUsername(req.params.username).then(result => {
         console.log(result);
         res.send(result.length === 1)
@@ -232,7 +243,6 @@ app.get("/validate/username/:username", (req, res) => {
 
 app.get("/validate/email/:email", (req, res) => {
     console.log("GET-request - /validate/email/:email");
-    console.log(req.params.email);
     return db.getUserByEmail(req.params.email).then(result => {
         console.log(result);
         res.send(result !== null)
@@ -253,6 +263,7 @@ app.post("/auth/logout", (req, res) => {
     let token = req.headers["x-access-token"];
     jwtBlacklist.push(token);
 
+    res.json.jwt = null;
     return res.sendStatus(201);
 });
 
@@ -280,10 +291,12 @@ app.post("/auth/refresh", (req, res) => {
 app.put('/forgotPass/:email', (req, res) => {
     console.log('PUT-request - /forgotPass/:email');
 
-    let email = req.params.email;
+    let email = decodeURIComponent(req.params.email);
     return db.forgotPassword(email)
         .then(success => success ? res.status(201) : res.status(400))
-        .catch(error => { res.send(error);});
+        .catch(error => {
+            res.send(error);
+        });
 });
 
 
@@ -304,12 +317,25 @@ app.put('/forgotPass/:email', (req, res) => {
 app.post("/users", (req, res) => {
     console.log('POST-request - /user');
     return db.getUserByEmailOrUsername(req.body.email, req.body.username)
-        .then(user => {
-            console.log(req.body);
-            if (user.length !== 0) {
-                res.sendStatus(409);
+        .then(users => users.map(user => user.dataValues))
+        .then(async users => {
+            if (users.length !== 0) {
+                users = await users.filter(async user => {
+                    await db.getSaltByEmail(user.email)
+                        .then(salt => salt[0].dataValues.salt == null);
+                });
+                if (users.length === 1 && users[0].email === req.body.email) {
+                    await db.updateUser({
+                        userId: users[0].userId,
+                        username: req.body.username,
+                        password: req.body.password,
+                        email: users[0].email
+                    })
+                        .then(() => res.sendStatus(200))
+                } else {
+                    res.sendStatus(409);
+                }
             } else {
-                console.log(req.body);
                 return hashPassword.hashPassword(req.body.password).then(credentials => {
                     db.createUser({
                         username: req.body.username,
@@ -381,50 +407,25 @@ app.get("/users/:userId", (req, res) => {
  * }
  */
 app.get("/auth/users/:userId", (req, res) => {
-	console.log("GET-request - /users/:userId");
-	return db.getUserById(req.params.userId)
-		.then(user => res.send(user))
-		.catch(error => console.error(error));
+    console.log("GET-request - /users/:userId");
+    return db.getUserById(req.params.userId)
+        .then(user => res.send(user))
+        .catch(error => console.error(error));
 });
 
 app.post("/auth/users/temp", (req, res) => {
-	console.log("GET-request - /auth/users/temp");
-	return db.createTempUser(req.body.email)
-		.then(result => res.status(201).send(result))
-		.catch(error => console.error(error));
+    console.log("GET-request - /auth/users/temp");
+    return db.createTempUser(req.body.email)
+        .then(result => res.status(201).send(result))
+        .catch(error => console.error(error));
 });
-
 
 /*
     EVENTS
  */
-
-
-/**
- *
- */
-app.post("/events", (req, res) => {
-    console.log("POST-request - /events");
-    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
-        let name = "image.png";
-        filehandler.uploadToCloud(req.body.imageUrl, name, true)
-            .then(urldata => {
-                console.log(urldata);
-                req.body.imageUrl = urldata.url;
-                console.log("in post events:" + req.body.imageUrl);
-                db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
-            });
-    }else{
-        db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
-    }
-
-});
-
-
-
 app.post("/auth/events", (req, res) => {
     console.log("POST-request - /events");
-    if(req.body.imageUrl && req.body.imageUrl.includes("base64")){
+    if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
         let name = "image.png";
         filehandler.uploadToCloud(req.body.imageUrl, name, true)
             .then(urldata => {
@@ -437,7 +438,6 @@ app.post("/auth/events", (req, res) => {
         db.createEvent(req.body).then(response => response.insertId ? res.status(201).send(response) : res.sendStatus(400));
     }
 });
-
 
 /**
  * Get all events in database as an array + checks and deletes old entries
@@ -470,7 +470,6 @@ app.get("/events", (req, res) => {
         )
         .catch(error => console.error(error));
 });
-
 
 /**
  * Get all events where eventName or description contains searchText
@@ -519,7 +518,7 @@ app.get("/auth/events/users/:userId", (req, res) => {
     }
 });
 
-
+//TODO fix
 /**
  * header:
  *      {
@@ -548,7 +547,7 @@ app.get("/myevents/users/:userId/", (req, res) => {
  */
 app.put('/auth/events/:eventId', (req, res) => {
     let userId = jwt.decode(req.headers['x-access-token']).userId;
-    if (req.body.organizerId != userId) {
+    if (req.body.organizerId !== userId) {
         res.status(401);
         console.log('Not authorized to update event');
         return;
@@ -556,20 +555,22 @@ app.put('/auth/events/:eventId', (req, res) => {
     if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
         db.getEventByEventId(req.params.eventId)
             .then(item => {
-                    console.log("deleting old");
-                    filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
-                    console.log("uploading  new");
-                    return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
-                        .then(data => {
-                            console.log(data.url);
-                            req.body.imageUrl = data.url;
+                console.log("deleting old");
+                filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true);
+                console.log("uploading  new");
+                return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
+                    .then(data => {
+                        console.log(data.url);
+                        req.body.imageUrl = data.url;
                             return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false))
                         })
                         .catch(err => res.status(400));
                 }
             )
     } else {
-        return db.updateEvent(req.body).then(updateOk => updateOk ? res.status(201).send(true) : res.status(400).send(false));
+        return db.updateEvent(req.body).then(updateOk => {
+            return updateOk ? res.status(201).send(true) : res.status(400).send(false)
+        });
     }
 });
 
@@ -789,7 +790,9 @@ app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
  *  @return {json} {jwt: token}
  */
 app.post("/auth/events/:eventId/gigs/:artistId/rider", (req, res) => {
-    db.addRiderItems(req.body).then((insertOk) => insertOk ? res.status(201).send(insertOk) : res.sendStatus(400));
+    db.addRiderItems(req.body).then((insertOk) => {
+        return insertOk ? res.status(201).send(insertOk) : res.sendStatus(400)
+    });
 });
 
 

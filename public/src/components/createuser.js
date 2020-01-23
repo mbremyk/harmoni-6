@@ -7,6 +7,7 @@ import {service, User} from "../services";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import {Card} from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
 
 export class CreateUserForm extends Component {
 	constructor(props) {
@@ -45,12 +46,14 @@ export class CreateUserForm extends Component {
 
     setError(message, variant) {
         this.setState({error: message, errorType: variant});
+	    if(!message) {return;}
         setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
 
 	handleSubmit() {
 		console.log('handle Submit user');
+		this.setError('', 'primary');
 
 		// check empty fields
         if (!this.state.username || !this.state.email) {
@@ -92,7 +95,9 @@ export class CreateUserForm extends Component {
 						service.createUser(user)
 							.then(res => console.log('Submit user status: ' + res))
 							.then(this.props.history.push("/logg-inn"))
-                            .catch(err => this.setError('Bruker ikke opprettet', 'danger'));
+                            .catch(err => {
+                            	this.setError('Bruker ikke opprettet', 'danger')
+                            })
 					}
 				})
 			}
