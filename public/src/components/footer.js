@@ -28,12 +28,6 @@ export class Footer extends Component {
                     </Col>
                     <Col>
                         <p className="text-dark">
-                            Følg oss her: <NavLink href="https://www.facebook.com/Marius.Torbjornsen">
-                            <u className="text-dark">Facebook</u></NavLink>
-                        </p>
-                    </Col>
-                    <Col>
-                        <p className="text-dark">
                             Rapporter bugs: <NavLink href="/bugs">
                             <u className="text-dark">Meld inn</u></NavLink>
                         </p>
