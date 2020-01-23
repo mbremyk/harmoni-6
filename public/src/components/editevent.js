@@ -11,7 +11,6 @@ import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
 import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {HarmoniNavbar} from "./navbar";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
@@ -19,11 +18,11 @@ import Alert from "react-bootstrap/Alert";
 import moment from "moment";
 import {
     CustomMenu,
-    minDateInput,
-    maxDateInput,
-    inputField,
-    textField,
     fromTimeInput,
+    inputField,
+    maxDateInput,
+    minDateInput,
+    textField,
     toTimeInput
 } from "./editandcreatefunctions";
 import {authService} from '../AuthService';
@@ -278,60 +277,85 @@ export default function EditEvent() {
                             {renderPersonnel()}
 
                         </Form.Row>
-                        <Row>
-                            <Form.Row>
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label>Billett-type</Form.Label>
-                                    <Form.Control
-                                        placeholder="Navn på billettype . . ."
-                                        onChange={event => setTicketType(event.target.value)}
-                                    />
-                                </Form.Group>
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label>Billettpris</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="number"
-                                            placeholder="Billettpris . . ."
-                                            onChange={event => setTicketPrice(event.target.value)}
-                                        />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr</InputGroup.Text>
-                                        </InputGroup.Append>
-                                    </InputGroup>
-                                </Form.Group>
 
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label>Antall billetter</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        placeholder="Antall billetter . . ."
-                                        onChange={event => setTicketAmount(event.target.value)}
-                                    />
+                        <Card>
 
-                                </Form.Group>
+                            <Card.Title>
+                                <h2 className="text-center">Biletter</h2>
+                            </Card.Title>
 
-                                <Form.Group as={Col} sm={"3"}>
-                                    <Form.Label> </Form.Label>
-                                    <Button onClick={handleTicketsAdd}>Legg til billett-typen</Button>
-                                </Form.Group>
+                            <ListGroup className={"p-3"}>
+                                <ListGroup.Item>
 
-                            </Form.Row>
-                            <ListGroup title={"Billett-typer på dette arrangementet"}>
-                                {tickets.map(ticket =>
-                                    <React.Fragment>
-                                        <ListGroupItem>
+                                    <Row>
+                                        <Col sm={3}>
+                                            <label>Bilett type</label>
+                                        </Col>
+
+
+                                        <Col sm={3}>
+                                            <label>Bilett pris</label>
+                                        </Col>
+
+
+                                        <Col sm={3}>
+                                            <label>Bilett mengde</label>
+                                        </Col>
+                                    </Row>
+
+
+                                    <Form.Row>
+
+                                        <Form.Group as={Col} sm={"3"}>
+                                            <Form.Control
+                                                placeholder="Navn på billettype . . ."
+                                                onChange={event => setTicketType(event.target.value)}
+                                            />
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} sm={"3"}>
+                                            <InputGroup>
+                                                <Form.Control
+                                                    type="number"
+                                                    placeholder="Billettpris . . ."
+                                                    onChange={event => setTicketPrice(event.target.value)}
+                                                />
+                                                <InputGroup.Append>
+                                                    <InputGroup.Text>kr</InputGroup.Text>
+                                                </InputGroup.Append>
+                                            </InputGroup>
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} sm={"3"}>
+                                            <Form.Control
+                                                type="number"
+                                                placeholder="Antall billetter . . ."
+                                                onChange={event => setTicketAmount(event.target.value)}
+                                            />
+
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} sm={"3"}>
+
+                                            <Button onClick={handleTicketsAdd} variant={"success"}>Legg til
+                                                bilett</Button>
+                                        </Form.Group>
+                                    </Form.Row>
+                                </ListGroup.Item>
+
+                                <ListGroup.Item>
+
+                                    {tickets.map(ticket =>
+                                        <React.Fragment>
                                             <Row>
-                                                <Col>
-                                                    <Form.Label>Billett-type</Form.Label>
+                                                <Col sm={3}>
                                                     <Form.Control
                                                         placeholder="Billett-type"
                                                         value={ticket.type}
                                                         onChange={event => handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
                                                     />
                                                 </Col>
-                                                <Col>
-                                                    <Form.Label>Billett-pris</Form.Label>
+                                                <Col sm={3}>
                                                     <Form.Control
                                                         type="number"
                                                         placeholder="Billett-pris"
@@ -339,8 +363,7 @@ export default function EditEvent() {
                                                         onChange={event => handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
                                                     />
                                                 </Col>
-                                                <Col>
-                                                    <Form.Label>Antall billetter</Form.Label>
+                                                <Col sm={3}>
                                                     <Form.Control
                                                         type="number"
                                                         placeholder="Antall billetter"
@@ -348,39 +371,40 @@ export default function EditEvent() {
                                                         onChange={event => handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
                                                     />
                                                 </Col>
-                                                <Col>
+                                                <Col sm={3}>
                                                     <Button type="button" variant={"danger"}
                                                             onClick={event => handleTicketsRemoval(event, ticket)}>X</Button>
                                                 </Col>
                                             </Row>
-                                        </ListGroupItem>
-                                    </React.Fragment>
-                                )}
+                                        </React.Fragment>
+                                    )}
+                                </ListGroup.Item>
                             </ListGroup>
-                            <Row>
-                                <Col>
-                                    <Button type="button" variant={"success"} onClick={handleSubmit}>Lagre</Button>
-                                </Col>
-                                <Col>
-                                    <Button variant={"danger"} type="button" onClick={handleEventCancel}>Avlys
-                                        arrangement</Button>
-                                </Col>
+                        </Card>
+                        <Row>
+                            <Col>
+                                <Button type="button" variant={"success"} onClick={handleSubmit}>Lagre</Button>
+                            </Col>
+                            <Col>
+                                <Button variant={"danger"} type="button" onClick={handleEventCancel}>Avlys
+                                    arrangement</Button>
+                            </Col>
 
-                                {(error) ?
-                                    <Alert style={{
-                                        height: '9em',
-                                        top: '50%',
-                                        left: '50%',
-                                        position: 'fixed',
-                                        transform: 'translate(-50%, -50%)'
-                                    }} variant={errorType}><Alert.Heading>Vent nå litt!</Alert.Heading>
-                                        <p>{error}</p></Alert> :
-                                    <div style={{height: '3em'}}/>}
-                                <Col>
-                                    <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
-                                </Col>
-                            </Row>
+                            {(error) ?
+                                <Alert style={{
+                                    height: '9em',
+                                    top: '50%',
+                                    left: '50%',
+                                    position: 'fixed',
+                                    transform: 'translate(-50%, -50%)'
+                                }} variant={errorType}><Alert.Heading>Vent nå litt!</Alert.Heading>
+                                    <p>{error}</p></Alert> :
+                                <div style={{height: '3em'}}/>}
+                            <Col>
+                                <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
+                            </Col>
                         </Row>
+
                     </Form>
                 </Card>
             </Container>

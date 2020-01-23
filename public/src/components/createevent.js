@@ -368,7 +368,7 @@ export default function EditEvent() {
                                     <p>{error}</p></Alert> :
                                 <div style={{height: '3em'}}/>}
                             <Col>
-                                <Button variant={"danger"} onClick={handleDelete}>Avbryt</Button>
+                                <Button variant={"danger"} onClick={handleCancel}>Avbryt</Button>
                             </Col>
                         </Row>
                     </Form>
