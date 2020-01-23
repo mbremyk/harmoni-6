@@ -101,9 +101,9 @@ export class CreateUserForm extends Component {
 
 	render() {
 		return (
-			<Container style={{width: '40em'}}>
+			<Container className={"c-sm"} /*style={{width: '40em'}}*/>
 
-				<h1 className="HarmoniLogo display-3 text-center m-3">Harmoni</h1>
+				<h1 className="HarmoniLogo display-sm-3 text-center m-3">Harmoni</h1>
 
 				<Card className="" style={{padding: '10px'}}>
                     <div style={{padding: '5%'}}>
