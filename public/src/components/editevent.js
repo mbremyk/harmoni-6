@@ -18,6 +18,7 @@ import Card from "react-bootstrap/Card";
 import Alert from "react-bootstrap/Alert";
 import moment from "moment";
 import {CustomMenu, dateInput, inputField, textField, timeInput} from "./editandcreatefunctions";
+import {authService} from '../AuthService';
 
 const jwt = require("jsonwebtoken");
 
@@ -50,6 +51,7 @@ export default function EditEvent() {
     const [gigsOld, setGigsOld] = useState([]);
     const [gigsNew, setGigsNew] = useState([]);
     const [gigsNewByEmail, setGigsNewByMail] = useState([]);
+    const [gigEmail, setGigEmail] = useState('');
     const [gigsRemove, setGigsRemove] = useState([]);
 
     //Personnel
@@ -69,6 +71,8 @@ export default function EditEvent() {
 
     useEffect(() => {
         service.getEventByEventId(match.params.id).then(event => {
+
+            if (event.organizerId != jwt.decode(authService.getToken()).userId) history.push("/arrangement/" + event.eventId);
 
             setEventId(event.eventId);
             setOrganizerId(event.organizerId);
@@ -181,24 +185,23 @@ export default function EditEvent() {
                                 </Form.Group>
                             </Row>
                             <Row>
-                                Forsidebilde:
+                                <label>Forsidebilde:</label>
+                                {renderImagePreview()}
+
+                                <Form.Group as={Col} sm={"4"}>
+                                    <input type="file" className="form-control" encType="multipart/form-data"
+                                           name="file"
+                                           onChange={event => handleImageUpload(event.target.files[0])}/>
+                                </Form.Group>
+
+                                <Form.Group as={Col} sm={"8"}>
+                                    <Form.Control
+                                        placeholder="Url.."
+                                        value={imageUrl}
+                                        onChange={event => setImageUrl(event.target.value)}
+                                    />
+                                </Form.Group>
                             </Row>
-
-                            {renderImagePreview()}
-
-                            <Form.Group as={Col} sm={"4"}>
-                                <input type="file" className="form-control" encType="multipart/form-data"
-                                       name="file"
-                                       onChange={event => handleImageUpload(event.target.files[0])}/>
-                            </Form.Group>
-
-                            <Form.Group as={Col} sm={"8"}>
-                                <Form.Control
-                                    placeholder="Url.."
-                                    value={imageUrl}
-                                    onChange={event => setImageUrl(event.target.value)}
-                                />
-                            </Form.Group>
 
                             <Form.Group as={Col} sm={"12"}>
                                 <Row>
@@ -392,7 +395,7 @@ export default function EditEvent() {
         if (!imageUrl || imageUrl === '') return null;
         return (
             <div className="imgPreviewFrame">
-                <span className="imgPreviewContainer"/><img src={imageUrl} height={'100%'} width={'100%'}
+                <span className="imgPreviewContainer"/><img src={imageUrl} height={'100%'}
                                                             alt={'Failed to load image'}/>
             </div>
         )
@@ -404,7 +407,7 @@ export default function EditEvent() {
      */
 
     function renderArtists() {
-        if ((gigsOld.length + gigsNew.length) === 0) return null;
+        if ((gigsOld.length + gigsNew.length + gigsNewByEmail.length) === 0) return null;
         return (
             <Form.Group as={Col} sm={"12"}>
                 <Card>
@@ -421,7 +424,65 @@ export default function EditEvent() {
         )
     }
 
+    function renderArtistsNewByEmail() {
+        return (
+            <>
+                {gigsNewByEmail.map(gig => (
+                    <ListGroup.Item>
+                        <Row>
+                            <Form.Group as={Col} controlId="formBasicEmail">
+                                <Form.Control
+                                    type="email"
+                                    placeholder="Epost til artist"
+                                    value={gig.user.email}
+                                    onChange={event => {
+                                        setGigEmail(event.target.value);
+                                        gig.user.email = event.target.value;
+                                    }}/>
+                            </Form.Group>
+                            <Form.Group as={Col} sm={"6"}>
+                                <input type="file" className="form-control"
+                                       encType="multipart/form-data" name="file"
+                                       onChange={event => handleContractUpload(event, gig)}/>
+                            </Form.Group>
+                            <Col>
+                                <Button type="button" variant={"danger"}
+                                        onClick={() => {
+                                            let copy = [...gigsNewByEmail];
+                                            copy.splice(gigsNewByEmail.indexOf(gig), 1);
+                                            setGigsNewByMail(copy)
+                                        }}>X</Button>
+                            </Col>
+                        </Row>
+                    </ListGroup.Item>
+                ))}
+            </>)
+    }
+
     function renderArtistsOld() {
+        return (<>
+            {gigsOld.map(gig => (
+                <React.Fragment key={gig.user.userId}>
+                    <ListGroup.Item>
+                        <Row>
+                            <Col sm={"2"}>
+                                <label>{gig.user.username}</label>
+                            </Col>
+                            <Col sm={"2"}>
+                                <label>{gig.user.email}</label>
+                            </Col>
+                            <Col sm={"2"}>
+                                <Button type="button" variant={"danger"}
+                                        onClick={() => handleGigRemoval(gig)}>X</Button>
+                            </Col>
+                        </Row>
+                    </ListGroup.Item>
+                </React.Fragment>
+            ))}
+        </>)
+    }
+
+    function renderArtistsNew() {
         return (<>
             {gigsNew.map(gig => (
                 <React.Fragment key={gig.user.userId}>
@@ -452,58 +513,6 @@ export default function EditEvent() {
         </>)
     }
 
-    function renderArtistsNew() {
-        return (<>
-            {gigsOld.map(gig => (
-                <React.Fragment key={gig.user.userId}>
-                    <ListGroup.Item>
-                        <Row>
-                            <Col sm={"2"}>
-                                <label>{gig.user.username}</label>
-                            </Col>
-                            <Col sm={"2"}>
-                                <label>{gig.user.email}</label>
-                            </Col>
-                            <Col sm={"2"}>
-                                <Button type="button" variant={"danger"}
-                                        onClick={() => handleGigRemoval(gig)}>X</Button>
-                            </Col>
-                        </Row>
-                    </ListGroup.Item>
-                </React.Fragment>
-            ))}
-        </>)
-    }
-
-    function renderArtistsNewByEmail() {
-        return (
-            <>
-                {gigsNewByEmail.map(artist => (
-                    <ListGroup.Item>
-                        <Row>
-                            <Form.Group as={Col} controlId="formBasicEmail">
-                                <Form.Control
-                                    type="email"
-                                    placeholder="Epost til artist"
-                                    value={artist.user.email}
-                                    onChange={event => {
-                                        artist.user.email = event.target.value;
-                                        setGigsNewByMail(gigsNewByEmail)
-                                    }}/>
-                            </Form.Group>
-                            <Col>
-                                <Button type="button" variant={"danger"}
-                                        onClick={() => {
-                                            let copy = [...gigsNewByEmail];
-                                            copy.splice(gigsNewByEmail.indexOf(artist), 1)
-                                            setGigsNewByMail(copy)
-                                        }}>X</Button>
-                            </Col>
-                        </Row>
-                    </ListGroup.Item>
-                ))}
-            </>)
-    }
 
     function handleGigsFromDatabase(event_gigsFromDatabase) {
         setGigsOld([...gigsOld, ...event_gigsFromDatabase]);
@@ -554,11 +563,31 @@ export default function EditEvent() {
                 console.log('add GIGs', gigsNew);
                 promises.push(gigsNew.map(gig => service.addGig(gig).catch(error => reject(error))));
             }
-            // if (Array.isArray(gigsNewByEmail) && gigsNewByEmail.length > 0) {
-            //     console.log('add GIGs by Mail', gigsNewByEmail);
-            //     promises.push(gigsNewByEmail.map(gig => service.addGig(gig).catch(error => reject(error))));
-            // }
+            if ((Array.isArray(gigsNewByEmail) && gigsNewByEmail.length)) {
+                console.log('add GIGS by Email', gigsNewByEmail);
+                promises.push(sendGigsByEmail());
+            }
+
             Promise.all(promises).then(() => resolve(true));
+        });
+    }
+
+    async function sendGigsByEmail() {
+
+        return new Promise((resolve, reject) => {
+            Promise.all(gigsNewByEmail.map(gig => {
+
+                let u = new User();
+                u.email = gig.user.email;
+                u.password = "";
+                u.username = "";
+
+                service.createTempUser(u).then(createdUser => {
+                    service
+                        .addGig(new Gig(eventId, createdUser.userId, gig.contract))
+                        .catch(error => reject(error))
+                })
+            })).then(() => resolve(true));
         });
     }
 
