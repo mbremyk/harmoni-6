@@ -7,6 +7,7 @@ import NavLink from "react-bootstrap/NavLink";
 import {authService} from "../AuthService";
 import {Card} from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
 
 export class LoginForm extends Component {
     constructor(props) {
@@ -19,6 +20,7 @@ export class LoginForm extends Component {
             password: '',
             error: '',
             errorType: 'success',
+            loading: false,
         };
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -34,11 +36,16 @@ export class LoginForm extends Component {
 
     setError(message, variant) {
         this.setState({error: message, errorType: variant});
+        if(!message) {return;}
         setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
     async handleLogin() {
+        this.setError('', 'primary');
+        this.setState({loading: true});
+
         if (!this.state.email || !this.state.password) {
+            this.setState({loading: false});
             this.setError('Alle felter må fylles.', 'danger');
             return;
         }
@@ -48,8 +55,10 @@ export class LoginForm extends Component {
         if(authService.loggedIn()) {
 	        window.location = '/hjem'
         } else {
+            this.setState({loading: false});
 	        this.setError('Innlogging feilet', 'danger');
         }
+        this.setState({loading: false});
     }
 
     render() {
@@ -90,6 +99,16 @@ export class LoginForm extends Component {
                                 onClick={this.handleLogin}
                                 variant="primary"
                                 type="button">
+
+                                {this.state.loading?
+                                    <Spinner
+                                    className="mr-2"
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"/> : <div/>}
+
                                 Login
                             </Button>
                             <Button

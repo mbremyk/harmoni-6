@@ -895,9 +895,14 @@ class Dao {
      */
     deleteGig(eventId, artistId) {
         return this.getContractId(eventId, artistId).then(contractId => {
-            model.FileModel.destroy({where: {fileId: contractId}}).then(() => {
-                return model.GigModel.destroy({where: {eventId: eventId, artistId: artistId}}).then(() => true)
-            })
+            console.log(contractId);
+            return model.FileModel.findByPk(contractId.dataValues.contract)
+                .then(contract => {
+                    filehandler.deleteFromCloud(contract.name, false);
+                    return model.FileModel.destroy({where: {fileId: contractId}}).then(() => {
+                        return model.GigModel.destroy({where: {eventId: eventId, artistId: artistId}}).then(() => true)
+                    })
+                })
         })
             .catch(error => {
                 console.error(error);

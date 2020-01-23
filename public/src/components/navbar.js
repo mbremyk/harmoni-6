@@ -24,7 +24,6 @@ export class HarmoniNavbar extends Component {
                 <Navbar.Toggle aria-controls="basic-harmoniNavbar-nav"/>
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
-                        <Nav.Link href="/hjem">Hjem</Nav.Link>
                         <NavDropdown title="Arrangementer" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/hjem/#arrangementer-jeg-organiserer">Arrangementer jeg organiserer</NavDropdown.Item>
                             <NavDropdown.Item href="/hjem/#arrangementer-jeg-er-artist-eller-er-personell-for">Arrangementer jeg er artist eller er personell for</NavDropdown.Item>
