@@ -27,6 +27,7 @@ import {
     toTimeInput
 } from "./editandcreatefunctions";
 import {authService} from '../AuthService';
+import {UploadWidget} from "../widgets";
 
 const jwt = require("jsonwebtoken");
 
@@ -183,20 +184,19 @@ export default function EditEvent() {
                                         </InputGroup>
                                     </ButtonToolbar>
                                 </Form.Group>
-                            </Row>
-                            <Row>
-                                <label>Forsidebilde:</label>
+                                <Col sm={'12'}>
+                                    <label>Forsidebilde:</label>
+                                </Col>
+
                                 {renderImagePreview()}
 
-                                <Form.Group as={Col} sm={"4"}>
-                                    <input type="file" className="form-control" encType="multipart/form-data"
-                                           name="file"
-                                           onChange={event => handleImageUpload(event.target.files[0])}/>
+                                <Form.Group as={Col} sm={"2"}>
+                                    <UploadWidget title={'Last opp bilde'}
+                                                  onChange={event => handleImageUpload(event.target.files[0])}/>
                                 </Form.Group>
-
-                                <Form.Group as={Col} sm={"8"}>
+                                <Form.Group as={Col} sm={"10"}>
                                     <Form.Control
-                                        placeholder="Url.."
+                                        placeholder="Url. . ."
                                         value={imageUrl}
                                         onChange={event => setImageUrl(event.target.value)}
                                     />
@@ -378,8 +378,10 @@ export default function EditEvent() {
     )
         ;
 
-    function handleDelete() {
-        history.push('/hjem');
+    function handleCancel() {
+        if (window.confirm("Er du sikker på at du vil angre, alle endringer vil bli slettet?")) {
+            history.push('/hjem');
+        }
     }
 
     function handleImageUpload(image) {
@@ -429,7 +431,7 @@ export default function EditEvent() {
                 {gigsNewByEmail.map(gig => (
                     <ListGroup.Item>
                         <Row>
-                            <Form.Group as={Col} controlId="formBasicEmail">
+                            <Form.Group as={Col} sm={5} controlId="formBasicEmail">
                                 <Form.Control
                                     type="email"
                                     placeholder="Epost til artist"
@@ -439,16 +441,14 @@ export default function EditEvent() {
                                         gig.user.email = event.target.value;
                                     }}/>
                             </Form.Group>
-                            <Form.Group as={Col} sm={"6"}>
-                                <input type="file" className="form-control"
-                                       encType="multipart/form-data" name="file"
-                                       onChange={event => handleContractUpload(event, gig)}/>
+                            <Form.Group as={Col} sm={"3"}>
+                                <UploadWidget title={'Last opp kontrakt'}
+                                              onChange={event => handleContractUpload(event.target.files[0], gig)}/>
                             </Form.Group>
-                            <Col>
+                            <Col sm={"3"}>{gig.contract ? gig.contract.name : ""}</Col>
+                            <Col sm={"1"}>
                                 <Button type="button" variant={"danger"}
-                                        onClick={() => {
-                                            handleGigRemoval(gig)
-                                        }}>X</Button>
+                                        onClick={() => handleGigRemoval(gig)}>X</Button>
                             </Col>
                         </Row>
                     </ListGroup.Item>
@@ -462,21 +462,14 @@ export default function EditEvent() {
                 <React.Fragment key={gig.user.userId}>
                     <ListGroup.Item>
                         <Row>
-                            <Col sm={"2"}>
-                                <label>{gig.user.username}</label>
-                            </Col>
-                            <Col sm={"2"}>
-                                <label>{gig.user.email}</label>
-                            </Col>
-                            <Col sm={"2"}>
-                                <label>Kontrakt:</label>
-                            </Col>
-                            <Form.Group as={Col} sm={"6"}>
-                                <input type="file" className="form-control"
-                                       encType="multipart/form-data" name="file"
-                                       onChange={event => handleContractUpload(event, gig)}/>
+                            <Col sm={"2"}>{gig.user.username}</Col>
+                            <Col sm={"3"}>{gig.user.email}</Col>
+                            <Form.Group as={Col} sm={"3"}>
+                                <UploadWidget title={'Last opp kontrakt'}
+                                              onChange={event => handleContractUpload(event.target.files[0], gig)}/>
                             </Form.Group>
-                            <Col sm={"2"}>
+                            <Col sm={"3"}>{gig.contract ? gig.contract.name : ""}</Col>
+                            <Col sm={"1"}>
                                 <Button type="button" variant={"danger"}
                                         onClick={() => handleGigRemoval(gig)}>X</Button>
                             </Col>
@@ -502,11 +495,12 @@ export default function EditEvent() {
         setGigsNewByMail([...gigsNewByEmail, gig])
     }
 
-    function handleContractUpload(event, gig) {
-        let file = event.target.files[0];
-        service.toBase64(file).then(contractData => {
-            gig.contract = new SimpleFile(contractData, file.name);
-        })
+    function handleContractUpload(contract, gig) {
+        service.toBase64(contract).then(contractData => {
+            gig.contract = new SimpleFile(contractData, contract.name);
+            setGigsNew([...gigsNew]);
+            setGigsNewByMail([...gigsNewByEmail]);
+        });
     }
 
     function handleGigRemoval(gig) {
@@ -574,19 +568,15 @@ export default function EditEvent() {
                             <React.Fragment key={p.userId}>
                                 <ListGroup.Item>
                                     <Row>
-                                        <Col>
-                                            {p.user.username}
-                                        </Col>
-                                        <Col>
-                                            {p.user.email}
-                                        </Col>
-                                        <Col>
+                                        <Col sm={"2"}>{p.user.username}</Col>
+                                        <Col sm={"3"}>{p.user.email}</Col>
+                                        <Col sm={6}>
                                             <Form.Control
-                                                placeholder="Rollen til personen"
+                                                placeholder="Oppgave. . ."
                                                 value={p.role}
                                                 onChange={event => handlePersonnelRoleChange(event, p)}/>
                                         </Col>
-                                        <Col>
+                                        <Col sm={1}>
                                             <Button type="button" variant={"danger"}
                                                     onClick={() => handlePersonnelRemoval(p)}>X</Button>
                                         </Col>
