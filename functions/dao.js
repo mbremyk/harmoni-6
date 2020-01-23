@@ -59,13 +59,9 @@ class Dao {
 
     createTempUser(email) {
         return model.UserModel.create({email: email, username: ''})
-            .then(response => response.dataValues)
-            .then(user => {
-                return model.UserModel.update({username: 'guest' + user.userId}, {where: {userId: user.userId}})
-                    .then(response => {
-                        user.username = 'guest' + user.userId;
-                        return user;
-                    })
+            .then(created => {
+                return model.UserModel.update({username: 'guest' + created.userId}, {where: {userId: created.userId}})
+                    .then(response => (response[0] === 1) ? created : null);
             })
             .catch(error => {
                 console.error(error);

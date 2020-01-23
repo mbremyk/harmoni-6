@@ -108,13 +108,28 @@ export default function EditEvent() {
 
     function handleSubmit() {
 
-        if (!eventName.trim() || !eventAddress.trim() || !eventDescription.trim() || !city.trim()) {
+        if (!eventName.trim() ||
+            !eventAddress.trim() ||
+            !eventDescription.trim() ||
+            !city.trim() ||
+            gigsNew.some(gig => gig.contract === null) ||
+            gigsNewByEmail.some(gig => gig.contract === null)) {
+
             let errmsg = 'Følgende felter mangler:';
             if (!eventName.trim()) errmsg += " [ Arrangementsavn ] ";
             if (!eventAddress.trim()) errmsg += "  [ Addresse ] ";
             if (!eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
             if (!city.trim()) errmsg += "  [ By ] ";
-            if (gigsNew.some(gig => gig.contract === null)) errmsg += "  [ Kontrakt for en Artist ] ";
+            gigsNew.map(gig => {
+                if (gig.contract === null) {
+                    errmsg += "  [ Kontrakt for " + gig.user.username + " mangler ] "
+                }
+            });
+            gigsNewByEmail.map(gig => {
+                if (gig.contract === null) {
+                    errmsg += "  [ Kontrakt for " + (gig.user.email ? gig.user.email : "ny artist") + " mangler ] "
+                }
+            });
             if (ticketPrice < 0) errmsg = "Billetpris må være større enn null";
             if (ticketAmount < 0) errmsg = "Antall billetter må være større enn null";
             if (ageLimit < 0) errmsg = "Aldersgrense må være større enn null";
@@ -411,16 +426,6 @@ export default function EditEvent() {
         </div>
     );
 
-    function handleMaxMinTime() {
-        if (fDate === tDate) {
-            setMaxTime(tTime);
-            setMinTime(fTime);
-        } else {
-            setMaxTime(moment('23:59', 'HH:mm').format('HH:mm'));
-            setMinTime(moment('00:00', 'HH:mm').format('HH:mm'));
-        }
-    }
-
     function handleDelete() {
         if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
             service.deleteEvent(eventId).then(() => {
@@ -488,10 +493,8 @@ export default function EditEvent() {
                                     type="email"
                                     placeholder="Epost til artist"
                                     value={gig.user.email}
-                                    onChange={event => {
-                                        setGigEmail(event.target.value);
-                                        gig.user.email = event.target.value;
-                                    }}/>
+                                    onChange={event => handleGigEmailText(event, gig)
+                                    }/>
                             </Form.Group>
                             <Form.Group as={Col} sm={"3"}>
                                 <UploadWidget title={'Last opp kontrakt'}
@@ -571,9 +574,20 @@ export default function EditEvent() {
         setGigsNewByMail([...gigsNewByEmail, gig])
     }
 
+    function handleGigEmailText(event, gig) {
+        if (gigsNewByEmail.some(gig => gig.user.email === event.target.value)) {
+            handleSetError('This email you are already tryig to add!', 'danger');
+            return;
+        }
+        setGigEmail(event.target.value);
+        gig.user.email = event.target.value;
+    }
+
     function handleContractUpload(contract, gig) {
         service.toBase64(contract).then(contractData => {
             gig.contract = new SimpleFile(contractData, contract.name);
+            setGigsNew([...gigsNew]);
+            setGigsNewByMail([...gigsNewByEmail]);
         })
     }
 
@@ -583,10 +597,14 @@ export default function EditEvent() {
             copy.splice(gigsOld.indexOf(gig), 1);
             setGigsOld(copy);
             setGigsRemove([...gigsRemove, gig]);
-        } else {
+        } else if (gigsNew.indexOf(gig) >= 0) {
             let copy = [...gigsNew];
             copy.splice(gigsNew.indexOf(gig), 1);
             setGigsNew(copy);
+        } else {
+            let copy = [...gigsNewByEmail];
+            copy.splice(gigsNewByEmail.indexOf(gig), 1);
+            setGigsNewByMail(copy);
         }
     }
 
@@ -611,20 +629,22 @@ export default function EditEvent() {
     }
 
     async function sendGigsByEmail() {
-
         return new Promise((resolve, reject) => {
             Promise.all(gigsNewByEmail.map(gig => {
-
-                let u = new User();
-                u.email = gig.user.email;
-                u.password = "";
-                u.username = "";
-
-                service.createTempUser(u).then(createdUser => {
-                    service
-                        .addGig(new Gig(eventId, createdUser.userId, gig.contract))
+                let u;
+                if (users.some(user => user.email === gig.user.email)) {
+                    u = users.find(user => user.email === gig.user.email);
+                    return service
+                        .addGig(new Gig(eventId, u.userId, gig.contract))
                         .catch(error => reject(error))
-                })
+                } else {
+                    u = new User(null, "", gig.user.email);
+                    return service.createTempUser(u).then(createdUser => {
+                        console.log(createdUser);
+                        return service.addGig(new Gig(eventId, createdUser.userId, gig.contract))
+                            .catch(error => reject(error))
+                    }).catch(error => reject(error))
+                }
             })).then(() => resolve(true));
         });
     }
@@ -770,6 +790,10 @@ export default function EditEvent() {
     }
 
     function handleTicketsTypeChange(event, ticket) {
+        if (tickets.some(t => t.type === event.target.value)) {
+            handleSetError('Denne billett-typen finnes allerede!', 'danger');
+            return;
+        }
         ticket.type = event.target.value;
         setTickets([...tickets]);
     }

@@ -11,7 +11,6 @@ import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
 import Dropdown from "react-bootstrap/Dropdown";
 import ListGroup from "react-bootstrap/ListGroup";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
 import {HarmoniNavbar} from "./navbar";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
@@ -19,11 +18,11 @@ import Alert from "react-bootstrap/Alert";
 import moment from "moment";
 import {
     CustomMenu,
-    minDateInput,
-    maxDateInput,
-    inputField,
-    textField,
     fromTimeInput,
+    inputField,
+    maxDateInput,
+    minDateInput,
+    textField,
     toTimeInput
 } from "./editandcreatefunctions";
 import {authService} from '../AuthService';
@@ -81,13 +80,31 @@ export default function EditEvent() {
 
     function handleSubmit() {
 
-        if (!eventName.trim() || !eventAddress.trim() || !eventDescription.trim() || !city.trim() || ageLimit < 0 || ticketPrice < 0 || ticketAmount < 0) {
+        if (!eventName.trim() ||
+            !eventAddress.trim() ||
+            !eventDescription.trim() ||
+            !city.trim() ||
+            ageLimit < 0 ||
+            ticketPrice < 0 ||
+            ticketAmount < 0 ||
+            gigsNew.some(gig => gig.contract === null) ||
+            gigsNewByEmail.some(gig => gig.contract === null)) {
+
             let errmsg = 'Følgende felter mangler:';
             if (!eventName.trim()) errmsg += " [ Arrangementsavn ] ";
             if (!eventAddress.trim()) errmsg += "  [ Addresse ] ";
             if (!eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
             if (!city.trim()) errmsg += "  [ By ] ";
-            if (gigsNew.some(gig => gig.contract === null)) errmsg += "  [ Kontrakt for en Artist ] ";
+            gigsNew.map(gig => {
+                if (gig.contract === null) {
+                    errmsg += "  [ Kontrakt for " + gig.user.username + " mangler ] "
+                }
+            });
+            gigsNewByEmail.map(gig => {
+                if (gig.contract === null) {
+                    errmsg += "  [ Kontrakt for " + (gig.user.email ? gig.user.email : "ny artist") + " mangler ] "
+                }
+            });
             if (ticketPrice < 0) errmsg = "Billetpris må være større enn null";
             if (ticketAmount < 0) errmsg = "Antall billetter må være større enn null";
             if (ageLimit < 0) errmsg = "Aldersgrense må være større enn null";
@@ -131,9 +148,9 @@ export default function EditEvent() {
         );
 
         service.createEvent(ev).then((created) => {
-            sendTickets(created.insertId).then(() => {
-                sendGigs(created.insertId).then(() => {
-                    sendPersonnel(created.insertId).then(() => {
+            sendGigs(created.insertId).then(() => {
+                sendPersonnel(created.insertId).then(() => {
+                    sendTickets(created.insertId).then(() => {
                         history.push("/arrangement/" + created.insertId)
                     })
                 })
@@ -314,39 +331,39 @@ export default function EditEvent() {
 
                                 <ListGroup.Item>
 
-                                {tickets.map(ticket =>
-                                    <React.Fragment>
-                                        <Row>
-                                            <Col sm={3}>
-                                                <Form.Control
-                                                    placeholder="Billett-type"
-                                                    value={ticket.type}
-                                                    onChange={event => handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
-                                                />
-                                            </Col>
-                                            <Col sm={3}>
-                                                <Form.Control
-                                                    type="number"
-                                                    placeholder="Billett-pris"
-                                                    value={ticket.price}
-                                                    onChange={event => handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
-                                                />
-                                            </Col>
-                                            <Col sm={3}>
-                                                <Form.Control
-                                                    type="number"
-                                                    placeholder="Antall billetter"
-                                                    value={ticket.amount}
-                                                    onChange={event => handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
-                                                />
-                                            </Col>
-                                            <Col sm={3}>
-                                                <Button type="button" variant={"danger"}
-                                                        onClick={event => handleTicketsRemoval(event, ticket)}>X</Button>
-                                            </Col>
-                                        </Row>
-                                    </React.Fragment>
-                                )}
+                                    {tickets.map(ticket =>
+                                        <React.Fragment>
+                                            <Row>
+                                                <Col sm={3}>
+                                                    <Form.Control
+                                                        placeholder="Billett-type"
+                                                        value={ticket.type}
+                                                        onChange={event => handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col sm={3}>
+                                                    <Form.Control
+                                                        type="number"
+                                                        placeholder="Billett-pris"
+                                                        value={ticket.price}
+                                                        onChange={event => handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col sm={3}>
+                                                    <Form.Control
+                                                        type="number"
+                                                        placeholder="Antall billetter"
+                                                        value={ticket.amount}
+                                                        onChange={event => handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
+                                                    />
+                                                </Col>
+                                                <Col sm={3}>
+                                                    <Button type="button" variant={"danger"}
+                                                            onClick={event => handleTicketsRemoval(event, ticket)}>X</Button>
+                                                </Col>
+                                            </Row>
+                                        </React.Fragment>
+                                    )}
                                 </ListGroup.Item>
                             </ListGroup>
                         </Card>
@@ -436,10 +453,7 @@ export default function EditEvent() {
                                     type="email"
                                     placeholder="Epost til artist"
                                     value={gig.user.email}
-                                    onChange={event => {
-                                        setGigEmail(event.target.value);
-                                        gig.user.email = event.target.value;
-                                    }}/>
+                                    onChange={event => handleGigEmailText(event, gig)}/>
                             </Form.Group>
                             <Form.Group as={Col} sm={"3"}>
                                 <UploadWidget title={'Last opp kontrakt'}
@@ -495,6 +509,15 @@ export default function EditEvent() {
         setGigsNewByMail([...gigsNewByEmail, gig])
     }
 
+    function handleGigEmailText(event, gig) {
+        if (gigsNewByEmail.some(gig => gig.user.email === event.target.value)) {
+            handleSetError('This email you are already tryig to add!', 'danger');
+            return;
+        }
+        setGigEmail(event.target.value);
+        gig.user.email = event.target.value;
+    }
+
     function handleContractUpload(contract, gig) {
         service.toBase64(contract).then(contractData => {
             gig.contract = new SimpleFile(contractData, contract.name);
@@ -508,10 +531,14 @@ export default function EditEvent() {
             let copy = [...gigsNewByEmail];
             copy.splice(gigsNewByEmail.indexOf(gig), 1);
             setGigsNewByMail(copy)
-        } else {
+        } else if (gigsNew.indexOf(gig) >= 0) {
             let copy = [...gigsNew];
             copy.splice(gigsNew.indexOf(gig), 1);
             setGigsNew(copy);
+        } else {
+            let copy = [...gigsNewByEmail];
+            copy.splice(gigsNewByEmail.indexOf(gig), 1);
+            setGigsNewByMail(copy);
         }
     }
 
@@ -535,17 +562,20 @@ export default function EditEvent() {
 
         return new Promise((resolve, reject) => {
             Promise.all(gigsNewByEmail.map(gig => {
-
-                let u = new User();
-                u.email = gig.user.email;
-                u.password = "";
-                u.username = "";
-
-                service.createTempUser(u).then(createdUser => {
-                    service
-                        .addGig(new Gig(eventId, createdUser.userId, gig.contract))
+                let u;
+                if (users.some(user => user.email === gig.user.email)) {
+                    u = users.find(user => user.email === gig.user.email);
+                    return service
+                        .addGig(new Gig(eventId, u.userId, gig.contract))
                         .catch(error => reject(error))
-                })
+                } else {
+                    u = new User(null, "", gig.user.email);
+                    return service.createTempUser(u).then(createdUser => {
+                        console.log(createdUser);
+                        return service.addGig(new Gig(eventId, createdUser.userId, gig.contract))
+                            .catch(error => reject(error))
+                    }).catch(error => reject(error))
+                }
             })).then(() => resolve(true));
         });
     }
@@ -657,6 +687,10 @@ export default function EditEvent() {
     }
 
     function handleTicketsTypeChange(event, ticket) {
+        if (tickets.some(t => t.type === event.target.value)) {
+            handleSetError('Denne billett-typen finnes allerede!', 'danger');
+            return;
+        }
         ticket.type = event.target.value;
         setTickets([...tickets]);
     }
