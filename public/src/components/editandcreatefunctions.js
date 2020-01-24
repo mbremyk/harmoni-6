@@ -108,10 +108,11 @@ export const CustomMenu = React.forwardRef(
                     value={value}
                 />
                 <ul className="list-unstyled">
-                    {React.Children.toArray(children).filter(
-                        child =>
-                            !value || child.props.children.toLowerCase().startsWith(value),
-                    )}
+                    {
+                        React.Children.toArray(children).filter(
+                            child =>
+                                !value || child.props.children.toLowerCase().startsWith(value.toLowerCase()),
+                        )}
                 </ul>
             </div>
         );
