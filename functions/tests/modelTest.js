@@ -83,9 +83,23 @@ describe('Users', () => {
         });
     });
 
+    it('deleteOneTimeLogin', done => {
+        db.deleteOneTimeLogin('steffen@mail.com').then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
     it('forgotPassword', done => {
         db.forgotPassword('steffen@mail.com').then(response => {
             expect(response).not.toBeNull();
+            done();
+        });
+    });
+
+    it('oneTimeLogin', done => {
+        db.onetimeLogin('steffen@mail.com', 'temp').then(response => {
+            expect(response).toBeTruthy();
             done();
         });
     });
