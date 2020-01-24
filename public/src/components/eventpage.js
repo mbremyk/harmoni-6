@@ -183,7 +183,7 @@ export class EventPage extends Component {
                         href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
                         Vis Rider
                     </Button>
-                    <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
+                    <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
 
         } else if (this.isOrganizer) {
@@ -266,28 +266,13 @@ export class EventPage extends Component {
         }
     }
 
-    //the button will render if the user is an artist or an organizer
-    DownloadContract() {
-        if (this.isOrganizer || this.isArtist) {
-            return <Row>
-                <Col>
-                    <a href="" download>
-                        <Button variant="primary" aria-label="Left Align" title="Last Ned">
-                            Last Ned Kontrakt
-                        </Button>
-                    </a>
-                </Col>
-            </Row>
-        }
-    }
-
     //only organizers get to edit the event so this button will only render when the user is the organizer
     EditButton() {
         if (this.isOrganizer) {
             return <Row>
                 <Col>
-                    <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
-                        Arragement</Button>
+                    <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">
+                        Endre Arragement</Button>
                 </Col>
             </Row>
         }
