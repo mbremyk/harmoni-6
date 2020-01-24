@@ -82,7 +82,7 @@ addMailEndpoints = (app, db) => {
         console.log(req.body.mailToDev);
         console.log(req.body.mailToUser);
 
-        return Promise.allSettled([
+        return Promise.all([
             sendMail(req.body.mailToDev),
             sendMail(req.body.mailToUser),
             db.createBug(req.body)
@@ -96,13 +96,7 @@ addMailEndpoints = (app, db) => {
         )
             .then(results => {
                 results.forEach(res => {
-                    if (res.status == 'fulfilled') {
                         console.log(res);
-                    } else if (res.status == 'rejected') {
-                        console.log(res);
-                    } else {
-                        console.log(res);
-                    }
                 });
                 res.sendStatus(200);
             });
