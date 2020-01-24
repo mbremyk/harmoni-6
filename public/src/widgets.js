@@ -1,13 +1,11 @@
 import {Component} from "react-simplified";
-import {Col, Card, Button, Form, Modal} from "react-bootstrap";
+import {Button, Card, Col, Form, Modal} from "react-bootstrap";
 import * as React from 'react';
 import Row from "react-bootstrap/Row";
 import moment from "moment";
 import Alert from "react-bootstrap/Alert";
 import {BugMail, Mail, service} from "./services";
 import {authService} from "./AuthService";
-import {HarmoniNavbar} from "./components/navbar";
-import NavLink from "react-bootstrap/NavLink";
 
 const jwt = require("jsonwebtoken");
 
@@ -29,12 +27,6 @@ export class EventInfo extends Component {
         hoverCss: "shadow-sm"
     };
 
-
-    /*<div className="font-weight-bold">
-     Pris fra
-     </div>
-     {this.props.price}*/
-
     getAgeLimitInfo(age_limit) {
         if (age_limit !== 0) {
             return <div>
@@ -47,11 +39,17 @@ export class EventInfo extends Component {
         }
     }
 
+    formatTimeDate(timeDate) {
+        let arr1 = timeDate.split('T');
+        let dateArr = arr1[0].split('-');
+        return dateArr[2] + "." + dateArr[1] + "/" + dateArr[0] + " klokka: " + arr1[1].slice(0, 5);
+    }
+
     getCardFooter(myEvent) {
         if (myEvent) {
             return <Row>
                 <Col>
-                    <small className="text-muted"> Publisert {this.props.uploaded}</small>
+                    <small className="text-muted"> Publisert {this.formatTimeDate(this.props.uploaded)}</small>
                 </Col>
                 <Col>
                     <Button href={"/endre-arrangement/" + this.props.link} variant="primary" size="sm">Rediger
@@ -140,7 +138,6 @@ export class DownloadWidget extends Component {
         service
             .downloadContract(this.event, this.artist)
             .then(response => {
-                console.log(response);
                 const link = document.createElement('a');
                 link.download = response.name;
                 link.href = response.data;
@@ -231,7 +228,6 @@ export class MailForm extends Component {
 
     getRecipentString(props) {
         let recipientsString = "";
-        console.log(props);
         if (props.recipients) {
             props.recipients.map(user => {
                 recipientsString = recipientsString += user.user.email + ", "
@@ -274,11 +270,12 @@ export class MailForm extends Component {
     render() {
         if (this.state.toggleable) {
             return (
-                <div>
-                    <div className={"c-sm "}>
+                <div className={'text-center'}>
+                    <div className={""}>
                         <Card className="border-0 m-sm-5 mt-4 p-sm-4">
                             <div>
-                                <Button style={{marginBottom: "10px"}} className={"btn-info"} onClick={this.toggleMail}
+                                <Button style={{marginBottom: "10px"}} className={"btn-primary"}
+                                        onClick={this.toggleMail}
                                         block>
                                     Send epost {this.state.arrow}
                                 </Button>
@@ -321,29 +318,29 @@ export class MailForm extends Component {
     toggleForm(on) {
         if (on && this.state.hasRecipients) {
             return (
-                <Form>
-                    <h1 className='h1 text-center'>Send en epost til flere </h1>
+                <Form className={'text-left'}>
                     {(this.state.error) ?
                         <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
                         <div style={{height: '3em'}}/>}
-                    <Form.Label>Mottaker:</Form.Label>
+                    <Form.Label>Mottakere:</Form.Label>
                     <Form.Control as="textarea" onChange={this.handleRecipientChange} value={this.state.recipientString}
-                                  placeholder={"mottakere"} rows="1" style={{display: 'flex'}}/>
-                    <Form.Label>Tittel:</Form.Label>
+                                  placeholder={"mottaker1@mail.com, mottaker2@mail.com"} rows="1"
+                                  style={{display: 'flex'}}/>
+                    <Form.Label>Emne:</Form.Label>
                     <Form.Control as="textarea" value={this.state.description} onChange={this.handleDescriptionChange}
-                                  placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                                  placeholder={"Emne. . ."} rows="2" style={{display: 'flex'}}/>
                     <Form.Label>Innhold:</Form.Label>
-                    <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
+                    <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"Innhold. . ."} rows="3"
                                   style={{display: 'flex'}}/>
                     <Button
-                        className={"btn-primary mt-2 mr-2"}
-                        onClick={() => this.sendMail(false)}>
-                        Send Email
-                    </Button>
-                    <Button
-                        className={"btn-secondary mt-2"}
+                        className={"btn-secondary mt-2 mr-2"}
                         onClick={() => this.props.history.pop()}>
                         Avbryt
+                    </Button>
+                    <Button
+                        className={"btn-primary mt-2"}
+                        onClick={() => this.sendMail(false)}>
+                        Send Email
                     </Button>
                 </Form>
             )
@@ -351,32 +348,33 @@ export class MailForm extends Component {
             return null;
         } else {
             return <Form>
-                <h1 className='h1 text-center'>Send en epost </h1>
+                <h1 className='h1 text-center'>Send en feilmelding</h1>
                 {(this.state.error) ?
                     <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
                     <div style={{height: '3em'}}/>}
-                <Form.Label>Mail-adresse</Form.Label>
+                <Form.Label>Din epost</Form.Label>
                 <Form.Control required as="textarea" value={this.state.email} onChange={this.handleEmailChange}
-                              placeholder={"email"} rows="1" style={{display: 'flex'}}/>
-                <Form.Label>Tittel:</Form.Label>
+                              placeholder={"Din epost. . ."} rows="1" style={{display: 'flex'}}/>
+                <Form.Label>Emne:</Form.Label>
                 <Form.Control required as="textarea" value={this.state.description}
                               onChange={this.handleDescriptionChange}
-                              placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                              placeholder={"Emne. . ."} rows="2" style={{display: 'flex'}}/>
                 <Form.Label>Innhold:</Form.Label>
-                <Form.Control required as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
+                <Form.Control required as="textarea" onChange={this.handleTextChange} placeholder={"innhold. . ."}
+                              rows="3"
                               style={{display: 'flex'}}/>
                 <Button
-                    className={"btn-primary mt-2 mr-2"}
-                    onClick={() => this.sendMail(true)}>
-                    Send Email
-                </Button>
-                <Button
-                    className={"btn-secondary mt-2"}
+                    className={"btn-secondary mt-2 mr-2"}
                     onClick={() => {
                         let path = authService.loggedIn() ? '/hjem' : '/';
                         window.location = path;
                     }}>
                     Avbryt
+                </Button>
+                <Button
+                    className={"btn-primary mt-2"}
+                    onClick={() => this.sendMail(true)}>
+                    Send Email
                 </Button>
             </Form>
         }
@@ -384,7 +382,6 @@ export class MailForm extends Component {
 
     getUser() {
         let token = jwt.decode(authService.getToken());
-        // console.log(token);
         if (!token) {
             this.setAlert("ERROR", "danger");
             return undefined;
@@ -394,8 +391,12 @@ export class MailForm extends Component {
     }
 
     sendMail(bug) {
+        if (!this.state.description || !this.state.text) {
+            this.setAlert('Vennligst fyll ut alle felter', 'danger');
+            return;
+        }
+
         console.log("Sendmail called");
-        //let bug = false;
         let user = this.getUser();
         if (bug) {
             if (!user) {
@@ -420,10 +421,11 @@ export class MailForm extends Component {
                     to.push(address);
                 }
             });
+            if (!Array.isArray(to) || to.length === 0) {
+                this.setAlert('ingen mottakere er lagt til!', 'danger');
+                return;
+            }
             let mail = new Mail(to, user.email, user.username, this.state.description, this.state.text);
-            console.log(this.state.mails);
-            console.log("Recipients");
-            console.log(mail);
             service.sendMails(mail)
                 .then(res => (this.setAlert(res.toString(), "info")))
                 .catch(err => this.setAlert(err.toString(), "danger"))

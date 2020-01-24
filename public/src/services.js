@@ -24,7 +24,6 @@ export class Artist {
         this.email = email;
         this.contract = contract;
     }
-
 }
 
 export class User {
@@ -385,6 +384,15 @@ class Services {
     addRiderItems(riderItems) {
         return axios.post(url + '/auth/events/' + riderItems[0].eventId + '/gigs/' + riderItems[0].artistId + '/rider', riderItems, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
     }
+
+    /**
+     * @param riderItem
+     * @returns Promise<>: boolean
+     */
+    deleteRiderItem(riderItem) {
+        return axios.delete(url + '/auth/events/' + riderItem.eventId + '/gigs/' + riderItem.artistId + '/rider/' + riderItem.item, {headers: {'x-access-token': authService.getToken()}}).then(response => response.data)
+    }
+
 
     /**
      * @param riderItems: RiderItem[]

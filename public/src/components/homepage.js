@@ -53,13 +53,15 @@ export class HomePage extends Component {
         service
             .getEventsByOrganizer(token.userId)
             .then(e => this.eventsUserOrganizes = e)
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
 
-        service
+         service
              .getMyEventsByUserId(token.userId)
-             .then(e => {this.eventsUserIsArtistOrPersonnel = e})
-             .catch((error) => console.log(error));
-        this.getAllEvents();
+             .then(e => {
+                 this.eventsUserIsArtistOrPersonnel = e
+             })
+             .catch((error) => console.error(error));
+         this.getAllEvents();
     }
 
     //gets all the events in the database and gives the array allEvents this value
@@ -67,7 +69,7 @@ export class HomePage extends Component {
         service
             .getEvents()
             .then(otherEvents => (this.allEvents = otherEvents))
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     //checks if the event is organized by the logged in user, if not it goes in this array
