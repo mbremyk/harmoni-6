@@ -118,7 +118,7 @@ describe('Users', () => {
         db.getSaltByEmail('steffen@mail.com')
             .then(salt => {
                 expect(salt[0].dataValues)
-                    .toEqual({salt: 'salt'});
+                    .toEqual({salt: '$2a$10$Hii2jl8XwvMHwDcB.kSrt.'});
                 done();
             });
     });
@@ -583,7 +583,7 @@ describe('RiderItems', () => {
             {
                 artistId: 5, //Magnus
                 eventId: 2, //Ungdomskonert
-                item: 'Varm Cola',
+                item: 'Litt Sjokolade hadde vært fint',
                 confirmed: true
             },
             {
@@ -601,7 +601,7 @@ describe('RiderItems', () => {
             {
                 artistId: 5, //Magnus
                 eventId: 2, //Ungdomskonert
-                item: 'Litt Sjokolade hadde vært fint',
+                item: 'Varm Cola',
                 confirmed: true
             }];
         db.updateRiderItems(items).then(updateOk => {
