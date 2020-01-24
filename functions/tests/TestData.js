@@ -6,6 +6,7 @@ let users = [
         //userId: 1
         username: 'Steffen T',
         password: 'ST',
+        tempPassword: 'temp',
         salt: '$2a$10$Hii2jl8XwvMHwDcB.kSrt.',
         email: 'steffen@mail.com'
     },
