@@ -503,9 +503,7 @@ app.put('/auth/events/:eventId', (req, res) => {
     if (req.body.imageUrl && req.body.imageUrl.includes("base64")) {
         db.getEventByEventId(req.params.eventId)
             .then(item => {
-                    if (item.imageUrl) {
-                        filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true)
-                    }
+                    filehandler.deleteFromCloud(filehandler.getNameFromUrl(item.imageUrl, true), true)
                     return filehandler.uploadToCloud(req.body.imageUrl, "img.png", true, false)
                         .then(data => {
                             req.body.imageUrl = data.url;
