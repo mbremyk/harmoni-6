@@ -32,7 +32,7 @@ class DefaultMail {
     get contactText() {
         return `Hei, ${this.user}\n\n` +
             `Vi har mottatt din epost og ser på den så fort vi har tid.\n\n` +
-            `Ditt support-nummer er ${Math.floor(Math.random() * 1000000)}\n\n` +
+            `Ditt support-nummer er ${test ? 123456 : Math.floor(Math.random() * 1000000)}\n\n` +
             `På ${this.date} skrev du: \n\n${this.text}\n\n` +
             `Hvis du har flere spørsmål eller informasjon som er relevant for denne saken kan du sende det som et svar på denne mailen\n` +
             this.hilsen;
