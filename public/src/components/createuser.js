@@ -159,17 +159,17 @@ export class CreateUserForm extends Component {
 
                             <Button
                                 className="mr-2"
-								onClick={this.handleSubmit}
-								variant="primary"
-								type="button">
-								Opprett bruker
-							</Button>
+                                onClick={this.handleSubmit}
+                                variant="success"
+                                type="button">
+                                Opprett bruker
+                            </Button>
 
                             <Button
                                 href="/logg-inn"
-                                variant="secondary"
+                                variant="primary"
                                 type="button">
-                                Avbryt
+                                Gå til Login
                             </Button>
                         </Form>
                     </div>
