@@ -694,26 +694,17 @@ app.get("/events/:eventId/gigs", (req, res) => {
 app.get("/auth/events/:eventId/gigs/:artistId", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
     let artistId = decodeURIComponent(req.params.artistId);
-    //db.getContract(eventId, artistId).then(contract => (contract !== null) ? res.status(201).send(contract) : res.sendStatus(400));
-    db.getEventByEventId(eventId)
-        .then(event => {
-            db.getContract(eventId, artistId).then(contract => {
-                // Check if the user is a valid organizer or artist
-                if ((event.organizerId === jwt.decode(req.headers["x-access-token"]).userId) || (artistId === jwt.decode(req.headers["x-access-token"]).userId)) {
-                    filehandler.downloadFromCloud(contract.name)
-                        .then(dataString => {
-                            contract.data = dataString;
-                            res.status(201).send(contract);
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            res.sendStatus(400);
-                        })
-                } else {
-                    res.sendStatus(401);
-                }
-            });
-        })
+    db.getContract(eventId, artistId).then(contract => {
+        filehandler.downloadFromCloud(contract.name)
+            .then(dataString => {
+                contract.data = dataString;
+                res.status(201).send(contract);
+            })
+            .catch(err => {
+                console.error(err);
+                res.sendStatus(400);
+            })
+    })
 });
 
 
