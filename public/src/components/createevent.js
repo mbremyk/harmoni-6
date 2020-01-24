@@ -194,7 +194,7 @@ export default function EditEvent() {
                                         </ButtonGroup>
                                         <InputGroup>
                                             <FormControl
-                                                type="input"
+                                                type="number"
                                                 value={ageLimit}
                                                 onChange={e => setAgeLimit(Number(e.target.value))}
                                                 aria-label="btn-age"
