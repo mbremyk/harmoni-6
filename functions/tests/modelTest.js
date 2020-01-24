@@ -536,6 +536,13 @@ describe('Gigs', () => {
         done();
     });
 
+    it('deleteGig', done => {
+        db.deleteGig(2, 5).then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
+
     it('getGigs', done => {
         db.getGigs(2).then(gigs => {
             expect(gigs.map(gig =>
