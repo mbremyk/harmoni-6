@@ -357,10 +357,10 @@ export default function EditEvent() {
                             </ListGroup>
                         </Card>
                         <Row className={'mt-4 text-center'}>
-                            <Col sm={'4'}>
+                            <Col sm={'6'}>
                                 <Button variant={"secondary"} onClick={handleCancel}>Avbryt</Button>
                             </Col>
-                            <Col sm={'8'}>
+                            <Col sm={'6'}>
                                 <Button type="button" variant={"success"}
                                         onClick={handleSubmit}>{disabled ? <Spinner
                                     className="mr-2"

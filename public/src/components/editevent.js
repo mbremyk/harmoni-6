@@ -406,7 +406,7 @@ export default function EditEvent() {
                                     role="status"
                                     aria-hidden="true"/> : null}Lagre</Button>
                             </Col>
-                            <Col sm={'4'}>
+                            <Col sm={'3'}>
                                 <Button variant={"secondary"} onClick={handleCancel}>Avbryt</Button>
                             </Col>
                             {(error) ?
