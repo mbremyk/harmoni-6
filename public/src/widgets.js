@@ -1,13 +1,11 @@
 import {Component} from "react-simplified";
-import {Col, Card, Button, Form, Modal} from "react-bootstrap";
+import {Button, Card, Col, Form, Modal} from "react-bootstrap";
 import * as React from 'react';
 import Row from "react-bootstrap/Row";
 import moment from "moment";
 import Alert from "react-bootstrap/Alert";
 import {BugMail, Mail, service} from "./services";
 import {authService} from "./AuthService";
-import {HarmoniNavbar} from "./components/navbar";
-import NavLink from "react-bootstrap/NavLink";
 
 const jwt = require("jsonwebtoken");
 
@@ -41,11 +39,17 @@ export class EventInfo extends Component {
         }
     }
 
+    formatTimeDate(timeDate) {
+        let arr1 = timeDate.split('T');
+        let dateArr = arr1[0].split('-');
+        return dateArr[2] + "." + dateArr[1] + "/" + dateArr[0] + " klokka: " + arr1[1].slice(0, 5);
+    }
+
     getCardFooter(myEvent) {
         if (myEvent) {
             return <Row>
                 <Col>
-                    <small className="text-muted"> Publisert {this.props.uploaded}</small>
+                    <small className="text-muted"> Publisert {this.formatTimeDate(this.props.uploaded)}</small>
                 </Col>
                 <Col>
                     <Button href={"/endre-arrangement/" + this.props.link} variant="primary" size="sm">Rediger
@@ -270,7 +274,8 @@ export class MailForm extends Component {
                     <div className={"c-sm "}>
                         <Card className="border-0 m-sm-5 mt-4 p-sm-4">
                             <div>
-                                <Button style={{marginBottom: "10px"}} className={"btn-info"} onClick={this.toggleMail}
+                                <Button style={{marginBottom: "10px"}} className={"btn-primary"}
+                                        onClick={this.toggleMail}
                                         block>
                                     Send epost {this.state.arrow}
                                 </Button>
