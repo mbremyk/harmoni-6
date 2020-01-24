@@ -181,7 +181,7 @@ class Dao {
         ).then(response => response ? newPass : null)
             .catch(error => {
                 console.error(error);
-                return false;
+                return null;
             });
     }
 
@@ -201,20 +201,6 @@ class Dao {
                 tempPassword: null
             },
             {where: {email: email}}
-        ).then(response => response[0] === 1)
-            .catch(error => {
-                console.error(error);
-                return false;
-            });
-    }
-
-    updatePassword(user) {
-        return model.UserModel.update(
-            {
-                password: user.password,
-                salt: user.salt
-            },
-            {where: {userId: user.userId}}
         ).then(response => response[0] === 1)
             .catch(error => {
                 console.error(error);
@@ -555,7 +541,7 @@ class Dao {
      * retrieves all events a user is artist or personnel
      *
      * @param userId
-     * @returns {Promise<Events[]>}
+     * @returns {Promise<Event[]>}
      */
     async getMyEventsByUserId(userId) {
         let personnelEvents = await model.PersonnelModel.findAll({where: {personnelId: userId}})
@@ -849,11 +835,9 @@ class Dao {
             where: {eventId: eventId}
         })
             .then(gigs => {
-                let toDelete = [];
                 gigs.map(gig => {
                     model.FileModel.findByPk(gig.contract)
                         .then(result => {
-                            //toDelete.push(result.name);
                             filehandler.deleteFromCloud(result.name, false);
                         })
                 });
@@ -880,25 +864,6 @@ class Dao {
             .catch(error => {
                 console.error(error);
                 return false;
-            });
-    }
-
-    /**
-     * retrieves the gig assosciated with an event, NOT INCLUDING contract data and username/email of artist
-     *
-     * @param eventId
-     * @returns {Promise<Gig[]>}
-     */
-    getPublicGigs(eventId) {
-        return model.GigModel.findAll({
-            include: [
-                {model: model.UserModel, attributes: ['username', 'email']},
-            ],
-            where: {eventId: eventId}
-        })
-            .catch(error => {
-                console.error(error);
-                return [];
             });
     }
 
@@ -1036,6 +1001,7 @@ class Dao {
     /*
                          🐞 BUG STUFF 🐛
      */
+
     createBug(body) {
         return model.BugModel.create({
             email: body.email,
@@ -1045,15 +1011,12 @@ class Dao {
         })
             .then(res => res.bugId !== null)
             .catch(error => {
-                //console.error(error);
+                console.error(error);
                 return false;
             });
     }
 }
 
-//model.dropTables();
-//model.syncTestData();
-//model.syncModels();
 module.exports = Dao;
 
 

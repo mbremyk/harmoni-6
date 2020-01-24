@@ -681,7 +681,7 @@ app.get("/auth/events/:eventId/gigs", (req, res) => {
  */
 app.get("/events/:eventId/gigs", (req, res) => {
     let eventId = decodeURIComponent(req.params.eventId);
-    return db.getPublicGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
+    return db.getGigs(eventId).then(gigs => (gigs !== null) ? res.status(201).send(gigs) : res.sendStatus(400));
 });
 
 /**

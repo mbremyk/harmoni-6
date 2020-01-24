@@ -118,16 +118,3 @@ export const CustomMenu = React.forwardRef(
         );
     },
 );
-
-export async function toBase64(file) {
-    return new Promise((resolve, reject) => {
-        if (file === "") {
-            resolve(null);
-        } else {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        }
-    });
-}
