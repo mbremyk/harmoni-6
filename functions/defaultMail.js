@@ -1,3 +1,5 @@
+const test = (process.env.NODE_ENV === 'test');
+
 class DefaultMail {
     constructor() {
         this.hilsen = `\nMed vennlig hilsen\nHarmoni team 6 support team`;
@@ -12,7 +14,7 @@ class DefaultMail {
     get bugText() {
         return `Hei, ${this.user}\n\n` +
             `Vi har mottatt din rapport og har satt våre fremste utviklere på saken.\n` +
-            `\nDitt support-nummer er ${Math.floor(Math.random() * 1000000)}\n` +
+            `\nDitt support-nummer er ${test ? 123456 : Math.floor(Math.random() * 1000000)}\n` +
             `På ${this.date} skrev du: \n\n${this.text}\n\n` +
             `Hvis du har spørsmål eller mer informasjon kan du sende det som svar på denne mailen\n` +
             this.hilsen;
