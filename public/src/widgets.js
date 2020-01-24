@@ -391,6 +391,11 @@ export class MailForm extends Component {
     }
 
     sendMail(bug) {
+        if (!this.state.description || !this.state.text) {
+            this.setAlert('Vennligst fyll ut alle felter', 'danger');
+            return;
+        }
+
         console.log("Sendmail called");
         let user = this.getUser();
         if (bug) {
@@ -416,6 +421,10 @@ export class MailForm extends Component {
                     to.push(address);
                 }
             });
+            if (!Array.isArray(to) || to.length === 0) {
+                this.setAlert('ingen mottakere er lagt til!', 'danger');
+                return;
+            }
             let mail = new Mail(to, user.email, user.username, this.state.description, this.state.text);
             service.sendMails(mail)
                 .then(res => (this.setAlert(res.toString(), "info")))
