@@ -112,6 +112,7 @@ export default function EditEvent() {
             !eventAddress.trim() ||
             !eventDescription.trim() ||
             !city.trim() ||
+            ageLimit < 0 ||
             gigsNew.some(gig => gig.contract === null) ||
             gigsNewByEmail.some(gig => gig.contract === null)) {
 
@@ -120,6 +121,7 @@ export default function EditEvent() {
             if (!eventAddress.trim()) errmsg += "  [ Addresse ] ";
             if (!eventDescription.trim()) errmsg += "  [ Beskrivelse ] ";
             if (!city.trim()) errmsg += "  [ By ] ";
+            if (ageLimit < 0) errmsg += "  [ Aldergrense er Negativ ] ";
             gigsNew.map(gig => {
                 if (gig.contract === null) {
                     errmsg += "  [ Kontrakt for " + gig.user.username + " mangler ] "
@@ -130,9 +132,6 @@ export default function EditEvent() {
                     errmsg += "  [ Kontrakt for " + (gig.user.email ? gig.user.email : "ny artist") + " mangler ] "
                 }
             });
-            if (ticketPrice < 0) errmsg = "Billetpris må være større enn null";
-            if (ticketAmount < 0) errmsg = "Antall billetter må være større enn null";
-            if (ageLimit < 0) errmsg = "Aldersgrense må være større enn null";
             handleSetError(errmsg, 'danger');
             return;
         }
@@ -195,15 +194,15 @@ export default function EditEvent() {
                             </Form.Group>
                             <Row>
 
-                                {inputField("12", "Arragementsnavn", "Navn på arragement", eventName, setEventName)}
-                                {inputField("4", "By", "By der arrangementet skal holdes", city, setCity)}
-                                {inputField("8", "Adresse", "Adresse der arrangementet skal holdes", eventAddress, setEventAddress)}
-                                {textField("12", "Informasjon om stedet", "For eksempel 3. etajse", placeDescription, setPlaceDescription)}
-                                {textField("12", "Beskrivelse av arrangement", "...", eventDescription, setEventDescription)}
-                                {minDateInput("4", "Fra:  dd/mm/yyyy", fDate, require('moment')().format('HH:mm'), tDate, setFDate)}
-                                {fromTimeInput("2", "HH:mm", fTime, maxTime, setFTime)}
-                                {maxDateInput("4", "Til:  dd/mm/yyyy", tDate, fDate, setTDate)}
-                                {toTimeInput("2", "HH:mm", tTime, minTime, setTTime)}
+                                {inputField("12", "Navn", "Navn. . .", eventName, setEventName)}
+                                {inputField("8", "Adresse", "Adresse. . .", eventAddress, setEventAddress)}
+                                {inputField("4", "By", "By. . .", city, setCity)}
+                                {textField("12", "Veibeskrivelse", "Veibeskrivelse. . .", placeDescription, setPlaceDescription)}
+                                {textField("12", "Beskrivelse", "Beskrivelse. . .", eventDescription, setEventDescription)}
+                                {minDateInput("3", "Fra: Dato", fDate, require('moment')().format('HH:mm'), tDate, setFDate)}
+                                {fromTimeInput("3", "Klokkeslett", fTime, maxTime, setFTime)}
+                                {maxDateInput("3", "Til:  Dato", tDate, fDate, setTDate)}
+                                {toTimeInput("3", "klokkeslett", tTime, minTime, setTTime)}
 
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Aldersgrense</Form.Label>
@@ -214,9 +213,9 @@ export default function EditEvent() {
                                         </ButtonGroup>
                                         <InputGroup>
                                             <FormControl
-                                                type="input"
+                                                type="number"
                                                 value={ageLimit}
-                                                onChange={event => setAgeLimit(event.target.value >= 0 ? (1 * event.target.value) : ((-1) * event.target.value) >= 0 ? ((-1) * event.target.value) : 0)}
+                                                onChange={e => setAgeLimit(Number(e.target.value))}
                                                 aria-label="btn-age"
                                                 aria-describedby="btnGroupAddon"/>
                                             <InputGroup.Append>
@@ -296,32 +295,14 @@ export default function EditEvent() {
                         <Card>
 
                             <Card.Title>
-                                <h2 className="text-center">Biletter</h2>
+                                <h2 className="text-center">Billetter</h2>
                             </Card.Title>
 
                             <ListGroup className={"p-3"}>
                                 <ListGroup.Item>
-
-                                    <Row>
-                                        <Col sm={3}>
-                                            <label>Bilett type</label>
-                                        </Col>
-
-
-                                        <Col sm={3}>
-                                            <label>Bilett pris</label>
-                                        </Col>
-
-
-                                        <Col sm={3}>
-                                            <label>Bilett mengde</label>
-                                        </Col>
-                                    </Row>
-
-
                                     <Form.Row>
 
-                                        <Form.Group as={Col} sm={"3"}>
+                                        <Form.Group as={Col} sm={"4"}>
                                             <Form.Control
                                                 placeholder="Navn på billettype . . ."
                                                 onChange={event => setTicketType(event.target.value)}
@@ -333,7 +314,7 @@ export default function EditEvent() {
                                                 <Form.Control
                                                     type="number"
                                                     placeholder="Billettpris . . ."
-                                                    onChange={event => setTicketPrice(event.target.value)}
+                                                    onChange={e => setTicketPrice(e.target.value)}
                                                 />
                                                 <InputGroup.Append>
                                                     <InputGroup.Text>kr</InputGroup.Text>
@@ -345,67 +326,71 @@ export default function EditEvent() {
                                             <Form.Control
                                                 type="number"
                                                 placeholder="Antall billetter . . ."
-                                                onChange={event => setTicketAmount(event.target.value)}
+                                                onChange={e => setTicketAmount(e.target.value)}
                                             />
 
                                         </Form.Group>
 
-                                        <Form.Group as={Col} sm={"3"}>
-
-                                            <Button onClick={handleTicketsAdd} variant={"success"} type={'reset'}>Legg
-                                                til
-                                                bilett</Button>
+                                        <Form.Group as={Col} sm={"2"}>
+                                            <Button className={'text-center ml-2'} onClick={handleTicketsAdd}
+                                                    variant={"success"} type={'reset'}>
+                                                Legg til billett</Button>
                                         </Form.Group>
                                     </Form.Row>
                                 </ListGroup.Item>
-
-                                <ListGroup.Item>
-
-                                    {tickets.map(ticket =>
-                                        <React.Fragment>
-                                            <Row>
-                                                <Col sm={3}>
-                                                    <Form.Control
-                                                        placeholder="Billett-type"
-                                                        value={ticket.type}
-                                                        onChange={event => handleTicketsTypeChange(event, ticket)}  // denne bør endre ticket type i gjeldende objekt
-                                                    />
-                                                </Col>
-                                                <Col sm={3}>
-                                                    <Form.Control
-                                                        type="number"
-                                                        placeholder="Billett-pris"
-                                                        value={ticket.price}
-                                                        onChange={event => handleTicketsPriceChange(event, ticket)} // denne bør endre ticket price i gjeldende objekt
-                                                    />
-                                                </Col>
-                                                <Col sm={3}>
-                                                    <Form.Control
-                                                        type="number"
-                                                        placeholder="Antall billetter"
-                                                        value={ticket.amount}
-                                                        onChange={event => handleTicketsAmountChange(event, ticket)} //denne bør endre ticket amount i gjeldende objekt
-                                                    />
-                                                </Col>
-                                                <Col sm={3}>
-                                                    <Button type="button" variant={"danger"}
-                                                            onClick={event => handleTicketsRemoval(event, ticket)}>X</Button>
-                                                </Col>
-                                            </Row>
-                                        </React.Fragment>
-                                    )}
-                                </ListGroup.Item>
+                                {tickets.length > 0 ?
+                                    <ListGroup.Item>
+                                        <Row>
+                                            <Col sm={5}><label>Type</label></Col>
+                                            <Col sm={3}><label>Pris</label></Col>
+                                            <Col sm={3}><label>Antall</label></Col>
+                                        </Row>
+                                        {tickets.map(ticket =>
+                                            <React.Fragment>
+                                                <Row>
+                                                    <Col sm={5}>
+                                                        <Form.Control
+                                                            placeholder="Billett-type"
+                                                            value={ticket.type}
+                                                            onChange={event => handleTicketsTypeChange(event, ticket)}
+                                                        />
+                                                    </Col>
+                                                    <Col sm={3}>
+                                                        <Form.Control
+                                                            type="number"
+                                                            placeholder="Billett-pris"
+                                                            value={ticket.price}
+                                                            onChange={event => handleTicketsPriceChange(event, ticket)}
+                                                        />
+                                                    </Col>
+                                                    <Col sm={3}>
+                                                        <Form.Control
+                                                            type="number"
+                                                            placeholder="Antall billetter"
+                                                            value={ticket.amount}
+                                                            onChange={event => handleTicketsAmountChange(event, ticket)}
+                                                        />
+                                                    </Col>
+                                                    <Col sm={1}>
+                                                        <Button type="button" variant={"danger"}
+                                                                onClick={event => handleTicketsRemoval(event, ticket)}>X</Button>
+                                                    </Col>
+                                                </Row>
+                                            </React.Fragment>
+                                        )}
+                                    </ListGroup.Item> : null}
                             </ListGroup>
                         </Card>
-                        <Row>
-                            <Col>
+                        <Row className={'mt-4'}>
+                            <Col sm={'3'}>
+                                <Button variant={"danger"} type="button" onClick={handleEventCancel}>Kanseller</Button>
+                            </Col>
+                            <Col sm={'3'}>
+                                <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
+                            </Col>
+                            <Col sm={'6'}>
                                 <Button type="button" variant={"success"} onClick={handleSubmit}>Lagre</Button>
                             </Col>
-                            <Col>
-                                <Button variant={"danger"} type="button" onClick={handleEventCancel}>Avlys
-                                    arrangement</Button>
-                            </Col>
-
                             {(error) ?
                                 <Alert style={{
                                     height: '9em',
@@ -416,11 +401,7 @@ export default function EditEvent() {
                                 }} variant={errorType}><Alert.Heading>Vent nå litt!</Alert.Heading>
                                     <p>{error}</p></Alert> :
                                 <div style={{height: '3em'}}/>}
-                            <Col>
-                                <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
-                            </Col>
                         </Row>
-
                     </Form>
                 </Card>
             </Container>
@@ -759,18 +740,25 @@ export default function EditEvent() {
 
     function handleTicketsAdd() {
         let errmsg = "";
-        if ((tickets.some(t => t.type.trim() === ticketType.trim()) && !(deletedTickets.some(t => t.type.trim() === ticketType.trim())))) {
-            errmsg += "Denne billett-typen finnes allerede!";
-            handleSetError(errmsg, 'danger');
-            setTicketType('');
-            return;
-        } else if (!ticketType.trim()) {
-            errmsg += "Vennligst skriv inn en billett-type";
+        if (!ticketType.trim()) {
+            errmsg = "Vennligst skriv inn en billett-type";
             handleSetError(errmsg, 'danger');
             return;
         }
+        if ((tickets.some(t => t.type.trim() === ticketType.trim()))) {
+            errmsg = "Denne billett-typen finnes allerede!";
+            handleSetError(errmsg, 'danger');
+            setTicketType('');
+            return;
+        }
+        if (ticketPrice < 0 || ticketAmount < 0) {
+            errmsg = "Billetpris og Antall kan ikke være negativt";
+            handleSetError(errmsg, 'danger');
+            setTicketPrice(0);
+            setTicketAmount(0);
+            return;
+        }
         let newTicket = new Ticket(eventId, ticketType, ticketPrice, ticketAmount);
-        setAddedTickets([...addedTickets, newTicket]);
         setTickets([...tickets, newTicket]);
         setTicketType('');
         setTicketPrice(0);
@@ -792,13 +780,13 @@ export default function EditEvent() {
         setTickets([...tickets]);
     }
 
-    function handleTicketsPriceChange(event, ticket) {
-        ticket.price = event.target.value;
+    function handleTicketsPriceChange(e, ticket) {
+        ticket.price = e.target.value;
         setTickets([...tickets]);
     }
 
-    function handleTicketsAmountChange(event, ticket) {
-        ticket.amount = event.target.value;
+    function handleTicketsAmountChange(e, ticket) {
+        ticket.amount = e.target.value;
         setTickets([...tickets]);
     }
 
@@ -851,12 +839,12 @@ export default function EditEvent() {
      */
 
     function IncrementAge() {
-        setAgeLimit(ageLimit + 1)
+        setAgeLimit(Number(ageLimit) + 1)
     }
 
     function decrementAge() {
         if (ageLimit > 0) {
-            setAgeLimit(ageLimit - 1)
+            setAgeLimit(Number(ageLimit) - 1)
         }
     }
 }
