@@ -255,10 +255,10 @@ export class EventPage extends Component {
 
     emailForm() {
         if (this.artists.length != 0 && this.isOrganizer) {
-            return <MailForm hasRecipients={true} description={"Info"} recipients={this.artists.concat(this.personnel)}
+            return <MailForm hasRecipients={true} recipients={this.artists.concat(this.personnel)}
                              toggleable={true}/>
         } else if (this.currentEvent.eventName && (this.isPersonnel || this.isArtist) && !this.isOrganizer) {
-            return <MailForm hasRecipients={true} description={"Info"}
+            return <MailForm hasRecipients={true}
                              recipients={[{user: this.user}]}
                              toggleable={true}/>
         } else {
