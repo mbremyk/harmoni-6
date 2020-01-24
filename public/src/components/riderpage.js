@@ -124,13 +124,11 @@ export class RiderPage extends Component {
 
     //sends the new items to the database
     saveRider() {
-        console.log('before', this.state.newItems);
         if (this.state.currentItem.trim() !== "") {
-            if (window.confirm("Du har ikke lagt til " + this.state.currentItem + " i listen, øsnker du at det skal legges til i Rideren?")) {
-                this.saveItem();
+            if (!window.confirm("Er du sikker på at du vil lagre? \nDu har ett element som ikke er lagt til i riderene, dette vil ikke bli lagret dersom du trykker 'ok'.")) {
+                return;
             }
         }
-        console.log('after', this.state.newItems);
 
         let promises = [];
         if (Array.isArray(this.state.deleteItems) && this.state.deleteItems.length > 0) {
@@ -223,7 +221,7 @@ export class RiderPage extends Component {
                                         <Button
                                             variant={'secondary'}
                                             onClick={() => {
-                                                if (window.confirm("Er du sikker på at du vil angre? \nAlle endringer vil bli slettet.")) {
+                                                if (window.confirm("Er du sikker på at du vil angre? \nEventuelle endringer vil ikke bli lagret.")) {
                                                     this.returnToEvent()
                                                 }
                                             }}>Avbryt</Button>
@@ -282,7 +280,7 @@ export class RiderPage extends Component {
                                     <Button
                                         variant={'secondary'}
                                         onClick={() => {
-                                            if (window.confirm("Er du sikker på at du vil angre? \nAlle endringer vil bli slettet.")) {
+                                            if (window.confirm("Er du sikker på at du vil angre? \nEventuelle endringer vil ikke bli lagret.")) {
                                                 this.returnToEvent()
                                             }
                                         }}>Avbryt</Button>
