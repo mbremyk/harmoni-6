@@ -75,7 +75,7 @@ class Dao {
                                 to: email,
                                 from: mailProps.username,
                                 subject: 'Anmodning om kontakt på Harmoni',
-                                text: `Hei\n\nHarmoni er en nettside for planlegging av konserter og andre arrangementer som skal gjøre det enklere for arrangører, artister og personell å samarbeide.\nNoen har lagt deg til artist eller personell på et arrangement, og oppgitt din epost-adresse.\nHvis du ønsker å se informasjon om arrangementet kan du opprette en bruker her ${url}ny-bruker/\n\nVi håper å se deg snart\n\nMed vennlig hilsen\nHarmoni team 6`
+                                text: `Hei\n\nHarmoni er en nettside for planlegging av konserter og andre arrangementer som skal gjøre det enklere for arrangører, artister og personell å samarbeide.\nNoen har lagt deg til  som artist på et arrangement, og oppgitt din epost-adresse.\nHvis du ønsker å se informasjon om arrangementet og kunne laste ned kontrakt samt opprette en rider, må du først opprette en bruker med denne epost-addressen her ${url}ny-bruker/\n\nVi håper å se deg snart\n\nMed vennlig hilsen\nHarmoni team 6`
                             };
                             mail.sendMail(post);
                         }
@@ -450,7 +450,7 @@ class Dao {
                                                         to: users,
                                                         from: mailProps.username,
                                                         subject: `Arrangement slettet: ${event.eventName}`,
-                                                        text: `Arrangementet ${event.eventName}, som du var artist eller personell på, har blitt slettet.\nHvis du lurer på hvorfor, kan du ta kontakt med organisator ${user.username} på mail: ${user.email}\n\nMed vennlig hilsen\nHarmoni team 6`
+                                                        text: `Arrangementet ${event.eventName}, som du var artist og/eller personell på, har blitt slettet.\nHvis du lurer på hvorfor, kan du ta kontakt med organisator ${user.username} på mail: ${user.email}\n\nMed vennlig hilsen\nHarmoni team 6`
                                                     };
                                                     return this.deleteGigs(eventId)
                                                         .then(() => {
