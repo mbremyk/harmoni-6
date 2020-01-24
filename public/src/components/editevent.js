@@ -251,7 +251,7 @@ export default function EditEvent() {
                                 </Form.Group>
                             </Row>
 
-                            <Form.Group as={Col} sm={"12"}>
+                            <Form.Group className={'text-center'} as={Col} sm={"12"}>
                                 <Row>
                                     <Col>
                                         <Button type="button" variant={"success"}
