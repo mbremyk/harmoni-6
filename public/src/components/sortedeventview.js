@@ -78,7 +78,6 @@ export class SortedEventView extends Component {
     }
 
     handleFilterOption(filter) {
-        console.log("filter option: " + filter);
         this.setState({filterActive: "active"});
         switch (filter) {
             case 'ChildFriendly':
@@ -93,10 +92,7 @@ export class SortedEventView extends Component {
                 this.setState({events: this.state.eventsBackup});
                 this.setState({showOld: "active"});
                 break;
-            case 'Free':
-                //TODO
-                this.setState({showOld: "active"});
-                break;
+
         }
     }
 
@@ -133,7 +129,7 @@ export class SortedEventView extends Component {
         return function innerSort(a, b) {
             if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
                 // property doesn't exist on either object
-                console.log("Error: not comparable!");
+                console.error("Error: not comparable!");
                 return 0;
             }
 
@@ -234,7 +230,7 @@ export class SortedEventView extends Component {
             service
                 .getEvents()
                 .then(events => (this.handleEvents(events)))
-                .catch((error) => console.log(error));
+                .catch((error) => console.error(error));
         }
     }
 }

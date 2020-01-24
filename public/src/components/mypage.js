@@ -139,7 +139,6 @@ export class myPage extends Component {
                 })
                 .catch(err => alert("En feil har oppstått: " + err.message));
         } else {
-            console.log("Not logged in");
             this.props.history.push('/logg-inn');
         }
     }
@@ -195,13 +194,13 @@ export class myPage extends Component {
         user.password = this.state.password1;
 
         service.updateUser(user).then(res => {
-            console.log(res);
+            console.error(res);
             this.setError('Bruker oppdatert!', 'success');
             this.setState({password1: '', password2: ''});
             this.setState({oldUsername: user.username, oldEmail: user.email});
             this.setState({loading: false});
         }).catch(err => {
-            console.log(err);
+            console.error(err);
             this.setError('Kunne ikke oppdatere bruker', 'danger');
             this.setState({username: this.state.oldUsername, email: this.state.oldEmail});
             this.setState({loading: false});
@@ -226,10 +225,9 @@ export class myPage extends Component {
     }
 
     async delete(password) {
-        let oldToken = authService.getToken()
+        let oldToken = authService.getToken();
 
         let res = await authService.login(this.state.email ,password);
-        //if(res.status === 401) return console.log("TEST!");
 
         if(oldToken !== authService.getToken()){
             service.deleteUser(this.state.userId)

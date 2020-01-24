@@ -169,7 +169,7 @@ function deleteFromCloud(filename, isPublic) {
         bucket = storage.bucket('harmoni-6-private-bucket');
         blob = bucket.file(filename);
     }
-    blob.delete().catch(err => console.log(err));
+    blob.delete().catch(err => console.error(err));
     return;
 }
 

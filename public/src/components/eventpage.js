@@ -120,7 +120,7 @@ export class EventPage extends Component {
                     this.getPublicArtistsForEvent();
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     //gets all the people working on that event and checks if the person viewing it is a part of the personnel
@@ -136,7 +136,7 @@ export class EventPage extends Component {
                     }
                 });
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     //gets all the artist working on that event and checks if the person viewing it is a an artist
@@ -152,7 +152,7 @@ export class EventPage extends Component {
                     }
                 });
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     getPublicArtistsForEvent() {
@@ -161,14 +161,14 @@ export class EventPage extends Component {
             .then(artists => {
                 this.artists = artists;
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     getInfoAboutOrganizer(id) {
         service
             .getUser(id)
             .then(user => this.user = user)
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     RenderButtons(artistId) {

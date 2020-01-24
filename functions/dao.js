@@ -140,7 +140,7 @@ class Dao {
     deleteUser(userId) {
         return (model.UserModel.update(
             {
-                username: 'this user no longer exists',
+                username: 'Denne brukeren finnes ikke lenger',
                 email: null,
                 password: null,
                 salt: null,

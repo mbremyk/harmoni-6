@@ -49,7 +49,7 @@ export class LandingPage extends Component {
         service
             .getEvents()
             .then(events => (this.handleEvents(events)))
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     getTicketPrice(eventId) {
@@ -61,12 +61,11 @@ export class LandingPage extends Component {
                 for (let i = 0; i < tickets.length; i++) {
                     if (tickets[i].price < lowestPrice) {
                         lowestPrice = tickets[i].price;
-                        console.log(lowestPrice);
                     }
                 }
                 return lowestPrice;
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     scroll() {
