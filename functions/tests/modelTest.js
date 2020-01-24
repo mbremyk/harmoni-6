@@ -66,7 +66,7 @@ describe('Users', () => {
         let user = {
             userId: '-1',
             username: 'FAIL',
-            password: 'FAIL',
+            password: '',
             salt: 'FAIL',
             email: 'FAIL'
         };
@@ -641,7 +641,7 @@ describe('RiderItems', () => {
                     artistId: item.artistId,
                     item: item.item
                 }
-            ))).toEqual([
+            ))).toBe([
                 {
                     artistId: 5, //Magnus
                     eventId: 2, //Ungdomskonert
