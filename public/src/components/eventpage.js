@@ -328,10 +328,10 @@ export class EventPage extends Component {
         let res = (this.currentEvent.address + " " + this.currentEvent.city).split(" ");
         var url = "";
         res.map(i => {
-            url += i + "-";
+            url += i + "+";
         });
         url = url.substring(0, url.length - 1);
-        url = url.replace(/[^\w\s-]/g, '');
+        url = url.replace(/[^\w\s+]/g, '');
         window.open('https://www.google.com/maps/search/' + url);
     }
 
