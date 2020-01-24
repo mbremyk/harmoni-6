@@ -7,26 +7,25 @@ import {service, User} from "../services";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import {Card} from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
-import Spinner from "react-bootstrap/Spinner";
 
 export class CreateUserForm extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			username: '',
-			email: '',
-			password1: '',
-			password2: '',
-			salt: '',
-			hash: '',
+    constructor(props) {
+        super(props);
+        this.state = {
+            username: '',
+            email: '',
+            password1: '',
+            password2: '',
+            salt: '',
+            hash: '',
             error: '',
             errorType: 'success',
-		};
-		this.handleEmailChange = this.handleEmailChange.bind(this);
-		this.handleUsernameChange = this.handleUsernameChange.bind(this);
-		this.handlePassword1Change = this.handlePassword1Change.bind(this);
-		this.handlePassword2Change = this.handlePassword2Change.bind(this);
-	}
+        };
+        this.handleEmailChange = this.handleEmailChange.bind(this);
+        this.handleUsernameChange = this.handleUsernameChange.bind(this);
+        this.handlePassword1Change = this.handlePassword1Change.bind(this);
+        this.handlePassword2Change = this.handlePassword2Change.bind(this);
+    }
 
     handleUsernameChange(event) {
         this.setState({username: event.target.value});
@@ -46,22 +45,29 @@ export class CreateUserForm extends Component {
 
     setError(message, variant) {
         this.setState({error: message, errorType: variant});
-	    if(!message) {return;}
+        if (!message) {
+            return;
+        }
         setTimeout(() => this.setState({error: '', errorType: 'primary'}), 5000);
     }
 
 
-	handleSubmit() {
-		console.log('handle Submit user');
-		this.setError('', 'primary');
+    handleSubmit() {
+        this.setError('', 'primary');
 
-		// check empty fields
+        // check empty fields
         if (!this.state.username || !this.state.email) {
             this.setError('Alle felter må fylles', 'danger');
-			return;
-		}
+            return;
+        }
 
-		// check password mismatch
+        //check that email contains @ and .
+        if (!this.state.email.includes('@') || !this.state.email.includes('.')) {
+            this.setError('ikke gyldig email adresse', 'danger');
+            return;
+        }
+
+        // check password mismatch
         if (this.state.password1 !== this.state.password2) {
             this.setError('Passordene må være like', 'danger');
             return;
@@ -70,47 +76,44 @@ export class CreateUserForm extends Component {
         // check password strength
         if (this.state.password1.length < 5) {
             this.setError('Passord må inneholde minst 5 tegn', 'danger');
-			return;
-		}
+            return;
+        }
 
-		let user = new User();
-		user.email = this.state.email;
-		user.username = this.state.username;
-		user.password = this.state.password1;
+        let user = new User();
+        user.email = this.state.email;
+        user.username = this.state.username;
+        user.password = this.state.password1;
 
-		// check username availability
-		service.validateUsername(user.username).then(taken1 => {
-			console.log('Check username, taken: ' + taken1);
+        // check username availability
+        service.validateUsername(user.username).then(taken1 => {
             if (taken1) {
                 this.setError('Brukernavn ikke tilgjengelig', 'danger');
             } else {
 
-				// check email availability
-				service.validateEmail(user.email).then(taken2 => {
-					console.log('Check email, taken: ' + taken2);
+                // check email availability
+                service.validateEmail(user.email).then(taken2 => {
                     if (taken2) {
                         this.setError('Epost ikke tilgjengelig', 'danger');
                     } else {
 
-						service.createUser(user)
-							.then(res => console.log('Submit user status: ' + res))
-							.then(this.props.history.push("/logg-inn"))
+                        service.createUser(user)
+                            .then(this.props.history.push("/logg-inn"))
                             .catch(err => {
-                            	this.setError('Bruker ikke opprettet', 'danger')
+                                this.setError('Bruker ikke opprettet', 'danger')
                             })
-					}
-				})
-			}
-		});
-	}
+                    }
+                })
+            }
+        });
+    }
 
-	render() {
-		return (
-			<Container className={"c-sm"} /*style={{width: '40em'}}*/>
+    render() {
+        return (
+            <Container className={"c-sm"} /*style={{width: '40em'}}*/>
 
-				<h1 className="HarmoniLogo display-sm-3 text-center m-3">Harmoni</h1>
+                <h1 className="HarmoniLogo display-sm-3 text-center m-3">Harmoni</h1>
 
-				<Card className="" style={{padding: '10px'}}>
+                <Card className="" style={{padding: '10px'}}>
                     <div style={{padding: '5%'}}>
                         <label className='h1'>Lag ny bruker</label>
 
@@ -159,25 +162,25 @@ export class CreateUserForm extends Component {
 
                             <Button
                                 className="mr-2"
-								onClick={this.handleSubmit}
-								variant="primary"
-								type="button">
-								Opprett bruker
-							</Button>
+                                onClick={this.handleSubmit}
+                                variant="success"
+                                type="button">
+                                Opprett bruker
+                            </Button>
 
                             <Button
                                 href="/logg-inn"
-                                variant="secondary"
+                                variant="primary"
                                 type="button">
-                                Avbryt
+                                Gå til Login
                             </Button>
                         </Form>
                     </div>
                 </Card>
-			</Container>
-		);
-	}
+            </Container>
+        );
+    }
 
-	mounted() {
-	}
+    mounted() {
+    }
 }

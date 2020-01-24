@@ -120,7 +120,7 @@ export class EventPage extends Component {
                     this.getPublicArtistsForEvent();
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     //gets all the people working on that event and checks if the person viewing it is a part of the personnel
@@ -136,7 +136,7 @@ export class EventPage extends Component {
                     }
                 });
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     //gets all the artist working on that event and checks if the person viewing it is a an artist
@@ -152,7 +152,7 @@ export class EventPage extends Component {
                     }
                 });
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     getPublicArtistsForEvent() {
@@ -161,14 +161,14 @@ export class EventPage extends Component {
             .then(artists => {
                 this.artists = artists;
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     getInfoAboutOrganizer(id) {
         service
             .getUser(id)
             .then(user => this.user = user)
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     }
 
     RenderButtons(artistId) {
@@ -183,7 +183,7 @@ export class EventPage extends Component {
                         href={"/arrangement/" + this.currentEvent.eventId + "/rider/" + artistId}>
                         Vis Rider
                     </Button>
-                    <DownloadWidget type={"kontrakt"} artist={artistId} event={this.currentEvent.eventId}/>
+                    <DownloadWidget artist={artistId} event={this.currentEvent.eventId}/>
                 </div>);
 
         } else if (this.isOrganizer) {
@@ -255,29 +255,14 @@ export class EventPage extends Component {
 
     emailForm() {
         if (this.artists.length != 0 && this.isOrganizer) {
-            return <MailForm hasRecipients={true} description={"Info"} recipients={this.artists.concat(this.personnel)}
+            return <MailForm hasRecipients={true} recipients={this.artists.concat(this.personnel)}
                              toggleable={true}/>
         } else if (this.currentEvent.eventName && (this.isPersonnel || this.isArtist) && !this.isOrganizer) {
-            return <MailForm hasRecipients={true} description={"Info"}
+            return <MailForm hasRecipients={true}
                              recipients={[{user: this.user}]}
                              toggleable={true}/>
         } else {
             return null;
-        }
-    }
-
-    //the button will render if the user is an artist or an organizer
-    DownloadContract() {
-        if (this.isOrganizer || this.isArtist) {
-            return <Row>
-                <Col>
-                    <a href="" download>
-                        <Button variant="primary" aria-label="Left Align" title="Last Ned">
-                            Last Ned Kontrakt
-                        </Button>
-                    </a>
-                </Col>
-            </Row>
         }
     }
 
@@ -286,8 +271,8 @@ export class EventPage extends Component {
         if (this.isOrganizer) {
             return <Row>
                 <Col>
-                    <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">Endre
-                        Arragement</Button>
+                    <Button href={"/endre-arrangement/" + this.props.match.params.id} variant="primary">
+                        Endre Arragement</Button>
                 </Col>
             </Row>
         }
@@ -328,10 +313,10 @@ export class EventPage extends Component {
         let res = (this.currentEvent.address + " " + this.currentEvent.city).split(" ");
         var url = "";
         res.map(i => {
-            url += i + "-";
+            url += i + "+";
         });
         url = url.substring(0, url.length - 1);
-        url = url.replace(/[^\w\s-]/g, '');
+        url = url.replace(/[^\w\s+]/g, '');
         window.open('https://www.google.com/maps/search/' + url);
     }
 

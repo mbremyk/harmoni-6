@@ -11,7 +11,7 @@ export class BugForm extends Component {
 		return (
 			<div>
 				{this.RenderNavbar()}
-				<MailForm toggleable={false} description={"Jeg har en bug"} hasRecipients={false}/>
+				<MailForm toggleable={false} hasRecipients={false}/>
 			</div>
 		)
 	}

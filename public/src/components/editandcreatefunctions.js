@@ -42,7 +42,6 @@ export function minDateInput(size, name, value, minDate, maxDate, setter) {
                 onChange={event => setter(event.target.value)}
                 type={"date"}
             />
-            <span className="customStyle"/>
         </Form.Group>);
 }
 
@@ -57,7 +56,6 @@ export function maxDateInput(size, name, value, minDate, setter) {
                 onChange={event => setter(event.target.value)}
                 type={"date"}
             />
-            <span className="customStyle"/>
         </Form.Group>);
 }
 
@@ -73,7 +71,6 @@ export function fromTimeInput(size, name, value, maxTime, setter) {
                 type={"time"}
 
             />
-            <span className="customStyle"/>
         </Form.Group>);
 }
 
@@ -89,7 +86,6 @@ export function toTimeInput(size, name, value, minTime, setter) {
                 type={"time"}
 
             />
-            <span className="customStyle"/>
         </Form.Group>);
 }
 
@@ -112,25 +108,13 @@ export const CustomMenu = React.forwardRef(
                     value={value}
                 />
                 <ul className="list-unstyled">
-                    {React.Children.toArray(children).filter(
-                        child =>
-                            !value || child.props.children.toLowerCase().startsWith(value),
-                    )}
+                    {
+                        React.Children.toArray(children).filter(
+                            child =>
+                                !value || child.props.children.toLowerCase().startsWith(value.toLowerCase()),
+                        )}
                 </ul>
             </div>
         );
     },
 );
-
-export async function toBase64(file) {
-    return new Promise((resolve, reject) => {
-        if (file === "") {
-            resolve(null);
-        } else {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        }
-    });
-}

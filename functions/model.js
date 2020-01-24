@@ -7,11 +7,9 @@ moment.locale('nb');
 
 function init() {
     if (isCI) {
-        console.log("CI");
         return new Sequelize('School', 'root', '', {host: 'mysql', dialect: 'mysql'});
     } else {
         let pr = test ? new properties.TestProperties() : new properties.Properties();
-        console.log('Connected to db: ' + pr.databaseUser);
         return new Sequelize(pr.databaseName, pr.databaseUser, pr.databasePassword,
             {
                 host: pr.databaseURL,
@@ -289,7 +287,7 @@ FileModel.hasOne(GigModel, {foreignKey: 'contract'});
 GigModel.belongsTo(FileModel, {foreignKey: 'contract'});
 
 
-let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.log(error));
+let syncModels = () => sequelize.sync({force: false}).then().catch(error => console.error(error));
 
 
 /*

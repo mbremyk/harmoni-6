@@ -4,9 +4,6 @@ import Route from "react-router-dom/es/Route";
 import {authService} from "../AuthService";
 
 export function PrivateRoute ({component: Component, authed, ...rest}) {
-	console.log('REDIRECTED');
-	//authService.refresh();
-
 	return (
 		<Route
 			{...rest}
