@@ -2,6 +2,7 @@ import {Artist, Event, Gig, Personnel, service, SimpleFile, Ticket, User} from "
 import useReactRouter from 'use-react-router';
 import React, {useEffect, useState} from "react";
 import Container from "react-bootstrap/Container";
+import Spinner from "react-bootstrap/Spinner";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
@@ -397,7 +398,13 @@ export default function EditEvent() {
                             </Col>
                             <Col sm={'6'}>
                                 <Button type="button" variant={"success"}
-                                        onClick={handleSubmit}>{disabled ? 'Lagrer...' : 'Lagre'}</Button>
+                                        onClick={handleSubmit}>{disabled ? <Spinner
+                                    className="mr-2"
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"/> : null}Lagre</Button>
                             </Col>
                             {(error) ?
                                 <Alert style={{
