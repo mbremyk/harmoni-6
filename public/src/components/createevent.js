@@ -389,7 +389,7 @@ export default function EditEvent() {
         ;
 
     function handleCancel() {
-        if (window.confirm("Er du sikker på at du vil angre, alle endringer vil bli slettet?")) {
+        if (window.confirm("Er du sikker på at du vil avbryte? \n\ninformasjonen vil ikke bli lagret.")) {
             history.push('/hjem');
         }
     }

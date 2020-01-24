@@ -391,12 +391,12 @@ export default function EditEvent() {
                         </Card>
                         <Row className={'mt-4'}>
                             <Col sm={'3'}>
+                                <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
+                            </Col>
+                            <Col sm={'3'}>
                                 <Button variant={"danger"} type="button" onClick={handleEventCancel}>Kanseller</Button>
                             </Col>
                             <Col sm={'3'}>
-                                <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
-                            </Col>
-                            <Col sm={'6'}>
                                 <Button type="button" variant={"success"}
                                         onClick={handleSubmit}>{disabled ? <Spinner
                                     className="mr-2"
@@ -405,6 +405,9 @@ export default function EditEvent() {
                                     size="sm"
                                     role="status"
                                     aria-hidden="true"/> : null}Lagre</Button>
+                            </Col>
+                            <Col sm={'4'}>
+                                <Button variant={"secondary"} onClick={handleCancel}>Avbryt</Button>
                             </Col>
                             {(error) ?
                                 <Alert style={{
@@ -424,11 +427,17 @@ export default function EditEvent() {
     );
 
     function handleDelete() {
-        if (window.confirm("Er du sikker på at du vil slette arrangementet? \nDette kan ikke angres")) {
+        if (window.confirm("Er du sikker på at du vil slette arrangementet? \n\nDette kan ikke angres")) {
             service.deleteEvent(eventId).then(() => {
                 history.push("/hjem");
                 alert("Arrangementet er nå slettet")
             });
+        }
+    }
+
+    function handleCancel() {
+        if (window.confirm("Er du sikker på at du vil avbryte? \n\neventuelle endringer vil ikke bli lagret.")) {
+            history.push('/hjem');
         }
     }
 
