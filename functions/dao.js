@@ -802,12 +802,6 @@ class Dao {
                     })
             });
 
-        /*model.GigModel.update(
-            {contract: contract},
-            { where: { gigId: gig, artistId: artist}}
-        );
-        model.update();*/
-
     }
 
 
@@ -833,12 +827,13 @@ class Dao {
     deleteGigs(eventId) {
         return model.GigModel.findAll({
             where: {eventId: eventId}
-        })
+        }).catch(() => false)
             .then(gigs => {
                 gigs.map(gig => {
-                    model.FileModel.findByPk(gig.contract)
+                    model.FileModel.findByPk(gig.contract).catch(() => false)
                         .then(result => {
                             filehandler.deleteFromCloud(result.name, false);
+                            return true;
                         })
                 });
             });
@@ -857,7 +852,14 @@ class Dao {
                 .then(contract => {
                     filehandler.deleteFromCloud(contract.name, false);
                     return model.FileModel.destroy({where: {fileId: contractId}}).then(() => {
-                        return model.GigModel.destroy({where: {eventId: eventId, artistId: artistId}}).then(() => true)
+                        return this.deleteRiderItems(eventId, artistId).then(() => {
+                            return model.GigModel.destroy({
+                                where: {
+                                    eventId: eventId,
+                                    artistId: artistId
+                                }
+                            }).then(() => true)
+                        })
                     })
                 })
         })
@@ -974,6 +976,22 @@ class Dao {
      */
     deleteRiderItem(eventId, artistId, item) {
         return model.RiderModel.destroy({where: {eventId: eventId, artistId: artistId, item: item}})
+            .then(() => true)
+            .catch(error => {
+                console.error(error);
+                return false;
+            })
+    }
+
+    /**
+     * retrieves the gig assosciated with an event, includes contract data and username/email of artist
+     *
+     * @param eventId
+     * @param artistId
+     * @returns {Promise<boolean>}
+     */
+    deleteRiderItems(eventId, artistId) {
+        return model.RiderModel.destroy({where: {eventId: eventId, artistId: artistId}})
             .then(() => true)
             .catch(error => {
                 console.error(error);
