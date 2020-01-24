@@ -270,8 +270,8 @@ export class MailForm extends Component {
     render() {
         if (this.state.toggleable) {
             return (
-                <div>
-                    <div className={"c-sm "}>
+                <div className={'text-center'}>
+                    <div className={""}>
                         <Card className="border-0 m-sm-5 mt-4 p-sm-4">
                             <div>
                                 <Button style={{marginBottom: "10px"}} className={"btn-primary"}
@@ -318,29 +318,29 @@ export class MailForm extends Component {
     toggleForm(on) {
         if (on && this.state.hasRecipients) {
             return (
-                <Form>
-                    <h1 className='h1 text-center'>Send en epost til flere </h1>
+                <Form className={'text-left'}>
                     {(this.state.error) ?
                         <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
                         <div style={{height: '3em'}}/>}
-                    <Form.Label>Mottaker:</Form.Label>
+                    <Form.Label>Mottakere:</Form.Label>
                     <Form.Control as="textarea" onChange={this.handleRecipientChange} value={this.state.recipientString}
-                                  placeholder={"mottakere"} rows="1" style={{display: 'flex'}}/>
-                    <Form.Label>Tittel:</Form.Label>
+                                  placeholder={"mottaker1@mail.com, mottaker2@mail.com"} rows="1"
+                                  style={{display: 'flex'}}/>
+                    <Form.Label>Emne:</Form.Label>
                     <Form.Control as="textarea" value={this.state.description} onChange={this.handleDescriptionChange}
-                                  placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                                  placeholder={"Emne. . ."} rows="2" style={{display: 'flex'}}/>
                     <Form.Label>Innhold:</Form.Label>
-                    <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
+                    <Form.Control as="textarea" onChange={this.handleTextChange} placeholder={"Innhold. . ."} rows="3"
                                   style={{display: 'flex'}}/>
                     <Button
-                        className={"btn-primary mt-2 mr-2"}
-                        onClick={() => this.sendMail(false)}>
-                        Send Email
-                    </Button>
-                    <Button
-                        className={"btn-secondary mt-2"}
+                        className={"btn-secondary mt-2 mr-2"}
                         onClick={() => this.props.history.pop()}>
                         Avbryt
+                    </Button>
+                    <Button
+                        className={"btn-primary mt-2"}
+                        onClick={() => this.sendMail(false)}>
+                        Send Email
                     </Button>
                 </Form>
             )
