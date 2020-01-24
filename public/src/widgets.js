@@ -348,32 +348,33 @@ export class MailForm extends Component {
             return null;
         } else {
             return <Form>
-                <h1 className='h1 text-center'>Send en epost </h1>
+                <h1 className='h1 text-center'>Send en feilmelding</h1>
                 {(this.state.error) ?
                     <Alert style={{height: '3em'}} variant={this.state.errorType}>{this.state.error}</Alert> :
                     <div style={{height: '3em'}}/>}
-                <Form.Label>Mail-adresse</Form.Label>
+                <Form.Label>Din epost</Form.Label>
                 <Form.Control required as="textarea" value={this.state.email} onChange={this.handleEmailChange}
-                              placeholder={"email"} rows="1" style={{display: 'flex'}}/>
-                <Form.Label>Tittel:</Form.Label>
+                              placeholder={"Din epost. . ."} rows="1" style={{display: 'flex'}}/>
+                <Form.Label>Emne:</Form.Label>
                 <Form.Control required as="textarea" value={this.state.description}
                               onChange={this.handleDescriptionChange}
-                              placeholder={"beskrivelse"} rows="2" style={{display: 'flex'}}/>
+                              placeholder={"Emne. . ."} rows="2" style={{display: 'flex'}}/>
                 <Form.Label>Innhold:</Form.Label>
-                <Form.Control required as="textarea" onChange={this.handleTextChange} placeholder={"tekst"} rows="3"
+                <Form.Control required as="textarea" onChange={this.handleTextChange} placeholder={"innhold. . ."}
+                              rows="3"
                               style={{display: 'flex'}}/>
                 <Button
-                    className={"btn-primary mt-2 mr-2"}
-                    onClick={() => this.sendMail(true)}>
-                    Send Email
-                </Button>
-                <Button
-                    className={"btn-secondary mt-2"}
+                    className={"btn-secondary mt-2 mr-2"}
                     onClick={() => {
                         let path = authService.loggedIn() ? '/hjem' : '/';
                         window.location = path;
                     }}>
                     Avbryt
+                </Button>
+                <Button
+                    className={"btn-primary mt-2"}
+                    onClick={() => this.sendMail(true)}>
+                    Send Email
                 </Button>
             </Form>
         }
