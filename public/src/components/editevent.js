@@ -32,6 +32,8 @@ const jwt = require("jsonwebtoken");
 
 export default function EditEvent() {
 
+    const [disabled, setDisabled] = useState(false);
+
     const {match, history} = useReactRouter();
     const [error, setError] = useState('');
     const [errorType, setErrorType] = useState('success');
@@ -149,6 +151,11 @@ export default function EditEvent() {
                 return;
             }
         }
+        if (disabled) {
+            return;
+        }
+        setDisabled(true);
+
         setMaxTime(moment('23:59', 'HH:mm').format('HH:mm'));
         setMinTime(moment('00:00', 'HH:mm').format('HH:mm'));
 
@@ -389,7 +396,8 @@ export default function EditEvent() {
                                 <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
                             </Col>
                             <Col sm={'6'}>
-                                <Button type="button" variant={"success"} onClick={handleSubmit}>Lagre</Button>
+                                <Button type="button" variant={"success"}
+                                        onClick={handleSubmit}>{disabled ? 'Lagrer...' : 'Lagre'}</Button>
                             </Col>
                             {(error) ?
                                 <Alert style={{
@@ -759,6 +767,7 @@ export default function EditEvent() {
             return;
         }
         let newTicket = new Ticket(eventId, ticketType, ticketPrice, ticketAmount);
+        setAddedTickets([...addedTickets, newTicket]);
         setTickets([...tickets, newTicket]);
         setTicketType('');
         setTicketPrice(0);
