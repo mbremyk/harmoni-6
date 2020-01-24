@@ -10,15 +10,22 @@ beforeEach(done => Models.syncTestData().then(() => done()));
  */
 
 describe('Login', () => {
-    it('Login Fail on wrong password', done => {
+    it('loginOk - fail - wrong password', done => {
         db.loginOk('steffen@mail.com', 'FeilPassord').then(ok => {
             expect(ok).toBeFalsy();
             done();
         });
     });
 
+    it('loginOk - fail - email doesnt exist', done => {
+        db.loginOk('finnesIkke@mail.com', 'ST').then(ok => {
+            expect(ok).toBeFalsy();
+            done();
+        });
+    });
 
-    it('Login Success on correct password', done => {
+
+    it('loginOk - success on correct password', done => {
         db.loginOk('steffen@mail.com', 'ST').then(ok => {
             expect(ok).toBeTruthy();
             done();
@@ -29,7 +36,7 @@ describe('Login', () => {
 
 describe('Users', () => {
 
-    it('create user', done => {
+    it('createUser', done => {
         let user = {
             username: 'TestBrukerCreated',
             password: 'Passord',
@@ -42,7 +49,7 @@ describe('Users', () => {
         });
     });
 
-    it('update user success', done => {
+    it('updateUser - success', done => {
         let user = {
             userId: '6',
             username: 'UPDATED',
@@ -55,7 +62,7 @@ describe('Users', () => {
         });
     });
 
-    it('update user fail - id doesnt exist', done => {
+    it('updateUser - fail', done => {
         let user = {
             userId: '-1',
             username: 'FAIL',
@@ -69,14 +76,21 @@ describe('Users', () => {
         });
     });
 
-    it('delete user', done => {
+    it('deleteUser', done => {
         db.deleteUser(5).then(response => {
             expect(response).toBeTruthy();
             done();
         });
     });
 
-    it('correct data in users', done => {
+    it('forgotPassword', done => {
+        db.forgotPassword('steffen@mail.com').then(response => {
+            expect(response).not.toBeNull();
+            done();
+        });
+    });
+
+    it('getAllUsers', done => {
         db.getAllUsers().then(users => {
             expect(users.length).toBe(9);
             done();
@@ -84,7 +98,7 @@ describe('Users', () => {
     });
 
 
-    it('find user by email', done => {
+    it('getUserByEmail', done => {
         db.getUserByEmail("steffen@mail.com").then(user => {
             expect({
                 userId: user.userId,
@@ -100,7 +114,7 @@ describe('Users', () => {
         });
     });
 
-    it('finds salt by email', done => {
+    it('getSaltByEmail', done => {
         db.getSaltByEmail('steffen@mail.com')
             .then(salt => {
                 expect(salt[0].dataValues)
@@ -109,7 +123,7 @@ describe('Users', () => {
             });
     });
 
-    it('find user by ID', done => {
+    it('getUserByID', done => {
         db.getUserById(1).then(user => {
             expect({
                 userId: user.userId,
@@ -125,7 +139,7 @@ describe('Users', () => {
         });
     });
 
-    it('finds user by email or username', done => {
+    it('getUserByEmailOrUsername', done => {
         db.getUserByEmailOrUsername('steffen@mail.com', 'Marius T')
             .then(users => {
                 expect([{
@@ -158,7 +172,7 @@ describe('Users', () => {
 
 describe('Events', () => {
 
-    it('create event', done => {
+    it('createEvent', done => {
         let event = {
             organizerId: 1,
             eventName: 'CREATE TEST',
@@ -177,7 +191,7 @@ describe('Events', () => {
         });
     });
 
-    it('finds events by organizerId', done => {
+    it('getEventsByOrganizerId', done => {
         db.getEventsByOrganizerId(2)
             .then(events => {
                 expect(events).toHaveLength(2);
@@ -214,7 +228,30 @@ describe('Events', () => {
             });
     });
 
-    it('finds event by eventId', done => {
+    it('getMyEventsByUserId', done => {
+        db.getMyEventsByUserId(2)
+            .then(events => {
+                expect(events.map(event => event.toJSON())
+                    .map(event => ({
+                        eventId: event.eventId,
+                        organizerId: event.organizerId,
+                        eventName: event.eventName,
+                        address: event.address,
+                        ageLimit: event.ageLimit,
+                    }))).toEqual([
+                    {
+                        eventId: 3,
+                        organizerId: 7, //Sivert
+                        eventName: 'D.D.E',
+                        address: 'Festningen',
+                        ageLimit: 18,
+                    }
+                ]);
+                done();
+            });
+    });
+
+    it('getEventsByEventId', done => {
         db.getEventByEventId(1)
             .then(event => {
                 expect({
@@ -223,22 +260,18 @@ describe('Events', () => {
                     eventName: event.eventName,
                     address: event.address,
                     ageLimit: event.ageLimit,
-                    startTime: event.startTime,
-                    endTime: event.endTime,
                 }).toEqual({
                     eventId: 1,
                     organizerId: 9, //Sabine
                     eventName: 'Fredagsquiz',
                     address: 'Ikke en faktisk addresse 1',
                     ageLimit: 0,
-                    startTime: 'Invalid date',
-                    endTime: 'Invalid date'
                 });
                 done();
             });
     });
 
-    it('update event success', done => {
+    it('updateEvent - success', done => {
         let event = {
             eventId: 5,
             organizerId: 7,
@@ -254,7 +287,7 @@ describe('Events', () => {
     });
 
 
-    it('update event fail', done => {
+    it('updateEvent - fail', done => {
         let event = {
             eventId: '-1',
             organizerId: '2',
@@ -269,7 +302,7 @@ describe('Events', () => {
         });
     });
 
-    it('cancels event', done => {
+    it('cancelEvent', done => {
         db.cancelEvent(1)
             .then(res => {
                 expect(res).toBeTruthy();
@@ -277,7 +310,7 @@ describe('Events', () => {
             });
     });
 
-    it('delete Event', done => {
+    it('deleteEvent', done => {
         db.deleteEvent(2).then(response => {
             expect(response).toBeTruthy();
             done();
@@ -285,7 +318,7 @@ describe('Events', () => {
     });
 
 
-    it('correct data in events', done => {
+    it('getAllEvents', done => {
         db.getAllEvents().then(events => {
             expect(events.length).toBe(5);
             done();
@@ -294,7 +327,7 @@ describe('Events', () => {
 });
 
 describe('Events - search', () => {
-    it('search several results', done => {
+    it('getEventsMatching - several results', done => {
         db.getEventsMatching('konsert').then(events => {
             expect(events.length).toBe(3);
             expect(events.map(event =>
@@ -318,7 +351,7 @@ describe('Events - search', () => {
     });
 
 
-    it('search one results', done => {
+    it('getEventsMatching - one result', done => {
         db.getEventsMatching('Kygo').then(events => {
             expect(events.length).toBe(1);
             expect({
@@ -331,7 +364,7 @@ describe('Events - search', () => {
     });
 
 
-    it('search with no results', done => {
+    it('getEventsMatching - no results', done => {
         db.getEventsMatching('Finnes ikke').then(events => {
             expect(events.length).toBe(0);
             done();
@@ -346,7 +379,7 @@ describe('Events - search', () => {
 
 
 describe('Personnel', () => {
-    it('add personnel[] to event', done => {
+    it('addPersonnel', done => {
         let personnel = [
             {
                 eventId: 1,
@@ -364,7 +397,7 @@ describe('Personnel', () => {
         });
     });
 
-    it('update personnel', done => {
+    it('updatePersonnel', done => {
         let personnel = [{
             eventId: 2,
             personnelId: 4,
@@ -376,14 +409,14 @@ describe('Personnel', () => {
         });
     });
 
-    it('remove personnel', done => {
+    it('removePersonnel', done => {
         db.removePersonnel(5, 3).then(response => {
             expect(response).toBeTruthy();
             done();
         });
     });
 
-    it('correct data in personnel', done => {
+    it('getPersonnel', done => {
         db.getPersonnel(4).then(personnel => {
             expect(personnel.length).toBe(2);
             expect(personnel.map(personnel =>
@@ -424,21 +457,21 @@ describe('Personnel', () => {
 
 
 describe('Tickets', () => {
-    it('create Ticket', done => {
-        let ticket = {
+    it('addTickets', done => {
+        let tickets = [{
             eventId: 4,
             type: 'CREATED',
             price: 69,
             amount: 69,
 
-        };
-        db.addTickets(ticket).then(response => {
+        }];
+        db.addTickets(tickets).then(response => {
             expect(response).toBeTruthy();
             done();
         });
     });
 
-    it('update Ticket', done => {
+    it('updateTickets', done => {
         let tickets = [{
             eventId: 4,
             type: 'Golden Circle',
@@ -451,14 +484,14 @@ describe('Tickets', () => {
         });
     });
 
-    it('remove Ticket', done => {
+    it('removeTicket', done => {
         db.removeTicket(1, 'Inngang').then(response => {
             expect(response).toBeTruthy();
             done();
         });
     });
 
-    it('correct data in tickets', done => {
+    it('getTickets', done => {
         db.getTickets(4).then(tickets => {
             expect(tickets.length).toBe(3);
             done();
@@ -473,7 +506,7 @@ describe('Tickets', () => {
 
 
 describe('Gigs', () => {
-    it('create Gig', done => {
+    it('addGig', done => {
         let gig = {
             eventId: 1,
             artistId: 2,
@@ -485,7 +518,25 @@ describe('Gigs', () => {
         });
     });
 
-    it('correct data in gig', done => {
+    it('getContract', done => {
+        db.getContract(2, 5).then(contract => {
+            expect(contract.map(contract =>
+                contract.toJSON()).map(contract => (
+                {
+                    name: contract.name,
+                    data: contract.data
+                }
+            ))).toEqual([
+                {
+                    name: 'Fil 2',
+                    data: 'DATA'
+                }
+            ]);
+        });
+        done();
+    });
+
+    it('getGigs', done => {
         db.getGigs(2).then(gigs => {
             expect(gigs.map(gig =>
                 gig.toJSON()).map(gig => (
@@ -504,9 +555,11 @@ describe('Gigs', () => {
         });
         done();
     });
+});
 
 
-    it('add riderItem', done => {
+describe('RiderItems', () => {
+    it('addRiderItems', done => {
         let item = [{
             eventId: 2,
             artistId: 5,
@@ -518,8 +571,14 @@ describe('Gigs', () => {
         });
     });
 
+    it('deleteRiderItem', done => {
+        db.deleteRiderItem(2, 5, 'Sigg').then(response => {
+            expect(response).toBeTruthy();
+            done();
+        });
+    });
 
-    it('update riderItems', done => {
+    it('updateRiderItems', done => {
         let items = [
             {
                 artistId: 5, //Magnus
@@ -551,7 +610,7 @@ describe('Gigs', () => {
         });
     });
 
-    it('correct riderItems', done => {
+    it('getRiderItems', done => {
         db.getRiderItems(2, 5).then(items => {
             expect(items.length).toBe(4);
             expect(items.map(item =>
@@ -592,3 +651,18 @@ describe('Gigs', () => {
     });
 });
 
+
+describe('Bugs', () => {
+    it('Create Bug', done => {
+        let bug = {
+            email: 'test@mail.com',
+            username: 'testUser',
+            subject: 'new bug',
+            bugText: 'it doesnt work'
+        };
+        db.createBug(bug).then(res => {
+            expect(res).toBeTruthy();
+        });
+        done();
+    });
+});
