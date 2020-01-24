@@ -180,10 +180,10 @@ export default function EditEvent() {
                                 {inputField("4", "By", "By. . .", city, setCity)}
                                 {textField("12", "Veibeskrivelse", "Veibeskrivelse. . .", placeDescription, setPlaceDescription)}
                                 {textField("12", "Beskrivelse", "Beskrivelse. . .", eventDescription, setEventDescription)}
-                                {minDateInput("4", "Fra: Dato", fDate, require('moment')().format('HH:mm'), tDate, setFDate)}
-                                {fromTimeInput("4", "Klokkeslett", fTime, maxTime, setFTime)}
-                                {maxDateInput("4", "Til:  Dato", tDate, fDate, setTDate)}
-                                {toTimeInput("4", "klokkeslett", tTime, minTime, setTTime)}
+                                {minDateInput("3", "Fra: Dato", fDate, require('moment')().format('HH:mm'), tDate, setFDate)}
+                                {fromTimeInput("3", "Klokkeslett", fTime, maxTime, setFTime)}
+                                {maxDateInput("3", "Til:  Dato", tDate, fDate, setTDate)}
+                                {toTimeInput("3", "klokkeslett", tTime, minTime, setTTime)}
 
                                 <Form.Group as={Col} sm={"12"}>
                                     <Form.Label>Aldersgrense</Form.Label>
