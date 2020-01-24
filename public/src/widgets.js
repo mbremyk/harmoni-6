@@ -42,7 +42,7 @@ export class EventInfo extends Component {
     formatTimeDate(timeDate) {
         let arr1 = timeDate.split('T');
         let dateArr = arr1[0].split('-');
-        return dateArr[2] + "." + dateArr[1] + "/" + dateArr[0] + " klokka: " + arr1[1].slice(0, 5);
+        return dateArr[2] + "." + dateArr[1] + "." + dateArr[0] + " klokka: " + arr1[1].slice(0, 5);
     }
 
     getCardFooter(myEvent) {
@@ -56,7 +56,7 @@ export class EventInfo extends Component {
                         Arragement</Button>
                 </Col>
             </Row>
-        } else return <small className="text-muted"> Publisert {this.props.uploaded}</small>
+        } else return <small className="text-muted"> Publisert {this.formatTimeDate(this.props.uploaded)}</small>
     }
 
     getImageOverlayTxt() {
