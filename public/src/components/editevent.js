@@ -389,7 +389,7 @@ export default function EditEvent() {
                                     </ListGroup.Item> : null}
                             </ListGroup>
                         </Card>
-                        <Row className={'mt-4'}>
+                        <Row className={'mt-4 text-center'}>
                             <Col sm={'3'}>
                                 <Button variant={"danger"} onClick={handleDelete}>Slett</Button>
                             </Col>

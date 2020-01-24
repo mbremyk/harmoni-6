@@ -356,7 +356,7 @@ export default function EditEvent() {
                                     </ListGroup.Item> : null}
                             </ListGroup>
                         </Card>
-                        <Row>
+                        <Row className={'mt-4 text-center'}>
                             <Col sm={'4'}>
                                 <Button variant={"secondary"} onClick={handleCancel}>Avbryt</Button>
                             </Col>
